@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="compile" name="pine">
+
+	<!-- Configure the directory into which the web application is built -->
+	<property name="build" value="${basedir}/build/classes" />
+
+	<!-- Configure the context path for this application -->
+	<property name="path" value="/pine" />
+
+	<!-- Configure properties to access the Manager application -->
+	<property name="url" value="http://localhost:8010/manager/text" />
+	<property name="username" value="admin" />
+	<property name="password" value="admin" />
+
+	<path id="pine.classpath">
+		<fileset dir="${basedir}/WebContent/WEB-INF/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Configure the custom Ant tasks for the Manager application -->
+	<taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask" />
+	<taskdef name="list" classname="org.apache.catalina.ant.ListTask" />
+	<taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask" />
+	<taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask" />
+	<taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask" />
+	<taskdef name="start" classname="org.apache.catalina.ant.StartTask" />
+	<taskdef name="stop" classname="org.apache.catalina.ant.StopTask" />
+	<taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask" />
+
+	<target name="clean">
+		<delete dir="${build}" />
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="build-number" depends="clean">
+		<property environment="env" />
+		<echo append="false" file="${build}/build-number.txt">${env.BUILD_NUMBER}</echo>
+	</target>
+
+	<target name="compile" depends="build-number" description="Compile web application">
+		<javac debug="true" destdir="${build}" includeantruntime="false">
+			<src path="src" />
+			<classpath refid="pine.classpath" />
+		</javac>
+	</target>
+
+	<target name="war" depends="compile">
+		<war destfile="${build}${path}.war" webxml="${basedir}/WebContent/WEB-INF/web.xml">
+			<fileset dir="${basedir}/WebContent" />
+			<lib dir="${basedir}/WebContent/WEB-INF/lib" />
+			<classes dir="${build}" />
+		</war>
+	</target>
+
+	<target name="deploy" description="Install web application" depends="war">
+		<deploy url="${url}" username="${username}" password="${password}" path="${path}" war="file:${build}${path}.war" />
+	</target>
+
+	<target name="reload" description="Reload web application" depends="war">
+		<reload url="${url}" username="${username}" password="${password}" path="${path}" />
+	</target>
+
+	<target name="undeploy" description="Remove web application">
+		<undeploy url="${url}" username="${username}" password="${password}" path="${path}" />
+	</target>
+
+</project>

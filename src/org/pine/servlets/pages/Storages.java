@@ -103,7 +103,7 @@ public class Storages extends HttpServlet {
 				out.print(ServletHelper.getContextMenus("storage"));
 				out.print(ServletHelper.getLoadingGif());
 			}
-			out.print(ServletHelper.getFooter(getServletContext().getRealPath(".")));
+			out.print(ServletHelper.getFooter(getServletContext().getRealPath("")));
 			out.print("</body>");
 			out.print("</html>");
 

@@ -30,7 +30,7 @@ public class ServletHelper {
 
 	public static String getFooter(String realPath) {
 		return "<div id=\"footer\" class=\"page-bottom\">" + "<br><br><span class=\"build\">Build: "
-				+ getContents(realPath + "/BUILD.txt") + "</span></div>";
+				+ getContents(realPath + "/VERSION.txt") + "</span></div>";
 	}
 	
 	private static String getContents(String path) {
@@ -44,14 +44,6 @@ public class ServletHelper {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			String realPath = "";
-			try {
-				realPath = new File(".").getCanonicalPath();
-
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			new IOException("!!! Real path: '" + realPath + "'").printStackTrace();
 		}
 
 		return content;

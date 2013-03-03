@@ -103,7 +103,7 @@ public class Tables extends HttpServlet {
 				out.print(ServletHelper.getContextMenus("table"));
 				out.print(ServletHelper.getLoadingGif());
 			}
-			out.print(ServletHelper.getFooter());
+			out.print(ServletHelper.getFooter(getServletContext().getRealPath(".")));
 			out.print("</body>");
 			out.print("</html>");
 

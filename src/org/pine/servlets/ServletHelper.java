@@ -1,12 +1,14 @@
 package org.pine.servlets;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.servlet.http.Part;
 
+import org.apache.commons.io.IOUtils;
 import org.pine.model.users.User;
-import org.pine.web.BuildNumber;
-
 
 public class ServletHelper {
 	public static boolean isXlsx(String fileName) {
@@ -26,9 +28,33 @@ public class ServletHelper {
 		return null;
 	}
 
-	public static String getFooter() {
-		return "<div id=\"footer\" class=\"page-bottom\">"
-				+ "<br><br><span class=\"build\">Pine Project.&nbsp;&nbsp;" + BuildNumber.getInstrance().getFromFile() + "</span></div>";
+	public static String getFooter(String realPath) {
+		return "<div id=\"footer\" class=\"page-bottom\">" + "<br><br><span class=\"build\">Build: "
+				+ getContents(realPath + "/BUILD.txt") + "</span></div>";
+	}
+	
+	private static String getContents(String path) {
+		String content = "";
+		try {
+			BufferedReader input = new BufferedReader(new FileReader(new File(path)));
+			try {
+				content = IOUtils.toString(input);
+			} finally {
+				input.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			String realPath = "";
+			try {
+				realPath = new File(".").getCanonicalPath();
+
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			new IOException("!!! Real path: '" + realPath + "'").printStackTrace();
+		}
+
+		return content;
 	}
 
 	public static String getLoadingGif() {

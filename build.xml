@@ -22,7 +22,7 @@
 
 	<target name="build-number" depends="clean">
 		<property environment="env" />
-		<echo append="false" file="${basedir}/BUILD.txt">${build}.${env.BUILD_NUMBER}</echo>
+		<echo append="false" file="${basedir}/WebContent/VERSION.txt">${version}.${env.BUILD_NUMBER}</echo>
 	</target>
 
 	<target name="compile" depends="build-number" description="Compile web application">

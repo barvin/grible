@@ -123,7 +123,7 @@ public class Import extends HttpServlet {
 					out.print("<div id=\"datastorage-import-response\">" + dataStorageImportResult + "</div>");
 				}
 			}
-			out.print(ServletHelper.getFooter(getServletContext().getRealPath(".")));
+			out.print(ServletHelper.getFooter(getServletContext().getRealPath("")));
 			out.print("</body>");
 			out.print("</html>");
 		}

@@ -120,7 +120,7 @@ public class Home extends HttpServlet {
 			}
 		}
 
-		out.println(ServletHelper.getFooter(getServletContext().getRealPath(".")));
+		out.println(ServletHelper.getFooter(getServletContext().getRealPath("")));
 		out.println("</body>");
 		out.println("</html>");
 

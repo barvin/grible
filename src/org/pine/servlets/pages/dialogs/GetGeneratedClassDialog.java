@@ -1,7 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Maksym Barvinskyi.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Maksym Barvinskyi - initial API and implementation
+ ******************************************************************************/
 package org.pine.servlets.pages.dialogs;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,11 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.pine.model.storages.DataStorage;
-import org.pine.model.storages.DataStorageKey;
-import org.pine.model.storages.DataStorageValue;
-import org.pine.sql.SQLHelper;
-
+import org.pine.dao.Dao;
+import org.pine.model.Key;
+import org.pine.model.Table;
+import org.pine.model.Value;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -24,8 +34,8 @@ import org.pine.sql.SQLHelper;
 @WebServlet("/GetGeneratedClassDialog")
 public class GetGeneratedClassDialog extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private SQLHelper sqlHelper;
-	private DataStorage storage;
+	private Dao dao;
+	private Table storage;
 	private String className;
 
 	/**
@@ -43,10 +53,14 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		sqlHelper = new SQLHelper();
+		dao = new Dao();
 
 		int id = Integer.parseInt(request.getParameter("id"));
-		storage = sqlHelper.getDataStorage(id);
+		try {
+			storage = dao.getTable(id);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		className = storage.getClassName();
 
 		out.println("<div id=\"generated-class-dialog\" class=\"ui-dialog\">");
@@ -79,99 +93,104 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 	private String getJavaClass() {
 		StringBuilder pack = new StringBuilder();
-		pack.append("<br>package com.company.descriptors;");
+		try {
+			pack.append("<br>package com.company.descriptors;");
 
-		StringBuilder imp = new StringBuilder();
-		imp.append("<br><br>import java.util.HashMap;");
-		imp.append("<br>import com.globallogic.zed.descriptors.BaseDescriptor;");
+			StringBuilder imp = new StringBuilder();
+			imp.append("<br><br>import java.util.HashMap;");
+			imp.append("<br>import com.globallogic.zed.descriptors.BaseDescriptor;");
 
-		boolean isListIncluded = false;
-		boolean isDataHelperIncluded = false;
+			boolean isListIncluded = false;
+			boolean isDataHelperIncluded = false;
 
-		StringBuilder header = new StringBuilder();
-		header.append("<br><br>public class ");
-		header.append(className);
-		header.append(" extends BaseDescriptor {");
+			StringBuilder header = new StringBuilder();
+			header.append("<br><br>public class ");
+			header.append(className);
+			header.append(" extends BaseDescriptor {");
 
-		StringBuilder fields = new StringBuilder("<br>");
-		StringBuilder methods = new StringBuilder();
-		StringBuilder constructor = new StringBuilder("<br><br>public ");
-		constructor.append(className);
-		constructor.append("(HashMap&lt;String, String&gt; data) {");
-		constructor.append("<br>super(data);");
+			StringBuilder fields = new StringBuilder("<br>");
+			StringBuilder methods = new StringBuilder();
+			StringBuilder constructor = new StringBuilder("<br><br>public ");
+			constructor.append(className);
+			constructor.append("(HashMap&lt;String, String&gt; data) {");
+			constructor.append("<br>super(data);");
 
-		List<DataStorageKey> keys = sqlHelper.getDataStorageKeys(storage.getId());
-		for (DataStorageKey key : keys) {
-			String keyName = key.getName();
-			String fieldName = StringUtils.uncapitalize(keyName);
-			String type = "String";
-			String method = "getString(\"" + keyName + "\");";
+			List<Key> keys = dao.getKeys(storage.getId());
+			for (Key key : keys) {
+				String keyName = key.getName();
+				String fieldName = StringUtils.uncapitalize(keyName);
+				String type = "String";
+				String method = "getString(\"" + keyName + "\");";
 
-			List<DataStorageValue> values = sqlHelper.getDataStorageValues(key);
-			if (key.getReferenceStorageId() == 0) {
-				if (isBoolean(values)) {
-					type = "boolean";
-					method = "getBoolean(\"" + keyName + "\");";
-				} else if (isInteger(values)) {
-					type = "int";
-					method = "getInt(\"" + keyName + "\");";
-				}
-			} else {
-				isDataHelperIncluded = true;
-				String refClassName = sqlHelper.getDataStorage(key.getReferenceStorageId()).getClassName();
-				if (semicoulumExists(values)) {
-					isListIncluded = true;
-					type = "List&lt;" + refClassName + "&gt;";
-					method = "DataHelper.getDescriptorsFromDC(" + refClassName + ".class, getString(\"" + keyName
-							+ "\"));";
+				List<Value> values = dao.getValues(key);
+				if (key.getReferenceTableId() == 0) {
+					if (isBoolean(values)) {
+						type = "boolean";
+						method = "getBoolean(\"" + keyName + "\");";
+					} else if (isInteger(values)) {
+						type = "int";
+						method = "getInt(\"" + keyName + "\");";
+					}
 				} else {
-					type = refClassName;
-					method = "DataHelper.getDescriptorFromDC(" + refClassName + ".class, getString(\"" + keyName
-							+ "\"));";
+					isDataHelperIncluded = true;
+					String refClassName;
+					refClassName = dao.getTable(key.getReferenceTableId()).getClassName();
+					if (semicoulumExists(values)) {
+						isListIncluded = true;
+						type = "List&lt;" + refClassName + "&gt;";
+						method = "DataHelper.getDescriptorsFromDC(" + refClassName + ".class, getString(\"" + keyName
+								+ "\"));";
+					} else {
+						type = refClassName;
+						method = "DataHelper.getDescriptorFromDC(" + refClassName + ".class, getString(\"" + keyName
+								+ "\"));";
+					}
 				}
+				fields.append("<br>private ").append(type).append(" ").append(fieldName).append(";");
+				constructor.append("<br>this.").append(fieldName).append(" = ").append(method);
+
+				methods.append("<br><br>public ").append(type).append(" get").append(keyName).append("() {<br>return ")
+						.append(fieldName).append(";<br>}");
 			}
-			fields.append("<br>private ").append(type).append(" ").append(fieldName).append(";");
-			constructor.append("<br>this.").append(fieldName).append(" = ").append(method);
 
-			methods.append("<br><br>public ").append(type).append(" get").append(keyName).append("() {<br>return ")
-					.append(fieldName).append(";<br>}");
+			if (isListIncluded) {
+				imp.append("<br>import java.util.List;");
+			}
+
+			if (isDataHelperIncluded) {
+				imp.append("<br>import com.globallogic.zed.data.DataHelper;");
+			}
+
+			constructor.append("<br>}");
+			pack.append(imp).append(header).append(fields).append(constructor).append(methods).append("<br>}");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-
-		if (isListIncluded) {
-			imp.append("<br>import java.util.List;");
-		}
-
-		if (isDataHelperIncluded) {
-			imp.append("<br>import com.globallogic.zed.data.DataHelper;");
-		}
-
-		constructor.append("<br>}");
-		pack.append(imp).append(header).append(fields).append(constructor).append(methods).append("<br>}");
-
 		return pack.toString();
 	}
 
-	private boolean semicoulumExists(List<DataStorageValue> values) {
+	private boolean semicoulumExists(List<Value> values) {
 		List<String> strValues = new ArrayList<>();
-		for (DataStorageValue value : values) {
+		for (Value value : values) {
 			strValues.add(value.getValue());
 		}
 		String allValues = StringUtils.join(strValues, "");
 		return allValues.contains(";");
 	}
 
-	private boolean isBoolean(List<DataStorageValue> values) {
+	private boolean isBoolean(List<Value> values) {
 		List<String> strValues = new ArrayList<>();
-		for (DataStorageValue value : values) {
+		for (Value value : values) {
 			strValues.add(value.getValue());
 		}
 		String allValues = StringUtils.join(strValues, "");
 		return allValues.matches("[true|false]+");
 	}
 
-	private boolean isInteger(List<DataStorageValue> values) {
+	private boolean isInteger(List<Value> values) {
 		List<String> strValues = new ArrayList<>();
-		for (DataStorageValue value : values) {
+		for (Value value : values) {
 			strValues.add(value.getValue());
 		}
 		String allValues = StringUtils.join(strValues, "");
@@ -180,68 +199,67 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 	private String getCSharpClass() {
 		StringBuilder imp = new StringBuilder();
-		imp.append("<br>using System.Collections.Generic;");
-		imp.append("<br>using Zed.Framework.Descriptors;");
+		try {
+			imp.append("<br>using System.Collections.Generic;");
+			imp.append("<br>using Your.Namespase.For.Descriptors;");
 
-		StringBuilder namespace = new StringBuilder();
-		namespace.append("<br><br>namespace Your.Namespase.For.Descriptors<br>{");
+			StringBuilder namespace = new StringBuilder();
+			namespace.append("<br><br>namespace Your.Namespase.For.Descriptors<br>{");
 
-		boolean isListIncluded = false;
-		boolean isDataHelperIncluded = false;
+			boolean isDataHelperIncluded = false;
 
-		StringBuilder header = new StringBuilder();
-		header.append("<br>public class ");
-		header.append(className);
-		header.append(" : BaseDescriptor<br>{");
+			StringBuilder header = new StringBuilder();
+			header.append("<br>public class ");
+			header.append(className);
+			header.append(" : BaseDescriptor<br>{");
 
-		StringBuilder properties = new StringBuilder();
-		StringBuilder constructor = new StringBuilder("<br><br>public ");
-		constructor.append(className);
-		constructor.append("(Dictionary&lt;string, string&gt; data) : base(data)<br>{");
+			StringBuilder properties = new StringBuilder();
+			StringBuilder constructor = new StringBuilder("<br><br>public ");
+			constructor.append(className);
+			constructor.append("(Dictionary&lt;string, string&gt; data) : base(data)<br>{");
 
-		List<DataStorageKey> keys = sqlHelper.getDataStorageKeys(storage.getId());
-		for (DataStorageKey key : keys) {
-			String keyName = key.getName();
-			String type = "string";
-			String method = "GetString(\"" + keyName + "\");";
+			List<Key> keys = dao.getKeys(storage.getId());
+			for (Key key : keys) {
+				String keyName = key.getName();
+				String type = "string";
+				String method = "GetString(\"" + keyName + "\");";
 
-			List<DataStorageValue> values = sqlHelper.getDataStorageValues(key);
-			if (key.getReferenceStorageId() == 0) {
-				if (isBoolean(values)) {
-					type = "bool";
-					method = "GetBoolean(\"" + keyName + "\");";
-				} else if (isInteger(values)) {
-					type = "int";
-					method = "GetInt(\"" + keyName + "\");";
-				}
-			} else {
-				isDataHelperIncluded = true;
-				String refClassName = sqlHelper.getDataStorage(key.getReferenceStorageId()).getClassName();
-				if (semicoulumExists(values)) {
-					isListIncluded = true;
-					type = "List&lt;" + refClassName + "&gt;";
-					method = "DataHelper.GetDescriptorsFromDC&lt;" + refClassName + "&gt;(GetString(\"" + keyName
-							+ "\"));";
+				List<Value> values = dao.getValues(key);
+				if (key.getReferenceTableId() == 0) {
+					if (isBoolean(values)) {
+						type = "bool";
+						method = "GetBoolean(\"" + keyName + "\");";
+					} else if (isInteger(values)) {
+						type = "int";
+						method = "GetInt(\"" + keyName + "\");";
+					}
 				} else {
-					type = refClassName;
-					method = "DataHelper.GetDescriptorFromDC&lt;" + refClassName + "&gt;(GetString(\"" + keyName
-							+ "\"));";
+					isDataHelperIncluded = true;
+					String refClassName = dao.getTable(key.getReferenceTableId()).getClassName();
+					if (semicoulumExists(values)) {
+						type = "List&lt;" + refClassName + "&gt;";
+						method = "DataHelper.GetDescriptorsFromDC&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+								+ "\"));";
+					} else {
+						type = refClassName;
+						method = "DataHelper.GetDescriptorFromDC&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+								+ "\"));";
+					}
 				}
+				properties.append("<br>public ").append(type).append(" ").append(keyName)
+						.append(" { get; private set; }");
+				constructor.append("<br>").append(keyName).append(" = ").append(method);
 			}
-			properties.append("<br>public ").append(type).append(" ").append(keyName).append(" { get; private set; }");
-			constructor.append("<br>").append(keyName).append(" = ").append(method);
-		}
 
-		if (isListIncluded) {
-			//imp.append("<br>using Zed.Framework.Descriptors;");
-		}
+			if (isDataHelperIncluded) {
+				imp.append("<br>using Zed.Framework.Data;");
+			}
 
-		if (isDataHelperIncluded) {
-			imp.append("<br>using Zed.Framework.Data;");
+			constructor.append("<br>}");
+			imp.append(namespace).append(header).append(properties).append(constructor).append("<br>}").append("<br>}");
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-
-		constructor.append("<br>}");
-		imp.append(namespace).append(header).append(properties).append(constructor).append("<br>}").append("<br>}");
 
 		return imp.toString();
 	}

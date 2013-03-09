@@ -1,8 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Maksym Barvinskyi.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Maksym Barvinskyi - initial API and implementation
+ ******************************************************************************/
 package org.pine.servlets.users;
 
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.pine.model.users.User;
-import org.pine.sql.SQLHelper;
+import org.pine.dao.Dao;
+import org.pine.model.User;
 
 
 /**
@@ -34,12 +45,17 @@ public class Login extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		SQLHelper sqlHelper = new SQLHelper();
+		Dao dao = new Dao();
 
 		String userName = request.getParameter("username");
 		String actualPass = request.getParameter("pass");
 
-		User user = sqlHelper.getUserByName(userName);
+		User user = null;
+		try {
+			user = dao.getUserByName(userName);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		if (user != null) {
 			MessageDigest md;
 			try {

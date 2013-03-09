@@ -3,13 +3,19 @@ html {
 		transparent;
 	overflow-y: scroll;
 	font-family: arial, sans-serif;
-	font-size: 14px;
+	font-size: 12px;
 	overflow-y: scroll;
 	color: #151B1B;
 }
 
 body {
-	padding: 15px;
+	padding: 15px 15px 0 15px;
+	margin-bottom: 0px;
+}
+
+img#logo-mini {
+	margin-top: 2px;
+	float: left;
 }
 
 .header-text {
@@ -19,6 +25,10 @@ body {
 
 #title {
 	color: #367F86;
+}
+
+#footer {
+	margin-top: 15px;
 }
 
 #product-name {
@@ -46,11 +56,11 @@ a:hover {
 
 .product {
 	background-color: #F0F0F0;
-	width: 300px;
-	padding: 15px;
+	width: 250px;
+	padding: 10px;
 	margin: 15px 15px 15px 0;
 	color: #49493E;
-	font-size: 20px;
+	font-size: 15px;
 	font-weight: bold;
 }
 
@@ -61,11 +71,11 @@ a:hover {
 
 .section {
 	background-color: #F0F0F0;
-	width: 300px;
-	padding: 15px;
+	width: 250px;
+	padding: 10px;
 	margin: 15px 15px 15px 0;
 	color: #49493E;
-	font-size: 20px;
+	font-size: 15px;
 	font-weight: bold;
 }
 
@@ -93,7 +103,7 @@ a:hover {
 }
 
 .entities-list {
-	width: 300px;
+	width: 250px;
 }
 
 .entities-values {
@@ -119,12 +129,12 @@ a:hover {
 }
 
 .ui-cell {
-	padding: 10px;
+	padding: 8px;
 	border: 1px solid #DDDDDD;
 }
 
 .ui-cell-mini {
-	padding: 7px;
+	padding: 6px;
 	border: 1px solid #DDDDDD;
 }
 
@@ -140,10 +150,10 @@ a:hover {
 .data-item {
 	background-color: #F0F0F0;
 	color: #367F86;
-	font-size: 16px;
+	font-size: 13px;
 	font-weight: bold;
 	margin-right: 10px;
-	padding: 10px;
+	padding: 8px;
 	margin-left: 15px;
 	margin-bottom: 5px;
 }
@@ -163,10 +173,10 @@ a:hover {
 .category-item {
 	background-color: #F0F0F0;
 	color: #49493E;
-	font-size: 18px;
+	font-size: 15px;
 	font-weight: bold;
 	margin: 10px 10px 10px 0;
-	padding: 10px;
+	padding: 8px;
 }
 
 .category-item-selected {
@@ -346,15 +356,19 @@ a:hover {
 	background-color: #7F774F;
 }
 
+#login-form {
+	position: absolute;
+	padding: 5px;
+	font-size: 14px;
+}
+
+#login-logo {
+	margin-bottom: 20px;
+}
+
 .ui-dialog {
 	background-color: #F0F0F0;
 	border: 1px solid #888888;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	margin: auto;
-	padding: 5px;
 	position: absolute;
 	padding: 5px;
 }
@@ -371,12 +385,6 @@ a:hover {
 
 .storage-cell {
 	color: #0066c5;
-}
-
-.page-bottom {
-	position: absolute;
-	top: 90%;
-	left: 20px;
 }
 
 .users-header-row {
@@ -411,62 +419,7 @@ a:hover {
 }
 
 #user-panel {
-	text-align: right;
-}
-
-#login-dialog {
-	width: 250px;
-	height: 160px;
-}
-
-#error-dialog {
-	width: 600px;
-	height: 400px;
-}
-
-#add-data-storage-dialog {
-	width: 300px;
-	height: 215px;
-}
-
-#add-data-table-dialog {
-	width: 300px;
-	height: 182px;
-}
-
-#edit-data-storage-dialog {
-	width: 350px;
-	height: 222px;
-}
-
-#edit-data-table-dialog {
-	width: 350px;
-	height: 162px;
-}
-
-#edit-category-dialog {
-	width: 250px;
-	height: 125px;
-}
-
-#add-category-dialog {
-	width: 250px;
-	height: 125px;
-}
-
-#fill-dialog {
-	width: 250px;
-	height: 125px;
-}
-
-#generated-class-dialog {
-	width: 800px;
-	height: 800px;
-}
-
-#edit-user-dialog {
-	width: 360px;
-	height: 300px;
+	float: right;
 }
 
 .dialog-buttons {
@@ -487,6 +440,8 @@ a:hover {
 }
 
 .dialog-error-message {
+	display: none;
+	font-size: 16px;
 	color: #C03300;
 }
 
@@ -494,7 +449,6 @@ a:hover {
 	background-color: #FFFFFF;
 	border: 1px solid #C0C0C0;
 	padding: 10px 20px;
-	height: 642px;
 	overflow: auto;
 	font-family: Consolas, 'Lucida Console', 'Bitstream Vera Sans Mono',
 		'DejaVu Sans Mono', monospace;

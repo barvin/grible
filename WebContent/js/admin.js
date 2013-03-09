@@ -63,7 +63,11 @@ $()
 								userid : $userid
 							}, function(data) {
 								if (data == "success") {
+									alert("User was deleted.");									
 									location.reload(true);
+								} else if (data == "gohome") {
+									alert("User was deleted.");
+									window.location = "../";
 								} else {
 									alert(data);
 								}
@@ -122,13 +126,22 @@ $()
 				});
 
 function initOneButtonDialog() {
+	initDialog();
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
 	});
 }
 
-function initEditUserDialog() {
+function initDialog() {
+	var $dialog = $(".ui-dialog");
+	var $posTop = ($(window).height() - $dialog.height()) / 2;
+	var $posLeft = ($(window).width() - $dialog.width()) / 2;
+	$dialog.css("top", $posTop);
+	$dialog.css("left", $posLeft);
+}
 
+function initEditUserDialog() {
+	initDialog();
 	$(".btn-update-user").click(function() {
 		var isFormCorrect = true;
 

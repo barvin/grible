@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Maksym Barvinskyi.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Maksym Barvinskyi - initial API and implementation
+ ******************************************************************************/
 package org.pine.servlets;
 
 import java.io.BufferedReader;
@@ -8,7 +18,7 @@ import java.io.IOException;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
-import org.pine.model.users.User;
+import org.pine.model.User;
 
 public class ServletHelper {
 	public static boolean isXlsx(String fileName) {
@@ -29,7 +39,7 @@ public class ServletHelper {
 	}
 
 	public static String getFooter(String realPath) {
-		return "<div id=\"footer\" class=\"page-bottom\">" + "<br><br><span class=\"build\">Build: "
+		return "<div id=\"footer\" class=\"page-bottom\">" + "<span class=\"build\">Build: "
 				+ getContents(realPath + "/VERSION.txt") + "</span></div>";
 	}
 	
@@ -65,10 +75,10 @@ public class ServletHelper {
 		return builder.toString();
 	}
 
-	public static String getContextMenus(String dataType) {
+	public static String getContextMenus(String tableType) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
-		builder.append("<li class=\"add\"><a href=\"#add\">Add data " + dataType + "</a></li>");
+		builder.append("<li class=\"add\"><a href=\"#add\">Add data " + tableType + "</a></li>");
 		builder.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
 		builder.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
 		builder.append("</ul>");

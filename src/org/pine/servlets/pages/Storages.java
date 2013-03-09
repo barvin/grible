@@ -1,7 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Maksym Barvinskyi.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Maksym Barvinskyi - initial API and implementation
+ ******************************************************************************/
 package org.pine.servlets.pages;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,12 +20,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.pine.dao.Dao;
 import org.pine.model.Product;
-import org.pine.model.users.User;
+import org.pine.model.User;
 import org.pine.servlets.ServletHelper;
-import org.pine.sql.SQLHelper;
-import org.pine.web.Sections;
-
+import org.pine.uimodel.Sections;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -31,13 +41,15 @@ public class Storages extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		try{
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		SQLHelper sqlHelper = new SQLHelper();
+		Dao dao = new Dao();
 
 		if (request.getSession(false) == null) {
 			response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
@@ -59,33 +71,35 @@ public class Storages extends HttpServlet {
 			out.print("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 
 			String userName = (String) request.getSession(false).getAttribute("userName");
-			User user = sqlHelper.getUserByName(userName);
+			User user = dao.getUserByName(userName);
 
 			int productId;
-			int dataTypeId;
+			int tableId;
 			if (request.getParameter("id") != null) {
-				dataTypeId = Integer.parseInt(request.getParameter("id"));
-				productId = sqlHelper.getProductIdByDataStorageId(dataTypeId);
+				tableId = Integer.parseInt(request.getParameter("id"));
+				productId = dao.getProductIdByPrimaryTableId(tableId);
 			} else {
 				productId = Integer.parseInt(request.getParameter("product"));
-				dataTypeId = 0;
+				tableId = 0;
 			}
 
 			if (!user.hasAccessToProduct(productId)) {
-				out.print("<a href=\".\"><span id=\"title\" class=\"header-text\">Pine</span></a>");
-				out.print("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
+				out.println("<a href=\".\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+				out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
+				out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 			} else {
 				out.print("<script type=\"text/javascript\">");
 				out.print("var productId = \"" + productId + "\";");
-				out.print("var dataTypeId = \"" + dataTypeId + "\";");
-				out.print("var dataType = \"storage\";");
+				out.print("var tableId = \"" + tableId + "\";");
+				out.print("var tableType = \"storage\";");
 				out.print("</script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
 
 				out.print("</head>");
 				out.print("<body>");
 				out.print(ServletHelper.getUserPanel(user));
-				includeHeader(out, "storages", sqlHelper.getProduct(productId));
+				includeHeader(out, "storages", dao.getProduct(productId));
 
 				out.print("<div id=\"main\" class=\"table\">");
 				out.print("<div class=\"table-row\">");
@@ -110,10 +124,14 @@ public class Storages extends HttpServlet {
 			out.flush();
 			out.close();
 		}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
@@ -124,7 +142,7 @@ public class Storages extends HttpServlet {
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		out.print("<a href=\"/pine\"><span id=\"title\" class=\"header-text\">Pine</span></a>");
+		out.print("<a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
 		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		out.print("<a href=\"/pine/?product=" + product.getId() + "\">");
 		out.print("<span id=\"product-name\" class=\"header-text\">" + productName + "</span></a>");

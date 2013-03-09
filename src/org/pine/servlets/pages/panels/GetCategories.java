@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Maksym Barvinskyi.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Maksym Barvinskyi - initial API and implementation
+ ******************************************************************************/
 package org.pine.servlets.pages.panels;
 
 import java.io.IOException;
@@ -10,12 +20,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.pine.model.files.Category;
-import org.pine.model.files.DataFile;
-import org.pine.model.storages.DataStorage;
-import org.pine.model.storages.StorageCategory;
-import org.pine.sql.SQLHelper;
-
+import org.pine.dao.Dao;
+import org.pine.model.Category;
+import org.pine.model.Table;
+import org.pine.model.TableType;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -37,44 +45,25 @@ public class GetCategories extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		int productId = Integer.parseInt(request.getParameter("productId"));
-		int dataTypeId = Integer.parseInt(request.getParameter("dataTypeId"));
-		String dataType = request.getParameter("dataType");
-		SQLHelper sqlHelper = new SQLHelper();
+		try {
+			response.setContentType("text/html");
+			PrintWriter out = response.getWriter();
+			int productId = Integer.parseInt(request.getParameter("productId"));
+			int tableId = Integer.parseInt(request.getParameter("tableId"));
+			String strTableType = request.getParameter("tableType");
+			Dao dao = new Dao();
 
-		if (dataType.equals("storage")) {
-			List<StorageCategory> categories = sqlHelper.getStorageCategories(productId);
-			for (StorageCategory category : categories) {
-				List<DataStorage> dataSotages = sqlHelper.getDataStoragesByCategoryId(category.getId());
-				boolean categorySelected = false;
-				for (DataStorage dataSotage : dataSotages) {
-					if (dataSotage.getId() == dataTypeId) {
-						categorySelected = true;
-						break;
-					}
-				}
-				String categorySelectedClass = "";
-				if (categorySelected) {
-					categorySelectedClass = " category-item-selected";
-				}
-				out.print("<h3 id=\"" + category.getId() + "\" class=\"category-item" + categorySelectedClass + "\">" + category.getName()
-						+ "</h3><div>");
-				for (DataStorage dataSotage : dataSotages) {
-					String selected = (dataSotage.getId() == dataTypeId) ? " data-item-selected" : "";
-					out.print("<div id=\"" + dataSotage.getId() + "\" class=\"data-item" + selected + "\">"
-							+ dataSotage.getName() + "</div>");
-				}
-				out.print("</div>");
+			TableType tableType = TableType.valueOf(strTableType.toUpperCase());
+			if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
+				tableType = TableType.TABLE;
+				tableId = dao.getTable(tableId).getParentId();
 			}
-		} else {
-			List<Category> categories = sqlHelper.getCategories(productId);
+			List<Category> categories = dao.getCategories(productId, tableType);
 			for (Category category : categories) {
-				List<DataFile> dataFiles = sqlHelper.getDataFiles(category.getId());
+				List<Table> tables = dao.getTablesByCategoryId(category.getId());
 				boolean categorySelected = false;
-				for (DataFile dataFile : dataFiles) {
-					if (dataFile.getId() == dataTypeId) {
+				for (Table table : tables) {
+					if (table.getId() == tableId) {
 						categorySelected = true;
 						break;
 					}
@@ -85,16 +74,18 @@ public class GetCategories extends HttpServlet {
 				}
 				out.print("<h3 id=\"" + category.getId() + "\" class=\"category-item" + categorySelectedClass + "\">"
 						+ category.getName() + "</h3><div>");
-				for (DataFile dataFile : dataFiles) {
-					String selected = (dataFile.getId() == dataTypeId) ? " data-item-selected" : "";
-					out.print("<div id=\"" + dataFile.getId() + "\"	 class=\"data-item" + selected + "\">"
-							+ dataFile.getName() + "</div>");
+				for (Table table : tables) {
+					String selected = (table.getId() == tableId) ? " data-item-selected" : "";
+					out.print("<div id=\"" + table.getId() + "\" class=\"data-item" + selected + "\">"
+							+ table.getName() + "</div>");
 				}
 				out.print("</div>");
 			}
-		}
 
-		out.flush();
-		out.close();
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

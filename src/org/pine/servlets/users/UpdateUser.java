@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Maksym Barvinskyi.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v2.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * 
+ * Contributors:
+ *     Maksym Barvinskyi - initial API and implementation
+ ******************************************************************************/
 package org.pine.servlets.users;
 
 import java.io.IOException;
@@ -11,9 +21,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.pine.model.users.User;
-import org.pine.sql.SQLHelper;
-
+import org.pine.dao.Dao;
+import org.pine.model.User;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -35,42 +44,47 @@ public class UpdateUser extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		SQLHelper sqlHelper = new SQLHelper();
+		try {
+			response.setContentType("text/html");
+			PrintWriter out = response.getWriter();
+			Dao dao = new Dao();
 
-		String userId = request.getParameter("userid");
-		String userName = request.getParameter("username");
-		String strPass = request.getParameter("pass");
-		boolean isAdmin = Boolean.parseBoolean(request.getParameter("isadmin"));
+			String userId = request.getParameter("userid");
+			String userName = request.getParameter("username");
+			String strPass = request.getParameter("pass");
+			boolean isAdmin = Boolean.parseBoolean(request.getParameter("isadmin"));
 
-		User user = sqlHelper.getUserById(Integer.parseInt(userId));
+			User user;
+			user = dao.getUserById(Integer.parseInt(userId));
 
-		if (!user.getName().equals(userName)) {
-			sqlHelper.updateUserName(user.getId(), userName);
-		}
-
-		if (!strPass.equals("")) {
-			MessageDigest md;
-			try {
-				md = MessageDigest.getInstance("MD5");
-				md.update(strPass.getBytes());
-				String hashPass = new String(md.digest());
-				sqlHelper.updateUserPassword(user.getId(), hashPass);
-			} catch (NoSuchAlgorithmException e) {
-				out.print("ERROR: " + e.getMessage());
-				e.printStackTrace();
+			if (!user.getName().equals(userName)) {
+				dao.updateUserName(user.getId(), userName);
 			}
-		}
 
-		if (user.isAdmin() != isAdmin) {
-			sqlHelper.updateUserIsAdmin(user.getId(), isAdmin);
-		}
+			if (!strPass.equals("")) {
+				MessageDigest md;
+				try {
+					md = MessageDigest.getInstance("MD5");
+					md.update(strPass.getBytes());
+					String hashPass = new String(md.digest());
+					dao.updateUserPassword(user.getId(), hashPass);
+				} catch (NoSuchAlgorithmException e) {
+					out.print("ERROR: " + e.getMessage());
+					e.printStackTrace();
+				}
+			}
 
-		if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
-			String[] productIds = request.getParameterValues("productIds[]");
-			sqlHelper.updateUserPermissions(user.getId(), productIds);
+			if (user.isAdmin() != isAdmin) {
+				dao.updateUserIsAdmin(user.getId(), isAdmin);
+			}
+
+			if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
+				String[] productIds = request.getParameterValues("productIds[]");
+				dao.updateUserPermissions(user.getId(), productIds);
+			}
+			out.print("success");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		out.print("success");
 	}
 }

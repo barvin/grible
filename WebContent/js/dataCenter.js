@@ -4,25 +4,26 @@ function initialize() {
 
 	$(document).ajaxError(
 			function(e, xhr, settings, exception) {
+				var exrrorText = xhr.responseText.substring(xhr.responseText.indexof("<h1>"));
 				$("body").append(
 						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>'
-								+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url + '<br><br>'
-								+ xhr.responseText + '<br><br>' + '<div class="right">'
+								+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url + exrrorText
+								+ '<br><br>' + '<div class="right">'
 								+ '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
 				initOneButtonDialog(jQuery);
 			});
 
 	$.post("../GetCategories", {
 		productId : productId,
-		dataTypeId : dataTypeId,
-		dataType : dataType
+		tableId : tableId,
+		tableType : tableType
 	}, function(data) {
 		$("#waiting-bg").remove();
 		$("#footer").removeClass("page-bottom");
 		$("#category-container").html(data);
 		$(".entities-list").append(
 				'<span class="top-panel-button button-enabled" id="btn-add-category"><img src="../img/add-icon.png"'
-						+ 'class="top-panel-icon"> Add category</span>');
+						+ 'class="top-panel-icon">&nbsp;&nbsp;Add category</span>');
 
 		initDataItemsPanel(jQuery);
 	});
@@ -49,20 +50,18 @@ function initDataItemsPanel() {
 		$("#waiting").addClass("loading");
 		$(".data-item-selected").find("span.changed-sign").remove();
 		$(".data-item-selected").removeClass("data-item-selected");
+		$("#btn-edit-data-item").removeClass("button-disabled");
+		$("#btn-edit-data-item").addClass("button-enabled");
 		$(this).addClass("data-item-selected");
-		var $id = $(this).attr('id');
+		tableId = $(this).attr('id');
 		history.pushState({
-			id : $id
-		}, "", "?id=" + $id);
-		if (dataType == "storage") {
-			loadTopPanel({});
-			loadDataStorageTable($id);
-		} else {
-			loadTopPanel({
-				datafileid : $id
-			});
-			loadDataFileTable($id, "general");
-		}
+			id : tableId
+		}, "", "?id=" + tableId);
+		loadTopPanel({
+			tabletype : tableType,
+			tableid : tableId
+		});
+		loadTableValues(tableId);
 	});
 
 	$(".category-item")
@@ -73,7 +72,7 @@ function initDataItemsPanel() {
 					function(action, el, pos) {
 						var $id = $(el).attr("id");
 						var $className = "";
-						if (dataType == "storage") {
+						if (tableType == "storage") {
 							$className = '<div class="table-row"><div class="table-cell dialog-cell">'
 									+ 'Class name:</div><div class="table-cell dialog-cell"><input class="data-storage-class-name dialog-edit"></div>'
 									+ '</div>';
@@ -82,10 +81,10 @@ function initDataItemsPanel() {
 							$("body")
 									.append(
 											'<div id="add-data-'
-													+ dataType
+													+ tableType
 													+ '-dialog" class="ui-dialog">'
 													+ '<div class="ui-dialog-title">Add data '
-													+ dataType
+													+ tableType
 													+ '</div>'
 													+ '<div class="ui-dialog-content">'
 													+ '<div class="table">'
@@ -95,7 +94,7 @@ function initDataItemsPanel() {
 													+ $className
 													+ '</div>'
 													+ '<br/>The data '
-													+ dataType
+													+ tableType
 													+ ' will be added to the category "'
 													+ $(el).text()
 													+ '".'
@@ -127,18 +126,12 @@ function initDataItemsPanel() {
 						} else if (action == "delete") {
 							var answer = confirm("Are you sure you want to delete this category?");
 							if (answer) {
-								var $servlet;
-								if (dataType == "storage") {
-									$servlet = "../DeleteStorageCategory";
-								} else {
-									$servlet = "../DeleteCategory";
-								}
-								$.post($servlet, {
+								$.post("../DeleteCategory", {
 									id : $id
 								}, function(data) {
 									if (data == "success") {
 										alert("Category was deleted.");
-										window.location = "../product=" + productId;
+										window.location = "?product=" + productId;
 									} else {
 										alert(data);
 									}
@@ -166,46 +159,48 @@ function initDataItemsPanel() {
 						initAddCategoryDialog(jQuery);
 					});
 
-	if (dataTypeId > 0) {
+	if (tableId > 0) {
 		$("#waiting").addClass("loading");
-		if (dataType == "storage") {
-			loadTopPanel({});
-			loadDataStorageTable(dataTypeId);
-		} else {
-			loadTopPanel({
-				datafileid : dataTypeId
-			});
-			loadDataFileTable(dataTypeId, "general");
-		}
+		loadTopPanel({
+			tabletype : tableType,
+			tableid : tableId
+		});
+		loadTableValues(tableId);
 	}
+}
 
+function initDialog() {
+	var $dialog = $(".ui-dialog");
+	var $posTop = ($(window).height() - $dialog.height()) / 2;
+	var $posLeft = ($(window).width() - $dialog.width()) / 2;
+	$dialog.css("top", $posTop);
+	$dialog.css("left", $posLeft);
 }
 
 function initAddDataItemDialog() {
-
+	initDialog();
 	$("input.data-item-name").focus();
 
 	$("#dialog-btn-add-data-item").click(function() {
 		var $id = $(this).attr("category-id");
-		var $servlet;
 		var $args;
-		if (dataType == "storage") {
-			$servlet = "../AddDataStorage";
+		if (tableType == "storage") {
 			$args = {
+				tabletype : tableType,
 				categoryid : $id,
 				name : $("input.data-item-name").val(),
 				classname : $("input.data-storage-class-name").val()
 			};
 		} else {
-			$servlet = "../AddDataFile";
 			$args = {
+				tabletype : "table",
 				categoryid : $id,
 				name : $("input.data-item-name").val()
 			};
 		}
-		$.post($servlet, $args, function() {
+		$.post("../AddTable", $args, function(newTableId) {
 			$("#add-category-dialog").remove();
-			location.reload(true);
+			window.location = "?id=" + newTableId;
 		});
 	});
 
@@ -215,7 +210,7 @@ function initAddDataItemDialog() {
 }
 
 function initFillDialog() {
-
+	initDialog();
 	$("input.fill-value").focus();
 
 	$("#dialog-btn-fill").click(function() {
@@ -245,17 +240,12 @@ function initFillDialog() {
 }
 
 function initAddCategoryDialog() {
-
+	initDialog();
 	$("input.category-name").focus();
 
 	$("#dialog-btn-add-category").click(function() {
-		var $servlet;
-		if (dataType == "storage") {
-			$servlet = "../InsertStorageCategory";
-		} else {
-			$servlet = "../InsertCategory";
-		}
-		$.post($servlet, {
+		$.post("../AddCategory", {
+			tabletype : tableType,
 			product : productId,
 			name : $("input.category-name").val()
 		}, function(data) {
@@ -274,18 +264,12 @@ function initAddCategoryDialog() {
 }
 
 function initEditCategoryDialog() {
-
+	initDialog();
 	$("input.category-name").focus();
 
 	$("#dialog-btn-edit-category").click(function() {
 		var $id = $(this).attr("category-id");
-		var $servlet;
-		if (dataType == "storage") {
-			$servlet = "../UpdateStorageCategory";
-		} else {
-			$servlet = "../UpdateCategory";
-		}
-		$.post($servlet, {
+		$.post("../UpdateCategory", {
 			id : $id,
 			name : $("input.category-name").val()
 		}, function(data) {
@@ -304,6 +288,7 @@ function initEditCategoryDialog() {
 }
 
 function initOneButtonDialog() {
+	initDialog();
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
 	});
@@ -318,19 +303,20 @@ function loadTopPanel(args) {
 
 function initTopPanel() {
 
-	var $id;
-	if ($(".data-item-selected").length > 0) {
-		$id = $(".data-item-selected").attr("id");
-	} else {
-		$id = dataTypeId;
-	}
-
-	if (dataType == "table") {
+	if ((tableType == "table") || (tableType == "precondition") || (tableType == "postcondition")) {
 		$(".sheet-tab").click(function() {
 			$(".sheet-tab-selected").removeClass("sheet-tab-selected");
 			$(this).addClass("sheet-tab-selected");
-			var $sheet = $(this).attr("label");
-			loadDataFileTable($id, $sheet);
+			tableId = $(this).attr('id');
+			tableType = $(this).attr('label');
+			history.pushState({
+				id : tableId
+			}, "", "?id=" + tableId);
+			loadTopPanel({
+				tabletype : tableType,
+				tableid : tableId
+			});
+			loadTableValues(tableId);
 		});
 	}
 
@@ -357,30 +343,16 @@ function initTopPanel() {
 						modifiedKeyIds[i] = $(this).attr('id');
 						modifiedKeyNumbers[i] = i + 1;
 					});
-					if (dataType == "storage") {
-						$.post("../SaveStorage", {
-							modkeyids : modifiedKeyIds,
-							modkeynumbers : modifiedKeyNumbers
-						}, function(data) {
-							if (data == "success") {
-								loadDataStorageTable($id);
-							} else {
-								alert(data);
-							}
-						});
-					} else {
-						$.post("../SaveDataFile", {
-							sheet : $(".sheet-tab-selected").attr("label"),
-							modkeyids : modifiedKeyIds,
-							modkeynumbers : modifiedKeyNumbers
-						}, function(data) {
-							if (data == "success") {
-								loadDataFileTable($id, $(".sheet-tab-selected").attr("label"));
-							} else {
-								alert(data);
-							}
-						});
-					}
+					$.post("../SaveTable", {
+						modkeyids : modifiedKeyIds,
+						modkeynumbers : modifiedKeyNumbers
+					}, function(data) {
+						if (data == "success") {
+							loadTableValues(tableId);
+						} else {
+							alert(data);
+						}
+					});
 				}
 
 			});
@@ -393,44 +365,34 @@ function initTopPanel() {
 	});
 
 	$("#btn-add-preconditions").click(function() {
-		$.post("../AddPreconditions", {
-			id : $id
-		}, function() {
-			loadTopPanel({
-				datafileid : $id
-			});
-			$(".sheet-tab[label='preconditions']").click();
+		$.post("../AddTable", {
+			parentid : tableId,
+			tabletype : "precondition"
+		}, function(newTableId) {
+			window.location = "?id=" + newTableId;
 		});
 	});
 
 	$("#btn-add-postconditions").click(function() {
-		$.post("../AddPostconditions", {
-			id : $id
-		}, function() {
-			loadTopPanel({
-				datafileid : $id
-			});
-			$(".sheet-tab[label='postconditions']").click();
+		$.post("../AddTable", {
+			parentid : tableId,
+			tabletype : "postcondition"
+		}, function(newTableId) {
+			window.location = "?id=" + newTableId;
 		});
 	});
 
 	$("#btn-delete-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
-			var answer = confirm("Are you sure you want to delete this data " + dataType + "?");
+			var answer = confirm("Are you sure you want to delete this " + tableType + "?");
 			if (answer) {
-				var $servlet;
-				if (dataType == "storage") {
-					$servlet = "../DeleteStorage";
-				} else {
-					$servlet = "../DeleteDataFile";
-				}
-				$.post($servlet, {
-					id : $id
+				$.post("../DeleteTable", {
+					id : tableId
 				}, function(data) {
 					if (data == "success") {
 						$("#section-name").click();
 					} else {
-						alert(data);
+						window.location = "?id=" + data;
 					}
 				});
 			}
@@ -467,47 +429,25 @@ function initTopPanel() {
 				modifiedKeyIds[i] = $(this).attr('id');
 				modifiedKeyValues[i] = $(this).text();
 			});
-			if (dataType == "storage") {
-				$.post("../SaveStorage", {
-					ids : modifiedIds,
-					values : modifiedValues,
-					keyids : modifiedKeyIds,
-					keyvalues : modifiedKeyValues,
-				}, function(data) {
-					if (data == "success") {
-						loadDataStorageTable($id);
-					} else {
-						alert(data);
-					}
-				});
-			} else {
-				$.post("../SaveDataFile", {
-					sheet : $(".sheet-tab-selected").attr("label"),
-					ids : modifiedIds,
-					values : modifiedValues,
-					keyids : modifiedKeyIds,
-					keyvalues : modifiedKeyValues,
-				}, function(data) {
-					if (data == "success") {
-						loadDataFileTable($id, $(".sheet-tab-selected").attr("label"));
-					} else {
-						alert(data);
-					}
-				});
-			}
+			$.post("../SaveTable", {
+				ids : modifiedIds,
+				values : modifiedValues,
+				keyids : modifiedKeyIds,
+				keyvalues : modifiedKeyValues,
+			}, function(data) {
+				if (data == "success") {
+					loadTableValues(tableId);
+				} else {
+					alert(data);
+				}
+			});
 		}
 	});
 
 	$("#btn-edit-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
-			var $servlet;
-			if (dataType == "storage") {
-				$servlet = "../GetEditDataStorageDialog";
-			} else {
-				$servlet = "../GetEditDataFileDialog";
-			}
-			$.post($servlet, {
-				id : $id
+			$.post("../GetEditTableDialog", {
+				id : tableId
 			}, function(data) {
 				$("body").append(data);
 				initEditDataItemDialog(jQuery);
@@ -518,7 +458,7 @@ function initTopPanel() {
 	$("#btn-class-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
 			$.post("../GetGeneratedClassDialog", {
-				id : $id
+				id : tableId
 			}, function(data) {
 				$("body").append(data);
 				initGeneratedClassDialog(jQuery);
@@ -529,37 +469,29 @@ function initTopPanel() {
 }
 
 function initEditDataItemDialog() {
+	initDialog();
 	$("input.data-item-name").focus();
 
 	$("#dialog-btn-edit-data-item").click(function() {
 
-		var $id;
-		if ($(".data-item-selected").length > 0) {
-			$id = $(".data-item-selected").attr("id");
-		} else {
-			$id = dataTypeId;
-		}
-		var $categoryid = $("select.categories").find("option:selected").attr('value');
-		var $servlet;
+		var $categoryid = $("select.categories").find("option:selected").val();
 		var $args;
-		if (dataType == "storage") {
-			$servlet = "../EditDataStorage";
+		if (tableType == "storage") {
 			$args = {
-				id : $id,
+				id : tableId,
 				categoryid : $categoryid,
 				usage : $("input.usage").is("input:checked"),
 				name : $("input.data-item-name").val(),
-				classname : $("input.data-storage-class-name").attr("value")
+				classname : $("input.data-storage-class-name").val()
 			};
 		} else {
-			$servlet = "../EditDataFile";
 			$args = {
-				id : $id,
+				id : tableId,
 				categoryid : $categoryid,
 				name : $("input.data-item-name").val()
 			};
 		}
-		$.post($servlet, $args, function(data) {
+		$.post("../EditTable", $args, function(data) {
 			if (data == "success") {
 				$(".ui-dialog").remove();
 				location.reload(true);
@@ -577,47 +509,38 @@ function initEditDataItemDialog() {
 function initGeneratedClassDialog() {
 	$("#tabs").tabs();
 
+	var $dialog = $("#generated-class-dialog");
+	var $dilogMaxWidth = 700;
+	if ($(window).width() < $dilogMaxWidth) {
+		$dialog.width($(window).width());
+	} else {
+		$dialog.width($dilogMaxWidth);
+	}
+	$dialog.height($(window).height() * 0.8);
+	$dialog.find(".tab-content").height($dialog.height() - 154);
+	var $posTop = ($(window).height() - $dialog.height()) / 2;
+	var $posLeft = ($(window).width() - $dialog.width()) / 2;
+	$dialog.css("top", $posTop);
+	$dialog.css("left", $posLeft);
+
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
 	});
 }
 
-function loadDataFileTable(id, sheet) {
-	if (sheet == "general") {
-		$.post("../GetDataFileValues?id=" + id, function(data) {
-			$(".entities-values").html(data);
-			initValuesTable(jQuery);
-		});
-	} else if (sheet == "preconditions") {
-		$.post("../GetPreconditions?id=" + id, function(data) {
-			$(".entities-values").html(data);
-			initValuesTable(jQuery);
-		});
-	} else {
-		$.post("../GetPostconditions?id=" + id, function(data) {
-			$(".entities-values").html(data);
-			initValuesTable(jQuery);
-		});
-	}
-}
-
-function loadDataStorageTable(id) {
-	$.post("../GetStorageValues?id=" + id, function(data) {
+function loadTableValues(id) {
+	$.post("../GetTableValues", {
+		id : id
+	}, function(data) {
 		$(".entities-values").html(data);
-		initValuesTable(jQuery);
+		initTableValues(jQuery);
 	});
 }
 
-function initValuesTable() {
+function initTableValues() {
 
 	$("#waiting").removeClass("loading");
-
-	var $id;
-	if ($(".data-item-selected").length > 0) {
-		$id = $(".data-item-selected").attr("id");
-	} else {
-		$id = dataTypeId;
-	}
+	loadFooter();
 
 	$("html").click(function() {
 		if ($(".selected-cell").length > 0) {
@@ -637,30 +560,16 @@ function initValuesTable() {
 				modifiedRowIds[i] = $(this).attr('id');
 				modifiedRowNumbers[i] = $(this).text();
 			});
-			if (dataType == "storage") {
-				$.post("../SaveStorage", {
-					rowids : modifiedRowIds,
-					rownumbers : modifiedRowNumbers
-				}, function(data) {
-					if (data == "success") {
-						loadDataStorageTable($id);
-					} else {
-						alert(data);
-					}
-				});
-			} else {
-				$.post("../SaveDataFile", {
-					sheet : $(".sheet-tab-selected").attr("label"),
-					rowids : modifiedRowIds,
-					rownumbers : modifiedRowNumbers
-				}, function(data) {
-					if (data == "success") {
-						loadDataFileTable($id, $(".sheet-tab-selected").attr("label"));
-					} else {
-						alert(data);
-					}
-				});
-			}
+			$.post("../SaveTable", {
+				rowids : modifiedRowIds,
+				rownumbers : modifiedRowNumbers
+			}, function(data) {
+				if (data == "success") {
+					loadTableValues(tableId);
+				} else {
+					alert(data);
+				}
+			});
 		}
 	});
 
@@ -673,21 +582,10 @@ function initValuesTable() {
 			$key.find("div.tooltip").remove();
 		}
 		var $content = $key.text();
-		var $args;
-		if (dataType == "storage") {
-			$args = {
-				product : productId,
-				storageid : $key.attr('id'),
-				content : $content
-			};
-		} else {
-			$args = {
-				product : productId,
-				datafileid : $(this).attr('id'),
-				sheet : $(".sheet-tab-selected").attr('label'),
-				content : $content
-			};
-		}
+		var $args = {
+			keyid : $key.attr('id'),
+			content : $content
+		};
 		$.post("../GetParameterTypeDialog", $args, function(data) {
 			$key.html(data);
 			$key.find("input.changed-value").focus();
@@ -695,24 +593,15 @@ function initValuesTable() {
 		});
 	});
 
-	$(".storage-cell").hover(function() {
+	$(".storage-cell:not(.modified-value-cell)").hover(function() {
 		var $value = $(this);
 		if (($value.has("div.tooltip").length == 0) && ($value.has("span.old-value").length == 0)) {
 			$("#waiting").addClass("loading");
 			$content = $value.text();
-			var $args;
-			if (dataType == "storage") {
-				$args = {
-					storagevalueid : $value.attr('id'),
-					content : $content
-				};
-			} else {
-				$args = {
-					datafilevalueid : $value.attr('id'),
-					sheet : $(".sheet-tab-selected").attr('label'),
-					content : $content
-				};
-			}
+			var $args = {
+				id : $value.attr('id'),
+				content : $content
+			};
 			$.post("../GetStorageTooltip", $args, function(data) {
 				$("#waiting").removeClass("loading");
 				var $widthRight = $(document).width() - $value.position().left - 35;
@@ -762,79 +651,37 @@ function initValuesTable() {
 	$(".index-cell").contextMenu({
 		menu : "rowMenu"
 	}, function(action, el, pos) {
-		var $id;
-		if ($(".data-item-selected").length > 0) {
-			$id = $(".data-item-selected").attr("id");
-		} else {
-			$id = dataTypeId;
-		}
 		var $rowId = $(el).attr("id");
 		if (action == "add") {
-			if (dataType == "storage") {
-				$.post("../InsertDataStorageRow", {
-					rowid : $rowId
-				}, function(data) {
-					if (data == "success") {
-						loadDataStorageTable($id);
-					} else {
-						alert(data);
-					}
-				});
-			} else {
-				$.post("../InsertDataFileRow", {
-					rowid : $rowId
-				}, function(data) {
-					if (data == "success") {
-						loadDataFileTable($id, "general");
-					} else {
-						alert(data);
-					}
-				});
-			}
+			$.post("../InsertRow", {
+				rowid : $rowId
+			}, function(data) {
+				if (data == "success") {
+					loadTableValues(tableId);
+				} else {
+					alert(data);
+				}
+			});
 		} else if (action == "copy") {
-			if (dataType == "storage") {
-				$.post("../CopyDataStorageRow", {
-					rowid : $rowId
-				}, function(data) {
-					if (data == "success") {
-						loadDataStorageTable($id);
-					} else {
-						alert(data);
-					}
-				});
-			} else {
-				$.post("../CopyDataFileRow", {
-					rowid : $rowId
-				}, function(data) {
-					if (data == "success") {
-						loadDataFileTable($id, "general");
-					} else {
-						alert(data);
-					}
-				});
-			}
+			$.post("../CopyRow", {
+				rowid : $rowId
+			}, function(data) {
+				if (data == "success") {
+					loadTableValues(tableId);
+				} else {
+					alert(data);
+				}
+			});
 		} else if (action == "delete") {
-			if (dataType == "storage") {
-				$.post("../DeleteDataStorageRow", {
-					rowid : $rowId
-				}, function(data) {
-					if (data == "success") {
-						loadDataStorageTable($id);
-					} else {
-						alert(data);
-					}
-				});
-			} else {
-				$.post("../DeleteDataFileRow", {
-					rowid : $rowId
-				}, function(data) {
-					if (data == "success") {
-						loadDataFileTable($id, "general");
-					} else {
-						alert(data);
-					}
-				});
-			}
+			$.post("../DeleteRow", {
+				rowid : $rowId
+			}, function(data) {
+				if (data == "success") {
+					loadTableValues(tableId);
+				} else {
+					alert(data);
+				}
+			});
 		}
 	});
 
@@ -851,81 +698,36 @@ function enableKeyContextMenu() {
 					},
 					function(action, el, pos) {
 						var $keyId = $(el).attr("id");
-						var $id;
-						if ($(".data-item-selected").length > 0) {
-							$id = $(".data-item-selected").attr("id");
-						} else {
-							$id = dataTypeId;
-						}
 						if (action == "add") {
-							if (dataType == "storage") {
-								$.post("../InsertDataStorageKey", {
-									keyid : $keyId
-								}, function(data) {
-									if (data == "success") {
-										loadDataStorageTable($id);
-									} else {
-										alert(data);
-									}
-								});
-							} else {
-								$.post("../InsertDataFileKey", {
-									keyid : $keyId,
-									sheet : $(".sheet-tab-selected").attr("label")
-								}, function(data) {
-									if (data == "success") {
-										loadDataFileTable($id, $(".sheet-tab-selected").attr("label"));
-									} else {
-										alert(data);
-									}
-								});
-							}
+							$.post("../InsertKey", {
+								keyid : $keyId
+							}, function(data) {
+								if (data == "success") {
+									loadTableValues(tableId);
+								} else {
+									alert(data);
+								}
+							});
 						} else if (action == "copy") {
-							if (dataType == "storage") {
-								$.post("../CopyDataStorageKey", {
-									keyid : $keyId,
-								}, function(data) {
-									if (data == "success") {
-										loadDataStorageTable($id);
-									} else {
-										alert(data);
-									}
-								});
-							} else {
-								$.post("../CopyDataFileKey", {
-									keyid : $keyId,
-									sheet : $(".sheet-tab-selected").attr("label")
-								}, function(data) {
-									if (data == "success") {
-										loadDataFileTable($id, $(".sheet-tab-selected").attr("label"));
-									} else {
-										alert(data);
-									}
-								});
-							}
+							$.post("../CopyKey", {
+								keyid : $keyId,
+							}, function(data) {
+								if (data == "success") {
+									loadTableValues(tableId);
+								} else {
+									alert(data);
+								}
+							});
 						} else if (action == "delete") {
-							if (dataType == "storage") {
-								$.post("../DeleteDataStorageKey", {
-									keyid : $keyId,
-								}, function(data) {
-									if (data == "success") {
-										loadDataStorageTable($id);
-									} else {
-										alert(data);
-									}
-								});
-							} else {
-								$.post("../DeleteDataFileKey", {
-									keyid : $keyId,
-									sheet : $(".sheet-tab-selected").attr("label")
-								}, function(data) {
-									if (data == "success") {
-										loadDataFileTable($id, $(".sheet-tab-selected").attr("label"));
-									} else {
-										alert(data);
-									}
-								});
-							}
+							$.post("../DeleteKey", {
+								keyid : $keyId,
+							}, function(data) {
+								if (data == "success") {
+									loadTableValues(tableId);
+								} else {
+									alert(data);
+								}
+							});
 						} else if (action == "fill") {
 							var $columnNumber = -1;
 							$(".key-cell").each(function(i) {
@@ -952,16 +754,11 @@ function enableKeyContextMenu() {
 						}
 					});
 
-	if (dataType == "table") {
-		if (($(".sheet-tab-selected").attr("label") == "preconditions")
-				|| ($(".sheet-tab-selected").attr("label") == "postconditions")) {
-			$("#keyMenu").enableContextMenuItems("#add,#delete");
-			$("#keyMenu").disableContextMenuItems("#copy,#fill");
-		} else {
-			$("#keyMenu").enableContextMenuItems("#add,#copy,#fill,#delete");
-		}
-	} else {
+	if ((tableType == "table") || (tableType == "storage")) {
 		$("#keyMenu").enableContextMenuItems("#add,#copy,#fill,#delete");
+	} else {
+		$("#keyMenu").enableContextMenuItems("#add,#delete");
+		$("#keyMenu").disableContextMenuItems("#copy,#fill");
 	}
 }
 
@@ -1005,46 +802,22 @@ function initEditableKeyCell() {
 	$(".btn-apply-type").click(function() {
 		var $id = $(this).parent().parent().attr('id');
 		var $dialog = $(this).parent();
-		var $type = $dialog.find("input:checked").attr('value');
-		var $storageId = $dialog.find("option:selected").attr('value');
-		var $dataTypeId;
-		if ($(".data-item-selected").length > 0) {
-			$dataTypeId = $(".data-item-selected").attr("id");
-		} else {
-			$dataTypeId = dataTypeId;
-		}
-		if (dataType == "storage") {
-			$.post("../ApplyStorageParameterType", {
-				keyId : $id,
-				type : $type,
-				storageId : $storageId
-			}, function(data) {
-				if (data == "success") {
-					alert("New type was successfully applied.");
-					loadDataStorageTable($dataTypeId);
-				} else if (data == "not-changed") {
-					alert("This parameter is already has that type.");
-				} else {
-					alert(data);
-				}
-			});
-		} else {
-			$.post("../ApplyDataFileParameterType", {
-				keyId : $id,
-				type : $type,
-				storageId : $storageId,
-				sheet : $(".sheet-tab-selected").attr("label")
-			}, function(data) {
-				if (data == "success") {
-					alert("New type was successfully applied.");
-					loadDataFileTable($dataTypeId, $(".sheet-tab-selected").attr('label'));
-				} else if (data == "not-changed") {
-					alert("This parameter is already has that type.");
-				} else {
-					alert(data);
-				}
-			});
-		}
+		var $type = $dialog.find("input:checked").val();
+		var $storageId = $dialog.find("option:selected").val();
+		$.post("../ApplyParameterType", {
+			keyId : $id,
+			type : $type,
+			storageId : $storageId
+		}, function(data) {
+			if (data == "success") {
+				alert("New type was successfully applied.");
+				loadTableValues(tableId);
+			} else if (data == "not-changed") {
+				alert("This parameter is already has that type.");
+			} else {
+				alert(data);
+			}
+		});
 	});
 }
 

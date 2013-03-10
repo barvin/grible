@@ -14,7 +14,8 @@ CREATE TABLE categories (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     productid integer NOT NULL,
-    parentid integer
+    parentid integer,
+    type integer NOT NULL
 );
 ALTER TABLE public.categories OWNER TO postgres;
 
@@ -258,6 +259,9 @@ ALTER TABLE ONLY categories
 
 ALTER TABLE ONLY categories
     ADD CONSTRAINT categories_productid_fkey FOREIGN KEY (productid) REFERENCES products(id);
+
+ALTER TABLE ONLY categories
+    ADD CONSTRAINT categories_type_fkey FOREIGN KEY (type) REFERENCES tabletypes(id);
 
 
 ALTER TABLE ONLY keys

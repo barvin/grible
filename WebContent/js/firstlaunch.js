@@ -3,12 +3,14 @@ $(window).on(
 		function() {
 
 			$("input[value='false']").click(function() {
+				$(".showninfo").css("display", "none");
 				$(".hiddeninfo").show();
 				$("#btn-createdb").val("Connect to database");
 			});
 
 			$("input[value='true']").click(function() {
 				$(".hiddeninfo").css("display", "none");
+				$(".showninfo").show();
 				$("#btn-createdb").val("Create database");
 			});
 

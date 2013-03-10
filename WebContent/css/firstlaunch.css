@@ -75,13 +75,16 @@ body {
 	width: 100%;
 	padding: 15px;
 	color: #FFFFFF;
-	height: 250px;
+	height: 200px;
 	overflow: auto;
 	font-family: "Courier New", Courier, monospace;
 }
 
-.hiddeninfo {
+.info {
 	font-size: 13px;
+}
+
+.hiddeninfo {
 	display: none;
 }
 

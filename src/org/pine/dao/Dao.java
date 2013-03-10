@@ -1093,4 +1093,14 @@ public class Dao {
 		conn.close();
 		stmt.close();
 	}
+
+	public ResultSet executeSelect(String query) throws SQLException {
+		ResultSet result = null;
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		result = stmt.executeQuery(query);
+		conn.close();
+		stmt.close();
+		return result;
+	}
 }

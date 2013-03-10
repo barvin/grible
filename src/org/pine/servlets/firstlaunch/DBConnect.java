@@ -54,7 +54,8 @@ public class DBConnect extends HttpServlet {
 				GlobalSettings.getInstance().setDbPswd(dbpswd);
 			}
 		} catch (Exception e) {
-			e.printStackTrace(out);
+			out.print("ERROR: " + e.getLocalizedMessage());
+			e.printStackTrace();
 		} finally {
 			out.flush();
 			out.close();

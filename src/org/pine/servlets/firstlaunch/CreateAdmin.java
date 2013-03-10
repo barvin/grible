@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
 import org.pine.model.User;
+import org.pine.settings.GlobalSettings;
 
 /**
  * Servlet implementation class CreateAdmin
@@ -65,7 +66,9 @@ public class CreateAdmin extends HttpServlet {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace(out);
+			GlobalSettings.getInstance().eraseDbSettings();
+			out.print("ERROR: " + e.getLocalizedMessage());
+			e.printStackTrace();
 		} finally {
 			out.flush();
 			out.close();

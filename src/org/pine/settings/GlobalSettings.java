@@ -82,4 +82,16 @@ public class GlobalSettings {
 		}
 		return false;
 	}
+
+	/**
+	 * Makes DB settings null, so that system would launch "firstlaunch" page.
+	 * Use this method for exceptions during creating database.
+	 */
+	public void eraseDbSettings() {
+		setDbHost(null);
+		setDbPort(null);
+		setDbName(null);
+		setDbLogin(null);
+		setDbPswd(null);
+	}
 }

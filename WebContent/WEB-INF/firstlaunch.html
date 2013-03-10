@@ -18,7 +18,7 @@
 	</p>
 	<div class="setting-table">
 		<input type="radio" name="createnewdb" value="true" checked="checked">Install
-		new Pine database<br> <input type="radio" name="createnewdb"
+		new Pine database<span class="showninfo info"> *</span><br> <input type="radio" name="createnewdb"
 			value="false">Already have the Pine database, just
 		reinstalling the application
 		<div class="table">
@@ -55,7 +55,7 @@
 				</div>
 			</div>
 			<div class="table-row">
-				<div class="table-cell dialog-cell">Pine administrator name<span class="hiddeninfo"> * </span>:</div>
+				<div class="table-cell dialog-cell">Pine administrator name<span class="hiddeninfo info"> * </span>:</div>
 				<div class="table-cell dialog-cell">
 					<input class="dialog-edit" name="pinelogin" value="admin">
 				</div>
@@ -69,8 +69,9 @@
 				</div>
 			</div>
 		</div>
-		<span class="hiddeninfo"><br>* If the user
+		<span class="hiddeninfo info"><br>* If the user
 						with this name already exists, the password will be updated.</span>
+		<span class="showninfo info"><br>* Note: database should be created in advance on the specified host.</span>
 		<div class="dialog-buttons right">
 			<input id="btn-createdb" type="button" value="Create database"
 				class="ui-button">

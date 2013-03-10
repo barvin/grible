@@ -78,7 +78,7 @@ public class SaveDBSettings extends HttpServlet {
 			bw.write(result);
 			bw.close();
 
-			out.println("Done.");
+			out.print("Done.");
 
 		} catch (Exception e) {
 			e.printStackTrace(out);

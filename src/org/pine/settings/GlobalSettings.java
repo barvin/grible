@@ -10,33 +10,63 @@
  ******************************************************************************/
 package org.pine.settings;
 
-import org.pine.excel.TempVars;
+import java.io.File;
+
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
 
 public class GlobalSettings {
 	private static GlobalSettings settings;
+	private String configFilePath;
 	private String dbhost;
 	private String dbport;
 	private String dbname;
 	private String dblogin;
 	private String dbpswd;
 
-	private GlobalSettings() {
-		ConfigParser configParser = new ConfigParser(TempVars.getLocalRootPath());
-		setDbHost(configParser.getDbhost());
-		setDbPort(configParser.getDbport());
-		setDbName(configParser.getDbname());
-		setDbLogin(configParser.getDblogin());
-		setDbPswd(configParser.getDbpswd());
+	private GlobalSettings() throws Exception {
 	}
 
-	public static GlobalSettings getInstance() {
+	public boolean init(String localRootPath) throws Exception {
+		if (this.configFilePath == null) {
+			this.configFilePath = localRootPath + "/WEB-INF/config.xml";
+		}
+		if (!configFileExists()) {
+			return false;
+		}
+		if (hasNulls()) {
+			setDbSettingsFromFile();
+		}
+		return true;
+	}
+
+	private boolean configFileExists() {
+		return new File(configFilePath).exists();
+	}
+
+	private void setDbSettingsFromFile() throws Exception {
+		Builder parser = new Builder();
+		Document doc = null;
+		doc = parser.build(configFilePath);
+		if (doc != null) {
+			Element database = doc.getRootElement().getFirstChildElement("database");
+			this.dbhost = database.getFirstChildElement("dbhost").getValue();
+			this.dbport = database.getFirstChildElement("dbport").getValue();
+			this.dbname = database.getFirstChildElement("dbname").getValue();
+			this.dblogin = database.getFirstChildElement("dblogin").getValue();
+			this.dbpswd = database.getFirstChildElement("dbpswd").getValue();
+		}
+	}
+
+	public static GlobalSettings getInstance() throws Exception {
 		if (settings == null) {
 			settings = new GlobalSettings();
 		}
 		return settings;
 	}
 
-	public String getDbHost() {
+	public String getDbHost() throws Exception {
 		return dbhost;
 	}
 
@@ -44,7 +74,7 @@ public class GlobalSettings {
 		this.dbhost = dbhost;
 	}
 
-	public String getDbPort() {
+	public String getDbPort() throws Exception {
 		return dbport;
 	}
 
@@ -52,7 +82,7 @@ public class GlobalSettings {
 		this.dbport = dbport;
 	}
 
-	public String getDbName() {
+	public String getDbName() throws Exception {
 		return dbname;
 	}
 
@@ -60,7 +90,7 @@ public class GlobalSettings {
 		this.dbname = dbname;
 	}
 
-	public String getDbLogin() {
+	public String getDbLogin() throws Exception {
 		return dblogin;
 	}
 
@@ -68,7 +98,7 @@ public class GlobalSettings {
 		this.dblogin = dblogin;
 	}
 
-	public String getDbPswd() {
+	public String getDbPswd() throws Exception {
 		return dbpswd;
 	}
 
@@ -94,4 +124,5 @@ public class GlobalSettings {
 		setDbLogin(null);
 		setDbPswd(null);
 	}
+
 }

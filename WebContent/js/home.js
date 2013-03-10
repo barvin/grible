@@ -34,11 +34,70 @@ $(window)
 										initAddProductDialog(jQuery);
 									});
 
+					$(".product-item")
+							.contextMenu(
+									{
+										menu : 'productMenu'
+									},
+									function(action, el, pos) {
+										var $id = $(el).attr("id");
+										if (action == "edit") {
+											$("body")
+													.append(
+															'<div id="edit-product-dialog" class="ui-dialog">'
+																	+ '<div class="ui-dialog-title">Edit product</div>'
+																	+ '<div class="ui-dialog-content">'
+																	+ '<div class="table">'
+																	+ '<div class="table-row"><div class="table-cell dialog-cell">'
+																	+ 'Name:</div><div class="table-cell dialog-cell"><input class="product-name dialog-edit" value="'
+																	+ $(el).text()
+																	+ '"></div>'
+																	+ '</div>'
+																	+ '</div>'
+																	+ '<div class="dialog-buttons right">'
+																	+ '<button id="dialog-btn-edit-product" product-id="'
+																	+ $id
+																	+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
+																	+ '</div></div></div>');
+											initEditProductDialog(jQuery);
+										} else if (action == "delete") {
+											var answer = confirm("Are you sure you want to delete this product?");
+											if (answer) {
+												$.post("DeleteProduct", {
+													id : $id
+												}, function(data) {
+													if (data == "success") {
+														alert("Product was deleted.");
+														location.reload(true);
+													} else {
+														alert(data);
+													}
+												});
+											}
+										}
+									});
+
+					$(".section").each(function(i) {
+						if ($(this).width() < 250) {
+							$(this).css("padding-right", (250 - $(this).width()) + "px");
+						}
+					});
+
 					function initAddProductDialog() {
 						initDialog();
 						$("input.product-name").focus();
 
+						$("input.product-name").keypress(function(event) {
+							if (event.which === 13) {
+								submitAddProduct();
+							}
+						});
+
 						$("#dialog-btn-add-product").click(function() {
+							submitAddProduct();
+						});
+
+						function submitAddProduct() {
 							$.post("AddProduct", {
 								name : $("input.product-name").val()
 							}, function(data) {
@@ -49,7 +108,7 @@ $(window)
 									alert(data);
 								}
 							});
-						});
+						}
 
 						$(".btn-cancel").click(function() {
 							$(".ui-dialog").remove();
@@ -62,5 +121,39 @@ $(window)
 						var $posLeft = ($(window).width() - $dialog.width()) / 2;
 						$dialog.css("top", $posTop);
 						$dialog.css("left", $posLeft);
+					}
+
+					function initEditProductDialog() {
+						initDialog();
+						$("input.product-name").focus();
+
+						$("input.product-name").keypress(function(event) {
+							if (event.which === 13) {
+								submitEditProduct();
+							}
+						});
+
+						$("#dialog-btn-edit-product").click(function() {
+							submitEditProduct();
+						});
+
+						function submitEditProduct() {
+							var $id = $("#dialog-btn-edit-product").attr("product-id");
+							$.post("UpdateProduct", {
+								id : $id,
+								name : $("input.product-name").val()
+							}, function(data) {
+								if (data == "success") {
+									$("#edit-product-dialog").remove();
+									location.reload(true);
+								} else {
+									alert(data);
+								}
+							});
+						}
+
+						$(".btn-cancel").click(function() {
+							$("#edit-product-dialog").remove();
+						});
 					}
 				});

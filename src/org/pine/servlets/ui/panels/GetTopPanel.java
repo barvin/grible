@@ -12,7 +12,6 @@ package org.pine.servlets.ui.panels;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -45,7 +44,6 @@ public class GetTopPanel extends HttpServlet {
 			IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		Dao dao = new Dao();
 		TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 		if (tableType == TableType.STORAGE) {
 			out.print("<div class=\"table-row\">");
@@ -60,6 +58,7 @@ public class GetTopPanel extends HttpServlet {
 
 		} else {
 			try {
+				Dao dao = new Dao();
 				Integer tableId = null;
 				Integer preId = null;
 				Integer postId = null;
@@ -127,8 +126,9 @@ public class GetTopPanel extends HttpServlet {
 						+ "\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
 				out.println("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
 				out.print("</div></div>");
-			} catch (SQLException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				out.print("ERROR: ");
+				e.printStackTrace(out);
 			}
 		}
 

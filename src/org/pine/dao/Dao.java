@@ -35,13 +35,18 @@ import org.pine.settings.GlobalSettings;
  */
 public class Dao {
 
-	private String sqlserver = GlobalSettings.getInstance().getDbHost();
-	private String sqlport = GlobalSettings.getInstance().getDbPort();
-	private String sqldatabase = GlobalSettings.getInstance().getDbName();
-	private String sqllogin = GlobalSettings.getInstance().getDbLogin();
-	private String sqlpassword = GlobalSettings.getInstance().getDbPswd();
+	private String sqlserver;
+	private String sqlport;
+	private String sqldatabase;
+	private String sqllogin;
+	private String sqlpassword;
 
-	public Dao() {
+	public Dao() throws Exception {
+		sqlserver = GlobalSettings.getInstance().getDbHost();
+		sqlport = GlobalSettings.getInstance().getDbPort();
+		sqldatabase = GlobalSettings.getInstance().getDbName();
+		sqllogin = GlobalSettings.getInstance().getDbLogin();
+		sqlpassword = GlobalSettings.getInstance().getDbPswd();
 		initializeSQLDriver();
 	}
 
@@ -155,7 +160,7 @@ public class Dao {
 		List<Product> result = new ArrayList<>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM products");
+		ResultSet rs = stmt.executeQuery("SELECT * FROM products ORDER BY name");
 		while (rs.next()) {
 			result.add(initProduct(rs));
 		}
@@ -1095,12 +1100,44 @@ public class Dao {
 	}
 
 	public ResultSet executeSelect(String query) throws SQLException {
-		ResultSet result = null;
+		ResultSet rs = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		result = stmt.executeQuery(query);
+		rs = stmt.executeQuery(query);
 		conn.close();
 		stmt.close();
-		return result;
+		return rs;
+	}
+
+	public boolean deleteProduct(int productId) throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate("ALTER TABLE ONLY keys DROP CONSTRAINT keys_reftable_fkey");
+
+		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE productid=" + productId);
+
+		while (rs.next()) {
+
+			if (!deleteCategory(rs.getInt("id"))) {
+				conn.close();
+				rs.close();
+				stmt.close();
+				return false;
+			}
+		}
+		stmt.executeUpdate("DELETE FROM products WHERE id=" + productId);
+		stmt.executeUpdate("ALTER TABLE ONLY keys ADD CONSTRAINT keys_reftable_fkey FOREIGN KEY (reftable) REFERENCES tables(id)");
+		conn.close();
+		rs.close();
+		stmt.close();
+		return true;
+	}
+
+	public void updateProduct(Product product) throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate("UPDATE products SET name='" + product.getName() + "' WHERE id=" + product.getId());
+		conn.close();
+		stmt.close();
 	}
 }

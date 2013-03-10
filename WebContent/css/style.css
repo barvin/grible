@@ -58,26 +58,9 @@ a:hover {
 	color: #367F86;
 }
 
-.product {
-	background-color: #F0F0F0;
-	width: 250px;
-	padding: 10px;
-	margin: 15px 15px 15px 0;
-	color: #49493E;
-	font-size: 15px;
-	font-weight: bold;
-}
-
-.product:hover {
-	background-color: #367F86;
-	color: #F0F0F0;
-}
-
 .section {
 	background-color: #F0F0F0;
-	width: 250px;
 	padding: 10px;
-	margin: 15px 15px 15px 0;
 	color: #49493E;
 	font-size: 15px;
 	font-weight: bold;
@@ -512,11 +495,21 @@ a:hover {
 }
 
 .section-desription {
-	padding: 15px;
-	margin: 10px 0 0;
 	color: #49493E;
 }
 
 .selected-cell {
 	background-color: #DAF0F0;
+}
+
+.under-sections {
+	margin-top: 35px;
+}
+
+.section-cell {
+	padding-top: 35px;
+}
+
+.gap {
+	width: 15px;
 }

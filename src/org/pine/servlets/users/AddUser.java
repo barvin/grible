@@ -13,8 +13,6 @@ package org.pine.servlets.users;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
-
 
 /**
  * Servlet implementation class GetStorageValues
@@ -40,13 +37,13 @@ public class AddUser extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		Dao dao = new Dao();
 
 		String userName = request.getParameter("username");
 		String strPass = request.getParameter("pass");
@@ -54,6 +51,7 @@ public class AddUser extends HttpServlet {
 
 		MessageDigest md;
 		try {
+			Dao dao = new Dao();
 			md = MessageDigest.getInstance("MD5");
 			md.update(strPass.getBytes());
 			String hashPass = new String(md.digest());
@@ -67,9 +65,10 @@ public class AddUser extends HttpServlet {
 			} else {
 				out.print("ERROR: User was not added. See server logs for details.");
 			}
-		} catch (NoSuchAlgorithmException | SQLException e) {
-			out.print("ERROR: " + e.getMessage());
-			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace(out);
 		}
+		out.flush();
+		out.close();
 	}
 }

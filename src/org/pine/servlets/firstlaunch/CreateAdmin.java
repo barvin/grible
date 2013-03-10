@@ -66,7 +66,11 @@ public class CreateAdmin extends HttpServlet {
 				}
 			}
 		} catch (Exception e) {
-			GlobalSettings.getInstance().eraseDbSettings();
+			try {
+				GlobalSettings.getInstance().eraseDbSettings();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {

@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.users;
+package org.pine.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,18 +20,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Product;
 
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/DeleteUser")
-public class DeleteUser extends HttpServlet {
+@WebServlet("/UpdateProduct")
+public class UpdateProduct extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public DeleteUser() {
+	public UpdateProduct() {
 		super();
 	}
 
@@ -42,22 +43,22 @@ public class DeleteUser extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			response.setContentType("text/html");
+			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
+			String name = request.getParameter("name");
 
-			String userId = request.getParameter("userid");
-			boolean isLastAdmin = dao.getAdminsCount() == 1;
-			if (isLastAdmin) {
-				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
+			if ("".equals(name)) {
+				out.print("ERROR: Product name cannot be empty.");
 			} else {
-				boolean deleted = dao.deleteUser(userId);
-				if (deleted) {
-					out.print("success");
-				} else {
-					out.print("ERROR: User was not deleted. See server logs for details.");
-				}
+				int productId = Integer.parseInt(request.getParameter("id"));
+				Product product;
+				product = dao.getProduct(productId);
+				product.setName(name);
+				dao.updateProduct(product);
+				out.print("success");
 			}
+
 			out.flush();
 			out.close();
 		} catch (Exception e) {

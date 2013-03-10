@@ -12,7 +12,6 @@ package org.pine.servlets.app.create;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -58,7 +57,7 @@ public class AddProduct extends HttpServlet {
 				} else {
 					try {
 						dao.insertProduct(name);
-					} catch (SQLException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					out.print("success");

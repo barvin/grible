@@ -12,7 +12,6 @@ package org.pine.servlets.app.create;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
 import org.pine.model.Row;
+import org.pine.model.Table;
 import org.pine.model.TableType;
 
 /**
@@ -49,18 +49,27 @@ public class AddTable extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
+			Dao dao = new Dao();
+
 			Integer categoryId = null;
 			if (request.getParameter("categoryid") != null) {
 				categoryId = Integer.parseInt(request.getParameter("categoryid"));
 			}
+
 			Integer parentId = null;
 			if (request.getParameter("parentid") != null) {
-				parentId = Integer.parseInt(request.getParameter("parentid"));
+				TableType currType = TableType.valueOf(request.getParameter("currTabletype").toUpperCase());
+				if (currType == TableType.TABLE) {
+					parentId = Integer.parseInt(request.getParameter("parentid"));	
+				} else {
+					Table sibling = dao.getTable(Integer.parseInt(request.getParameter("parentid")));
+					parentId = sibling.getParentId();
+				}
 			}
+
 			String name = request.getParameter("name");
 			TableType type = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			String className = request.getParameter("classname");
-			Dao dao = new Dao();
 
 			int tableId;
 			tableId = dao.insertTable(name, type, categoryId, parentId, className);
@@ -73,7 +82,7 @@ public class AddTable extends HttpServlet {
 			out.print(tableId);
 			out.flush();
 			out.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

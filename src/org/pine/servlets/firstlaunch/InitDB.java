@@ -1,7 +1,6 @@
 package org.pine.servlets.firstlaunch;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -52,7 +51,11 @@ public class InitDB extends HttpServlet {
 			}
 			out.print("Done.");
 		} catch (Exception e) {
-			GlobalSettings.getInstance().eraseDbSettings();
+			try {
+				GlobalSettings.getInstance().eraseDbSettings();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {
@@ -61,7 +64,7 @@ public class InitDB extends HttpServlet {
 		}
 	}
 
-	private String getSQLQuery(String filePath) throws FileNotFoundException, IOException {
+	private String getSQLQuery(String filePath) throws Exception {
 		FileReader fr = new FileReader(new File(getServletContext().getRealPath("") + filePath));
 		List<String> lines = IOUtils.readLines(fr);
 		StringBuilder content = new StringBuilder();

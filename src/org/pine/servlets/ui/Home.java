@@ -12,7 +12,6 @@ package org.pine.servlets.ui;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -23,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
-import org.pine.excel.TempVars;
 import org.pine.model.Product;
 import org.pine.model.User;
 import org.pine.servlets.ServletHelper;
@@ -51,14 +49,13 @@ public class Home extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		TempVars.setLocalRootPath(getServletContext().getRealPath(""));
-		if (GlobalSettings.getInstance().hasNulls()) {
-			response.sendRedirect("/pine/firstlaunch");
-			return;
-		}
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
+			if (!GlobalSettings.getInstance().init(getServletContext().getRealPath(""))) {
+				response.sendRedirect("/pine/firstlaunch");
+				return;
+			}
 			Dao dao = new Dao();
 			out.println("<!DOCTYPE html>");
 			out.println("<html>");
@@ -66,9 +63,11 @@ public class Home extends HttpServlet {
 			out.println("<title>Pine</title>");
 			out.println("<link rel=\"shortcut icon\" href=\"img/favicon.ico\" >");
 			out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />");
+			out.println("<link href=\"css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
 			out.println("<script type=\"text/javascript\" src=\"http://code.jquery.com/jquery-latest.min.js\"></script>");
 			out.println("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
 			out.println("<script type=\"text/javascript\" src=\"js/footer.js\"></script>");
+			out.println("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");
 			out.println("</head>");
 			out.println("<body>");
 
@@ -131,39 +130,42 @@ public class Home extends HttpServlet {
 					}
 				} else {
 					out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
-					out.println("<div class=\"table\" style=\"width: 300px;\">");
-					out.println("<div class=\"table-row\">");
-					out.println("<div class=\"table-cell entities-list\">");
+					out.println("<div class=\"table\">");
 
 					List<Product> products = dao.getProducts();
 					for (Product product : products) {
 						if (user.hasAccessToProduct(product.getId())) {
-							out.println("<a href=\"?product=" + product.getId() + "\"><div class=\"product\">"
-									+ product.getName() + "</div></a>");
+							out.println("<div class=\"table-row\">");
+							out.println("<div class=\"table-cell section-cell\">");
+							out.println("<a href=\"?product=" + product.getId() + "\"><span id=\"" + product.getId()
+									+ "\" class=\"section product-item\">" + product.getName() + "</span></a>");
+							out.println("</div>");
+							out.println("</div>");
 						}
 					}
-
-					out.println("</div>");
-					out.println("</div>");
 					out.println("</div>");
 
 					if (user.isAdmin()) {
+						out.println("<div class=\"under-sections\">");
 						out.println("<span class=\"top-panel-button button-enabled\" id=\"btn-add-product\">"
 								+ "<img src=\"img/add-icon.png\" class=\"top-panel-icon\">"
 								+ "&nbsp;&nbsp;Add product</span>");
+						out.println("</div>");
 					}
 
 				}
 			}
 
 			out.println(ServletHelper.getFooter(getServletContext().getRealPath("")));
+			out.println(getContextMenus());
 			out.println("</body>");
 			out.println("</html>");
 
+		} catch (Exception e) {
+			e.printStackTrace(out);
+		} finally {
 			out.flush();
 			out.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -177,20 +179,29 @@ public class Home extends HttpServlet {
 
 	private void includeSections(PrintWriter out, Product product) {
 		out.println("<div class=\"table\">");
-		out.println("<div class=\"table-row\">");
-		out.println("<div class=\"table-cell entities-list\">");
 		List<Section> sections = Sections.getSections();
 		for (Section section : sections) {
-			out.println("<a href=\"" + section.getKey() + "/?product=" + product.getId() + "\"><div class=\"section\">"
-					+ section.getName() + "</div></a>");
-		}
-		out.println("</div>");
-		out.println("<div class=\"table-cell\">");
-		for (Section section : sections) {
+			out.println("<div class=\"table-row\">");
+			out.println("<div class=\"table-cell section-cell\">");
+			out.println("<a href=\"" + section.getKey() + "/?product=" + product.getId()
+					+ "\"><span class=\"section\">" + section.getName() + "</span></a>");
+			out.println("</div>");
+			out.println("<div class=\"table-cell gap\">");
+			out.println("</div>");
+			out.println("<div class=\"table-cell\">");
 			out.println("<div class=\"section-desription\">" + section.getDescription() + "</div>");
+			out.println("</div>");
+			out.println("</div>");
 		}
 		out.println("</div>");
-		out.println("</div>");
-		out.println("</div>");
+	}
+
+	public String getContextMenus() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<ul id=\"productMenu\" class=\"contextMenu\">");
+		builder.append("<li class=\"edit\"><a href=\"#edit\">Edit product</a></li>");
+		builder.append("<li class=\"delete\"><a href=\"#delete\">Delete product</a></li>");
+		builder.append("</ul>");
+		return builder.toString();
 	}
 }

@@ -22,8 +22,9 @@ function initialize() {
 		$("#footer").removeClass("page-bottom");
 		$("#category-container").html(data);
 		$(".entities-list").append(
-				'<span class="top-panel-button button-enabled" id="btn-add-category"><img src="../img/add-icon.png"'
-						+ 'class="top-panel-icon">&nbsp;&nbsp;Add category</span>');
+				'<div class="under-sections"><span class="top-panel-button button-enabled"'
+						+ 'id="btn-add-category"><img src="../img/add-icon.png"'
+						+ 'class="top-panel-icon">&nbsp;&nbsp;Add category</span></div>');
 
 		initDataItemsPanel(jQuery);
 	});
@@ -54,6 +55,9 @@ function initDataItemsPanel() {
 		$("#btn-edit-data-item").addClass("button-enabled");
 		$(this).addClass("data-item-selected");
 		tableId = $(this).attr('id');
+		if ((tableType == "precondition") || (tableType == "postcondition")) {
+			tableType = "table";
+		}
 		history.pushState({
 			id : tableId
 		}, "", "?id=" + tableId);
@@ -181,8 +185,24 @@ function initAddDataItemDialog() {
 	initDialog();
 	$("input.data-item-name").focus();
 
+	$("input.data-item-name").keypress(function(event) {
+		if (event.which === 13) {
+			submitAddDataItem();
+		}
+	});
+
+	$("input.data-storage-class-name").keypress(function(event) {
+		if (event.which === 13) {
+			submitAddDataItem();
+		}
+	});
+
 	$("#dialog-btn-add-data-item").click(function() {
-		var $id = $(this).attr("category-id");
+		submitAddDataItem();
+	});
+
+	function submitAddDataItem() {
+		var $id = $("#dialog-btn-add-data-item").attr("category-id");
 		var $args;
 		if (tableType == "storage") {
 			$args = {
@@ -202,7 +222,7 @@ function initAddDataItemDialog() {
 			$("#add-category-dialog").remove();
 			window.location = "?id=" + newTableId;
 		});
-	});
+	}
 
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
@@ -213,8 +233,18 @@ function initFillDialog() {
 	initDialog();
 	$("input.fill-value").focus();
 
+	$("input.fill-value").keypress(function(event) {
+		if (event.which === 13) {
+			submitFill();
+		}
+	});
+
 	$("#dialog-btn-fill").click(function() {
-		var $columnNumber = $(this).attr("column-number");
+		submitFill();
+	});
+
+	function submitFill() {
+		var $columnNumber = $("#dialog-btn-fill").attr("column-number");
 		var $value = $("input.fill-value").val();
 		var $columnChanged = false;
 		$(".value-row").each(function(i) {
@@ -232,7 +262,7 @@ function initFillDialog() {
 			enableSaveButton();
 		}
 		$(".ui-dialog").remove();
-	});
+	}
 
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
@@ -244,6 +274,16 @@ function initAddCategoryDialog() {
 	$("input.category-name").focus();
 
 	$("#dialog-btn-add-category").click(function() {
+		submitAddCategory();
+	});
+
+	$("input.category-name").keypress(function(event) {
+		if (event.which === 13) {
+			submitAddCategory();
+		}
+	});
+
+	function submitAddCategory() {
 		$.post("../AddCategory", {
 			tabletype : tableType,
 			product : productId,
@@ -256,7 +296,7 @@ function initAddCategoryDialog() {
 				alert(data);
 			}
 		});
-	});
+	}
 
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
@@ -267,8 +307,18 @@ function initEditCategoryDialog() {
 	initDialog();
 	$("input.category-name").focus();
 
+	$("input.category-name").keypress(function(event) {
+		if (event.which === 13) {
+			submitEditCategory();
+		}
+	});
+
 	$("#dialog-btn-edit-category").click(function() {
-		var $id = $(this).attr("category-id");
+		submitEditCategory();
+	});
+
+	function submitEditCategory() {
+		var $id = $("#dialog-btn-edit-category").attr("category-id");
 		$.post("../UpdateCategory", {
 			id : $id,
 			name : $("input.category-name").val()
@@ -280,7 +330,7 @@ function initEditCategoryDialog() {
 				alert(data);
 			}
 		});
-	});
+	}
 
 	$(".btn-cancel").click(function() {
 		$("#edit-category-dialog").remove();
@@ -367,6 +417,7 @@ function initTopPanel() {
 	$("#btn-add-preconditions").click(function() {
 		$.post("../AddTable", {
 			parentid : tableId,
+			currTabletype : tableType,
 			tabletype : "precondition"
 		}, function(newTableId) {
 			window.location = "?id=" + newTableId;
@@ -376,6 +427,7 @@ function initTopPanel() {
 	$("#btn-add-postconditions").click(function() {
 		$.post("../AddTable", {
 			parentid : tableId,
+			currTabletype : tableType,
 			tabletype : "postcondition"
 		}, function(newTableId) {
 			window.location = "?id=" + newTableId;
@@ -472,8 +524,23 @@ function initEditDataItemDialog() {
 	initDialog();
 	$("input.data-item-name").focus();
 
-	$("#dialog-btn-edit-data-item").click(function() {
+	$("input.data-item-name").keypress(function(event) {
+		if (event.which === 13) {
+			submitDataItem();
+		}
+	});
 
+	$("input.data-storage-class-name").keypress(function(event) {
+		if (event.which === 13) {
+			submitDataItem();
+		}
+	});
+
+	$("#dialog-btn-edit-data-item").click(function() {
+		submitDataItem();
+	});
+
+	function submitDataItem() {
 		var $categoryid = $("select.categories").find("option:selected").val();
 		var $args;
 		if (tableType == "storage") {
@@ -499,7 +566,7 @@ function initEditDataItemDialog() {
 				alert(data);
 			}
 		});
-	});
+	}
 
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();

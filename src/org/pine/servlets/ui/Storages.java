@@ -12,7 +12,6 @@ package org.pine.servlets.ui;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,6 +23,7 @@ import org.pine.dao.Dao;
 import org.pine.model.Product;
 import org.pine.model.User;
 import org.pine.servlets.ServletHelper;
+import org.pine.settings.GlobalSettings;
 import org.pine.uimodel.Sections;
 
 /**
@@ -49,6 +49,10 @@ public class Storages extends HttpServlet {
 		try{
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
+		if (!GlobalSettings.getInstance().init(getServletContext().getRealPath(""))) {
+			response.sendRedirect("/pine/firstlaunch");
+			return;
+		}
 		Dao dao = new Dao();
 
 		if (request.getSession(false) == null) {
@@ -124,7 +128,7 @@ public class Storages extends HttpServlet {
 			out.flush();
 			out.close();
 		}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

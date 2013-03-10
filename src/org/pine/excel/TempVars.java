@@ -13,7 +13,6 @@ package org.pine.excel;
 public class TempVars {
 	private static String storageImportResult;
 	private static String tableImportResult;
-	private static String localRootPath;
 
 	public static String getStorageImportResult() {
 		String result = storageImportResult == null ? "" : storageImportResult;
@@ -35,11 +34,4 @@ public class TempVars {
 		TempVars.tableImportResult = result;
 	}
 
-	public static String getLocalRootPath() {
-		return localRootPath;
-	}
-
-	public static void setLocalRootPath(String localRootPath) {
-		TempVars.localRootPath = localRootPath;
-	}
 }

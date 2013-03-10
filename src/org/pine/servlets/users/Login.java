@@ -13,7 +13,6 @@ package org.pine.servlets.users;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -45,15 +44,15 @@ public class Login extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		Dao dao = new Dao();
 
 		String userName = request.getParameter("username");
 		String actualPass = request.getParameter("pass");
 
 		User user = null;
 		try {
+			Dao dao = new Dao();
 			user = dao.getUserByName(userName);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if (user != null) {

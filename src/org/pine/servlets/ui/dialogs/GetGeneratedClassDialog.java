@@ -12,7 +12,6 @@ package org.pine.servlets.ui.dialogs;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,13 +52,13 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		dao = new Dao();
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		try {
+			dao = new Dao();
 			storage = dao.getTable(id);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace(out);
 		}
 		className = storage.getClassName();
 
@@ -164,7 +163,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append("<br>}");
 			pack.append(imp).append(header).append(fields).append(constructor).append(methods).append("<br>}");
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return pack.toString();
@@ -257,7 +256,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 			constructor.append("<br>}");
 			imp.append(namespace).append(header).append(properties).append(constructor).append("<br>}").append("<br>}");
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

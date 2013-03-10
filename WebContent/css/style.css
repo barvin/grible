@@ -45,6 +45,10 @@ img#logo-mini {
 	font-weight: bold;
 }
 
+#main {
+	width: 100%;
+}
+
 a {
 	color: #367F86;
 	text-decoration: none;
@@ -289,6 +293,7 @@ a:hover {
 
 .top-panel {
 	height: 42px;
+	width: 100%;
 }
 
 .top-panel-button {
@@ -508,7 +513,7 @@ a:hover {
 
 .section-desription {
 	padding: 15px;
-	margin: 22px 15px 15px 0;
+	margin: 10px 0 0;
 	color: #49493E;
 }
 

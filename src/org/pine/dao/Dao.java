@@ -28,14 +28,18 @@ import org.pine.model.TableType;
 import org.pine.model.User;
 import org.pine.model.UserPermission;
 import org.pine.model.Value;
+import org.pine.settings.GlobalSettings;
 
+/**
+ * @author Maksym Barvinskyi
+ */
 public class Dao {
 
-	private static String sqlserver = "localhost";
-	private static String sqlport = "5432";
-	private static String sqldatabase = "pine";
-	private static String sqllogin = "pgpine";
-	private static String sqlpassword = "pgpine";
+	private String sqlserver = GlobalSettings.getInstance().getDbHost();
+	private String sqlport = GlobalSettings.getInstance().getDbPort();
+	private String sqldatabase = GlobalSettings.getInstance().getDbName();
+	private String sqllogin = GlobalSettings.getInstance().getDbLogin();
+	private String sqlpassword = GlobalSettings.getInstance().getDbPswd();
 
 	public Dao() {
 		initializeSQLDriver();
@@ -1067,5 +1071,26 @@ public class Dao {
 		conn.close();
 		stmt.close();
 		return id;
+	}
+
+	public int getAdminsCount() throws SQLException {
+		int result = 0;
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT count(id) FROM users WHERE isadmin=true");
+		if (rs.next()) {
+			result = rs.getInt(1);
+		}
+		conn.close();
+		stmt.close();
+		return result;
+	}
+
+	public void execute(String query) throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate(query);
+		conn.close();
+		stmt.close();
 	}
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.users;
+package org.pine.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,18 +21,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Table;
 
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/DeleteUser")
-public class DeleteUser extends HttpServlet {
+@WebServlet("/EditTable")
+public class EditTable extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public DeleteUser() {
+	public EditTable() {
 		super();
 	}
 
@@ -43,22 +44,31 @@ public class DeleteUser extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			response.setContentType("text/html");
+			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
 
-			String userId = request.getParameter("userid");
-			boolean isLastAdmin = dao.getAdminsCount() == 1;
-			if (isLastAdmin) {
-				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
-			} else {
-				boolean deleted = dao.deleteUser(userId);
-				if (deleted) {
-					out.print("success");
-				} else {
-					out.print("ERROR: User was not deleted. See server logs for details.");
-				}
+			int id = Integer.parseInt(request.getParameter("id"));
+			Table table = dao.getTable(id);
+			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
+			String name = request.getParameter("name");
+			String className = request.getParameter("classname");
+			boolean usage = false;
+			if (request.getParameter("usage") != null) {
+				usage = Boolean.parseBoolean(request.getParameter("usage"));
 			}
+
+			if ("".equals(name)) {
+				out.print("ERROR: Name cannot be empty.");
+			} else {
+				table.setCategoryId(categoryId);
+				table.setName(name);
+				table.setClassName(className);
+				table.setShowUsage(usage);
+				dao.updateTable(table);
+				out.print("success");
+			}
+
 			out.flush();
 			out.close();
 		} catch (SQLException e) {

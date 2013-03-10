@@ -1,0 +1,96 @@
+html {
+	background: url("../img/cardboard_flat.png") repeat scroll 0% 0%
+		transparent;
+	overflow-y: scroll;
+	font-family: arial, sans-serif;
+	font-size: 15px;
+	color: #151B1B;
+	margin-left: auto;
+	margin-right: auto;
+	width: 750px;
+}
+
+body {
+	padding: 15px 15px 0 15px;
+	margin-bottom: 0px;
+}
+
+.table {
+	display: table;
+	margin-top: 8px;
+}
+
+.table-row {
+	display: table-row;
+}
+
+.table-cell {
+	display: table-cell;
+	padding: 8px 8px 8px 5px;
+}
+
+#footer {
+	margin-top: 25px;
+}
+
+.build {
+	color: #777777;
+}
+
+.dialog-buttons {
+	margin-top: 5px;
+}
+
+.ui-button {
+	background-color: #F0F0F0;
+	border: 1px solid #888888;
+	padding: 5px;
+	color: #49493E;
+}
+
+.ui-button:hover {
+	background-color: #367F86;
+	border: 1px solid #F0F0F0;
+	padding: 5px;
+	color: #F0F0F0;
+	cursor: pointer;
+}
+
+.left {
+	text-align: left;
+}
+
+.right {
+	text-align: right;
+}
+
+.setting-table {
+	background-color: rgba(180, 180, 180, 0.4);
+	width: 100%;
+	padding: 15px;
+}
+
+#console {
+	background-color: rgba(54, 127, 134, 0.7);
+	width: 100%;
+	padding: 15px;
+	color: #FFFFFF;
+	height: 250px;
+	overflow: auto;
+	font-family: "Courier New", Courier, monospace;
+}
+
+.hiddeninfo {
+	font-size: 13px;
+	display: none;
+}
+
+#success {
+	margin-top: 25px;
+}
+
+#success img {
+	float: left;
+	margin-top: -4px;
+	margin-right: 8px;
+}

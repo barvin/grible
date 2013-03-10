@@ -11,26 +11,35 @@
 package org.pine.excel;
 
 public class TempVars {
-	private static String dataStorageImportResult;
-	private static String dataFileImportResult;
+	private static String storageImportResult;
+	private static String tableImportResult;
+	private static String localRootPath;
 
-	public static String getDataStorageImportResult() {
-		String result = dataStorageImportResult == null ? "" : dataStorageImportResult;
-		TempVars.dataStorageImportResult = "";
+	public static String getStorageImportResult() {
+		String result = storageImportResult == null ? "" : storageImportResult;
+		TempVars.storageImportResult = "";
 		return result;
 	}
 
-	public static void setDataStorageImportResult(String result) {
-		TempVars.dataStorageImportResult = result;
+	public static void setStorageImportResult(String result) {
+		TempVars.storageImportResult = result;
 	}
 
-	public static String getDataFileImportResult() {
-		String result = dataFileImportResult == null ? "" : dataFileImportResult;
-		TempVars.dataFileImportResult = "";
+	public static String getTableImportResult() {
+		String result = tableImportResult == null ? "" : tableImportResult;
+		TempVars.tableImportResult = "";
 		return result;
 	}
 
-	public static void setDataFileImportResult(String result) {
-		TempVars.dataFileImportResult = result;
+	public static void setTableImportResult(String result) {
+		TempVars.tableImportResult = result;
+	}
+
+	public static String getLocalRootPath() {
+		return localRootPath;
+	}
+
+	public static void setLocalRootPath(String localRootPath) {
+		TempVars.localRootPath = localRootPath;
 	}
 }

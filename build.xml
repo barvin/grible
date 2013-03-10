@@ -34,10 +34,12 @@
 
 	<target name="war" depends="compile">
 		<war destfile="${build}${path}.war" webxml="${basedir}/WebContent/WEB-INF/web.xml">
-			<fileset dir="${basedir}/WebContent" />
+			<fileset dir="${basedir}/WebContent">
+				<exclude name="**/*config.xml" />
+			</fileset>
 			<lib dir="${basedir}/WebContent/WEB-INF/lib" />
 			<classes dir="${build}" />
 		</war>
 	</target>
-	
+
 </project>

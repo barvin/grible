@@ -8,11 +8,12 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.users;
+package org.pine.servlets.app.delete;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,18 +22,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Key;
 
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/DeleteUser")
-public class DeleteUser extends HttpServlet {
+@WebServlet("/DeleteKey")
+public class DeleteKey extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public DeleteUser() {
+	public DeleteKey() {
 		super();
 	}
 
@@ -43,25 +45,29 @@ public class DeleteUser extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			response.setContentType("text/html");
+			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
+			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-			String userId = request.getParameter("userid");
-			boolean isLastAdmin = dao.getAdminsCount() == 1;
-			if (isLastAdmin) {
-				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
-			} else {
-				boolean deleted = dao.deleteUser(userId);
-				if (deleted) {
-					out.print("success");
-				} else {
-					out.print("ERROR: User was not deleted. See server logs for details.");
+			int tableId = dao.getKey(keyId).getTableId();
+			if (dao.deleteKey(keyId)) {
+				List<Integer> keyIds = new ArrayList<>();
+				List<Integer> keyNumbers = new ArrayList<>();
+				List<Key> keys = dao.getKeys(tableId);
+				for (int i = 0; i < keys.size(); i++) {
+					keyIds.add(keys.get(i).getId());
+					keyNumbers.add(i + 1);
 				}
+				dao.updateKeys(keyIds, keyNumbers);
+				out.print("success");
+			} else {
+				out.print("Could not delete the column. See server log for detail.");
 			}
+
 			out.flush();
 			out.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

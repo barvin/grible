@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.users;
+package org.pine.servlets.app.create;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,18 +21,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Category;
+import org.pine.model.TableType;
 
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/DeleteUser")
-public class DeleteUser extends HttpServlet {
+@WebServlet("/AddCategory")
+public class AddCategory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public DeleteUser() {
+	public AddCategory() {
 		super();
 	}
 
@@ -43,25 +45,35 @@ public class DeleteUser extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			response.setContentType("text/html");
+			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
+			int productId = Integer.parseInt(request.getParameter("product"));
+			String name = request.getParameter("name");
+			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
+			if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
+				tableType = TableType.TABLE;
+			}
 
-			String userId = request.getParameter("userid");
-			boolean isLastAdmin = dao.getAdminsCount() == 1;
-			if (isLastAdmin) {
-				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
+			if ("".equals(name)) {
+				out.print("ERROR: Category name cannot be empty.");
 			} else {
-				boolean deleted = dao.deleteUser(userId);
-				if (deleted) {
-					out.print("success");
+				Category category = dao.getCategory(name, productId);
+				if (category != null) {
+					out.print("ERROR: Category with name '" + name + "' already exists.");
 				} else {
-					out.print("ERROR: User was not deleted. See server logs for details.");
+					try {
+						dao.insertCategory(tableType, productId, name, null);
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					out.print("success");
 				}
 			}
+
 			out.flush();
 			out.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

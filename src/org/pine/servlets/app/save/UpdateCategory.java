@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.users;
+package org.pine.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,18 +21,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Category;
 
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/DeleteUser")
-public class DeleteUser extends HttpServlet {
+@WebServlet("/UpdateCategory")
+public class UpdateCategory extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public DeleteUser() {
+	public UpdateCategory() {
 		super();
 	}
 
@@ -43,22 +44,22 @@ public class DeleteUser extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			response.setContentType("text/html");
+			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
+			String name = request.getParameter("name");
 
-			String userId = request.getParameter("userid");
-			boolean isLastAdmin = dao.getAdminsCount() == 1;
-			if (isLastAdmin) {
-				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
+			if ("".equals(name)) {
+				out.print("ERROR: Category name cannot be empty.");
 			} else {
-				boolean deleted = dao.deleteUser(userId);
-				if (deleted) {
-					out.print("success");
-				} else {
-					out.print("ERROR: User was not deleted. See server logs for details.");
-				}
+				int categoryId = Integer.parseInt(request.getParameter("id"));
+				Category category;
+				category = dao.getCategory(categoryId);
+				category.setName(name);
+				dao.updateCategory(category);
+				out.print("success");
 			}
+
 			out.flush();
 			out.close();
 		} catch (SQLException e) {

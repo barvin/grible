@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>First launch - Pine</title>
+<link rel="shortcut icon" href="img/favicon.ico">
+<link rel="stylesheet" type="text/css" href="css/firstlaunch.css" />
+<script type="text/javascript"
+	src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="js/firstlaunch.js"></script>
+</head>
+<body>
+	<img id="login-logo" src="img/pine_logo.png">
+	<p>
+		It seems like you launch the Pine first time. Please, configure the
+		database. <br> <strong>Note:</strong> At the moment PostgreSQL as
+		a database is only supported. If you have not installed it, please <a
+			href="http://www.postgresql.org/download/" target="_blank">do it</a>.
+	</p>
+	<div class="setting-table">
+		<input type="radio" name="createnewdb" value="true" checked="checked">Install
+		new Pine database<br> <input type="radio" name="createnewdb"
+			value="false">Already have the Pine database, just
+		reinstalling the application
+		<div class="table">
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database host:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dbhost"
+						value="localhost">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database port:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dbport" value="5432">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database name:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dbname" value="pine">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database user name:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dblogin"
+						value="postgres">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database user password:</div>
+				<div class="table-cell dialog-cell">
+					<input type="password" class="dialog-edit" name="dbpswd">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Pine administrator name<span class="hiddeninfo"> * </span>:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="pinelogin" value="admin">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Pine administrator
+					password:</div>
+				<div class="table-cell dialog-cell">
+					<input type="password" class="dialog-edit"
+						name="pinepswd">
+				</div>
+			</div>
+		</div>
+		<span class="hiddeninfo"><br>* If the user
+						with this name already exists, the password will be updated.</span>
+		<div class="dialog-buttons right">
+			<input id="btn-createdb" type="button" value="Create database"
+				class="ui-button">
+		</div>
+	</div>
+	<div id="console"></div>
+	<div id="success"></div>
+	<div id="footer" class="page-bottom">
+		<span class="build">Build: 0.5-LOCAL</span>
+	</div>
+</body>
+</html>

@@ -14,7 +14,8 @@ CREATE TABLE categories (
     id integer NOT NULL,
     name character varying(255) NOT NULL,
     productid integer NOT NULL,
-    parentid integer
+    parentid integer,
+    type integer NOT NULL
 );
 ALTER TABLE public.categories OWNER TO postgres;
 
@@ -34,7 +35,7 @@ CREATE TABLE keys (
     tableid integer NOT NULL,
     name character varying(255) NOT NULL,
     "order" integer NOT NULL,
-    reftable integer NOT NULL
+    reftable integer
 );
 ALTER TABLE public.keys OWNER TO postgres;
 
@@ -68,7 +69,7 @@ ALTER SEQUENCE products_id_seq OWNED BY products.id;
 
 CREATE TABLE rows (
     id integer NOT NULL,
-    parentid integer NOT NULL,
+    tableid integer NOT NULL,
     "order" integer NOT NULL
 );
 ALTER TABLE public.rows OWNER TO postgres;
@@ -259,6 +260,9 @@ ALTER TABLE ONLY categories
 ALTER TABLE ONLY categories
     ADD CONSTRAINT categories_productid_fkey FOREIGN KEY (productid) REFERENCES products(id);
 
+ALTER TABLE ONLY categories
+    ADD CONSTRAINT categories_type_fkey FOREIGN KEY (type) REFERENCES tabletypes(id);
+
 
 ALTER TABLE ONLY keys
     ADD CONSTRAINT keys_reftable_fkey FOREIGN KEY (reftable) REFERENCES tables(id);
@@ -269,7 +273,7 @@ ALTER TABLE ONLY keys
 
 
 ALTER TABLE ONLY rows
-    ADD CONSTRAINT rows_parentid_fkey FOREIGN KEY (parentid) REFERENCES tables(id);
+    ADD CONSTRAINT rows_tableid_fkey FOREIGN KEY (tableid) REFERENCES tables(id);
 
 
 ALTER TABLE ONLY tables

@@ -36,7 +36,7 @@ public class ConfigParser {
 			}
 			if (doc != null) {
 				Element database = doc.getRootElement().getFirstChildElement("database");
-				this.dbhost = database.getFirstChildElement("dnhost").getValue();
+				this.dbhost = database.getFirstChildElement("dbhost").getValue();
 				this.dbport = database.getFirstChildElement("dbport").getValue();
 				this.dbname = database.getFirstChildElement("dbname").getValue();
 				this.dblogin = database.getFirstChildElement("dblogin").getValue();

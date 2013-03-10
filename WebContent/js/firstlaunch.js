@@ -98,7 +98,7 @@ $(window).on(
 															$("#success").html(
 																	"<img src='img/success-icon.png'> "
 																			+ "Database is successfully initialized. "
-																			+ "<a href='../'>Start the Pine</a>.");
+																			+ "<a href='../pine'>Start the Pine</a>.");
 														}
 													});
 												}

@@ -815,8 +815,9 @@ public class Dao {
 	public boolean deleteCategory(int categoryId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE categoryid=" + categoryId);
-
+		ResultSet rs = stmt
+				.executeQuery("SELECT id FROM tables WHERE parentid IN (SELECT id FROM tables WHERE categoryid="
+						+ categoryId + ")");
 		while (rs.next()) {
 			if (!deleteTable(rs.getInt("id"))) {
 				conn.close();
@@ -825,9 +826,19 @@ public class Dao {
 				return false;
 			}
 		}
+		rs.close();
+		ResultSet rs2 = stmt.executeQuery("SELECT id FROM tables WHERE categoryid=" + categoryId);
+		while (rs2.next()) {
+			if (!deleteTable(rs2.getInt("id"))) {
+				conn.close();
+				rs2.close();
+				stmt.close();
+				return false;
+			}
+		}
 		stmt.executeUpdate("DELETE FROM categories WHERE id=" + categoryId);
 		conn.close();
-		rs.close();
+		rs2.close();
 		stmt.close();
 		return true;
 	}
@@ -1132,6 +1143,7 @@ public class Dao {
 				return false;
 			}
 		}
+		stmt.executeUpdate("DELETE FROM userpermissions WHERE productid=" + productId);
 		stmt.executeUpdate("DELETE FROM products WHERE id=" + productId);
 		stmt.executeUpdate("ALTER TABLE ONLY keys ADD CONSTRAINT keys_reftable_fkey FOREIGN KEY (reftable) REFERENCES tables(id)");
 		conn.close();

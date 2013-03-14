@@ -45,9 +45,9 @@ public class ApplyParameterType extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
 
 			int keyId = Integer.parseInt(request.getParameter("keyId"));
@@ -106,10 +106,10 @@ public class ApplyParameterType extends HttpServlet {
 				dao.updateKey(key);
 				out.print("success");
 			}
-			out.flush();
-			out.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			e.printStackTrace(out);
 		}
+		out.flush();
+		out.close();
 	}
 }

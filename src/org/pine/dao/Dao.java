@@ -1005,8 +1005,12 @@ public class Dao {
 	public void updateKey(Key key) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE keys " + "SET name='" + key.getName() + "', " + "\"order\"=" + key.getOrder() + ", "
-				+ "reftable=" + key.getReferenceTableId() + " " + "WHERE id=" + key.getId());
+		String finalRefTableId = "null";
+		if (key.getReferenceTableId() != 0) {
+			finalRefTableId = String.valueOf(key.getReferenceTableId());
+		}
+		stmt.executeUpdate("UPDATE keys SET name='" + key.getName() + "', " + "\"order\"=" + key.getOrder() + ", "
+				+ "reftable=" + finalRefTableId + " " + "WHERE id=" + key.getId());
 		conn.close();
 		stmt.close();
 	}
@@ -1014,7 +1018,7 @@ public class Dao {
 	public void updateValuesTypes(int keyId, boolean isStorage, String storageIds) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE values " + "SET isstorage=" + isStorage + ", " + "storagerows=" + storageIds + " "
+		stmt.executeUpdate("UPDATE values SET isstorage=" + isStorage + ", " + "storagerows=" + storageIds + " "
 				+ "WHERE keyid=" + keyId);
 		conn.close();
 		stmt.close();

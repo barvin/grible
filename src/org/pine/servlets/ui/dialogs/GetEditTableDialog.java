@@ -62,23 +62,23 @@ public class GetEditTableDialog extends HttpServlet {
 				out.println("<div class=\"ui-dialog-content\">");
 				out.println("<div class=\"table\">");
 				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell\">Name:</div>");
-				out.println("<div class=\"table-cell dialog-cell\"><input class=\"data-item-name dialog-edit\" value=\""
+				out.println("<div class=\"table-cell dialog-cell dialog-label\">Name:</div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"data-item-name dialog-edit\" value=\""
 						+ name + "\"></div>");
 				out.println("</div>");
 
 				if (table.getType() == TableType.STORAGE) {
 					out.println("<div class=\"table-row\">");
-					out.println("<div class=\"table-cell dialog-cell\">Class name:</div>");
-					out.println("<div class=\"table-cell dialog-cell\"><input class=\"data-storage-class-name dialog-edit\" value=\""
+					out.println("<div class=\"table-cell dialog-cell dialog-label\">Class name:</div>");
+					out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"data-storage-class-name dialog-edit\" value=\""
 							+ table.getClassName() + "\"></div>");
 					out.println("</div>");
 				}
 
 				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell\">Category:</div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-label\">Category:</div>");
 				out.println("<div class=\"table-cell dialog-cell\">");
-				out.println("<select class=\"categories\" \">");
+				out.println("<select class=\"categories dialog-edit\" \">");
 
 				List<Category> categories = dao.getCategories(dao.getCategory(categoryId).getProductId(),
 						table.getType());
@@ -96,7 +96,7 @@ public class GetEditTableDialog extends HttpServlet {
 
 				if (table.getType() == TableType.STORAGE) {
 					out.println("<div class=\"table-row\">");
-					out.println("<div class=\"table-cell dialog-cell\">Show rows usage:</div>");
+					out.println("<div class=\"table-cell dialog-cell dialog-label\">Show rows usage:</div>");
 					String usage = "";
 					if (table.isShowUsage()) {
 						usage = "checked=\"checked\"";

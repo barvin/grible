@@ -94,8 +94,8 @@ function initDataItemsPanel() {
 						var $id = $(el).attr("id");
 						var $className = "";
 						if (tableType == "storage") {
-							$className = '<div class="table-row"><div class="table-cell dialog-cell">'
-									+ 'Class name:</div><div class="table-cell dialog-cell"><input class="data-storage-class-name dialog-edit"></div>'
+							$className = '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+									+ 'Class name:</div><div class="table-cell dialog-cell dialog-edit"><input class="data-storage-class-name dialog-edit"></div>'
 									+ '</div>';
 						}
 						if (action == "add") {
@@ -109,8 +109,8 @@ function initDataItemsPanel() {
 													+ '</div>'
 													+ '<div class="ui-dialog-content">'
 													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell">'
-													+ 'Name:</div><div class="table-cell dialog-cell"><input class="data-item-name dialog-edit"></div>'
+													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="data-item-name dialog-edit"></div>'
 													+ '</div>'
 													+ $className
 													+ '</div>'
@@ -132,8 +132,8 @@ function initDataItemsPanel() {
 													+ '<div class="ui-dialog-title">Edit category</div>'
 													+ '<div class="ui-dialog-content">'
 													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell">'
-													+ 'Name:</div><div class="table-cell dialog-cell"><input class="category-name dialog-edit" value="'
+													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="'
 													+ $(el).text()
 													+ '"></div>'
 													+ '</div>'
@@ -171,8 +171,8 @@ function initDataItemsPanel() {
 												+ '<div class="ui-dialog-title">Add category</div>'
 												+ '<div class="ui-dialog-content">'
 												+ '<div class="table">'
-												+ '<div class="table-row"><div class="table-cell dialog-cell">'
-												+ 'Name:</div><div class="table-cell dialog-cell"><input class="category-name dialog-edit"></div>'
+												+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+												+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>'
 												+ '</div>'
 												+ '</div>'
 												+ '<div class="dialog-buttons right">'
@@ -825,8 +825,8 @@ function enableKeyContextMenu() {
 													+ '<div class="ui-dialog-title">Fill column with value</div>'
 													+ '<div class="ui-dialog-content">'
 													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell">'
-													+ 'Value: </div><div class="table-cell dialog-cell"><input class="fill-value dialog-edit"></div>'
+													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Value: </div><div class="table-cell dialog-cell dialog-edit"><input class="fill-value dialog-edit"></div>'
 													+ '</div>'
 													+ '</div>'
 													+ '<div class="dialog-buttons right">'

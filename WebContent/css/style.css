@@ -345,7 +345,6 @@ a:hover {
 
 #login-form {
 	position: absolute;
-	padding: 5px;
 	font-size: 14px;
 }
 
@@ -417,8 +416,8 @@ a:hover {
 	padding-bottom: 10px;
 }
 
-.dialog-edit {
-	width: 97%;
+.dialog-label {
+	padding-right: 10px;
 }
 
 .error-message {

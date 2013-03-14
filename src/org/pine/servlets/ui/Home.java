@@ -78,12 +78,12 @@ public class Home extends HttpServlet {
 				out.println("<form method=\"post\" action=\"Login\">");
 				out.println("<div class=\"table\">");
 				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell\">Username:</div>");
-				out.println("<div class=\"table-cell dialog-cell\"><input class=\"dialog-edit\" name=\"username\"></div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-label\">Username:</div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"dialog-edit\" name=\"username\"></div>");
 				out.println("</div>");
 				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell\">Password:</div>");
-				out.println("<div class=\"table-cell dialog-cell\"><input type=\"password\" class=\"dialog-edit\" name=\"pass\"></div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-label\">Password:</div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input type=\"password\" class=\"dialog-edit\" name=\"pass\"></div>");
 				out.println("</div>");
 				out.println("</div>");
 				if (request.getParameter("url") != null) {

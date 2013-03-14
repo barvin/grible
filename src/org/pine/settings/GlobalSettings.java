@@ -18,7 +18,7 @@ import nu.xom.Element;
 
 public class GlobalSettings {
 	private static GlobalSettings settings;
-	private String configFilePath;
+	private File configFile;
 	private String dbhost;
 	private String dbport;
 	private String dbname;
@@ -29,10 +29,10 @@ public class GlobalSettings {
 	}
 
 	public boolean init(String localRootPath) throws Exception {
-		if (this.configFilePath == null) {
-			this.configFilePath = localRootPath + "/WEB-INF/config.xml";
+		if (this.configFile == null) {
+			this.configFile = new File(localRootPath + File.separator + "WEB-INF" + File.separator + "config.xml");
 		}
-		if (!configFileExists()) {
+		if (!configFile.exists()) {
 			return false;
 		}
 		if (hasNulls()) {
@@ -41,14 +41,10 @@ public class GlobalSettings {
 		return true;
 	}
 
-	private boolean configFileExists() {
-		return new File(configFilePath).exists();
-	}
-
 	private void setDbSettingsFromFile() throws Exception {
 		Builder parser = new Builder();
 		Document doc = null;
-		doc = parser.build(configFilePath);
+		doc = parser.build(configFile);
 		if (doc != null) {
 			Element database = doc.getRootElement().getFirstChildElement("database");
 			this.dbhost = database.getFirstChildElement("dbhost").getValue();
@@ -106,7 +102,7 @@ public class GlobalSettings {
 		this.dbpswd = dbpswd;
 	}
 
-	public boolean hasNulls() {
+	private boolean hasNulls() {
 		if ((dbhost == null) || (dbport == null) || (dbname == null) || (dblogin == null) || (dbpswd == null)) {
 			return true;
 		}
@@ -114,8 +110,8 @@ public class GlobalSettings {
 	}
 
 	/**
-	 * Makes DB settings null, so that system would launch "firstlaunch" page.
-	 * Use this method for exceptions during creating database.
+	 * Makes DB settings null, so that system would launch "firstlaunch" page. Use this method for exceptions during
+	 * creating database.
 	 */
 	public void eraseDbSettings() {
 		setDbHost(null);

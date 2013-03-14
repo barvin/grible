@@ -48,8 +48,7 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -105,8 +104,9 @@ public class GetTableValues extends HttpServlet {
 			}
 			for (Value value : valuesRow) {
 				String storageCell = (value.isStorage()) ? " storage-cell" : "";
-				out.println("<div id=\"" + value.getId() + "\" class=\"table-cell ui-cell value-cell" + storageCell
-						+ "\">" + StringEscapeUtils.escapeHtml4(value.getValue()) + "</div>");
+				out.println("<div id=\"" + value.getId() + "\" keyid=\"" + value.getKeyId()
+						+ "\" class=\"table-cell ui-cell value-cell" + storageCell + "\">"
+						+ StringEscapeUtils.escapeHtml4(value.getValue()) + "</div>");
 			}
 			if (showUsage) {
 				if (!valuesRow.isEmpty()) {

@@ -2,32 +2,46 @@ $().ready(initialize());
 
 function initialize() {
 
-	$(document).ajaxError(
-			function(e, xhr, settings, exception) {
-				var exrrorText = xhr.responseText.substring(xhr.responseText.indexof("<h1>"));
-				$("body").append(
-						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>'
-								+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url + exrrorText
-								+ '<br><br>' + '<div class="right">'
-								+ '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
-				initOneButtonDialog(jQuery);
-			});
+	$(document)
+			.ajaxError(
+					function(e, xhr, settings, exception) {
+						var exrrorText = xhr.responseText
+								.substring(xhr.responseText.indexof("<h1>"));
+						$("body")
+								.append(
+										'<div id="error-dialog" class="ui-dialog">'
+												+ '<div class="ui-dialog-title">Error</div>'
+												+ '<div class="ui-dialog-content">'
+												+ 'Location: '
+												+ settings.url
+												+ exrrorText
+												+ '<br><br>'
+												+ '<div class="right">'
+												+ '<button class="ui-button btn-cancel">OK</button>'
+												+ '</div></div></div>');
+						initOneButtonDialog(jQuery);
+					});
 
-	$.post("../GetCategories", {
-		productId : productId,
-		tableId : tableId,
-		tableType : tableType
-	}, function(data) {
-		$("#waiting-bg").remove();
-		$("#footer").removeClass("page-bottom");
-		$("#category-container").html(data);
-		$(".entities-list").append(
-				'<div class="under-sections"><span class="top-panel-button button-enabled"'
-						+ 'id="btn-add-category"><img src="../img/add-icon.png"'
-						+ 'class="top-panel-icon">&nbsp;&nbsp;Add category</span></div>');
+	$
+			.post(
+					"../GetCategories",
+					{
+						productId : productId,
+						tableId : tableId,
+						tableType : tableType
+					},
+					function(data) {
+						$("#waiting-bg").remove();
+						$("#footer").removeClass("page-bottom");
+						$("#category-container").html(data);
+						$(".entities-list")
+								.append(
+										'<div class="under-sections"><span class="top-panel-button button-enabled"'
+												+ 'id="btn-add-category"><img src="../img/add-icon.png"'
+												+ 'class="top-panel-icon">&nbsp;&nbsp;Add category</span></div>');
 
-		initDataItemsPanel(jQuery);
-	});
+						initDataItemsPanel(jQuery);
+					});
 
 }
 
@@ -135,7 +149,8 @@ function initDataItemsPanel() {
 								}, function(data) {
 									if (data == "success") {
 										alert("Category was deleted.");
-										window.location = "?product=" + productId;
+										window.location = "?product="
+												+ productId;
 									} else {
 										alert(data);
 									}
@@ -244,19 +259,15 @@ function initFillDialog() {
 	});
 
 	function submitFill() {
-		var $columnNumber = $("#dialog-btn-fill").attr("column-number");
+		var $keyId = $("#dialog-btn-fill").attr("keyid");
 		var $value = $("input.fill-value").val();
 		var $columnChanged = false;
-		$(".value-row").each(function(i) {
-			$(this).find(".value-cell").each(function(j) {
-				if (j == $columnNumber) {
-					if ($(this).text() != $value) {
-						$(this).text($value);
-						$(this).addClass("modified-value-cell");
-						$columnChanged = true;
-					}
-				}
-			});
+		$("div[keyid='" + $keyId + "']").each(function(i) {
+			if ($(this).text() != $value) {
+				$(this).text($value);
+				$(this).addClass("modified-value-cell");
+				$columnChanged = true;
+			}
 		});
 		if ($columnChanged) {
 			enableSaveButton();
@@ -353,7 +364,8 @@ function loadTopPanel(args) {
 
 function initTopPanel() {
 
-	if ((tableType == "table") || (tableType == "precondition") || (tableType == "postcondition")) {
+	if ((tableType == "table") || (tableType == "precondition")
+			|| (tableType == "postcondition")) {
 		$(".sheet-tab").click(function() {
 			$(".sheet-tab-selected").removeClass("sheet-tab-selected");
 			$(this).addClass("sheet-tab-selected");
@@ -434,22 +446,25 @@ function initTopPanel() {
 		});
 	});
 
-	$("#btn-delete-data-item").click(function() {
-		if ($(this).hasClass("button-enabled")) {
-			var answer = confirm("Are you sure you want to delete this " + tableType + "?");
-			if (answer) {
-				$.post("../DeleteTable", {
-					id : tableId
-				}, function(data) {
-					if (data == "success") {
-						$("#section-name").click();
-					} else {
-						window.location = "?id=" + data;
-					}
-				});
-			}
-		}
-	});
+	$("#btn-delete-data-item")
+			.click(
+					function() {
+						if ($(this).hasClass("button-enabled")) {
+							var answer = confirm("Are you sure you want to delete this "
+									+ tableType + "?");
+							if (answer) {
+								$.post("../DeleteTable", {
+									id : tableId
+								}, function(data) {
+									if (data == "success") {
+										$("#section-name").click();
+									} else {
+										window.location = "?id=" + data;
+									}
+								});
+							}
+						}
+					});
 
 	$("#btn-save-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
@@ -660,28 +675,32 @@ function initTableValues() {
 		});
 	});
 
-	$(".storage-cell:not(.modified-value-cell)").hover(function() {
-		var $value = $(this);
-		if (($value.has("div.tooltip").length == 0) && ($value.has("span.old-value").length == 0)) {
-			$("#waiting").addClass("loading");
-			$content = $value.text();
-			var $args = {
-				id : $value.attr('id'),
-				content : $content
-			};
-			$.post("../GetStorageTooltip", $args, function(data) {
-				$("#waiting").removeClass("loading");
-				var $widthRight = $(document).width() - $value.position().left - 35;
-				// 35 - is width of scroll bar.
-				$value.html(data);
-				var $tooltip = $value.find("div.tooltip");
-				var $tooltipWidth = $tooltip.width();
-				if ($widthRight < $tooltipWidth) {
-					$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");
+	$(".storage-cell:not(.modified-value-cell)").hover(
+			function() {
+				var $value = $(this);
+				if (($value.has("div.tooltip").length == 0)
+						&& ($value.has("span.old-value").length == 0)) {
+					$("#waiting").addClass("loading");
+					$content = $value.text();
+					var $args = {
+						id : $value.attr('id'),
+						content : $content
+					};
+					$.post("../GetStorageTooltip", $args, function(data) {
+						$("#waiting").removeClass("loading");
+						var $widthRight = $(document).width()
+								- $value.position().left - 35;
+						// 35 - is width of scroll bar.
+						$value.html(data);
+						var $tooltip = $value.find("div.tooltip");
+						var $tooltipWidth = $tooltip.width();
+						if ($widthRight < $tooltipWidth) {
+							$tooltip.css("margin-left", "-"
+									+ ($tooltipWidth - $widthRight) + "px");
+						}
+					});
 				}
 			});
-		}
-	});
 
 	$(".value-cell:not(:has(> input.changed-value))").dblclick(
 			function() {
@@ -695,7 +714,8 @@ function initTableValues() {
 				}
 				var $content = $cell.text();
 				$cell.html("<input class='changed-value' value='" + $content
-						+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
+						+ "' /><span class='old-value' style='display: none;'>"
+						+ $content + "</span>");
 				$cell.find("input.changed-value").focus();
 				initEditableCell(jQuery);
 			});
@@ -796,12 +816,6 @@ function enableKeyContextMenu() {
 								}
 							});
 						} else if (action == "fill") {
-							var $columnNumber = -1;
-							$(".key-cell").each(function(i) {
-								if ($(this).attr('id') == $keyId) {
-									$columnNumber = i;
-								}
-							});
 							$("body")
 									.append(
 											'<div id="fill-dialog" class="ui-dialog">'
@@ -813,8 +827,8 @@ function enableKeyContextMenu() {
 													+ '</div>'
 													+ '</div>'
 													+ '<div class="dialog-buttons right">'
-													+ '<button id="dialog-btn-fill" column-number="'
-													+ $columnNumber
+													+ '<button id="dialog-btn-fill" keyid="'
+													+ $keyId
 													+ '" class="ui-button">Fill</button> <button class="ui-button btn-cancel">Cancel</button>'
 													+ '</div></div></div>');
 							initFillDialog(jQuery);
@@ -935,7 +949,8 @@ function modifyValueCell() {
 }
 
 function enableSaveButton() {
-	$(".data-item-selected:not(:has(> span.changed-sign))").append(" <span class='changed-sign'>changed</span>");
+	$(".data-item-selected:not(:has(> span.changed-sign))").append(
+			" <span class='changed-sign'>changed</span>");
 	$("#btn-save-data-item").removeClass("button-disabled");
 	$("#btn-save-data-item").addClass("button-enabled");
 	$("#rowMenu").disableContextMenuItems("#add,#copy,#delete");

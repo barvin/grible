@@ -638,15 +638,14 @@ public class Dao {
 
 	}
 
-	public Category getCategory(String name, int productId) throws SQLException {
-		Category result = null;
+	public Integer getCategoryId(String name, int productId, TableType type) throws SQLException {
+		Integer result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT c.id, c.name, c.productid, c.parentid, tt.name as type "
-				+ " FROM categories as c JOIN tabletypes as tt ON c.type=tt.id AND c.productid=" + productId
-				+ " AND c.name='" + name + "'");
+		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE productid=" + productId + " AND name='"
+				+ name + "' AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase() + "')");
 		if (rs.next()) {
-			result = initCategory(rs);
+			result = rs.getInt("id");
 		}
 		conn.close();
 		stmt.close();

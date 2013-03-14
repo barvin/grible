@@ -59,6 +59,9 @@ function initDataItemsPanel() {
 		$(".data-item-selected").removeClass("data-item-selected");
 		$(".top-panel").html("");
 		$(".entities-values").html("");
+		history.pushState({
+			product : productId
+		}, "", "?product=" + productId);
 	});
 
 	$(".data-item").click(function() {

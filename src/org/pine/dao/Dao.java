@@ -938,7 +938,11 @@ public class Dao {
 	public void updateTable(Table table) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE tables " + "SET name='" + table.getName() + "', type=" + table.getType().getId()
+		String finalName = table.getName();
+		if (finalName != null) {
+			finalName = "'" + finalName + "'";
+		}
+		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
 				+ table.getParentId() + ", showusage=" + table.isShowUsage() + " WHERE id=" + table.getId());
 		conn.close();

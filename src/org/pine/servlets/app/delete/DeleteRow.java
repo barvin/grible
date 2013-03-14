@@ -41,8 +41,7 @@ public class DeleteRow extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -58,17 +57,20 @@ public class DeleteRow extends HttpServlet {
 			boolean isUsedByTables = false;
 			String error = "";
 			if (currentTable.getType() == TableType.STORAGE) {
-				List<Table> tablesUsingRow = dao.getTablesUsingRow(tableId);
-
+				List<Table> tablesUsingRow = dao.getTablesUsingRow(rowId);
 				if (!tablesUsingRow.isEmpty()) {
 					isUsedByTables = true;
-				} else {
 					error = "ERROR: This row is used by:";
+					String tableName = "";
 					for (Table table : tablesUsingRow) {
-						error += "\n- " + table.getName() + " (" + table.getType().toString().toLowerCase() + ");";
+						if (table.getName() != null) {
+							tableName = table.getName();
+						} else {
+							tableName = "-";
+						}
+						error += "\n- " + tableName + " (" + table.getType().toString().toLowerCase() + ");";
 					}
 				}
-
 			}
 			if (isUsedByTables) {
 				out.print(error);

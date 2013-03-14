@@ -189,6 +189,7 @@ function initDataItemsPanel() {
 		});
 		loadTableValues(tableId);
 	}
+	loadFooter();
 }
 
 function initDialog() {

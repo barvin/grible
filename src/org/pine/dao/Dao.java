@@ -628,7 +628,7 @@ public class Dao {
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
 						+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
 						+ "ON t.type=tt.id AND tt.name='storage' AND t.categoryid IN (SELECT id FROM categories WHERE productid="
-						+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.id");
+						+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.name");
 		while (rs3.next()) {
 			result.add(initTable(rs3));
 		}

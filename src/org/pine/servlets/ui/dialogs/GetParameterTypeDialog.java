@@ -41,21 +41,22 @@ public class GetParameterTypeDialog extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
 			String content = request.getParameter("content");
 			dao = new Dao();
 			Key key = dao.getKey(Integer.parseInt(request.getParameter("keyid")));
 			getDialog(out, key, content);
 		} catch (Exception e) {
-			e.printStackTrace();
+			e.printStackTrace(out);
 		}
+		out.flush();
+		out.close();
 	}
 
 	private void getDialog(PrintWriter out, Key key, String content) throws SQLException {
@@ -93,9 +94,6 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.println("</span>");
 		out.println("<input class='changed-value' value='" + content
 				+ "' /><span class='old-value' style='display: none;'>" + content + "</span>");
-
-		out.flush();
-		out.close();
 	}
 
 }

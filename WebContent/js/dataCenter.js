@@ -700,7 +700,7 @@ function initTableValues() {
 				if ($cell.has("div.tooltip")) {
 					$cell.find("div.tooltip").remove();
 				}
-				var $content = $cell.text();
+				var $content = $cell.text().replace(/'/g, "&#39;");
 				var $width = $cell.width();
 				$cell.html("<input class='changed-value' value='" + $content
 						+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");

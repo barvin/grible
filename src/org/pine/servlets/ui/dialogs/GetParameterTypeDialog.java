@@ -48,12 +48,13 @@ public class GetParameterTypeDialog extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			String content = request.getParameter("content");
+			String content = request.getParameter("content").replace("'", "&#39;");
 			dao = new Dao();
 			Key key = dao.getKey(Integer.parseInt(request.getParameter("keyid")));
 			getDialog(out, key, content);
 		} catch (Exception e) {
-			e.printStackTrace(out);
+			out.print(e.getLocalizedMessage());
+			e.printStackTrace();
 		}
 		out.flush();
 		out.close();

@@ -1007,7 +1007,7 @@ public class Dao {
 	public void updateKeyValue(String id, String value) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE keys SET name='" + value + "' " + "WHERE id=" + id);
+		stmt.executeUpdate("UPDATE keys SET name='" + value.replace("'", "''") + "' " + "WHERE id=" + id);
 		conn.close();
 		stmt.close();
 	}

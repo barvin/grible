@@ -36,29 +36,28 @@ public class SaveKeyValue extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
 			String id = request.getParameter("id");
 			String value = request.getParameter("value");
 			dao.updateKeyValue(id, value);
 			out.print("success");
-			out.flush();
-			out.close();
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

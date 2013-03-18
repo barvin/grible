@@ -720,8 +720,8 @@ public class Dao {
 		Statement stmt = conn.createStatement();
 		for (Value value : values) {
 			stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ value.getRowId() + ", " + newKeyId + ", '" + value.getValue() + "', " + value.isStorage() + ", "
-					+ value.getStorageIdsAsString() + ")");
+					+ value.getRowId() + ", " + newKeyId + ", '" + escape(value.getValue()) + "', " + value.isStorage()
+					+ ", " + value.getStorageIdsAsString() + ")");
 			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
 			if (rs.next()) {
 				result.add(rs.getInt("id"));
@@ -730,6 +730,16 @@ public class Dao {
 		conn.close();
 		stmt.close();
 		return result;
+	}
+
+	/**
+	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * 
+	 * @param value
+	 * @return value that is ready for DB inserting.
+	 */
+	private String escape(String value) {
+		return value.replace("'", "''");
 	}
 
 	public void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
@@ -798,8 +808,8 @@ public class Dao {
 		Statement stmt = conn.createStatement();
 		for (Value value : values) {
 			stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ newRowId + ", " + value.getKeyId() + ", '" + value.getValue() + "', " + value.isStorage() + ", "
-					+ value.getStorageIdsAsString() + ")");
+					+ newRowId + ", " + value.getKeyId() + ", '" + escape(value.getValue()) + "', " + value.isStorage()
+					+ ", " + value.getStorageIdsAsString() + ")");
 			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
 			if (rs.next()) {
 				result.add(rs.getInt("id"));
@@ -827,7 +837,7 @@ public class Dao {
 			}
 
 			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ tempValue.getRowId() + ", " + tempValue.getKeyId() + ", '" + tempValue.getValue() + "', "
+					+ tempValue.getRowId() + ", " + tempValue.getKeyId() + ", '" + escape(tempValue.getValue()) + "', "
 					+ tempValue.isStorage() + ", " + tempValue.getStorageIdsAsString() + ")");
 			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
 			if (rs.next()) {
@@ -1044,8 +1054,8 @@ public class Dao {
 		Statement stmt = conn.createStatement();
 		for (Value value : values) {
 			stmt.executeUpdate("UPDATE values SET rowid=" + value.getRowId() + ", keyid=" + value.getKeyId()
-					+ ", value='" + value.getValue().replace("'", "''") + "', isstorage=" + value.isStorage()
-					+ ", storagerows=" + value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
+					+ ", value='" + escape(value.getValue()) + "', isstorage=" + value.isStorage() + ", storagerows="
+					+ value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
 		}
 		conn.close();
 		stmt.close();
@@ -1077,8 +1087,8 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE values " + "SET rowid=" + value.getRowId() + ", keyid=" + value.getKeyId()
-				+ ", value='" + value.getValue().replace("'", "''") + "', isstorage=" + value.isStorage() + ", "
-				+ "storagerows=" + value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
+				+ ", value='" + escape(value.getValue()) + "', isstorage=" + value.isStorage() + ", " + "storagerows="
+				+ value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
 		conn.close();
 		stmt.close();
 	}

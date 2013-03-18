@@ -48,14 +48,14 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
+			StringBuilder responseHtml = new StringBuilder();
 			dao = new Dao();
 			int tableId = Integer.parseInt(request.getParameter("id"));
 			Table table = dao.getTable(tableId);
@@ -63,75 +63,77 @@ public class GetTableValues extends HttpServlet {
 			showUsage = table.isShowUsage();
 
 			List<Key> keys = dao.getKeys(tableId);
-			writeKeys(out, keys);
+			writeKeys(responseHtml, keys);
 
 			List<Row> rows = dao.getRows(tableId);
 			ArrayList<ArrayList<Value>> values = new ArrayList<ArrayList<Value>>();
 			for (Row row : rows) {
 				values.add(dao.getValues(row));
 			}
-			writeValues(out, values);
-
-			out.flush();
-			out.close();
+			writeValues(responseHtml, values);
+			out.print(responseHtml.toString());
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 
-	private void writeKeys(PrintWriter out, List<Key> keys) {
-		out.println("<div class=\"table-row key-row\">");
+	private void writeKeys(StringBuilder responseHtml, List<Key> keys) {
+		responseHtml.append("<div class=\"table-row key-row\">");
 		if (tableType == TableType.STORAGE || tableType == TableType.TABLE) {
-			out.println("<div class=\"table-cell ui-cell index-header-cell\">Index</div>");
+			responseHtml.append("<div class=\"table-cell ui-cell index-header-cell\">Index</div>");
 		}
 		for (Key key : keys) {
-			out.println("<div id=\"" + key.getId() + "\" key-order=\"" + key.getOrder()
-					+ "\" class=\"table-cell ui-cell key-cell\">" + key.getName() + "</div>");
+			responseHtml.append("<div id=\"").append(key.getId()).append("\" key-order=\"").append(key.getOrder())
+					.append("\" class=\"table-cell ui-cell key-cell\">").append(key.getName()).append("</div>");
 		}
 		if (showUsage) {
-			out.println("<div class=\"table-cell ui-cell info-key-cell\">Used in tables</div>");
-			out.println("<div class=\"table-cell ui-cell info-key-cell\">Used in storages</div>");
+			responseHtml.append("<div class=\"table-cell ui-cell info-key-cell\">Used in tables</div>");
+			responseHtml.append("<div class=\"table-cell ui-cell info-key-cell\">Used in storages</div>");
 		}
-		out.println("</div>");
+		responseHtml.append("</div>");
 	}
 
-	private void writeValues(PrintWriter out, ArrayList<ArrayList<Value>> values) throws SQLException {
+	private void writeValues(StringBuilder responseHtml, ArrayList<ArrayList<Value>> values) throws SQLException {
 		int i = 1;
 		for (ArrayList<Value> valuesRow : values) {
-			out.println("<div class=\"table-row value-row\">");
+			responseHtml.append("<div class=\"table-row value-row\">");
 			if (tableType == TableType.STORAGE || tableType == TableType.TABLE) {
-				out.println("<div id=\"" + valuesRow.get(0).getRowId() + "\" class=\"table-cell ui-cell index-cell\">"
-						+ (i++) + "</div>");
+				responseHtml.append("<div id=\"").append(valuesRow.get(0).getRowId())
+						.append("\" class=\"table-cell ui-cell index-cell\">").append(i++).append("</div>");
 			}
 			for (Value value : valuesRow) {
 				String storageCell = (value.isStorage()) ? " storage-cell" : "";
-				out.println("<div id=\"" + value.getId() + "\" keyid=\"" + value.getKeyId() + "\" rowid=\""
-						+ value.getRowId() + "\" class=\"table-cell ui-cell value-cell" + storageCell + "\">"
-						+ StringEscapeUtils.escapeHtml4(value.getValue()) + "</div>");
+				responseHtml.append("<div id=\"").append(value.getId()).append("\" keyid=\"").append(value.getKeyId())
+						.append("\" rowid=\"").append(value.getRowId())
+						.append("\" class=\"table-cell ui-cell value-cell").append(storageCell).append("\">")
+						.append(StringEscapeUtils.escapeHtml4(value.getValue())).append("</div>");
 			}
 			if (showUsage) {
 				if (!valuesRow.isEmpty()) {
 					List<Table> tables = dao.getTablesUsingRow(valuesRow.get(0).getRowId());
-					out.println("<div class=\"table-cell ui-cell info-cell\">" + getOccurences(tables, TableType.TABLE)
-							+ "</div>");
-					out.println("<div class=\"table-cell ui-cell info-cell\">"
-							+ getOccurences(tables, TableType.STORAGE) + "</div>");
+					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")
+							.append(getOccurences(tables, TableType.TABLE)).append("</div>");
+					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")
+							.append(getOccurences(tables, TableType.STORAGE)).append("</div>");
 				}
 			}
-			out.println("</div>");
+			responseHtml.append("</div>");
 		}
 	}
 
 	private String getOccurences(List<Table> tables, TableType type) throws SQLException {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		for (int i = 0; i < tables.size(); i++) {
 			if (type == tables.get(i).getType()) {
-				result += tables.get(i).getName() + ", ";
+				result.append(tables.get(i).getName()).append(", ");
 			}
 		}
-		if (result.length() > 2) {
-			result = result.substring(0, result.length() - 2);
+		if (result.toString().length() > 2) {
+			return result.substring(0, result.length() - 2);
 		} // remove ", "
-		return result;
+		return result.toString();
 	}
 }

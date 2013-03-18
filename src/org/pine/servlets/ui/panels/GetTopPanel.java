@@ -37,27 +37,32 @@ public class GetTopPanel extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
-		if (tableType == TableType.STORAGE) {
-			out.print("<div class=\"table-row\">");
-			out.print("<div class=\"table-cell right\">");
-			out.println("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
-			out.println("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
-			out.println("<span id=\"btn-edit-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
-			out.println("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
-			out.println("<span id=\"btn-class-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/brackets.png\"> Class</span>");
-			out.print("</div>");
-			out.print("</div>");
+		try {
+			StringBuilder responseHtml = new StringBuilder();
+			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
+			if (tableType == TableType.STORAGE) {
+				responseHtml.append("<div class=\"table-row\">");
+				responseHtml.append("<div class=\"table-cell right\">");
+				responseHtml
+						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
+				responseHtml
+						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
+				responseHtml
+						.append("<span id=\"btn-edit-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
+				responseHtml
+						.append("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
+				responseHtml
+						.append("<span id=\"btn-class-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/brackets.png\"> Class</span>");
+				responseHtml.append("</div>");
+				responseHtml.append("</div>");
 
-		} else {
-			try {
+			} else {
 				Dao dao = new Dao();
 				Integer tableId = null;
 				Integer preId = null;
@@ -95,41 +100,48 @@ public class GetTopPanel extends HttpServlet {
 					break;
 				}
 
-				out.print("<div class=\"table-row\">");
-				out.print("<div class=\"table-cell sheet-tab-container left\">");
-				out.print("<div id=\"" + tableId + "\" class=\"sheet-tab" + generalSelected
-						+ "\" label=\"table\">General</div>");
-				out.print("</div>");
+				responseHtml.append("<div class=\"table-row\">");
+				responseHtml.append("<div class=\"table-cell sheet-tab-container left\">");
+				responseHtml.append("<div id=\"").append(tableId).append("\" class=\"sheet-tab")
+						.append(generalSelected).append("\" label=\"table\">General</div>");
+				responseHtml.append("</div>");
 
-				out.print("<div class=\"table-cell sheet-tab-container left\">");
+				responseHtml.append("<div class=\"table-cell sheet-tab-container left\">");
 				if (preId != null) {
-					out.print("<div id=\"" + preId + "\" class=\"sheet-tab" + preSelected
-							+ "\" label=\"precondition\">Preconditions</div>");
+					responseHtml.append("<div id=\"").append(preId).append("\" class=\"sheet-tab").append(preSelected)
+							.append("\" label=\"precondition\">Preconditions</div>");
 				} else {
-					out.println("<span id=\"btn-add-preconditions\" class=\"add-tab-button\">Add preconditions</span>");
+					responseHtml
+							.append("<span id=\"btn-add-preconditions\" class=\"add-tab-button\">Add preconditions</span>");
 				}
-				out.print("</div>");
+				responseHtml.append("</div>");
 
-				out.print("<div class=\"table-cell sheet-tab-container left\">");
+				responseHtml.append("<div class=\"table-cell sheet-tab-container left\">");
 				if (postId != null) {
-					out.print("<div id=\"" + postId + "\" class=\"sheet-tab" + postSelected
-							+ "\" label=\"postcondition\">Postconditions</div>");
+					responseHtml.append("<div id=\"").append(postId).append("\" class=\"sheet-tab")
+							.append(postSelected).append("\" label=\"postcondition\">Postconditions</div>");
 				} else {
-					out.println("<span id=\"btn-add-postconditions\" class=\"add-tab-button\">Add postconditions</span>");
+					responseHtml
+							.append("<span id=\"btn-add-postconditions\" class=\"add-tab-button\">Add postconditions</span>");
 				}
-				out.print("</div>");
+				responseHtml.append("</div>");
 
-				out.print("<div class=\"table-cell right\">");
-				out.println("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
-				out.println("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
-				out.println("<span id=\"btn-edit-data-item\" class=\"top-panel-button " + editButtonEnable
-						+ "\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
-				out.println("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
-				out.print("</div></div>");
-			} catch (Exception e) {
-				out.print("ERROR: ");
-				e.printStackTrace(out);
+				responseHtml.append("<div class=\"table-cell right\">");
+				responseHtml
+						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
+				responseHtml
+						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
+				responseHtml.append("<span id=\"btn-edit-data-item\" class=\"top-panel-button ")
+						.append(editButtonEnable)
+						.append("\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
+				responseHtml
+						.append("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
+				responseHtml.append("</div></div>");
 			}
+			out.print(responseHtml.toString());
+		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
+			e.printStackTrace(out);
 		}
 
 		out.flush();

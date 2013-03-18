@@ -42,18 +42,18 @@ public class Tables extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
 			if (!GlobalSettings.getInstance().init(getServletContext().getRealPath(""))) {
 				response.sendRedirect("/pine/firstlaunch");
 				return;
 			}
+			StringBuilder responseHtml = new StringBuilder();
 			Dao dao = new Dao();
 
 			if (request.getSession(false) == null) {
@@ -64,16 +64,18 @@ public class Tables extends HttpServlet {
 				response.sendRedirect("/pine");
 			} else {
 
-				out.print("<!DOCTYPE html>");
-				out.print("<html>");
-				out.print("<head>");
-				out.print("<title>Data Tables - Pine</title>");
-				out.print("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
-				out.print("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
-				out.print("<link href=\"../css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
-				out.print("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
-				out.print("<script type=\"text/javascript\" src=\"../js/jquery-ui-1.10.2.custom.min.js\"></script>");
-				out.print("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
+				responseHtml.append("<!DOCTYPE html>");
+				responseHtml.append("<html>");
+				responseHtml.append("<head>");
+				responseHtml.append("<title>Data Tables - Pine</title>");
+				responseHtml.append("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
+				responseHtml.append("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
+				responseHtml
+						.append("<link href=\"../css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
+				responseHtml
+						.append("<script type=\"text/javascript\" src=\"../js/jquery-ui-1.10.2.custom.min.js\"></script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User user = dao.getUserByName(userName);
@@ -106,72 +108,77 @@ public class Tables extends HttpServlet {
 				}
 
 				if (!user.hasAccessToProduct(productId)) {
-					out.println("<a href=\".\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
-					out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
-					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
+					responseHtml.append("<a href=\".\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+					responseHtml
+							.append("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
+					responseHtml
+							.append("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
 
-					out.print("<script type=\"text/javascript\">");
-					out.print("var productId = \"" + productId + "\";");
-					out.print("var tableId = \"" + tableId + "\";");
-					out.print("var tableType = \"" + tableType + "\";");
-					out.print("</script>");
-					out.print("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
-					out.print("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
+					responseHtml.append("<script type=\"text/javascript\">");
+					responseHtml.append("var productId = \"").append(productId).append("\";");
+					responseHtml.append("var tableId = \"").append(tableId).append("\";");
+					responseHtml.append("var tableType = \"").append(tableType).append("\";");
+					responseHtml.append("</script>");
+					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
+					responseHtml.append("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
 
-					out.print("</head>");
-					out.print("<body>");
-					out.print(ServletHelper.getUserPanel(user));
-					includeHeader(out, "tables", dao.getProduct(productId));
+					responseHtml.append("</head>");
+					responseHtml.append("<body>");
+					responseHtml.append(ServletHelper.getUserPanel(user));
+					includeHeader(responseHtml, "tables", dao.getProduct(productId));
 
-					out.print("<div id=\"main\" class=\"table\">");
-					out.print("<div class=\"table-row\">");
-					out.print("<div class=\"table-cell entities-list\">");
-					out.print("<div id=\"category-container\"></div>");
-					out.print("</div>");
-					out.print("<div id=\"waiting\" class=\"table-cell\">");
-					out.print("<img src=\"../img/ajax-loader.gif\" class=\"waiting-gif\" />");
-					out.print("<div class=\"table top-panel\"></div>");
-					out.print("<div class=\"table entities-values\" style=\"width: auto;\"></div>");
-					out.print("</div>");
-					out.print("</div>");
-					out.print("</div>");
-					out.print(ServletHelper.getContextMenus("table"));
-					out.print(ServletHelper.getLoadingGif());
+					responseHtml.append("<div id=\"main\" class=\"table\">");
+					responseHtml.append("<div class=\"table-row\">");
+					responseHtml.append("<div class=\"table-cell entities-list\">");
+					responseHtml.append("<div id=\"category-container\"></div>");
+					responseHtml.append("</div>");
+					responseHtml.append("<div id=\"waiting\" class=\"table-cell\">");
+					responseHtml.append("<img src=\"../img/ajax-loader.gif\" class=\"waiting-gif\" />");
+					responseHtml.append("<div class=\"table top-panel\"></div>");
+					responseHtml.append("<div class=\"table entities-values\" style=\"width: auto;\"></div>");
+					responseHtml.append("</div>");
+					responseHtml.append("</div>");
+					responseHtml.append("</div>");
+					responseHtml.append(ServletHelper.getContextMenus("table"));
+					responseHtml.append(ServletHelper.getLoadingGif());
 				}
-				out.print(ServletHelper.getFooter(getServletContext().getRealPath("")));
-				out.print("</body>");
-				out.print("</html>");
-
-				out.flush();
-				out.close();
+				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
+				responseHtml.append("</body>");
+				responseHtml.append("</html>");
+				out.print(responseHtml.toString());
 			}
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
 	}
 
-	private void includeHeader(PrintWriter out, String sectionKey, Product product) {
+	private void includeHeader(StringBuilder responseHtml, String sectionKey, Product product) {
 
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		out.print("<a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
-		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		out.print("<a href=\"/pine/?product=" + product.getId() + "\">");
-		out.print("<span id=\"product-name\" class=\"header-text\">" + productName + "</span></a>");
-		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		out.print("<a href=\"/pine/" + sectionKey + "/?product=" + product.getId() + "\">");
-		out.print("<span id=\"section-name\" class=\"header-text\">" + sectionName + "</span></a>");
-		out.print("<br /><br />");
+		responseHtml.append("<a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
+		responseHtml.append("<span id=\"product-name\" class=\"header-text\">").append(productName)
+				.append("</span></a>");
+		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+		responseHtml.append("<a href=\"/pine/").append(sectionKey).append("/?product=").append(product.getId())
+				.append("\">");
+		responseHtml.append("<span id=\"section-name\" class=\"header-text\">").append(sectionName)
+				.append("</span></a>");
+		responseHtml.append("<br /><br />");
 
 	}
 }

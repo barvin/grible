@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.app.create;
+package org.pine.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,22 +21,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
-import org.pine.model.Key;
-import org.pine.model.Row;
 
 /**
- * Servlet implementation class GetStorageValues
+ * Servlet implementation class SaveTable
  */
-@WebServlet("/InsertKey")
-public class InsertKey extends HttpServlet {
+@WebServlet("/UpdateKeysOrder")
+public class UpdateKeysOrder extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public InsertKey() {
+	public UpdateKeysOrder() {
 		super();
 	}
 
@@ -46,39 +43,36 @@ public class InsertKey extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		response.setContentType("text/plain");
-		PrintWriter out = response.getWriter();
 		try {
+			response.setContentType("text/html");
+			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
-			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-			Key currentKey = dao.getKey(keyId);
-			int currentKeyNumber = currentKey.getOrder();
-			int tableId = currentKey.getTableId();
-			List<Integer> keyIds = new ArrayList<>();
-			List<Integer> keyNumbers = new ArrayList<>();
-			List<Key> keys = dao.getKeys(tableId);
-			for (int i = 0; i < keys.size(); i++) {
-				keyIds.add(keys.get(i).getId());
-				if (keys.get(i).getOrder() >= currentKeyNumber) {
-					keyNumbers.add(i + 2);
-				} else {
-					keyNumbers.add(i + 1);
+			if (request.getParameterValues("modkeyids[]") != null) {
+				String[] strKeyIds = request.getParameterValues("modkeyids[]");
+				String[] strKeyNumbers = request.getParameterValues("modkeynumbers[]");
+				List<Integer> keyIds = new ArrayList<Integer>();
+				List<Integer> keyNumbers = new ArrayList<Integer>();
+				for (int i = 0; i < strKeyIds.length; i++) {
+					keyIds.add(Integer.parseInt(strKeyIds[i]));
+					keyNumbers.add(Integer.parseInt(strKeyNumbers[i]));
 				}
+				dao.updateKeys(keyIds, keyNumbers);
 			}
-			dao.updateKeys(keyIds, keyNumbers);
-			currentKey.setOrder(currentKeyNumber);
-			int newKeyId = dao.insertKeyCopy(currentKey, false);
+			out.print("success");
 
-			List<Row> rows = dao.getRows(tableId);
-			List<Integer> ids = dao.insertValuesEmptyWithKeyId(newKeyId, rows);
-
-			String result = newKeyId + ";" + StringUtils.join(ids, ";");
-			out.print(result);
+			out.flush();
+			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		out.flush();
-		out.close();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request, response);
 	}
 }

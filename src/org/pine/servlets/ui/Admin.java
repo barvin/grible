@@ -63,7 +63,7 @@ public class Admin extends HttpServlet {
 				out.print("<title>Admin - Pine</title>");
 				out.print("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
 				out.print("<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/style.css\" />");
-				out.print("<script type=\"text/javascript\" src=\"http://code.jquery.com/jquery-latest.min.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/admin.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
 				out.println("<script type=\"text/javascript\">");

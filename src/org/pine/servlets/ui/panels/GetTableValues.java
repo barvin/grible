@@ -48,7 +48,8 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -84,8 +85,8 @@ public class GetTableValues extends HttpServlet {
 			out.println("<div class=\"table-cell ui-cell index-header-cell\">Index</div>");
 		}
 		for (Key key : keys) {
-			out.println("<div id=\"" + key.getId() + "\" class=\"table-cell ui-cell key-cell\">" + key.getName()
-					+ "</div>");
+			out.println("<div id=\"" + key.getId() + "\" key-order=\"" + key.getOrder()
+					+ "\" class=\"table-cell ui-cell key-cell\">" + key.getName() + "</div>");
 		}
 		if (showUsage) {
 			out.println("<div class=\"table-cell ui-cell info-key-cell\">Used in tables</div>");
@@ -104,8 +105,8 @@ public class GetTableValues extends HttpServlet {
 			}
 			for (Value value : valuesRow) {
 				String storageCell = (value.isStorage()) ? " storage-cell" : "";
-				out.println("<div id=\"" + value.getId() + "\" keyid=\"" + value.getKeyId()
-						+ "\" class=\"table-cell ui-cell value-cell" + storageCell + "\">"
+				out.println("<div id=\"" + value.getId() + "\" keyid=\"" + value.getKeyId() + "\" rowid=\""
+						+ value.getRowId() + "\" class=\"table-cell ui-cell value-cell" + storageCell + "\">"
 						+ StringEscapeUtils.escapeHtml4(value.getValue()) + "</div>");
 			}
 			if (showUsage) {

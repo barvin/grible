@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
 import org.pine.model.Key;
 import org.pine.model.Value;
@@ -45,9 +46,9 @@ public class CopyKey extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
 			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
@@ -67,16 +68,17 @@ public class CopyKey extends HttpServlet {
 			}
 			dao.updateKeys(keyIds, keyNumbers);
 			currentKey.setOrder(currentKeyNumber + 1);
-			int newKeyId = dao.insertKeyCopy(currentKey);
+			int newKeyId = dao.insertKeyCopy(currentKey, true);
 
 			List<Value> values = dao.getValues(currentKey);
-			dao.insertValuesWithKeyId(newKeyId, values);
+			List<Integer> ids = dao.insertValuesWithKeyId(newKeyId, values);
 
-			out.print("success");
-			out.flush();
-			out.close();
+			String result = newKeyId + ";" + StringUtils.join(ids, ";");
+			out.print(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 }

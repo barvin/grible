@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.app.create;
+package org.pine.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,22 +21,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
-import org.pine.model.Row;
-import org.pine.model.Value;
 
 /**
- * Servlet implementation class GetStorageValues
+ * Servlet implementation class SaveTable
  */
-@WebServlet("/CopyRow")
-public class CopyRow extends HttpServlet {
+@WebServlet("/UpdateRowsOrder")
+public class UpdateRowsOrder extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public CopyRow() {
+	public UpdateRowsOrder() {
 		super();
 	}
 
@@ -46,42 +43,40 @@ public class CopyRow extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
-		response.setContentType("text/plain");
+		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
 			Dao dao = new Dao();
-			int rowId = Integer.parseInt(request.getParameter("rowid"));
 
-			Row currentRow = dao.getRow(rowId);
-			int currentRowNumber = currentRow.getOrder();
-			int tableId = currentRow.getTableId();
-			List<Integer> rowIds = new ArrayList<>();
-			List<Integer> rowNumbers = new ArrayList<>();
-			List<Integer> oldRowNumbers = new ArrayList<>();
-			List<Row> rows = dao.getRows(tableId);
-			for (int i = 0; i < rows.size(); i++) {
-				rowIds.add(rows.get(i).getId());
-				if (rows.get(i).getOrder() > currentRowNumber) {
-					rowNumbers.add(i + 2);
-				} else {
-					rowNumbers.add(i + 1);
+			if (request.getParameterValues("rowids[]") != null) {
+				String[] strRowIds = request.getParameterValues("rowids[]");
+				String[] strOldOrder = request.getParameterValues("oldorder[]");
+				String[] strNewOrder = request.getParameterValues("neworder[]");
+				List<Integer> modifiedRowIds = new ArrayList<Integer>();
+				List<Integer> oldRowNumbers = new ArrayList<Integer>();
+				List<Integer> modifiedRowNumbers = new ArrayList<Integer>();
+				for (int i = 0; i < strRowIds.length; i++) {
+					modifiedRowIds.add(Integer.parseInt(strRowIds[i]));
+					oldRowNumbers.add(Integer.parseInt(strOldOrder[i]));
+					modifiedRowNumbers.add(Integer.parseInt(strNewOrder[i]));
 				}
-				oldRowNumbers.add(i + 1);
+				dao.updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
 			}
-			dao.updateRows(rowIds, oldRowNumbers, rowNumbers);
-			currentRow.setOrder(currentRowNumber + 1);
-			int newRowId = dao.insertRowCopy(currentRow);
+			out.print("success");
 
-			List<Value> values = dao.getValues(currentRow);
-			List<Integer> ids = dao.insertValuesWithRowId(newRowId, values);
-
-			String result = newRowId + ";" + StringUtils.join(ids, ";");
-			out.print(result);
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 		out.flush();
 		out.close();
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request, response);
 	}
 }

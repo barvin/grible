@@ -71,8 +71,8 @@ public class Tables extends HttpServlet {
 				out.print("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
 				out.print("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
 				out.print("<link href=\"../css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
-				out.print("<script type=\"text/javascript\" src=\"http://code.jquery.com/jquery-latest.min.js\"></script>");
-				out.print("<script type=\"text/javascript\" src=\"http://code.jquery.com/ui/1.9.1/jquery-ui.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/jquery-ui-1.10.2.custom.min.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");

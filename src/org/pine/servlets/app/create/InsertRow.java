@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
 import org.pine.model.Key;
 import org.pine.model.Row;
@@ -45,9 +46,9 @@ public class InsertRow extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
 			int rowId = Integer.parseInt(request.getParameter("rowid"));
 
@@ -72,13 +73,15 @@ public class InsertRow extends HttpServlet {
 			int newRowId = dao.insertRowCopy(currentRow);
 
 			List<Key> keys = dao.getKeys(tableId);
-			dao.insertValuesEmptyWithRowId(newRowId, keys);
+			List<Integer> ids = dao.insertValuesEmptyWithRowId(newRowId, keys);
 
-			out.print("success");
-			out.flush();
-			out.close();
+			String result = newRowId + ";" + StringUtils.join(ids, ";");
+			out.print(result);
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 }

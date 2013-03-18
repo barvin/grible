@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project basedir="." default="compile" name="pine">
 
-	<property name="version" value="0.5" />
+	<property name="version" value="0.8" />
 
 	<!-- Configure the directory into which the web application is built -->
 	<property name="build" value="${basedir}/build/classes" />

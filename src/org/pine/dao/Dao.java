@@ -559,7 +559,9 @@ public class Dao {
 		List<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM values WHERE keyid=" + key.getId());
+		ResultSet rs = stmt.executeQuery("SELECT v.id, v.keyid, v.rowid, v.value, v.isstorage, v.storagerows, "
+				+ "r.\"order\" FROM values as v JOIN rows as r ON v.rowid=r.id AND v.keyid=" + key.getId()
+				+ " ORDER BY r.\"order\"");
 		while (rs.next()) {
 			result.add(initValue(rs));
 		}
@@ -669,15 +671,21 @@ public class Dao {
 		return result;
 	}
 
-	public void insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws SQLException {
+	public List<Integer> insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws SQLException {
+		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Row row : rows) {
 			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) VALUES (" + row.getId()
 					+ ", " + keyId + ", '', false, null)");
+			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
+			if (rs.next()) {
+				result.add(rs.getInt("id"));
+			}
 		}
 		conn.close();
 		stmt.close();
+		return result;
 	}
 
 	public void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
@@ -690,12 +698,13 @@ public class Dao {
 		stmt.close();
 	}
 
-	public int insertKeyCopy(Key currentKey) throws SQLException {
+	public int insertKeyCopy(Key currentKey, boolean copyName) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
+		String name = (copyName) ? currentKey.getName() : "editme";
 		stmt.executeUpdate("INSERT INTO keys(tableid, name, \"order\") VALUES (" + currentKey.getTableId() + ", '"
-				+ currentKey.getName() + "'," + currentKey.getOrder() + ")");
+				+ name + "'," + currentKey.getOrder() + ")");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {
 			result = rs.getInt("id");
@@ -705,16 +714,22 @@ public class Dao {
 		return result;
 	}
 
-	public void insertValuesWithKeyId(int newKeyId, List<Value> values) throws SQLException {
+	public List<Integer> insertValuesWithKeyId(int newKeyId, List<Value> values) throws SQLException {
+		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Value value : values) {
 			stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
 					+ value.getRowId() + ", " + newKeyId + ", '" + value.getValue() + "', " + value.isStorage() + ", "
 					+ value.getStorageIdsAsString() + ")");
+			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
+			if (rs.next()) {
+				result.add(rs.getInt("id"));
+			}
 		}
 		conn.close();
 		stmt.close();
+		return result;
 	}
 
 	public void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
@@ -777,19 +792,26 @@ public class Dao {
 		return result;
 	}
 
-	public void insertValuesWithRowId(int newRowId, List<Value> values) throws SQLException {
+	public List<Integer> insertValuesWithRowId(int newRowId, List<Value> values) throws SQLException {
+		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Value value : values) {
 			stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
 					+ newRowId + ", " + value.getKeyId() + ", '" + value.getValue() + "', " + value.isStorage() + ", "
 					+ value.getStorageIdsAsString() + ")");
+			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
+			if (rs.next()) {
+				result.add(rs.getInt("id"));
+			}
 		}
 		conn.close();
 		stmt.close();
+		return result;
 	}
 
-	public void insertValuesEmptyWithRowId(int newRowId, List<Key> keys) throws SQLException {
+	public List<Integer> insertValuesEmptyWithRowId(int newRowId, List<Key> keys) throws SQLException {
+		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Key key : keys) {
@@ -804,12 +826,17 @@ public class Dao {
 				tempValue.setValue("0");
 			}
 
-			stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
+			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
 					+ tempValue.getRowId() + ", " + tempValue.getKeyId() + ", '" + tempValue.getValue() + "', "
 					+ tempValue.isStorage() + ", " + tempValue.getStorageIdsAsString() + ")");
+			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
+			if (rs.next()) {
+				result.add(rs.getInt("id"));
+			}
 		}
 		conn.close();
 		stmt.close();
+		return result;
 	}
 
 	public boolean deleteCategory(int categoryId) throws SQLException {
@@ -973,6 +1000,14 @@ public class Dao {
 		for (int i = 0; i < keyIds.length; i++) {
 			stmt.executeUpdate("UPDATE keys SET name='" + keyValues[i] + "' " + "WHERE id=" + keyIds[i]);
 		}
+		conn.close();
+		stmt.close();
+	}
+
+	public void updateKeyValue(String id, String value) throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate("UPDATE keys SET name='" + value + "' " + "WHERE id=" + id);
 		conn.close();
 		stmt.close();
 	}

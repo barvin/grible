@@ -64,7 +64,7 @@ public class Home extends HttpServlet {
 			out.println("<link rel=\"shortcut icon\" href=\"img/favicon.ico\" >");
 			out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />");
 			out.println("<link href=\"css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
-			out.println("<script type=\"text/javascript\" src=\"http://code.jquery.com/jquery-latest.min.js\"></script>");
+			out.println("<script type=\"text/javascript\" src=\"js/jquery-1.9.1.min.js\"></script>");
 			out.println("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
 			out.println("<script type=\"text/javascript\" src=\"js/footer.js\"></script>");
 			out.println("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");

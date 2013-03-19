@@ -688,26 +688,8 @@ function initTableValues() {
 		}
 	});
 
+	initValueCells($(".value-cell:not(:has(> input.changed-value))"));
 	initTooltipCells($(".storage-cell"));
-
-	$(".value-cell:not(:has(> input.changed-value))").dblclick(
-			function() {
-				var $cell = $(this);
-				$cell.removeClass("selected-cell");
-				if ($cell.has("span")) {
-					$cell.find("span").remove();
-				}
-				if ($cell.has("div.tooltip")) {
-					$cell.find("div.tooltip").remove();
-				}
-				var $content = $cell.text().replace(/'/g, "&#39;");
-				var $width = $cell.width();
-				$cell.html("<input class='changed-value' value='" + $content
-						+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
-				$cell.find("input.changed-value").css("width", $width + "px");
-				$cell.find("input.changed-value").focus();
-				initEditableCell(jQuery);
-			});
 
 	$(".value-cell").click(function(event) {
 		event.stopPropagation();
@@ -722,6 +704,26 @@ function initTableValues() {
 		if (event.ctrlKey) {
 			// TODO: Copy to clipboard.
 		}
+	});
+}
+
+function initValueCells(cells) {
+	cells.dblclick(function() {
+		var $cell = $(this);
+		$cell.removeClass("selected-cell");
+		if ($cell.has("span")) {
+			$cell.find("span").remove();
+		}
+		if ($cell.has("div.tooltip")) {
+			$cell.find("div.tooltip").remove();
+		}
+		var $content = $cell.text().replace(/'/g, "&#39;");
+		var $width = $cell.width();
+		$cell.html("<input class='changed-value' value='" + $content
+				+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
+		$cell.find("input.changed-value").css("width", $width + "px");
+		$cell.find("input.changed-value").focus();
+		initEditableCell(jQuery);
 	});
 }
 
@@ -1031,6 +1033,7 @@ function initEditableKeyCell() {
 					$column.find("div.tooltip").remove();
 					$column.off();
 					$column.removeClass("storage-cell");
+					initValueCells($column);
 					modifyKeyCell();
 				} else {
 					$column.addClass("storage-cell");

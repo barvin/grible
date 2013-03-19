@@ -40,14 +40,13 @@ public class GetCategories extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
 			int productId = Integer.parseInt(request.getParameter("productId"));
 			int tableId = Integer.parseInt(request.getParameter("tableId"));
 			String strTableType = request.getParameter("tableType");
@@ -59,6 +58,7 @@ public class GetCategories extends HttpServlet {
 				tableId = dao.getTable(tableId).getParentId();
 			}
 			List<Category> categories = dao.getCategories(productId, tableType);
+			StringBuilder responseHtml = new StringBuilder();
 			for (Category category : categories) {
 				List<Table> tables = dao.getTablesByCategoryId(category.getId());
 				boolean categorySelected = false;
@@ -72,20 +72,21 @@ public class GetCategories extends HttpServlet {
 				if (categorySelected) {
 					categorySelectedClass = " category-item-selected";
 				}
-				out.print("<h3 id=\"" + category.getId() + "\" class=\"category-item" + categorySelectedClass + "\">"
-						+ category.getName() + "</h3><div>");
+				responseHtml.append("<h3 id=\"").append(category.getId()).append("\" class=\"category-item")
+						.append(categorySelectedClass).append("\">").append(category.getName()).append("</h3><div>");
 				for (Table table : tables) {
 					String selected = (table.getId() == tableId) ? " data-item-selected" : "";
-					out.print("<div id=\"" + table.getId() + "\" class=\"data-item" + selected + "\">"
-							+ table.getName() + "</div>");
+					responseHtml.append("<div id=\"").append(table.getId()).append("\" class=\"data-item")
+							.append(selected).append("\">").append(table.getName()).append("</div>");
 				}
-				out.print("</div>");
+				responseHtml.append("</div>");
 			}
-
-			out.flush();
-			out.close();
+			out.print(responseHtml.toString());
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 }

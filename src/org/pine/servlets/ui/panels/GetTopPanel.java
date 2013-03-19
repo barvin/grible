@@ -55,10 +55,13 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
+				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-edit-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
+				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
+				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-class-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/brackets.png\"> Class</span>");
 				responseHtml.append("</div>");
@@ -131,11 +134,14 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div class=\"table-cell right\">");
 				responseHtml
 						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
+				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
+				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml.append("<span id=\"btn-edit-data-item\" class=\"top-panel-button ")
 						.append(editButtonEnable)
 						.append("\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
+				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
 				responseHtml.append("</div></div>");

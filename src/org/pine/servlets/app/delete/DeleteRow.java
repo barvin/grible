@@ -76,9 +76,9 @@ public class DeleteRow extends HttpServlet {
 				out.print(error);
 			} else {
 				if (dao.deleteRow(rowId)) {
-					List<Integer> rowIds = new ArrayList<>();
-					List<Integer> oldRowNumbers = new ArrayList<>();
-					List<Integer> rowNumbers = new ArrayList<>();
+					List<Integer> rowIds = new ArrayList<Integer>();
+					List<Integer> oldRowNumbers = new ArrayList<Integer>();
+					List<Integer> rowNumbers = new ArrayList<Integer>();
 					List<Row> rows = dao.getRows(tableId);
 					for (int i = 0; i < rows.size(); i++) {
 						rowIds.add(rows.get(i).getId());

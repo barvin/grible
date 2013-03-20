@@ -50,7 +50,7 @@ public class ExcelFile {
 		int rowCount = sheet.getPhysicalNumberOfRows() - 1;
 
 		for (int i = 1; i < rowCount + 1; i++) {
-			ArrayList<String> values = new ArrayList<>();
+			ArrayList<String> values = new ArrayList<String>();
 			Row row = sheet.getRow(i);
 			for (int j = 0; j < keysCount; j++) {
 				Cell cell = row.getCell(j);
@@ -106,7 +106,7 @@ public class ExcelFile {
 	}
 
 	private HashMap<String, String> getFirstRowHashBySheetName(String sheetName) {
-		HashMap<String, String> result = new HashMap<>();
+		HashMap<String, String> result = new HashMap<String, String>();
 		Sheet sheet = workbook.getSheet(sheetName);
 		Row keysRow = sheet.getRow(0);
 		Row valuesRow = sheet.getRow(1);

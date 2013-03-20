@@ -110,7 +110,7 @@ public class Dao {
 	}
 
 	private List<UserPermission> getUserPermissions(int userId) throws SQLException {
-		ArrayList<UserPermission> result = new ArrayList<>();
+		ArrayList<UserPermission> result = new ArrayList<UserPermission>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT * FROM userpermissions WHERE userid=" + userId + " ORDER BY id");
@@ -157,7 +157,7 @@ public class Dao {
 	}
 
 	public List<Product> getProducts() throws SQLException {
-		List<Product> result = new ArrayList<>();
+		List<Product> result = new ArrayList<Product>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT * FROM products ORDER BY name");
@@ -185,7 +185,7 @@ public class Dao {
 	}
 
 	public List<Category> getCategories(int productId, TableType type) throws SQLException {
-		List<Category> result = new ArrayList<>();
+		List<Category> result = new ArrayList<Category>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT c.id, c.name, c.productid, c.parentid, tt.name as type "
@@ -361,7 +361,7 @@ public class Dao {
 	}
 
 	public List<User> getUsers() throws SQLException {
-		List<User> result = new ArrayList<>();
+		List<User> result = new ArrayList<User>();
 
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -745,7 +745,7 @@ public class Dao {
 
 	public void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
 			throws SQLException {
-		List<Value> values = new ArrayList<>();
+		List<Value> values = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < rowIds.size(); i++) {
@@ -1221,5 +1221,10 @@ public class Dao {
 		conn.close();
 		stmt.close();
 		return result;
+	}
+
+	public void getTableOfProductByName(String name, TableType type, Integer categoryId) {
+		// TODO Auto-generated method stub
+		
 	}
 }

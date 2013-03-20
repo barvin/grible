@@ -72,10 +72,11 @@ public class AddTable extends HttpServlet {
 				throw new Exception("ERROR: Name cannot be empty.");
 			}
 			TableType type = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
+			dao.getTableOfProductByName(name, type, categoryId);
 			String className = request.getParameter("classname");
 			int tableId;
 			tableId = dao.insertTable(name, type, categoryId, parentId, className);
-			List<String> keys = new ArrayList<>();
+			List<String> keys = new ArrayList<String>();
 			keys.add("editme");
 			int keyId = dao.insertKeys(tableId, keys).get(0);
 			dao.insertRow(tableId, 1);

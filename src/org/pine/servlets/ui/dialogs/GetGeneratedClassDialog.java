@@ -170,7 +170,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 	}
 
 	private boolean semicoulumExists(List<Value> values) {
-		List<String> strValues = new ArrayList<>();
+		List<String> strValues = new ArrayList<String>();
 		for (Value value : values) {
 			strValues.add(value.getValue());
 		}
@@ -179,7 +179,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 	}
 
 	private boolean isBoolean(List<Value> values) {
-		List<String> strValues = new ArrayList<>();
+		List<String> strValues = new ArrayList<String>();
 		for (Value value : values) {
 			strValues.add(value.getValue());
 		}
@@ -188,7 +188,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 	}
 
 	private boolean isInteger(List<Value> values) {
-		List<String> strValues = new ArrayList<>();
+		List<String> strValues = new ArrayList<String>();
 		for (Value value : values) {
 			strValues.add(value.getValue());
 		}

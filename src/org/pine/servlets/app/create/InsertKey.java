@@ -55,8 +55,8 @@ public class InsertKey extends HttpServlet {
 			Key currentKey = dao.getKey(keyId);
 			int currentKeyNumber = currentKey.getOrder();
 			int tableId = currentKey.getTableId();
-			List<Integer> keyIds = new ArrayList<>();
-			List<Integer> keyNumbers = new ArrayList<>();
+			List<Integer> keyIds = new ArrayList<Integer>();
+			List<Integer> keyNumbers = new ArrayList<Integer>();
 			List<Key> keys = dao.getKeys(tableId);
 			for (int i = 0; i < keys.size(); i++) {
 				keyIds.add(keys.get(i).getId());

@@ -81,7 +81,7 @@ public class User {
 		if (isAdmin) {
 			return true;
 		}
-		List<Product> products = new ArrayList<>();
+		List<Product> products = new ArrayList<Product>();
 		for (UserPermission permission : permissions) {
 			products.add(permission.getProduct());
 		}

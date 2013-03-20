@@ -78,39 +78,13 @@ function initDataItemsPanel() {
 					},
 					function(action, el, pos) {
 						var $id = $(el).attr("id");
-						var $className = "";
-						if (tableType == "storage") {
-							$className = '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-									+ 'Class name:</div><div class="table-cell dialog-cell dialog-edit"><input class="data-storage-class-name dialog-edit"></div>'
-									+ '</div>';
-						}
 						if (action == "add") {
-							$("body")
-									.append(
-											'<div id="add-data-'
-													+ tableType
-													+ '-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Add data '
-													+ tableType
-													+ '</div>'
-													+ '<div class="ui-dialog-content">'
-													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="data-item-name dialog-edit"></div>'
-													+ '</div>'
-													+ $className
-													+ '</div>'
-													+ '<br/>The data '
-													+ tableType
-													+ ' will be added to the category "'
-													+ $(el).text()
-													+ '".'
-													+ '<div class="dialog-buttons right">'
-													+ '<button id="dialog-btn-add-data-item" category-id="'
-													+ $id
-													+ '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-													+ '</div></div></div>');
-							initAddDataItemDialog(jQuery);
+							$.post("../GetAddTableDialog", {
+								categoryid : $id
+							}, function(data) {
+								$("body").append(data);
+								initAddDataItemDialog(jQuery);
+							});
 						} else if (action == "edit") {
 							$("body")
 									.append(
@@ -189,6 +163,16 @@ function initAddDataItemDialog() {
 	initDialog();
 	$("input.data-item-name").focus();
 
+	$("input.copy-existing").click(function() {
+		if ($(this).is(':checked')) {
+			$("select.tables-list").prop("disabled", false);
+			$("input.only-columns").prop("disabled", false);
+		} else {
+			$("select.tables-list").prop("disabled", true);
+			$("input.only-columns").prop("disabled", true);
+		}
+	});
+
 	$("input.data-item-name").keypress(function(event) {
 		if (event.which === 13) {
 			submitAddDataItem();
@@ -213,18 +197,28 @@ function initAddDataItemDialog() {
 				tabletype : tableType,
 				categoryid : $id,
 				name : $("input.data-item-name").val(),
-				classname : $("input.data-storage-class-name").val()
+				classname : $("input.data-storage-class-name").val(),
+				iscopy : $("input.copy-existing").is(':checked'),
+				copytableid : $("select.tables-list").find("option:selected").val(),
+				isonlycolumns : $("input.only-columns").is(':checked')
 			};
 		} else {
 			$args = {
 				tabletype : "table",
 				categoryid : $id,
-				name : $("input.data-item-name").val()
+				name : $("input.data-item-name").val(),
+				iscopy : $("input.copy-existing").is(':checked'),
+				copytableid : $("select.tables-list").find("option:selected").val(),
+				isonlycolumns : $("input.only-columns").is(':checked')
 			};
 		}
 		$.post("../AddTable", $args, function(newTableId) {
-			$("#add-category-dialog").remove();
-			window.location = "?id=" + newTableId;
+			if (isNaN(newTableId)) {
+				alert(newTableId);
+			} else {
+				$("#add-category-dialog").remove();
+				window.location = "?id=" + newTableId;
+			}
 		});
 	}
 

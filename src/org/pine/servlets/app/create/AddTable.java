@@ -46,9 +46,9 @@ public class AddTable extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
 			Dao dao = new Dao();
 
 			Integer categoryId = null;
@@ -60,7 +60,7 @@ public class AddTable extends HttpServlet {
 			if (request.getParameter("parentid") != null) {
 				TableType currType = TableType.valueOf(request.getParameter("currTabletype").toUpperCase());
 				if (currType == TableType.TABLE) {
-					parentId = Integer.parseInt(request.getParameter("parentid"));	
+					parentId = Integer.parseInt(request.getParameter("parentid"));
 				} else {
 					Table sibling = dao.getTable(Integer.parseInt(request.getParameter("parentid")));
 					parentId = sibling.getParentId();
@@ -68,9 +68,11 @@ public class AddTable extends HttpServlet {
 			}
 
 			String name = request.getParameter("name");
+			if (("").equals(name)) {
+				throw new Exception("ERROR: Name cannot be empty.");
+			}
 			TableType type = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			String className = request.getParameter("classname");
-
 			int tableId;
 			tableId = dao.insertTable(name, type, categoryId, parentId, className);
 			List<String> keys = new ArrayList<>();
@@ -80,10 +82,13 @@ public class AddTable extends HttpServlet {
 			List<Row> rows = dao.getRows(tableId);
 			dao.insertValuesEmptyWithKeyId(keyId, rows);
 			out.print(tableId);
-			out.flush();
-			out.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
+			if (!e.getLocalizedMessage().startsWith("ERROR")) {
+				e.printStackTrace();
+			}
 		}
+		out.flush();
+		out.close();
 	}
 }

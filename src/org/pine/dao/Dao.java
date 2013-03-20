@@ -455,13 +455,13 @@ public class Dao {
 		return productId;
 	}
 
-	public List<Table> getTablesByCategoryId(int categpryId) throws SQLException {
+	public List<Table> getTablesByCategoryId(int categoryId) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
 				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
-				+ "ON t.type=tt.id AND t.categoryid=" + categpryId + " ORDER BY t.id");
+				+ "ON t.type=tt.id AND t.categoryid=" + categoryId + " ORDER BY t.id");
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
@@ -733,7 +733,8 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted
+	 * to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -1203,5 +1204,22 @@ public class Dao {
 		stmt.executeUpdate("UPDATE products SET name='" + product.getName() + "' WHERE id=" + product.getId());
 		conn.close();
 		stmt.close();
+	}
+
+	public List<Table> getTablesOfProduct(int productId, TableType type) throws SQLException {
+		ArrayList<Table> result = new ArrayList<Table>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
+				+ "ON t.type=tt.id AND t.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
+				+ " AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
+				+ "')) ORDER BY t.name");
+		while (rs.next()) {
+			result.add(initTable(rs));
+		}
+		conn.close();
+		stmt.close();
+		return result;
 	}
 }

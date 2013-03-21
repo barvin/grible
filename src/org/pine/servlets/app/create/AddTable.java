@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Key;
 import org.pine.model.Row;
 import org.pine.model.Table;
 import org.pine.model.TableType;
@@ -83,7 +84,14 @@ public class AddTable extends HttpServlet {
 			if (isCopy) {
 				int copyTableId = Integer.parseInt(request.getParameter("copytableid"));
 				boolean isOnlyColumns = Boolean.parseBoolean(request.getParameter("isonlycolumns"));
-				dao.insertKeysFromOneTableToAnother(copyTableId, tableId);
+				List<Key> keys = dao.insertKeysFromOneTableToAnother(copyTableId, tableId);
+				if (isOnlyColumns) {
+					int rowId = dao.insertRow(tableId, 1);
+					dao.insertValuesEmptyWithRowId(rowId, keys);
+				} else {
+					List<Row> oldRows = dao.getRows(copyTableId);
+					dao.insertValues(tableId, copyTableId, oldRows, keys);
+				}
 			} else {
 				List<String> keys = new ArrayList<String>();
 				keys.add("editme");

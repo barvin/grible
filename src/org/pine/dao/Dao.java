@@ -663,7 +663,7 @@ public class Dao {
 					+ keyNames.get(i) + "', " + (i + 1) + ", NULL)");
 			ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
 			if (rs.next()) {
-				result.add(rs.getInt("Id"));
+				result.add(rs.getInt("id"));
 			}
 		}
 		conn.close();
@@ -733,8 +733,7 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted
-	 * to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -821,25 +820,25 @@ public class Dao {
 		return result;
 	}
 
-	public List<Integer> insertValuesEmptyWithRowId(int newRowId, List<Key> keys) throws SQLException {
+	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Key key : keys) {
-			Value tempValue = new Value(0);
-			tempValue.setIsStorage(false);
-			tempValue.setValue("");
-			tempValue.setKeyId(key.getId());
-			tempValue.setRowId(newRowId);
-			tempValue.setStorageIds(null);
+			Value value = new Value(0);
+			value.setIsStorage(false);
+			value.setValue("");
+			value.setKeyId(key.getId());
+			value.setRowId(rowId);
+			value.setStorageIds(null);
 			if (key.getReferenceTableId() != 0) {
-				tempValue.setIsStorage(true);
-				tempValue.setValue("0");
+				value.setIsStorage(true);
+				value.setValue("0");
 			}
 
 			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ tempValue.getRowId() + ", " + tempValue.getKeyId() + ", '" + escape(tempValue.getValue()) + "', "
-					+ tempValue.isStorage() + ", " + tempValue.getStorageIdsAsString() + ")");
+					+ value.getRowId() + ", " + value.getKeyId() + ", '" + escape(value.getValue()) + "', "
+					+ value.isStorage() + ", " + value.getStorageIdsAsString() + ")");
 			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
 			if (rs.next()) {
 				result.add(rs.getInt("id"));
@@ -957,7 +956,7 @@ public class Dao {
 			stmt.executeUpdate("INSERT INTO rows(tableid, \"order\") VALUES (" + tableId + ", " + (i + 1) + ")");
 			ResultSet rs = stmt.executeQuery("SELECT id FROM rows ORDER BY id DESC LIMIT 1");
 			if (rs.next()) {
-				result.add(rs.getInt("Id"));
+				result.add(rs.getInt("id"));
 			}
 		}
 		conn.close();
@@ -1239,19 +1238,39 @@ public class Dao {
 		return result;
 	}
 
-	public List<Integer> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
+	public List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
+		List<Key> result = new ArrayList<Key>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("INSERT INTO keys" + "(tableid, name, \"order\", reftable) VALUES (" + tableId + ", '" + ""
-				+ "', NULL)");
+		stmt.executeUpdate("INSERT INTO keys (tableid, name, \"order\", reftable) " + "SELECT " + tableId
+				+ ", name, \"order\", reftable FROM keys WHERE tableid=" + copyTableId);
 
-		ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
-		if (rs.next()) {
-			result.add(rs.getInt("Id"));
+		ResultSet rs = stmt.executeQuery("SELECT * FROM keys WHERE tableid=" + tableId);
+		while (rs.next()) {
+			result.add(initKey(rs));
 		}
 		conn.close();
 		stmt.close();
 		return result;
+	}
+
+	public void insertValues(int tableId, int oldTableId, List<Row> oldRows, List<Key> keys) throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		for (Row oldRow : oldRows) {
+			stmt.executeUpdate("INSERT INTO rows (tableid, \"order\") VALUES (" + tableId + ", " + oldRow.getOrder()
+					+ ")");
+			for (Key key : keys) {
+				stmt.executeUpdate("INSERT INTO values (rowid, keyid, value, isstorage, storagerows) "
+						+ "SELECT (SELECT id FROM rows WHERE tableid=" + tableId + " AND \"order\"="
+						+ oldRow.getOrder() + "), " + key.getId()
+						+ ", value, isstorage, storagerows FROM values WHERE rowid=" + oldRow.getId() + " AND keyid=" +
+								"(SELECT id FROM keys WHERE tableid=" + oldTableId + " AND \"order\"="
+						+ key.getOrder() + ")");
+			}
+		}
+
+		conn.close();
+		stmt.close();
 	}
 }

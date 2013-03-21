@@ -1223,8 +1223,35 @@ public class Dao {
 		return result;
 	}
 
-	public void getTableOfProductByName(String name, TableType type, Integer categoryId) {
-		// TODO Auto-generated method stub
-		
+	public boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws SQLException {
+		boolean result = false;
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE categoryid IN "
+				+ "(SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id=" + categoryId
+				+ ")) AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
+				+ "') AND name='" + name + "'");
+		if (rs.next()) {
+			result = true;
+		}
+		conn.close();
+		stmt.close();
+		return result;
+	}
+
+	public List<Integer> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
+		List<Integer> result = new ArrayList<Integer>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate("INSERT INTO keys" + "(tableid, name, \"order\", reftable) VALUES (" + tableId + ", '" + ""
+				+ "', NULL)");
+
+		ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
+		if (rs.next()) {
+			result.add(rs.getInt("Id"));
+		}
+		conn.close();
+		stmt.close();
+		return result;
 	}
 }

@@ -57,51 +57,56 @@ public class Home extends HttpServlet {
 				return;
 			}
 			Dao dao = new Dao();
-			out.println("<!DOCTYPE html>");
-			out.println("<html>");
-			out.println("<head>");
-			out.println("<title>Pine</title>");
-			out.println("<link rel=\"shortcut icon\" href=\"img/favicon.ico\" >");
-			out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />");
-			out.println("<link href=\"css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
-			out.println("<script type=\"text/javascript\" src=\"js/jquery-1.9.1.min.js\"></script>");
-			out.println("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
-			out.println("<script type=\"text/javascript\" src=\"js/footer.js\"></script>");
-			out.println("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");
-			out.println("</head>");
-			out.println("<body>");
+			StringBuilder responseHtml = new StringBuilder();
+			responseHtml.append("<!DOCTYPE html>");
+			responseHtml.append("<html>");
+			responseHtml.append("<head>");
+			responseHtml.append("<title>Pine</title>");
+			responseHtml.append("<link rel=\"shortcut icon\" href=\"img/favicon.ico\" >");
+			responseHtml.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />");
+			responseHtml.append("<link href=\"css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-1.9.1.min.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/footer.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");
+			responseHtml.append("</head>");
+			responseHtml.append("<body>");
 
 			if (request.getSession(false).getAttribute("userName") == null) {
-				out.println("<div id=\"waiting-bg\">");
-				out.println("<div id=\"login-form\">");
-				out.println("<img id=\"login-logo\" src=\"img/pine_logo.png\"><br>");
-				out.println("<form method=\"post\" action=\"Login\">");
-				out.println("<div class=\"table\">");
-				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell dialog-label\">Username:</div>");
-				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"dialog-edit\" name=\"username\"></div>");
-				out.println("</div>");
-				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell dialog-label\">Password:</div>");
-				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input type=\"password\" class=\"dialog-edit\" name=\"pass\"></div>");
-				out.println("</div>");
-				out.println("</div>");
+				responseHtml.append("<div id=\"waiting-bg\">");
+				responseHtml.append("<div id=\"login-form\">");
+				responseHtml.append("<img id=\"login-logo\" src=\"img/pine_logo.png\"><br>");
+				responseHtml.append("<form method=\"post\" action=\"Login\">");
+				responseHtml.append("<div class=\"table\">");
+				responseHtml.append("<div class=\"table-row\">");
+				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Username:</div>");
+				responseHtml
+						.append("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"dialog-edit\" name=\"username\"></div>");
+				responseHtml.append("</div>");
+				responseHtml.append("<div class=\"table-row\">");
+				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Password:</div>");
+				responseHtml
+						.append("<div class=\"table-cell dialog-cell dialog-edit\"><input type=\"password\" class=\"dialog-edit\" name=\"pass\"></div>");
+				responseHtml.append("</div>");
+				responseHtml.append("</div>");
 				if (request.getParameter("url") != null) {
-					out.println("<input type=\"hidden\" name=\"url\" value=\"" + request.getParameter("url") + "\">");
+					responseHtml.append("<input type=\"hidden\" name=\"url\" value=\"" + request.getParameter("url")
+							+ "\">");
 				}
-				out.println("<div class=\"dialog-buttons right\"><input type=\"submit\" value=\"Log in\" class=\"ui-button\"></div></form>");
+				responseHtml
+						.append("<div class=\"dialog-buttons right\"><input type=\"submit\" value=\"Log in\" class=\"ui-button\"></div></form>");
 				if (request.getSession(false).getAttribute("loginFailed") != null) {
 					String message = (String) request.getSession(false).getAttribute("loginFailed");
-					out.println("<br><span class=\"dialog-error-message\">" + message + "</span>");
+					responseHtml.append("<br><span class=\"dialog-error-message\">" + message + "</span>");
 				}
-				out.println("</div>");
-				out.println("</div>");
+				responseHtml.append("</div>");
+				responseHtml.append("</div>");
 			} else {
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User user = dao.getUserByName(userName);
 
-				out.print(ServletHelper.getUserPanel(user));
-				out.print("<a href=\".\"><img id=\"logo-mini\" src=\"img/pine_logo_mini.png\"></a>");
+				responseHtml.append(ServletHelper.getUserPanel(user));
+				responseHtml.append("<div id=\"breadcrump\"><a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 
 				if (request.getParameter("product") != null) {
 					if (StringUtils.isNumeric(request.getParameter("product"))) {
@@ -110,16 +115,15 @@ public class Home extends HttpServlet {
 						Product product = dao.getProduct(id);
 						if (product != null) {
 
-							out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-							out.print("<a href=\"?product=" + id
-									+ "\"><span id=\"product-name\" class=\"header-text\">" + product.getName()
-									+ "</span></a>");
+							responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+							responseHtml.append("<a href=\"?product=" + id
+									+ "\"><span id=\"product-name\" class=\"header-text\">" + product.getName()	+ "</span></a></div>");
 
 							if (!user.hasAccessToProduct(product.getId())) {
-								out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
-								out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
+								responseHtml
+										.append("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 							} else {
-								includeSections(out, product);
+								includeSections(responseHtml, product);
 							}
 
 						} else {
@@ -129,37 +133,38 @@ public class Home extends HttpServlet {
 						response.sendRedirect("/pine");
 					}
 				} else {
-					out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
-					out.println("<div class=\"table\">");
+					responseHtml.append("</div>");
+					responseHtml.append("<div class=\"table\">");
 
 					List<Product> products = dao.getProducts();
 					for (Product product : products) {
 						if (user.hasAccessToProduct(product.getId())) {
-							out.println("<div class=\"table-row\">");
-							out.println("<div class=\"table-cell section-cell\">");
-							out.println("<a href=\"?product=" + product.getId() + "\"><span id=\"" + product.getId()
-									+ "\" class=\"section product-item\">" + product.getName() + "</span></a>");
-							out.println("</div>");
-							out.println("</div>");
+							responseHtml.append("<div class=\"table-row\">");
+							responseHtml.append("<div class=\"table-cell section-cell\">");
+							responseHtml.append("<a href=\"?product=" + product.getId() + "\"><span id=\""
+									+ product.getId() + "\" class=\"section product-item\">" + product.getName()
+									+ "</span></a>");
+							responseHtml.append("</div>");
+							responseHtml.append("</div>");
 						}
 					}
-					out.println("</div>");
+					responseHtml.append("</div>");
 
 					if (user.isAdmin()) {
-						out.println("<div class=\"under-sections\">");
-						out.println("<span class=\"top-panel-button button-enabled\" id=\"btn-add-product\">"
+						responseHtml.append("<div class=\"under-sections\">");
+						responseHtml.append("<span class=\"top-panel-button button-enabled\" id=\"btn-add-product\">"
 								+ "<img src=\"img/add-icon.png\" class=\"top-panel-icon\">"
 								+ "&nbsp;&nbsp;Add product</span>");
-						out.println("</div>");
+						responseHtml.append("</div>");
 					}
-
 				}
 			}
 
-			out.println(ServletHelper.getFooter(getServletContext().getRealPath("")));
-			out.println(getContextMenus());
-			out.println("</body>");
-			out.println("</html>");
+			responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
+			responseHtml.append(getContextMenus());
+			responseHtml.append("</body>");
+			responseHtml.append("</html>");
+			out.print(responseHtml.toString());
 
 		} catch (Exception e) {
 			e.printStackTrace(out);
@@ -177,23 +182,23 @@ public class Home extends HttpServlet {
 		doPost(request, response);
 	}
 
-	private void includeSections(PrintWriter out, Product product) {
-		out.println("<div class=\"table\">");
+	private void includeSections(StringBuilder responseHtml, Product product) {
+		responseHtml.append("<div class=\"table\">");
 		List<Section> sections = Sections.getSections();
 		for (Section section : sections) {
-			out.println("<div class=\"table-row\">");
-			out.println("<div class=\"table-cell section-cell\">");
-			out.println("<a href=\"" + section.getKey() + "/?product=" + product.getId()
+			responseHtml.append("<div class=\"table-row\">");
+			responseHtml.append("<div class=\"table-cell section-cell\">");
+			responseHtml.append("<a href=\"" + section.getKey() + "/?product=" + product.getId()
 					+ "\"><span class=\"section\">" + section.getName() + "</span></a>");
-			out.println("</div>");
-			out.println("<div class=\"table-cell gap\">");
-			out.println("</div>");
-			out.println("<div class=\"table-cell\">");
-			out.println("<div class=\"section-desription\">" + section.getDescription() + "</div>");
-			out.println("</div>");
-			out.println("</div>");
+			responseHtml.append("</div>");
+			responseHtml.append("<div class=\"table-cell gap\">");
+			responseHtml.append("</div>");
+			responseHtml.append("<div class=\"table-cell\">");
+			responseHtml.append("<div class=\"section-desription\">" + section.getDescription() + "</div>");
+			responseHtml.append("</div>");
+			responseHtml.append("</div>");
 		}
-		out.println("</div>");
+		responseHtml.append("</div>");
 	}
 
 	public String getContextMenus() {

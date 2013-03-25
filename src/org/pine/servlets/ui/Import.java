@@ -82,7 +82,7 @@ public class Import extends HttpServlet {
 				int productId = Integer.parseInt(request.getParameter("product"));
 
 				if (!user.hasAccessToProduct(productId)) {
-					out.println("<a href=\".\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+					out.println("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 					out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
 					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
@@ -167,14 +167,14 @@ public class Import extends HttpServlet {
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		out.print("<div id=\"breadcrump\"><a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+		out.print("<div id=\"breadcrump\"><a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		out.print("<a href=\"/pine/?product=" + product.getId() + "\">");
 		out.print("<span id=\"product-name\" class=\"header-text\">" + productName + "</span></a>");
 		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		out.print("<a href=\"/pine/" + sectionKey + "/?product=" + product.getId() + "\">");
 		out.print("<span id=\"section-name\" class=\"header-text\">" + sectionName + "</span></a></div>");
-		out.print("<br /><br />");
+		out.print("<br />");
 
 	}
 }

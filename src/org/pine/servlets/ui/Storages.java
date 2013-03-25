@@ -90,7 +90,7 @@ public class Storages extends HttpServlet {
 				}
 
 				if (!user.hasAccessToProduct(productId)) {
-					responseHtml.append("<a href=\".\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+					responseHtml.append("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 					responseHtml
 							.append("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
 					responseHtml
@@ -150,7 +150,7 @@ public class Storages extends HttpServlet {
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		responseHtml.append("<div id=\"breadcrump\"><a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+		responseHtml.append("<div id=\"breadcrump\"><a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
 		responseHtml.append("<span id=\"product-name\" class=\"header-text\">").append(productName)
@@ -160,7 +160,7 @@ public class Storages extends HttpServlet {
 				.append("\">");
 		responseHtml.append("<span id=\"section-name\" class=\"header-text\">").append(sectionName)
 				.append("</span></a></div>");
-		responseHtml.append("<br /><br />");
+		responseHtml.append("<br />");
 
 	}
 }

@@ -82,7 +82,7 @@ public class Admin extends HttpServlet {
 				out.print("</head>");
 				out.print("<body>");
 
-				out.print("<div id=\"breadcrump\"><a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+				out.print("<div id=\"breadcrump\"><a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 				out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 				out.print("<span id=\"product-name\" class=\"header-text\">Admin</span></div>");
 

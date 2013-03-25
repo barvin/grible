@@ -97,7 +97,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 			StringBuilder imp = new StringBuilder();
 			imp.append("<br><br>import java.util.HashMap;");
-			imp.append("<br>import com.globallogic.zed.descriptors.BaseDescriptor;");
+			imp.append("<br>import org.pine.adaptor.BaseDescriptor;");
 
 			boolean isListIncluded = false;
 			boolean isDataHelperIncluded = false;
@@ -117,7 +117,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			List<Key> keys = dao.getKeys(storage.getId());
 			for (Key key : keys) {
 				String keyName = key.getName();
-				String fieldName = StringUtils.uncapitalize(keyName);
+				String fieldName = StringUtils.uncapitalize(keyName).replace(" ", "");
 				String type = "String";
 				String method = "getString(\"" + keyName + "\");";
 
@@ -126,9 +126,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 					if (isBoolean(values)) {
 						type = "boolean";
 						method = "getBoolean(\"" + keyName + "\");";
-					} else if (isInteger(values)) {
-						type = "int";
-						method = "getInt(\"" + keyName + "\");";
 					}
 				} else {
 					isDataHelperIncluded = true;
@@ -137,11 +134,11 @@ public class GetGeneratedClassDialog extends HttpServlet {
 					if (semicoulumExists(values)) {
 						isListIncluded = true;
 						type = "List&lt;" + refClassName + "&gt;";
-						method = "DataHelper.getDescriptorsFromDC(" + refClassName + ".class, getString(\"" + keyName
+						method = "DataStorage.getDescriptors(" + refClassName + ".class, getString(\"" + keyName
 								+ "\"));";
 					} else {
 						type = refClassName;
-						method = "DataHelper.getDescriptorFromDC(" + refClassName + ".class, getString(\"" + keyName
+						method = "DataStorage.getDescriptor(" + refClassName + ".class, getString(\"" + keyName
 								+ "\"));";
 					}
 				}
@@ -157,7 +154,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			}
 
 			if (isDataHelperIncluded) {
-				imp.append("<br>import com.globallogic.zed.data.DataHelper;");
+				imp.append("<br>import org.pine.adaptor.DataStorage;");
 			}
 
 			constructor.append("<br>}");
@@ -187,15 +184,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 		return allValues.matches("[true|false]+");
 	}
 
-	private boolean isInteger(List<Value> values) {
-		List<String> strValues = new ArrayList<String>();
-		for (Value value : values) {
-			strValues.add(value.getValue());
-		}
-		String allValues = StringUtils.join(strValues, "");
-		return allValues.matches("\\d+");
-	}
-
 	private String getCSharpClass() {
 		StringBuilder imp = new StringBuilder();
 		try {
@@ -219,7 +207,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 			List<Key> keys = dao.getKeys(storage.getId());
 			for (Key key : keys) {
-				String keyName = key.getName();
+				String keyName = key.getName().replace(" ", "");
 				String type = "string";
 				String method = "GetString(\"" + keyName + "\");";
 
@@ -228,20 +216,17 @@ public class GetGeneratedClassDialog extends HttpServlet {
 					if (isBoolean(values)) {
 						type = "bool";
 						method = "GetBoolean(\"" + keyName + "\");";
-					} else if (isInteger(values)) {
-						type = "int";
-						method = "GetInt(\"" + keyName + "\");";
 					}
 				} else {
 					isDataHelperIncluded = true;
 					String refClassName = dao.getTable(key.getReferenceTableId()).getClassName();
 					if (semicoulumExists(values)) {
 						type = "List&lt;" + refClassName + "&gt;";
-						method = "DataHelper.GetDescriptorsFromDC&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+						method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\"" + keyName
 								+ "\"));";
 					} else {
 						type = refClassName;
-						method = "DataHelper.GetDescriptorFromDC&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+						method = "DataStorage.GetDescriptor&lt;" + refClassName + "&gt;(GetString(\"" + keyName
 								+ "\"));";
 					}
 				}
@@ -251,7 +236,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			}
 
 			if (isDataHelperIncluded) {
-				imp.append("<br>using Zed.Framework.Data;");
+				imp.append("<br>using Pine.Adaptor;");
 			}
 
 			constructor.append("<br>}");

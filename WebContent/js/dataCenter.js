@@ -377,7 +377,7 @@ function initTopPanel() {
 								cursor : "move",
 								delay : 50,
 								items : "> .key-cell",
-								forcePlaceholderSize : true,
+								forcePlaceholderSize : false,
 								containment : "parent",
 								axis : "x",
 								update : function(event, ui) {
@@ -942,8 +942,8 @@ function enableKeyContextMenu() {
 	if ((tableType == "table") || (tableType == "storage")) {
 		$("#keyMenu").enableContextMenuItems("#add,#copy,#fill,#delete");
 	} else {
-		$("#keyMenu").enableContextMenuItems("#add,#delete");
-		$("#keyMenu").disableContextMenuItems("#copy,#fill");
+		$("#keyMenu").enableContextMenuItems("#add,#copy,#delete");
+		$("#keyMenu").disableContextMenuItems("#fill");
 	}
 }
 

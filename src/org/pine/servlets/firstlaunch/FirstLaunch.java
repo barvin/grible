@@ -65,7 +65,7 @@ public class FirstLaunch extends HttpServlet {
 				out.println("<br/><br/><div class=\"error-message\">You cannot access this page!"
 						+ "<br>Your database information is stored in config.xml file and seems to be valid."
 						+ "<br>If you really need to reset your database information and/or Pine administrator credentials, delete config.xml file on the server.</div>");
-				out.println(ServletHelper.getFooter(getServletContext().getRealPath("")));
+				out.println(ServletHelper.getFooter(getServletContext().getRealPath(""), "img"));
 				out.println("</body>");
 				out.println("</html>");
 			}

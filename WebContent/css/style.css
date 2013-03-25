@@ -29,6 +29,7 @@ img#logo-mini {
 
 #footer {
 	margin-top: 15px;
+	margin-bottom: 10px;
 }
 
 #product-name {
@@ -406,6 +407,7 @@ a:hover {
 
 #user-panel {
 	float: right;
+	font-size: 15px;
 }
 
 .dialog-buttons {
@@ -491,6 +493,7 @@ a:hover {
 
 .build {
 	color: #777777;
+	float: right;
 }
 
 .section-desription {

@@ -160,7 +160,7 @@ public class Home extends HttpServlet {
 				}
 			}
 
-			responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
+			responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath(""), "img"));
 			responseHtml.append(getContextMenus());
 			responseHtml.append("</body>");
 			responseHtml.append("</html>");

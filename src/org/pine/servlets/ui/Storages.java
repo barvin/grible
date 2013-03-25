@@ -125,7 +125,7 @@ public class Storages extends HttpServlet {
 					responseHtml.append(ServletHelper.getContextMenus("storage"));
 					responseHtml.append(ServletHelper.getLoadingGif());
 				}
-				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
+				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath(""), "../img"));
 				responseHtml.append("</body>");
 				responseHtml.append("</html>");
 				out.print(responseHtml.toString());

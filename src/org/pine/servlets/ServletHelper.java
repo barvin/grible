@@ -38,9 +38,10 @@ public class ServletHelper {
 		return null;
 	}
 
-	public static String getFooter(String realPath) {
-		return "<div id=\"footer\" class=\"page-bottom\">" + "<span class=\"build\">Build: "
-				+ getContents(realPath + "/VERSION.txt") + "</span></div>";
+	public static String getFooter(String realPath, String pathToImg) {
+		return "<div id=\"footer\" class=\"page-bottom\"><hr><img src=\"" + pathToImg
+				+ "/pine_logo_mini.png\"><span class=\"build\">Build: " + getContents(realPath + "/VERSION.txt")
+				+ "</span></div>";
 	}
 
 	private static String getContents(String path) {

@@ -152,7 +152,7 @@ public class Admin extends HttpServlet {
 					out.print("<br><button id=\"add-user\" class=\"ui-button\">Add</button>");
 
 				}
-				out.println(ServletHelper.getFooter(getServletContext().getRealPath("")));
+				out.println(ServletHelper.getFooter(getServletContext().getRealPath(""), "../img"));
 				out.print("</body>");
 				out.print("</html>");
 			}

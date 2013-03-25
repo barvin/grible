@@ -776,6 +776,7 @@ function initKeysAndIndexes() {
 							$(this).text(i + 1);
 						}
 					});
+					loadFooter();
 				} else {
 					alert(data);
 				}
@@ -799,6 +800,7 @@ function initKeysAndIndexes() {
 							$(this).text(i + 1);
 						}
 					});
+					loadFooter();
 				} else {
 					alert(data);
 				}
@@ -816,6 +818,7 @@ function initKeysAndIndexes() {
 								$(this).text(i + 1);
 							}
 						});
+						loadFooter();
 					});
 				} else {
 					alert(data);

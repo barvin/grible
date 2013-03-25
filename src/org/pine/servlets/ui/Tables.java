@@ -168,7 +168,7 @@ public class Tables extends HttpServlet {
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		responseHtml.append("<a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+		responseHtml.append("<div id=\"breadcrump\"><a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
 		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
 		responseHtml.append("<span id=\"product-name\" class=\"header-text\">").append(productName)
@@ -177,7 +177,7 @@ public class Tables extends HttpServlet {
 		responseHtml.append("<a href=\"/pine/").append(sectionKey).append("/?product=").append(product.getId())
 				.append("\">");
 		responseHtml.append("<span id=\"section-name\" class=\"header-text\">").append(sectionName)
-				.append("</span></a>");
+				.append("</span></a></div>");
 		responseHtml.append("<br /><br />");
 
 	}

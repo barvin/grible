@@ -167,13 +167,13 @@ public class Import extends HttpServlet {
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		out.print("<a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
+		out.print("<div id=\"breadcrump\"><a href=\"/pine\"><img id=\"logo-mini\" src=\"../img/pine_logo_mini.png\"></a>");
 		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		out.print("<a href=\"/pine/?product=" + product.getId() + "\">");
 		out.print("<span id=\"product-name\" class=\"header-text\">" + productName + "</span></a>");
 		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		out.print("<a href=\"/pine/" + sectionKey + "/?product=" + product.getId() + "\">");
-		out.print("<span id=\"section-name\" class=\"header-text\">" + sectionName + "</span></a>");
+		out.print("<span id=\"section-name\" class=\"header-text\">" + sectionName + "</span></a></div>");
 		out.print("<br /><br />");
 
 	}

@@ -42,7 +42,7 @@ public class ServletHelper {
 		return "<div id=\"footer\" class=\"page-bottom\">" + "<span class=\"build\">Build: "
 				+ getContents(realPath + "/VERSION.txt") + "</span></div>";
 	}
-	
+
 	private static String getContents(String path) {
 		String content = "";
 		try {
@@ -66,11 +66,12 @@ public class ServletHelper {
 
 	public static String getUserPanel(User user) {
 		StringBuilder builder = new StringBuilder();
-		builder.append("<div id=\"user-panel\">User: " + user.getName());
+		builder.append("<div id=\"user-panel\"><span id=\"lbl-user\">User: </span><span id=\"userName\">"
+				+ user.getName() + "</span><span id=\"lnk-admin-page\">");
 		if (user.isAdmin()) {
 			builder.append(" | <a href=\"/pine/admin/\">Admin page</a>");
 		}
-		builder.append(" | <a href=\"/pine/logout\">Log out</a></div>");
+		builder.append("</span><span id=\"lnk-logout\"> | <a href=\"/pine/logout\">Log out</a></span></div>");
 
 		return builder.toString();
 	}

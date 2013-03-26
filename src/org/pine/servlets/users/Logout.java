@@ -40,7 +40,9 @@ public class Logout extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		HttpSession session = request.getSession(false);
-		session.setAttribute("userName", null);
+		if (session != null) {
+			session.setAttribute("userName", null);
+		}
 		response.sendRedirect("/pine");
 	}
 	

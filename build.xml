@@ -8,6 +8,7 @@
 
 	<!-- Configure the context path for this application -->
 	<property name="path" value="/pine" />
+	<property name="tomcat.manager.url" value="http://localhost:7070/manager/text" />
 
 	<path id="pine.classpath">
 		<fileset dir="${basedir}/WebContent/WEB-INF/lib">
@@ -41,5 +42,17 @@
 			<classes dir="${build}" />
 		</war>
 	</target>
+
+	<taskdef name="catalina-deploy" classname="org.apache.catalina.ant.DeployTask" />
+	<taskdef name="catalina-undeploy" classname="org.apache.catalina.ant.UndeployTask" />
+
+	<target name="undeploy">
+		<catalina-undeploy url="${tomcat.manager.url}" username="${tomcat.username}" password="${tomcat.password}" path="${path}" failonerror="false" />
+	</target>
+
+	<target name="deploy" depends="war">
+		<catalina-deploy url="${tomcat.manager.url}" username="${tomcat.username}" password="${tomcat.password}" path="${path}" war="file:${build}${path}.war" />
+	</target>
+
 
 </project>

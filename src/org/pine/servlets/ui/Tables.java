@@ -168,7 +168,7 @@ public class Tables extends HttpServlet {
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		responseHtml.append("<div id=\"breadcrump\"><span id=\"home\" class=\"header-text\">Home</span></a>");
+		responseHtml.append("<div id=\"breadcrump\"><a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
 		responseHtml.append("<span id=\"product-name\" class=\"header-text\">").append(productName)

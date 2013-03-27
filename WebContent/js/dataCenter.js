@@ -857,11 +857,8 @@ function enableKeyContextMenu() {
 									$column.each(function(i) {
 										$newCell = $(this).clone(true);
 										$newCell.removeClass("modified-value-cell");
-										if ($newCell.hasClass("storage-cell")) {
-											$newCell.text("0");
-										} else {
-											$newCell.text("");
-										}
+										$newCell.removeClass("storage-cell");
+										$newCell.text("");
 										$newCell.attr("keyid", newIds[0]);
 										$newCell.attr("id", newIds[i + 1]);
 										$newCell.insertBefore($(this));
@@ -954,7 +951,7 @@ function initTooltipCells(elements) {
 	elements.hover(function() {
 		var $value = $(this);
 		if (($value.has("div.tooltip").length == 0) && ($value.has("span.old-value").length == 0)
-				&& ($value.text() != "0") && (!$value.hasClass("modified-value-cell"))) {
+				&& ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))) {
 			$("#waiting").addClass("loading");
 			var $content = $value.text();
 			var $args = {

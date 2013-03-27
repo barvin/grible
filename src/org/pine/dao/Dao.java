@@ -698,13 +698,14 @@ public class Dao {
 		stmt.close();
 	}
 
-	public int insertKeyCopy(Key currentKey, boolean copyName) throws SQLException {
+	public int insertKeyCopy(Key currentKey) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		String name = (copyName) ? currentKey.getName() : "editme";
-		stmt.executeUpdate("INSERT INTO keys(tableid, name, \"order\") VALUES (" + currentKey.getTableId() + ", '"
-				+ name + "'," + currentKey.getOrder() + ")");
+		String finalRefStorageId = (currentKey.getReferenceTableId() == 0) ? "NULL" : String.valueOf(currentKey
+				.getReferenceTableId());
+		stmt.executeUpdate("INSERT INTO keys(tableid, name, \"order\", reftable) VALUES (" + currentKey.getTableId()
+				+ ", '" + currentKey.getName() + "'," + currentKey.getOrder() + ", " + finalRefStorageId + ")");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {
 			result = rs.getInt("id");
@@ -733,7 +734,8 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted
+	 * to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -1264,9 +1266,8 @@ public class Dao {
 				stmt.executeUpdate("INSERT INTO values (rowid, keyid, value, isstorage, storagerows) "
 						+ "SELECT (SELECT id FROM rows WHERE tableid=" + tableId + " AND \"order\"="
 						+ oldRow.getOrder() + "), " + key.getId()
-						+ ", value, isstorage, storagerows FROM values WHERE rowid=" + oldRow.getId() + " AND keyid=" +
-								"(SELECT id FROM keys WHERE tableid=" + oldTableId + " AND \"order\"="
-						+ key.getOrder() + ")");
+						+ ", value, isstorage, storagerows FROM values WHERE rowid=" + oldRow.getId() + " AND keyid="
+						+ "(SELECT id FROM keys WHERE tableid=" + oldTableId + " AND \"order\"=" + key.getOrder() + ")");
 			}
 		}
 

@@ -68,7 +68,7 @@ public class InsertKey extends HttpServlet {
 			}
 			dao.updateKeys(keyIds, keyNumbers);
 			currentKey.setOrder(currentKeyNumber);
-			int newKeyId = dao.insertKeyCopy(currentKey, false);
+			int newKeyId = dao.insertKey(tableId, "editme", currentKey.getOrder(), 0);
 
 			List<Row> rows = dao.getRows(tableId);
 			List<Integer> ids = dao.insertValuesEmptyWithKeyId(newKeyId, rows);

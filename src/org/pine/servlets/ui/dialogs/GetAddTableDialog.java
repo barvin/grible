@@ -80,7 +80,7 @@ public class GetAddTableDialog extends HttpServlet {
 				if (category.getType() == TableType.STORAGE) {
 					responseHtml.append("<div class=\"table-row\"><div class=\"table-cell dialog-cell dialog-label\">");
 					responseHtml.append("Class name:</div><div class=\"table-cell dialog-cell dialog-edit\">");
-					responseHtml.append("<input class=\"data-item-name dialog-edit\"></div>");
+					responseHtml.append("<input class=\"data-storage-class-name dialog-edit\"></div>");
 					responseHtml.append("</div>");
 				}
 

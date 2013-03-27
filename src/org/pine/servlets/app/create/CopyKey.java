@@ -68,7 +68,7 @@ public class CopyKey extends HttpServlet {
 			}
 			dao.updateKeys(keyIds, keyNumbers);
 			currentKey.setOrder(currentKeyNumber + 1);
-			int newKeyId = dao.insertKeyCopy(currentKey, true);
+			int newKeyId = dao.insertKeyCopy(currentKey);
 
 			List<Value> values = dao.getValues(currentKey);
 			List<Integer> ids = dao.insertValuesWithKeyId(newKeyId, values);

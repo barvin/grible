@@ -40,12 +40,12 @@ public class InitDB extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			boolean createNewDb = Boolean.parseBoolean(request.getParameter("createnew"));
-			Dao dao = new Dao();
+			
 			if (createNewDb) {
 				String query = getSQLQuery("/WEB-INF/sql/pine_init.sql");
 				String querySetSeqVal = getSQLQuery("/WEB-INF/sql/pine_setseqval.sql");
-				dao.execute(query);
-				dao.executeSelect(querySetSeqVal);
+				Dao.execute(query);
+				Dao.executeSelect(querySetSeqVal);
 			} else {
 				// TODO: validate existing database.
 			}

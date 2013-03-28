@@ -45,7 +45,7 @@ public class UpdateCategory extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			String name = request.getParameter("name");
 
 			if ("".equals(name)) {
@@ -53,9 +53,9 @@ public class UpdateCategory extends HttpServlet {
 			} else {
 				int categoryId = Integer.parseInt(request.getParameter("id"));
 				Category category;
-				category = dao.getCategory(categoryId);
+				category = Dao.getCategory(categoryId);
 				category.setName(name);
-				dao.updateCategory(category);
+				Dao.updateCategory(category);
 				out.print("success");
 			}
 

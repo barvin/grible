@@ -51,15 +51,15 @@ public class AddUser extends HttpServlet {
 
 		MessageDigest md;
 		try {
-			Dao dao = new Dao();
+			
 			md = MessageDigest.getInstance("MD5");
 			md.update(strPass.getBytes());
 			String hashPass = new String(md.digest());
-			int userId = dao.insertUser(userName, hashPass, isAdmin);
+			int userId = Dao.insertUser(userName, hashPass, isAdmin);
 			if (userId > 0) {
 				if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
 					String[] productIds = request.getParameterValues("productIds[]");
-					dao.insertUserPermissions(userId, productIds);
+					Dao.insertUserPermissions(userId, productIds);
 				}
 				out.print("success");
 			} else {

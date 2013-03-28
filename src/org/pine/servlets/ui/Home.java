@@ -56,7 +56,7 @@ public class Home extends HttpServlet {
 				response.sendRedirect("/pine/firstlaunch");
 				return;
 			}
-			Dao dao = new Dao();
+			
 			StringBuilder responseHtml = new StringBuilder();
 			responseHtml.append("<!DOCTYPE html>");
 			responseHtml.append("<html>");
@@ -103,7 +103,7 @@ public class Home extends HttpServlet {
 				responseHtml.append("</div>");
 			} else {
 				String userName = (String) request.getSession(false).getAttribute("userName");
-				User user = dao.getUserByName(userName);
+				User user = Dao.getUserByName(userName);
 
 				responseHtml.append(ServletHelper.getUserPanel(user));
 				responseHtml.append("<div id=\"breadcrump\"><a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
@@ -112,7 +112,7 @@ public class Home extends HttpServlet {
 					if (StringUtils.isNumeric(request.getParameter("product"))) {
 
 						int id = Integer.parseInt(request.getParameter("product"));
-						Product product = dao.getProduct(id);
+						Product product = Dao.getProduct(id);
 						if (product != null) {
 
 							responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
@@ -136,7 +136,7 @@ public class Home extends HttpServlet {
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table\">");
 
-					List<Product> products = dao.getProducts();
+					List<Product> products = Dao.getProducts();
 					for (Product product : products) {
 						if (user.hasAccessToProduct(product.getId())) {
 							responseHtml.append("<div class=\"table-row\">");

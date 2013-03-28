@@ -47,30 +47,30 @@ public class SaveCellValue extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 
 			String strId = request.getParameter("id");
 			String strValue = request.getParameter("value");
 			int id = Integer.parseInt(strId);
 
-			Value value = dao.getValue(id);
+			Value value = Dao.getValue(id);
 			value.setValue(StringEscapeUtils.unescapeHtml4(strValue));
 
 			if (value.isStorage()) {
 				String[] strRows = value.getValue().split(";");
-				int refStorageId = dao.getRefStorageId(value.getKeyId());
+				int refStorageId = Dao.getRefStorageId(value.getKeyId());
 				for (int i = 0; i < strRows.length; i++) {
 					if (!StringUtils.isNumeric(strRows[i])) {
 						out.print("\nERROR: Indexes is not numeric. Row: "
-								+ dao.getRow(value.getRowId()).getOrder() + ".\nIf you want to set no index, set '0'.");
+								+ Dao.getRow(value.getRowId()).getOrder() + ".\nIf you want to set no index, set '0'.");
 						out.flush();
 						out.close();
 						return;
 					} else if ((!strRows[i].equals("0"))
-							&& (dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
-						out.print("\nERROR: Data storage '" + dao.getTable(refStorageId).getName()
+							&& (Dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
+						out.print("\nERROR: Data storage '" + Dao.getTable(refStorageId).getName()
 								+ "' does not contain row number " + strRows[i] + ".\nYou specified it in row: "
-								+ dao.getRow(value.getRowId()).getOrder()
+								+ Dao.getRow(value.getRowId()).getOrder()
 								+ ".\nYou must first create this row in specified data storage.");
 						out.flush();
 						out.close();
@@ -82,13 +82,13 @@ public class SaveCellValue extends HttpServlet {
 				} else {
 					Integer[] intRows = new Integer[strRows.length];
 					for (int i = 0; i < strRows.length; i++) {
-						intRows[i] = dao.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
+						intRows[i] = Dao.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
 					}
 					value.setStorageIds(intRows);
 				}
 				value.setIsStorage(true);
 			}
-			dao.updateValue(value);
+			Dao.updateValue(value);
 			out.print("success");
 
 			out.flush();

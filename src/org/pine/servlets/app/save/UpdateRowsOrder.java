@@ -46,7 +46,7 @@ public class UpdateRowsOrder extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			Dao dao = new Dao();
+			
 
 			if (request.getParameterValues("rowids[]") != null) {
 				String[] strRowIds = request.getParameterValues("rowids[]");
@@ -60,7 +60,7 @@ public class UpdateRowsOrder extends HttpServlet {
 					oldRowNumbers.add(Integer.parseInt(strOldOrder[i]));
 					modifiedRowNumbers.add(Integer.parseInt(strNewOrder[i]));
 				}
-				dao.updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
+				Dao.updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
 			}
 			out.print("success");
 

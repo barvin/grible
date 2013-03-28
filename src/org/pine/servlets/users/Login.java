@@ -50,8 +50,8 @@ public class Login extends HttpServlet {
 
 		User user = null;
 		try {
-			Dao dao = new Dao();
-			user = dao.getUserByName(userName);
+			
+			user = Dao.getUserByName(userName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

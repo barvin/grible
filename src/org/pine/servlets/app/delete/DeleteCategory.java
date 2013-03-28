@@ -44,10 +44,10 @@ public class DeleteCategory extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			int categoryId = Integer.parseInt(request.getParameter("id"));
 
-			boolean deleted = dao.deleteCategory(categoryId);
+			boolean deleted = Dao.deleteCategory(categoryId);
 			if (deleted) {
 				out.print("success");
 			} else {

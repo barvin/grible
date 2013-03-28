@@ -53,7 +53,7 @@ public class Admin extends HttpServlet {
 				response.sendRedirect("/pine/firstlaunch");
 				return;
 			}
-			Dao dao = new Dao();
+			
 			if (request.getSession(false).getAttribute("userName") == null) {
 				response.sendRedirect("/pine");
 			} else {
@@ -70,7 +70,7 @@ public class Admin extends HttpServlet {
 
 				out.println("function getProductsCheckboxes() {");
 				StringBuilder builder = new StringBuilder("return '");
-				List<Product> products = dao.getProducts();
+				List<Product> products = Dao.getProducts();
 				for (Product product : products) {
 					builder.append("<input id=\"" + product.getId()
 							+ "\" class=\"access-product\" type=\"checkbox\" > " + product.getName() + "<br>");
@@ -87,7 +87,7 @@ public class Admin extends HttpServlet {
 				out.print("<span id=\"product-name\" class=\"header-text\">Admin</span></div>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
-				User currentUser = dao.getUserByName(userName);
+				User currentUser = Dao.getUserByName(userName);
 				if (!currentUser.isAdmin()) {
 					out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
 					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
@@ -103,7 +103,7 @@ public class Admin extends HttpServlet {
 					out.print("<div class=\"table-cell users-header-cell\">Manage</div>");
 					out.print("</div>");
 
-					List<User> users = dao.getUsers();
+					List<User> users = Dao.getUsers();
 					for (User user : users) {
 						out.print("<div class=\"table-row users-row\">");
 						out.print("<div class=\"table-cell users-cell\" userid=\"" + user.getId() + "\">"

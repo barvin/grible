@@ -58,17 +58,17 @@ public class GetTableValues extends HttpServlet {
 			StringBuilder responseHtml = new StringBuilder();
 			dao = new Dao();
 			int tableId = Integer.parseInt(request.getParameter("id"));
-			Table table = dao.getTable(tableId);
+			Table table = Dao.getTable(tableId);
 			tableType = table.getType();
 			showUsage = table.isShowUsage();
 
-			List<Key> keys = dao.getKeys(tableId);
+			List<Key> keys = Dao.getKeys(tableId);
 			writeKeys(responseHtml, keys);
 
-			List<Row> rows = dao.getRows(tableId);
+			List<Row> rows = Dao.getRows(tableId);
 			ArrayList<ArrayList<Value>> values = new ArrayList<ArrayList<Value>>();
 			for (Row row : rows) {
-				values.add(dao.getValues(row));
+				values.add(Dao.getValues(row));
 			}
 			writeValues(responseHtml, values);
 			out.print(responseHtml.toString());
@@ -113,7 +113,7 @@ public class GetTableValues extends HttpServlet {
 			}
 			if (showUsage) {
 				if (!valuesRow.isEmpty()) {
-					List<Table> tables = dao.getTablesUsingRow(valuesRow.get(0).getRowId());
+					List<Table> tables = Dao.getTablesUsingRow(valuesRow.get(0).getRowId());
 					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")
 							.append(getOccurences(tables, TableType.TABLE)).append("</div>");
 					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")

@@ -50,7 +50,7 @@ public class AddTable extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
-			Dao dao = new Dao();
+			
 
 			Integer categoryId = null;
 			if (request.getParameter("categoryid") != null) {
@@ -63,7 +63,7 @@ public class AddTable extends HttpServlet {
 				if (currType == TableType.TABLE) {
 					parentId = Integer.parseInt(request.getParameter("parentid"));
 				} else {
-					Table sibling = dao.getTable(Integer.parseInt(request.getParameter("parentid")));
+					Table sibling = Dao.getTable(Integer.parseInt(request.getParameter("parentid")));
 					parentId = sibling.getParentId();
 				}
 			}
@@ -73,32 +73,32 @@ public class AddTable extends HttpServlet {
 				throw new Exception("ERROR: Name cannot be empty.");
 			}
 			TableType type = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
-			if (dao.isTableInProductExist(name, type, categoryId)) {
+			if (Dao.isTableInProductExist(name, type, categoryId)) {
 				throw new Exception("ERROR: " + type.toString().toLowerCase() + " with name '" + name
 						+ "' already exists.");
 			}
 			String className = request.getParameter("classname");
 
-			int tableId = dao.insertTable(name, type, categoryId, parentId, className);
+			int tableId = Dao.insertTable(name, type, categoryId, parentId, className);
 			boolean isCopy = Boolean.parseBoolean(request.getParameter("iscopy"));
 			if (isCopy) {
 				int copyTableId = Integer.parseInt(request.getParameter("copytableid"));
 				boolean isOnlyColumns = Boolean.parseBoolean(request.getParameter("isonlycolumns"));
-				List<Key> keys = dao.insertKeysFromOneTableToAnother(copyTableId, tableId);
+				List<Key> keys = Dao.insertKeysFromOneTableToAnother(copyTableId, tableId);
 				if (isOnlyColumns) {
-					int rowId = dao.insertRow(tableId, 1);
-					dao.insertValuesEmptyWithRowId(rowId, keys);
+					int rowId = Dao.insertRow(tableId, 1);
+					Dao.insertValuesEmptyWithRowId(rowId, keys);
 				} else {
-					List<Row> oldRows = dao.getRows(copyTableId);
-					dao.insertValues(tableId, copyTableId, oldRows, keys);
+					List<Row> oldRows = Dao.getRows(copyTableId);
+					Dao.insertValues(tableId, copyTableId, oldRows, keys);
 				}
 			} else {
 				List<String> keys = new ArrayList<String>();
 				keys.add("editme");
-				int keyId = dao.insertKeys(tableId, keys).get(0);
-				dao.insertRow(tableId, 1);
-				List<Row> rows = dao.getRows(tableId);
-				dao.insertValuesEmptyWithKeyId(keyId, rows);
+				int keyId = Dao.insertKeys(tableId, keys).get(0);
+				Dao.insertRow(tableId, 1);
+				List<Row> rows = Dao.getRows(tableId);
+				Dao.insertValuesEmptyWithKeyId(keyId, rows);
 			}
 			out.print(tableId);
 		} catch (Exception e) {

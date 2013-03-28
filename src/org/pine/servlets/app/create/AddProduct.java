@@ -45,18 +45,18 @@ public class AddProduct extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			String name = request.getParameter("name");
 
 			if ("".equals(name)) {
 				out.print("ERROR: Product name cannot be empty.");
 			} else {
-				Product product = dao.getProduct(name);
+				Product product = Dao.getProduct(name);
 				if (product != null) {
 					out.print("ERROR: Category with name '" + name + "' already exists.");
 				} else {
 					try {
-						dao.insertProduct(name);
+						Dao.insertProduct(name);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

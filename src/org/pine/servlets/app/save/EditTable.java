@@ -45,10 +45,10 @@ public class EditTable extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = dao.getTable(id);
+			Table table = Dao.getTable(id);
 			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
 			String name = request.getParameter("name");
 			String className = request.getParameter("classname");
@@ -64,7 +64,7 @@ public class EditTable extends HttpServlet {
 				table.setName(name);
 				table.setClassName(className);
 				table.setShowUsage(usage);
-				dao.updateTable(table);
+				Dao.updateTable(table);
 				out.print("success");
 			}
 

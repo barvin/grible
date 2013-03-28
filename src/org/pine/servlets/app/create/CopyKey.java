@@ -49,15 +49,15 @@ public class CopyKey extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
-			Dao dao = new Dao();
+			
 			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-			Key currentKey = dao.getKey(keyId);
+			Key currentKey = Dao.getKey(keyId);
 			int currentKeyNumber = currentKey.getOrder();
 			int tableId = currentKey.getTableId();
 			List<Integer> keyIds = new ArrayList<Integer>();
 			List<Integer> keyNumbers = new ArrayList<Integer>();
-			List<Key> keys = dao.getKeys(tableId);
+			List<Key> keys = Dao.getKeys(tableId);
 			for (int i = 0; i < keys.size(); i++) {
 				keyIds.add(keys.get(i).getId());
 				if (keys.get(i).getOrder() > currentKeyNumber) {
@@ -66,12 +66,12 @@ public class CopyKey extends HttpServlet {
 					keyNumbers.add(i + 1);
 				}
 			}
-			dao.updateKeys(keyIds, keyNumbers);
+			Dao.updateKeys(keyIds, keyNumbers);
 			currentKey.setOrder(currentKeyNumber + 1);
-			int newKeyId = dao.insertKeyCopy(currentKey);
+			int newKeyId = Dao.insertKeyCopy(currentKey);
 
-			List<Value> values = dao.getValues(currentKey);
-			List<Integer> ids = dao.insertValuesWithKeyId(newKeyId, values);
+			List<Value> values = Dao.getValues(currentKey);
+			List<Integer> ids = Dao.insertValuesWithKeyId(newKeyId, values);
 
 			String result = newKeyId + ";" + StringUtils.join(ids, ";");
 			out.print(result);

@@ -47,7 +47,7 @@ public class UpdateUser extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 
 			String userId = request.getParameter("userid");
 			String userName = request.getParameter("username");
@@ -55,10 +55,10 @@ public class UpdateUser extends HttpServlet {
 			boolean isAdmin = Boolean.parseBoolean(request.getParameter("isadmin"));
 
 			User user;
-			user = dao.getUserById(Integer.parseInt(userId));
+			user = Dao.getUserById(Integer.parseInt(userId));
 
 			if (!user.getName().equals(userName)) {
-				dao.updateUserName(user.getId(), userName);
+				Dao.updateUserName(user.getId(), userName);
 			}
 
 			if (!strPass.equals("")) {
@@ -67,7 +67,7 @@ public class UpdateUser extends HttpServlet {
 					md = MessageDigest.getInstance("MD5");
 					md.update(strPass.getBytes());
 					String hashPass = new String(md.digest());
-					dao.updateUserPassword(user.getId(), hashPass);
+					Dao.updateUserPassword(user.getId(), hashPass);
 				} catch (NoSuchAlgorithmException e) {
 					out.print("ERROR: " + e.getMessage());
 					e.printStackTrace();
@@ -75,12 +75,12 @@ public class UpdateUser extends HttpServlet {
 			}
 
 			if (user.isAdmin() != isAdmin) {
-				dao.updateUserIsAdmin(user.getId(), isAdmin);
+				Dao.updateUserIsAdmin(user.getId(), isAdmin);
 			}
 
 			if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
 				String[] productIds = request.getParameterValues("productIds[]");
-				dao.updateUserPermissions(user.getId(), productIds);
+				Dao.updateUserPermissions(user.getId(), productIds);
 			}
 			out.print("success");
 		} catch (Exception e) {

@@ -56,33 +56,33 @@ public class TableImport extends HttpServlet {
 			String fileName = ServletHelper.getFilename(filePart);
 			InputStream filecontent = filePart.getInputStream();
 			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
-			Dao dao = new Dao();
+			
 
 			String tableName = fileName.substring(0, fileName.lastIndexOf(".xls"));
 			int categoryId = Integer.parseInt(request.getParameter("category"));
 
-			int tableId = dao.insertTable(tableName, TableType.TABLE, categoryId, null, null);
-			List<Integer> keyIds = dao.insertKeys(tableId, excelFile.getKeys());
+			int tableId = Dao.insertTable(tableName, TableType.TABLE, categoryId, null, null);
+			List<Integer> keyIds = Dao.insertKeys(tableId, excelFile.getKeys());
 			ArrayList<ArrayList<String>> values = excelFile.getValues();
-			List<Integer> rowIds = dao.insertRows(tableId, values.size());
-			dao.insertValues(rowIds, keyIds, values);
+			List<Integer> rowIds = Dao.insertRows(tableId, values.size());
+			Dao.insertValues(rowIds, keyIds, values);
 
 			if (excelFile.hasPreconditions()) {
 				List<String> precondKeyNames = getKeyNames(excelFile.getPrecondition());
 				ArrayList<ArrayList<String>> precondValues = getValues(excelFile.getPrecondition());
-				int precondTableId = dao.insertTable(null, TableType.PRECONDITION, null, tableId, null);
-				List<Integer> precondKeyIds = dao.insertKeys(precondTableId, precondKeyNames);
-				List<Integer> precondRowIds = dao.insertRows(precondTableId, 1);
-				dao.insertValues(precondRowIds, precondKeyIds, precondValues);
+				int precondTableId = Dao.insertTable(null, TableType.PRECONDITION, null, tableId, null);
+				List<Integer> precondKeyIds = Dao.insertKeys(precondTableId, precondKeyNames);
+				List<Integer> precondRowIds = Dao.insertRows(precondTableId, 1);
+				Dao.insertValues(precondRowIds, precondKeyIds, precondValues);
 			}
 
 			if (excelFile.hasPostconditions()) {
 				List<String> postcondKeyNames = getKeyNames(excelFile.getPostcondition());
 				ArrayList<ArrayList<String>> postcondValues = getValues(excelFile.getPostcondition());
-				int postcondTableId = dao.insertTable(null, TableType.POSTCONDITION, null, tableId, null);
-				List<Integer> postcondKeyIds = dao.insertKeys(postcondTableId, postcondKeyNames);
-				List<Integer> postcondRowIds = dao.insertRows(postcondTableId, 1);
-				dao.insertValues(postcondRowIds, postcondKeyIds, postcondValues);
+				int postcondTableId = Dao.insertTable(null, TableType.POSTCONDITION, null, tableId, null);
+				List<Integer> postcondKeyIds = Dao.insertKeys(postcondTableId, postcondKeyNames);
+				List<Integer> postcondRowIds = Dao.insertRows(postcondTableId, 1);
+				Dao.insertValues(postcondRowIds, postcondKeyIds, postcondValues);
 			}
 
 			int productId = Integer.parseInt(request.getParameter("product"));

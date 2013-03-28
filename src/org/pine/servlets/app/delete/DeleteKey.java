@@ -47,19 +47,19 @@ public class DeleteKey extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-			int tableId = dao.getKey(keyId).getTableId();
-			if (dao.deleteKey(keyId)) {
+			int tableId = Dao.getKey(keyId).getTableId();
+			if (Dao.deleteKey(keyId)) {
 				List<Integer> keyIds = new ArrayList<Integer>();
 				List<Integer> keyNumbers = new ArrayList<Integer>();
-				List<Key> keys = dao.getKeys(tableId);
+				List<Key> keys = Dao.getKeys(tableId);
 				for (int i = 0; i < keys.size(); i++) {
 					keyIds.add(keys.get(i).getId());
 					keyNumbers.add(i + 1);
 				}
-				dao.updateKeys(keyIds, keyNumbers);
+				Dao.updateKeys(keyIds, keyNumbers);
 				out.print("success");
 			} else {
 				out.print("Could not delete the column. See server log for detail.");

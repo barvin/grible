@@ -43,10 +43,10 @@ public class SaveKeyValue extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			Dao dao = new Dao();
+			
 			String id = request.getParameter("id");
 			String value = request.getParameter("value");
-			dao.updateKeyValue(id, value);
+			Dao.updateKeyValue(id, value);
 			out.print("success");
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());

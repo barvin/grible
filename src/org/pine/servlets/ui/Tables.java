@@ -54,7 +54,7 @@ public class Tables extends HttpServlet {
 				return;
 			}
 			StringBuilder responseHtml = new StringBuilder();
-			Dao dao = new Dao();
+			
 
 			if (request.getSession(false) == null) {
 				response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
@@ -78,25 +78,25 @@ public class Tables extends HttpServlet {
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
-				User user = dao.getUserByName(userName);
+				User user = Dao.getUserByName(userName);
 
 				int productId = 0;
 				int tableId = 0;
 				String tableType = "table";
 				if (request.getParameter("id") != null) {
 					tableId = Integer.parseInt(request.getParameter("id"));
-					Table table = dao.getTable(tableId);
+					Table table = Dao.getTable(tableId);
 					switch (table.getType()) {
 					case TABLE:
-						productId = dao.getProductIdByPrimaryTableId(tableId);
+						productId = Dao.getProductIdByPrimaryTableId(tableId);
 						break;
 
 					case PRECONDITION:
-						productId = dao.getProductIdBySecondaryTableId(tableId);
+						productId = Dao.getProductIdBySecondaryTableId(tableId);
 						break;
 
 					case POSTCONDITION:
-						productId = dao.getProductIdBySecondaryTableId(tableId);
+						productId = Dao.getProductIdBySecondaryTableId(tableId);
 						break;
 
 					default:
@@ -126,7 +126,7 @@ public class Tables extends HttpServlet {
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");
 					responseHtml.append(ServletHelper.getUserPanel(user));
-					includeHeader(responseHtml, "tables", dao.getProduct(productId));
+					includeHeader(responseHtml, "tables", Dao.getProduct(productId));
 
 					responseHtml.append("<div id=\"main\" class=\"table\">");
 					responseHtml.append("<div class=\"table-row\">");

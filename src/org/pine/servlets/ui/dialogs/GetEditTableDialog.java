@@ -46,10 +46,10 @@ public class GetEditTableDialog extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			Dao dao = new Dao();
+			
 			int id = Integer.parseInt(request.getParameter("id"));
 			
-			Table table = dao.getTable(id);
+			Table table = Dao.getTable(id);
 			if ((table.getType() == TableType.TABLE) || (table.getType() == TableType.STORAGE)) {
 				response.setContentType("text/html");
 				PrintWriter out = response.getWriter();
@@ -80,7 +80,7 @@ public class GetEditTableDialog extends HttpServlet {
 				out.println("<div class=\"table-cell dialog-cell\">");
 				out.println("<select class=\"categories dialog-edit\" \">");
 
-				List<Category> categories = dao.getCategories(dao.getCategory(categoryId).getProductId(),
+				List<Category> categories = Dao.getCategories(Dao.getCategory(categoryId).getProductId(),
 						table.getType());
 				for (Category category : categories) {
 					String selected = "";

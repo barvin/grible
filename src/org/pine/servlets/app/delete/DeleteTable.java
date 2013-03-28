@@ -47,14 +47,14 @@ public class DeleteTable extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			int tableId = Integer.parseInt(request.getParameter("id"));
-			Table currentTable = dao.getTable(tableId);
+			Table currentTable = Dao.getTable(tableId);
 
 			boolean isUsedByTables = false;
 			String error = "";
 			if (currentTable.getType() == TableType.STORAGE) {
-				List<Table> tablesUsingThisStorage = dao.getTablesUsingStorage(tableId);
+				List<Table> tablesUsingThisStorage = Dao.getTablesUsingStorage(tableId);
 
 				if (!tablesUsingThisStorage.isEmpty()) {
 					isUsedByTables = true;
@@ -69,7 +69,7 @@ public class DeleteTable extends HttpServlet {
 			if (isUsedByTables) {
 				out.print(error);
 			} else {
-				boolean deleted = dao.deleteTable(tableId);
+				boolean deleted = Dao.deleteTable(tableId);
 				if (deleted) {
 					switch (currentTable.getType()) {
 					case TABLE:

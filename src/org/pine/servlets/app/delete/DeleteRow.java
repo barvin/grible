@@ -48,16 +48,16 @@ public class DeleteRow extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			int rowId = Integer.parseInt(request.getParameter("rowid"));
-			Row row = dao.getRow(rowId);
+			Row row = Dao.getRow(rowId);
 			int tableId = row.getTableId();
-			Table currentTable = dao.getTable(tableId);
+			Table currentTable = Dao.getTable(tableId);
 
 			boolean isUsedByTables = false;
 			String error = "";
 			if (currentTable.getType() == TableType.STORAGE) {
-				List<Table> tablesUsingRow = dao.getTablesUsingRow(rowId);
+				List<Table> tablesUsingRow = Dao.getTablesUsingRow(rowId);
 				if (!tablesUsingRow.isEmpty()) {
 					isUsedByTables = true;
 					error = "ERROR: This row is used by:";
@@ -75,17 +75,17 @@ public class DeleteRow extends HttpServlet {
 			if (isUsedByTables) {
 				out.print(error);
 			} else {
-				if (dao.deleteRow(rowId)) {
+				if (Dao.deleteRow(rowId)) {
 					List<Integer> rowIds = new ArrayList<Integer>();
 					List<Integer> oldRowNumbers = new ArrayList<Integer>();
 					List<Integer> rowNumbers = new ArrayList<Integer>();
-					List<Row> rows = dao.getRows(tableId);
+					List<Row> rows = Dao.getRows(tableId);
 					for (int i = 0; i < rows.size(); i++) {
 						rowIds.add(rows.get(i).getId());
 						oldRowNumbers.add(rows.get(i).getOrder());
 						rowNumbers.add(i + 1);
 					}
-					dao.updateRows(rowIds, oldRowNumbers, rowNumbers);
+					Dao.updateRows(rowIds, oldRowNumbers, rowNumbers);
 					out.print("success");
 				} else {
 					out.print("Could not delete the row. See server log for details.");

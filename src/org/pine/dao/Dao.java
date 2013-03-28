@@ -35,32 +35,32 @@ import org.pine.settings.GlobalSettings;
  */
 public class Dao {
 
-	private String sqlserver;
-	private String sqlport;
-	private String sqldatabase;
-	private String sqllogin;
-	private String sqlpassword;
+	private static Connection connection;
 
-	public Dao() throws Exception {
-		sqlserver = GlobalSettings.getInstance().getDbHost();
-		sqlport = GlobalSettings.getInstance().getDbPort();
-		sqldatabase = GlobalSettings.getInstance().getDbName();
-		sqllogin = GlobalSettings.getInstance().getDbLogin();
-		sqlpassword = GlobalSettings.getInstance().getDbPswd();
-		initializeSQLDriver();
+	private static Connection getConnection() throws SQLException {
+		if (connection == null) {
+			initializeSQLDriver();
+			String sqlserver = null;
+			String sqlport = null;
+			String sqldatabase = null;
+			String sqllogin = null;
+			String sqlpassword = null;
+			try {
+				sqlserver = GlobalSettings.getInstance().getDbHost();
+				sqlport = GlobalSettings.getInstance().getDbPort();
+				sqldatabase = GlobalSettings.getInstance().getDbName();
+				sqllogin = GlobalSettings.getInstance().getDbLogin();
+				sqlpassword = GlobalSettings.getInstance().getDbPswd();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			connection = DriverManager.getConnection("jdbc:postgresql://" + sqlserver + ":" + sqlport + "/"
+					+ sqldatabase, sqllogin, sqlpassword);
+		}
+		return connection;
 	}
 
-	public void setDatabase(String dbName) {
-		sqldatabase = dbName;
-	}
-
-	private Connection getConnection() throws SQLException {
-		Connection conn = DriverManager.getConnection("jdbc:postgresql://" + sqlserver + ":" + sqlport + "/"
-				+ sqldatabase, sqllogin, sqlpassword);
-		return conn;
-	}
-
-	private void initializeSQLDriver() {
+	private static void initializeSQLDriver() {
 		try {
 			Class.forName("org.postgresql.Driver").newInstance();
 		} catch (Exception e) {
@@ -69,13 +69,13 @@ public class Dao {
 		}
 	}
 
-	private Product initProduct(ResultSet rs) throws SQLException {
+	private static Product initProduct(ResultSet rs) throws SQLException {
 		Product product = new Product(rs.getInt("id"));
 		product.setName(rs.getString("name"));
 		return product;
 	}
 
-	private Category initCategory(ResultSet rs) throws SQLException {
+	private static Category initCategory(ResultSet rs) throws SQLException {
 		Category category = new Category(rs.getInt("id"));
 		category.setName(rs.getString("name"));
 		category.setProductId(rs.getInt("productid"));
@@ -84,7 +84,7 @@ public class Dao {
 		return category;
 	}
 
-	private Table initTable(ResultSet rs) throws SQLException {
+	private static Table initTable(ResultSet rs) throws SQLException {
 		Table result = new Table(rs.getInt("id"));
 		result.setType(TableType.valueOf(rs.getString("type").toUpperCase()));
 		result.setName(rs.getString("name"));
@@ -99,7 +99,7 @@ public class Dao {
 		return result;
 	}
 
-	private User initUser(ResultSet rs) throws SQLException {
+	private static User initUser(ResultSet rs) throws SQLException {
 		User user = new User(rs.getInt("id"));
 		user.setName(rs.getString("login"));
 		user.setPassword(rs.getString("password"));
@@ -109,7 +109,7 @@ public class Dao {
 		return user;
 	}
 
-	private List<UserPermission> getUserPermissions(int userId) throws SQLException {
+	private static List<UserPermission> getUserPermissions(int userId) throws SQLException {
 		ArrayList<UserPermission> result = new ArrayList<UserPermission>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -121,12 +121,12 @@ public class Dao {
 			permission.setHasWriteAccess(rs.getBoolean("writeaccess"));
 			result.add(permission);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	private Key initKey(ResultSet rs) throws SQLException {
+	private static Key initKey(ResultSet rs) throws SQLException {
 		Key result = new Key(rs.getInt("id"));
 		result.setName(rs.getString("name"));
 		result.setTableId(rs.getInt("tableid"));
@@ -135,14 +135,14 @@ public class Dao {
 		return result;
 	}
 
-	private Row initRow(ResultSet rs) throws SQLException {
+	private static Row initRow(ResultSet rs) throws SQLException {
 		Row result = new Row(rs.getInt("id"));
 		result.setTableId(rs.getInt("tableid"));
 		result.setOrder(rs.getInt("order"));
 		return result;
 	}
 
-	private Value initValue(ResultSet rs) throws SQLException {
+	private static Value initValue(ResultSet rs) throws SQLException {
 		Value result = new Value(rs.getInt("id"));
 		result.setKeyId(rs.getInt("keyid"));
 		result.setRowId(rs.getInt("rowid"));
@@ -156,7 +156,7 @@ public class Dao {
 		return result;
 	}
 
-	public List<Product> getProducts() throws SQLException {
+	public static List<Product> getProducts() throws SQLException {
 		List<Product> result = new ArrayList<Product>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -164,13 +164,13 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initProduct(rs));
 		}
-		conn.close();
+
 		rs.close();
 		stmt.close();
 		return result;
 	}
 
-	public Product getProduct(int id) throws SQLException {
+	public static Product getProduct(int id) throws SQLException {
 		Product result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -178,13 +178,13 @@ public class Dao {
 		while (rs.next()) {
 			result = initProduct(rs);
 		}
-		conn.close();
+
 		rs.close();
 		stmt.close();
 		return result;
 	}
 
-	public List<Category> getCategories(int productId, TableType type) throws SQLException {
+	public static List<Category> getCategories(int productId, TableType type) throws SQLException {
 		List<Category> result = new ArrayList<Category>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -195,13 +195,13 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initCategory(rs));
 		}
-		conn.close();
+
 		rs.close();
 		stmt.close();
 		return result;
 	}
 
-	public int insertCategory(TableType type, int productId, String name, Integer parentId) throws SQLException {
+	public static int insertCategory(TableType type, int productId, String name, Integer parentId) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -211,12 +211,12 @@ public class Dao {
 		if (rs.next()) {
 			id = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return id;
 	}
 
-	public int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className)
+	public static int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className)
 			throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
@@ -231,12 +231,12 @@ public class Dao {
 		if (rs.next()) {
 			id = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return id;
 	}
 
-	public int insertRow(int tableId, int order) throws SQLException {
+	public static int insertRow(int tableId, int order) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -245,12 +245,12 @@ public class Dao {
 		if (rs.next()) {
 			id = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return id;
 	}
 
-	public int insertKey(int tableId, String name, int order, int referenceStorageId) throws SQLException {
+	public static int insertKey(int tableId, String name, int order, int referenceStorageId) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -261,23 +261,23 @@ public class Dao {
 		if (rs.next()) {
 			id = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return id;
 	}
 
-	public void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
+	public static void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
 			throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		value = value.replace("'", "''");
 		stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) VALUES (" + rowId + ", "
 				+ keyId + ", '" + value + "', " + isStorage + ", " + storageIdsAsString + ")");
-		conn.close();
+
 		stmt.close();
 	}
 
-	public boolean deleteUser(String userId) throws SQLException {
+	public static boolean deleteUser(String userId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -289,12 +289,11 @@ public class Dao {
 			result = true;
 		}
 
-		conn.close();
 		stmt.close();
 		return result;
 	}
 
-	public User getUserById(int id) throws SQLException {
+	public static User getUserById(int id) throws SQLException {
 		User result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -302,12 +301,12 @@ public class Dao {
 		if (rs.next()) {
 			result = initUser(rs);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public void updateUserPermissions(int userId, String[] productIds) throws SQLException {
+	public static void updateUserPermissions(int userId, String[] productIds) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("DELETE FROM userpermissions WHERE userid=" + userId);
@@ -315,35 +314,35 @@ public class Dao {
 			stmt.executeUpdate("INSERT INTO userpermissions(userid, productid) VALUES (" + userId + ", "
 					+ productIds[i] + ")");
 		}
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateUserName(int id, String userName) throws SQLException {
+	public static void updateUserName(int id, String userName) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE users " + "SET login='" + userName + "' WHERE id=" + id);
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateUserPassword(int id, String hashPass) throws SQLException {
+	public static void updateUserPassword(int id, String hashPass) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE users " + "SET password='" + hashPass + "' WHERE id=" + id);
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateUserIsAdmin(int id, boolean isAdmin) throws SQLException {
+	public static void updateUserIsAdmin(int id, boolean isAdmin) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE users " + "SET isadmin=" + isAdmin + " WHERE id=" + id);
-		conn.close();
+
 		stmt.close();
 	}
 
-	public int insertUser(String userName, String hashPass, boolean isAdmin) throws SQLException {
+	public static int insertUser(String userName, String hashPass, boolean isAdmin) throws SQLException {
 		int id = 0;
 
 		Connection conn = getConnection();
@@ -354,13 +353,13 @@ public class Dao {
 		if (rs.next()) {
 			id = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 
 		return id;
 	}
 
-	public List<User> getUsers() throws SQLException {
+	public static List<User> getUsers() throws SQLException {
 		List<User> result = new ArrayList<User>();
 
 		Connection conn = getConnection();
@@ -371,26 +370,25 @@ public class Dao {
 			result.add(initUser(rs));
 		}
 
-		conn.close();
 		rs.close();
 		stmt.close();
 
 		return result;
 	}
 
-	public void insertUserPermissions(int userId, String[] productIds) throws SQLException {
+	public static void insertUserPermissions(int userId, String[] productIds) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < productIds.length; i++) {
 			stmt.executeUpdate("INSERT INTO userpermissions(userid, productid) VALUES (" + userId + ", "
 					+ productIds[i] + ")");
 		}
-		conn.close();
+
 		stmt.close();
 
 	}
 
-	public User getUserByName(String userName) throws SQLException {
+	public static User getUserByName(String userName) throws SQLException {
 		User result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -398,12 +396,12 @@ public class Dao {
 		if (rs.next()) {
 			result = initUser(rs);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Table getTable(int id) throws SQLException {
+	public static Table getTable(int id) throws SQLException {
 		Table result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -415,7 +413,6 @@ public class Dao {
 			result = initTable(rs);
 		}
 
-		conn.close();
 		rs.close();
 		stmt.close();
 		return result;
@@ -424,7 +421,7 @@ public class Dao {
 	/**
 	 * Method for 'tables' or 'storages'.
 	 */
-	public int getProductIdByPrimaryTableId(int tableId) throws SQLException {
+	public static int getProductIdByPrimaryTableId(int tableId) throws SQLException {
 		int productId = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -433,7 +430,7 @@ public class Dao {
 		if (rs.next()) {
 			productId = rs.getInt("productid");
 		}
-		conn.close();
+
 		stmt.close();
 		return productId;
 	}
@@ -441,7 +438,7 @@ public class Dao {
 	/**
 	 * Method for 'preconditions' or 'postconditions'.
 	 */
-	public int getProductIdBySecondaryTableId(int tableId) throws SQLException {
+	public static int getProductIdBySecondaryTableId(int tableId) throws SQLException {
 		int productId = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -450,12 +447,12 @@ public class Dao {
 		if (rs.next()) {
 			productId = rs.getInt("productid");
 		}
-		conn.close();
+
 		stmt.close();
 		return productId;
 	}
 
-	public List<Table> getTablesByCategoryId(int categoryId) throws SQLException {
+	public static List<Table> getTablesByCategoryId(int categoryId) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -465,12 +462,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Key> getKeys(int tableId) throws SQLException {
+	public static List<Key> getKeys(int tableId) throws SQLException {
 		ArrayList<Key> result = new ArrayList<Key>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -478,12 +475,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initKey(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Row> getRows(int tableId) throws SQLException {
+	public static List<Row> getRows(int tableId) throws SQLException {
 		ArrayList<Row> result = new ArrayList<Row>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -491,12 +488,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initRow(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public ArrayList<Value> getValues(Row row) throws SQLException {
+	public static ArrayList<Value> getValues(Row row) throws SQLException {
 		ArrayList<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -506,12 +503,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initValue(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Table> getTablesUsingRow(int rowId) throws SQLException {
+	public static List<Table> getTablesUsingRow(int rowId) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -522,12 +519,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Integer getChildtable(int tableId, TableType childType) throws SQLException {
+	public static Integer getChildtable(int tableId, TableType childType) throws SQLException {
 		Integer result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -536,12 +533,12 @@ public class Dao {
 		if (rs.next()) {
 			result = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Category getCategory(int id) throws SQLException {
+	public static Category getCategory(int id) throws SQLException {
 		Category result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -550,12 +547,12 @@ public class Dao {
 		if (rs.next()) {
 			result = initCategory(rs);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Value> getValues(Key key) throws SQLException {
+	public static List<Value> getValues(Key key) throws SQLException {
 		List<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -565,12 +562,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initValue(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Row getRow(int id) throws SQLException {
+	public static Row getRow(int id) throws SQLException {
 		Row result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -578,12 +575,12 @@ public class Dao {
 		if (rs.next()) {
 			result = initRow(rs);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Value getValue(int id) throws SQLException {
+	public static Value getValue(int id) throws SQLException {
 		Value result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -591,12 +588,12 @@ public class Dao {
 		if (rs.next()) {
 			result = initValue(rs);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Key getKey(int id) throws SQLException {
+	public static Key getKey(int id) throws SQLException {
 		Key result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -604,12 +601,12 @@ public class Dao {
 		if (rs.next()) {
 			result = initKey(rs);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Table> getStorageTablesOfProductByKeyId(int keyId) throws SQLException {
+	public static List<Table> getStorageTablesOfProductByKeyId(int keyId) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -634,13 +631,13 @@ public class Dao {
 		while (rs3.next()) {
 			result.add(initTable(rs3));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 
 	}
 
-	public Integer getCategoryId(String name, int productId, TableType type) throws SQLException {
+	public static Integer getCategoryId(String name, int productId, TableType type) throws SQLException {
 		Integer result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -649,12 +646,12 @@ public class Dao {
 		if (rs.next()) {
 			result = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Integer> insertKeys(int tableId, List<String> keyNames) throws SQLException {
+	public static List<Integer> insertKeys(int tableId, List<String> keyNames) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -666,12 +663,12 @@ public class Dao {
 				result.add(rs.getInt("id"));
 			}
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Integer> insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws SQLException {
+	public static List<Integer> insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -683,22 +680,22 @@ public class Dao {
 				result.add(rs.getInt("id"));
 			}
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
+	public static void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < keyIds.size(); i++) {
 			stmt.executeUpdate("UPDATE keys SET \"order\"=" + keyNumbers.get(i) + " " + "WHERE id=" + keyIds.get(i));
 		}
-		conn.close();
+
 		stmt.close();
 	}
 
-	public int insertKeyCopy(Key currentKey) throws SQLException {
+	public static int insertKeyCopy(Key currentKey) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -710,12 +707,12 @@ public class Dao {
 		if (rs.next()) {
 			result = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Integer> insertValuesWithKeyId(int newKeyId, List<Value> values) throws SQLException {
+	public static List<Integer> insertValuesWithKeyId(int newKeyId, List<Value> values) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -728,7 +725,7 @@ public class Dao {
 				result.add(rs.getInt("id"));
 			}
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
@@ -740,11 +737,11 @@ public class Dao {
 	 * @param value
 	 * @return value that is ready for DB inserting.
 	 */
-	private String escape(String value) {
+	private static String escape(String value) {
 		return value.replace("'", "''");
 	}
 
-	public void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
+	public static void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
 			throws SQLException {
 		List<Value> values = new ArrayList<Value>();
 		Connection conn = getConnection();
@@ -775,21 +772,20 @@ public class Dao {
 			updateValue(value);
 		}
 
-		conn.close();
 		stmt.close();
 	}
 
-	public void updateRows(List<Integer> rowIds, List<Integer> rowNumbers) throws SQLException {
+	public static void updateRows(List<Integer> rowIds, List<Integer> rowNumbers) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < rowIds.size(); i++) {
 			stmt.executeUpdate("UPDATE rows SET \"order\"=" + rowNumbers.get(i) + " " + "WHERE id=" + rowIds.get(i));
 		}
-		conn.close();
+
 		stmt.close();
 	}
 
-	public int insertRowCopy(Row currentRow) throws SQLException {
+	public static int insertRowCopy(Row currentRow) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -799,12 +795,12 @@ public class Dao {
 		if (rs.next()) {
 			result = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Integer> insertValuesWithRowId(int newRowId, List<Value> values) throws SQLException {
+	public static List<Integer> insertValuesWithRowId(int newRowId, List<Value> values) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -817,12 +813,12 @@ public class Dao {
 				result.add(rs.getInt("id"));
 			}
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
+	public static List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -846,12 +842,12 @@ public class Dao {
 				result.add(rs.getInt("id"));
 			}
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public boolean deleteCategory(int categoryId) throws SQLException {
+	public static boolean deleteCategory(int categoryId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
@@ -859,7 +855,7 @@ public class Dao {
 						+ categoryId + ")");
 		while (rs.next()) {
 			if (!deleteTable(rs.getInt("id"))) {
-				conn.close();
+
 				rs.close();
 				stmt.close();
 				return false;
@@ -869,20 +865,20 @@ public class Dao {
 		ResultSet rs2 = stmt.executeQuery("SELECT id FROM tables WHERE categoryid=" + categoryId);
 		while (rs2.next()) {
 			if (!deleteTable(rs2.getInt("id"))) {
-				conn.close();
+
 				rs2.close();
 				stmt.close();
 				return false;
 			}
 		}
 		stmt.executeUpdate("DELETE FROM categories WHERE id=" + categoryId);
-		conn.close();
+
 		rs2.close();
 		stmt.close();
 		return true;
 	}
 
-	public List<Table> getTablesUsingStorage(int storageId) throws SQLException {
+	public static List<Table> getTablesUsingStorage(int storageId) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -893,12 +889,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public boolean deleteTable(int tableId) throws SQLException {
+	public static boolean deleteTable(int tableId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -911,12 +907,12 @@ public class Dao {
 		if (!rs.next()) {
 			result = true;
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public boolean deleteKey(int keyId) throws SQLException {
+	public static boolean deleteKey(int keyId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -928,12 +924,11 @@ public class Dao {
 			result = true;
 		}
 
-		conn.close();
 		stmt.close();
 		return result;
 	}
 
-	public boolean deleteRow(int rowId) throws SQLException {
+	public static boolean deleteRow(int rowId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -945,12 +940,11 @@ public class Dao {
 			result = true;
 		}
 
-		conn.close();
 		stmt.close();
 		return result;
 	}
 
-	public List<Integer> insertRows(int tableId, int rowsNumber) throws SQLException {
+	public static List<Integer> insertRows(int tableId, int rowsNumber) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -961,12 +955,12 @@ public class Dao {
 				result.add(rs.getInt("id"));
 			}
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public void insertValues(List<Integer> rowIds, List<Integer> keyIds, ArrayList<ArrayList<String>> values)
+	public static void insertValues(List<Integer> rowIds, List<Integer> keyIds, ArrayList<ArrayList<String>> values)
 			throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -980,11 +974,11 @@ public class Dao {
 						+ rowId + ", " + keyId + ", '" + value + "', false, NULL)");
 			}
 		}
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateTable(Table table) throws SQLException {
+	public static void updateTable(Table table) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		String finalName = table.getName();
@@ -994,37 +988,37 @@ public class Dao {
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
 				+ table.getParentId() + ", showusage=" + table.isShowUsage() + " WHERE id=" + table.getId());
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateCategory(Category category) throws SQLException {
+	public static void updateCategory(Category category) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE categories SET name='" + category.getName() + "' WHERE id=" + category.getId());
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateKeys(String[] keyIds, String[] keyValues) throws SQLException {
+	public static void updateKeys(String[] keyIds, String[] keyValues) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < keyIds.length; i++) {
 			stmt.executeUpdate("UPDATE keys SET name='" + keyValues[i] + "' " + "WHERE id=" + keyIds[i]);
 		}
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateKeyValue(String id, String value) throws SQLException {
+	public static void updateKeyValue(String id, String value) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE keys SET name='" + value.replace("'", "''") + "' " + "WHERE id=" + id);
-		conn.close();
+
 		stmt.close();
 	}
 
-	public int getRefStorageId(int keyId) throws SQLException {
+	public static int getRefStorageId(int keyId) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1032,12 +1026,12 @@ public class Dao {
 		if (rs.next()) {
 			result = rs.getInt("reftable");
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Row getRow(int refStorageId, int order) throws SQLException {
+	public static Row getRow(int refStorageId, int order) throws SQLException {
 		Row result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1046,12 +1040,12 @@ public class Dao {
 		if (rs.next()) {
 			result = initRow(rs);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public void updateValues(ArrayList<Value> values) throws SQLException {
+	public static void updateValues(ArrayList<Value> values) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Value value : values) {
@@ -1059,11 +1053,11 @@ public class Dao {
 					+ ", value='" + escape(value.getValue()) + "', isstorage=" + value.isStorage() + ", storagerows="
 					+ value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
 		}
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateKey(Key key) throws SQLException {
+	public static void updateKey(Key key) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		String finalRefTableId = "null";
@@ -1072,30 +1066,30 @@ public class Dao {
 		}
 		stmt.executeUpdate("UPDATE keys SET name='" + key.getName() + "', " + "\"order\"=" + key.getOrder() + ", "
 				+ "reftable=" + finalRefTableId + " " + "WHERE id=" + key.getId());
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateValuesTypes(int keyId, boolean isStorage, String storageIds) throws SQLException {
+	public static void updateValuesTypes(int keyId, boolean isStorage, String storageIds) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE values SET isstorage=" + isStorage + ", " + "storagerows=" + storageIds + " "
 				+ "WHERE keyid=" + keyId);
-		conn.close();
+
 		stmt.close();
 	}
 
-	public void updateValue(Value value) throws SQLException {
+	public static void updateValue(Value value) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE values " + "SET rowid=" + value.getRowId() + ", keyid=" + value.getKeyId()
 				+ ", value='" + escape(value.getValue()) + "', isstorage=" + value.isStorage() + ", " + "storagerows="
 				+ value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
-		conn.close();
+
 		stmt.close();
 	}
 
-	public boolean isLastAdmin(String userId) throws SQLException {
+	public static boolean isLastAdmin(String userId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1110,12 +1104,12 @@ public class Dao {
 				}
 			}
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public Product getProduct(String name) throws SQLException {
+	public static Product getProduct(String name) throws SQLException {
 		Product result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1123,13 +1117,13 @@ public class Dao {
 		while (rs.next()) {
 			result = initProduct(rs);
 		}
-		conn.close();
+
 		rs.close();
 		stmt.close();
 		return result;
 	}
 
-	public int insertProduct(String name) throws SQLException {
+	public static int insertProduct(String name) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1138,12 +1132,12 @@ public class Dao {
 		if (rs.next()) {
 			id = rs.getInt("id");
 		}
-		conn.close();
+
 		stmt.close();
 		return id;
 	}
 
-	public int getAdminsCount() throws SQLException {
+	public static int getAdminsCount() throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1151,30 +1145,30 @@ public class Dao {
 		if (rs.next()) {
 			result = rs.getInt(1);
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public void execute(String query) throws SQLException {
+	public static void execute(String query) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(query);
-		conn.close();
+
 		stmt.close();
 	}
 
-	public ResultSet executeSelect(String query) throws SQLException {
+	public static ResultSet executeSelect(String query) throws SQLException {
 		ResultSet rs = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		rs = stmt.executeQuery(query);
-		conn.close();
+
 		stmt.close();
 		return rs;
 	}
 
-	public boolean deleteProduct(int productId) throws SQLException {
+	public static boolean deleteProduct(int productId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("ALTER TABLE ONLY keys DROP CONSTRAINT keys_reftable_fkey");
@@ -1184,7 +1178,7 @@ public class Dao {
 		while (rs.next()) {
 
 			if (!deleteCategory(rs.getInt("id"))) {
-				conn.close();
+
 				rs.close();
 				stmt.close();
 				return false;
@@ -1193,21 +1187,21 @@ public class Dao {
 		stmt.executeUpdate("DELETE FROM userpermissions WHERE productid=" + productId);
 		stmt.executeUpdate("DELETE FROM products WHERE id=" + productId);
 		stmt.executeUpdate("ALTER TABLE ONLY keys ADD CONSTRAINT keys_reftable_fkey FOREIGN KEY (reftable) REFERENCES tables(id)");
-		conn.close();
+
 		rs.close();
 		stmt.close();
 		return true;
 	}
 
-	public void updateProduct(Product product) throws SQLException {
+	public static void updateProduct(Product product) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE products SET name='" + product.getName() + "' WHERE id=" + product.getId());
-		conn.close();
+
 		stmt.close();
 	}
 
-	public List<Table> getTablesOfProduct(int productId, TableType type) throws SQLException {
+	public static List<Table> getTablesOfProduct(int productId, TableType type) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1219,12 +1213,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws SQLException {
+	public static boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1235,12 +1229,12 @@ public class Dao {
 		if (rs.next()) {
 			result = true;
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
+	public static List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
 		List<Key> result = new ArrayList<Key>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1251,12 +1245,12 @@ public class Dao {
 		while (rs.next()) {
 			result.add(initKey(rs));
 		}
-		conn.close();
+
 		stmt.close();
 		return result;
 	}
 
-	public void insertValues(int tableId, int oldTableId, List<Row> oldRows, List<Key> keys) throws SQLException {
+	public static void insertValues(int tableId, int oldTableId, List<Row> oldRows, List<Key> keys) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Row oldRow : oldRows) {
@@ -1271,7 +1265,6 @@ public class Dao {
 			}
 		}
 
-		conn.close();
 		stmt.close();
 	}
 }

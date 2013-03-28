@@ -62,16 +62,16 @@ public class StorageImport extends HttpServlet {
 				String fileName = ServletHelper.getFilename(filePart);
 				InputStream filecontent = filePart.getInputStream();
 				ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
-				Dao dao = new Dao();
+				
 				
 				String storageName = fileName.substring(0, fileName.lastIndexOf(".xls"));
 				int categoryId = Integer.parseInt(request.getParameter("category"));
-				int storageId = dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
+				int storageId = Dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
 				
-				List<Integer> keyIds = dao.insertKeys(storageId, excelFile.getKeys());
+				List<Integer> keyIds = Dao.insertKeys(storageId, excelFile.getKeys());
 				ArrayList<ArrayList<String>> values = excelFile.getValues();
-				List<Integer> rowIds = dao.insertRows(storageId, values.size());
-				dao.insertValues(rowIds, keyIds, values);
+				List<Integer> rowIds = Dao.insertRows(storageId, values.size());
+				Dao.insertValues(rowIds, keyIds, values);
 
 				message = "'" + storageName + "' storage was successfully imported.";
 			}

@@ -44,14 +44,14 @@ public class DeleteUser extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 
 			String userId = request.getParameter("userid");
-			boolean isLastAdmin = dao.getAdminsCount() == 1;
+			boolean isLastAdmin = Dao.getAdminsCount() == 1;
 			if (isLastAdmin) {
 				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
 			} else {
-				boolean deleted = dao.deleteUser(userId);
+				boolean deleted = Dao.deleteUser(userId);
 				if (deleted) {
 					out.print("success");
 				} else {

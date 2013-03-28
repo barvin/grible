@@ -46,9 +46,9 @@ public class GetAddTableDialog extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			Dao dao = new Dao();
+			
 			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
-			Category category = dao.getCategory(categoryId);
+			Category category = Dao.getCategory(categoryId);
 			/*
 			 * + '</div>' + '<br/>The data ' + tableType + ' will be added to
 			 * the category "' + $(el).text() + '".' + '<div
@@ -95,7 +95,7 @@ public class GetAddTableDialog extends HttpServlet {
 				responseHtml.append("<div class=\"table-cell dialog-cell\">");
 				responseHtml.append("<select class=\"tables-list dialog-edit\" disabled=\"disabled\"\">");
 
-				List<Table> tables = dao.getTablesOfProduct(category.getProductId(), category.getType());
+				List<Table> tables = Dao.getTablesOfProduct(category.getProductId(), category.getType());
 				for (Table table : tables) {
 					responseHtml.append("<option value=\"");
 					responseHtml.append(table.getId());

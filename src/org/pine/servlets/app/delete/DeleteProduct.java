@@ -44,10 +44,10 @@ public class DeleteProduct extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			int productId = Integer.parseInt(request.getParameter("id"));
 
-			boolean deleted = dao.deleteProduct(productId);
+			boolean deleted = Dao.deleteProduct(productId);
 			if (deleted) {
 				out.print("success");
 			} else {

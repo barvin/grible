@@ -53,7 +53,7 @@ public class Storages extends HttpServlet {
 				return;
 			}
 			StringBuilder responseHtml = new StringBuilder();
-			Dao dao = new Dao();
+			
 
 			if (request.getSession(false) == null) {
 				response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
@@ -77,13 +77,13 @@ public class Storages extends HttpServlet {
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
-				User user = dao.getUserByName(userName);
+				User user = Dao.getUserByName(userName);
 
 				int productId;
 				int tableId;
 				if (request.getParameter("id") != null) {
 					tableId = Integer.parseInt(request.getParameter("id"));
-					productId = dao.getProductIdByPrimaryTableId(tableId);
+					productId = Dao.getProductIdByPrimaryTableId(tableId);
 				} else {
 					productId = Integer.parseInt(request.getParameter("product"));
 					tableId = 0;
@@ -107,7 +107,7 @@ public class Storages extends HttpServlet {
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");
 					responseHtml.append(ServletHelper.getUserPanel(user));
-					includeHeader(responseHtml, "storages", dao.getProduct(productId));
+					includeHeader(responseHtml, "storages", Dao.getProduct(productId));
 
 					responseHtml.append("<div id=\"main\" class=\"table\">");
 					responseHtml.append("<div class=\"table-row\">");

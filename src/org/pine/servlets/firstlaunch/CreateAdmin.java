@@ -40,14 +40,14 @@ public class CreateAdmin extends HttpServlet {
 			String pineLogin = request.getParameter("pinelogin");
 			String pinePswd = request.getParameter("pinepswd");
 
-			Dao dao = new Dao();
+			
 
-			User user = dao.getUserByName(pineLogin);
+			User user = Dao.getUserByName(pineLogin);
 			if (user == null) {
 				MessageDigest md = MessageDigest.getInstance("MD5");
 				md.update(pinePswd.getBytes());
 				String hashPass = new String(md.digest());
-				int userId = dao.insertUser(pineLogin, hashPass, true);
+				int userId = Dao.insertUser(pineLogin, hashPass, true);
 				if (userId > 0) {
 					out.print("Done.");
 				} else {
@@ -58,8 +58,8 @@ public class CreateAdmin extends HttpServlet {
 					MessageDigest md = MessageDigest.getInstance("MD5");
 					md.update(pinePswd.getBytes());
 					String hashPass = new String(md.digest());
-					dao.updateUserPassword(user.getId(), hashPass);
-					dao.updateUserIsAdmin(user.getId(), true);
+					Dao.updateUserPassword(user.getId(), hashPass);
+					Dao.updateUserIsAdmin(user.getId(), true);
 					out.print("Done.");
 				} else {
 					out.print("ERROR: Password for Pine administrator cannot be empty.");

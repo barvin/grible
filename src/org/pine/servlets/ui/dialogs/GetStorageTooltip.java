@@ -69,7 +69,7 @@ public class GetStorageTooltip extends HttpServlet {
 
 			if (correctFormat) {
 				dao = new Dao();
-				Value value = dao.getValue(Integer.parseInt(request.getParameter("id")));
+				Value value = Dao.getValue(Integer.parseInt(request.getParameter("id")));
 				Integer[] storageIds = value.getStorageIds();
 				out.print(content + getStorageTooltip(storageIds));
 			} else {
@@ -86,9 +86,9 @@ public class GetStorageTooltip extends HttpServlet {
 		if (integers != null) {
 			StringBuilder result = new StringBuilder(
 					"<div class=\"tooltip\"><div style=\"width: auto;\" class=\"table\">");
-			int tableId = dao.getRow(integers[0]).getTableId();
+			int tableId = Dao.getRow(integers[0]).getTableId();
 
-			List<Key> keys = dao.getKeys(tableId);
+			List<Key> keys = Dao.getKeys(tableId);
 			result.append("<div class=\"table-row key-row\">");
 			for (Key key : keys) {
 				result.append("<div class=\"table-cell ui-cell-mini key-cell\">").append(key.getName())
@@ -97,8 +97,8 @@ public class GetStorageTooltip extends HttpServlet {
 			result.append("</div>");
 
 			for (int i = 0; i < integers.length; i++) {
-				Row row = dao.getRow(integers[i]);
-				List<Value> values = dao.getValues(row);
+				Row row = Dao.getRow(integers[i]);
+				List<Value> values = Dao.getValues(row);
 				result.append("<div class=\"table-row value-row\">");
 				for (Value value : values) {
 					String storageCell = (value.isStorage()) ? " storage-cell" : "";

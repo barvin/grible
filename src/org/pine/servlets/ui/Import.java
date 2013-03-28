@@ -57,7 +57,7 @@ public class Import extends HttpServlet {
 				response.sendRedirect("/pine/firstlaunch");
 				return;
 			}
-			Dao dao = new Dao();
+			
 
 			if (request.getSession(false) == null) {
 				response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
@@ -78,7 +78,7 @@ public class Import extends HttpServlet {
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User user = null;
-				user = dao.getUserByName(userName);
+				user = Dao.getUserByName(userName);
 				int productId = Integer.parseInt(request.getParameter("product"));
 
 				if (!user.hasAccessToProduct(productId)) {
@@ -87,7 +87,7 @@ public class Import extends HttpServlet {
 					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
 					out.print(ServletHelper.getUserPanel(user));
-					includeHeader(out, "import", dao.getProduct(productId));
+					includeHeader(out, "import", Dao.getProduct(productId));
 
 					out.print("<br />");
 					out.print("<span class=\"medium-header\">Data Table Import</span>");
@@ -103,7 +103,7 @@ public class Import extends HttpServlet {
 					out.print("enctype=\"multipart/form-data\">");
 					out.print("Select category: &nbsp;<select name=\"category\">");
 
-					List<Category> categories = dao.getCategories(productId, TableType.TABLE);
+					List<Category> categories = Dao.getCategories(productId, TableType.TABLE);
 					for (Category category : categories) {
 						out.print("<option value=\"" + category.getId() + "\">" + category.getName() + "</option>");
 					}
@@ -127,7 +127,7 @@ public class Import extends HttpServlet {
 							+ "enctype=\"multipart/form-data\">");
 					out.print("Select category: &nbsp;<select name=\"category\">");
 
-					List<Category> storageCategories = dao.getCategories(productId, TableType.STORAGE);
+					List<Category> storageCategories = Dao.getCategories(productId, TableType.STORAGE);
 					for (Category category : storageCategories) {
 						out.print("<option value=\"" + category.getId() + "\">" + category.getName() + "</option>");
 					}

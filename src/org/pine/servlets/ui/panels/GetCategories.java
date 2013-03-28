@@ -50,17 +50,17 @@ public class GetCategories extends HttpServlet {
 			int productId = Integer.parseInt(request.getParameter("productId"));
 			int tableId = Integer.parseInt(request.getParameter("tableId"));
 			String strTableType = request.getParameter("tableType");
-			Dao dao = new Dao();
+			
 
 			TableType tableType = TableType.valueOf(strTableType.toUpperCase());
 			if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
 				tableType = TableType.TABLE;
-				tableId = dao.getTable(tableId).getParentId();
+				tableId = Dao.getTable(tableId).getParentId();
 			}
-			List<Category> categories = dao.getCategories(productId, tableType);
+			List<Category> categories = Dao.getCategories(productId, tableType);
 			StringBuilder responseHtml = new StringBuilder();
 			for (Category category : categories) {
-				List<Table> tables = dao.getTablesByCategoryId(category.getId());
+				List<Table> tables = Dao.getTablesByCategoryId(category.getId());
 				boolean categorySelected = false;
 				for (Table table : tables) {
 					if (table.getId() == tableId) {

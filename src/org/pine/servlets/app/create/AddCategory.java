@@ -45,7 +45,7 @@ public class AddCategory extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			int productId = Integer.parseInt(request.getParameter("product"));
 			String name = request.getParameter("name");
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
@@ -56,12 +56,12 @@ public class AddCategory extends HttpServlet {
 			if ("".equals(name)) {
 				out.print("ERROR: Category name cannot be empty.");
 			} else {
-				Integer categoryId = dao.getCategoryId(name, productId, tableType);
+				Integer categoryId = Dao.getCategoryId(name, productId, tableType);
 				if (categoryId != null) {
 					out.print("ERROR: Category with name '" + name + "' already exists.");
 				} else {
 					try {
-						dao.insertCategory(tableType, productId, name, null);
+						Dao.insertCategory(tableType, productId, name, null);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

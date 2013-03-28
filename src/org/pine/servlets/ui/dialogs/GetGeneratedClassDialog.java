@@ -56,7 +56,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 		int id = Integer.parseInt(request.getParameter("id"));
 		try {
 			dao = new Dao();
-			storage = dao.getTable(id);
+			storage = Dao.getTable(id);
 		} catch (Exception e) {
 			e.printStackTrace(out);
 		}
@@ -114,14 +114,14 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append("(HashMap&lt;String, String&gt; data) {");
 			constructor.append("<br>super(data);");
 
-			List<Key> keys = dao.getKeys(storage.getId());
+			List<Key> keys = Dao.getKeys(storage.getId());
 			for (Key key : keys) {
 				String keyName = key.getName();
 				String fieldName = StringUtils.uncapitalize(keyName).replace(" ", "");
 				String type = "String";
 				String method = "getString(\"" + keyName + "\");";
 
-				List<Value> values = dao.getValues(key);
+				List<Value> values = Dao.getValues(key);
 				if (key.getReferenceTableId() == 0) {
 					if (isBoolean(values)) {
 						type = "boolean";
@@ -130,7 +130,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				} else {
 					isDataHelperIncluded = true;
 					String refClassName;
-					refClassName = dao.getTable(key.getReferenceTableId()).getClassName();
+					refClassName = Dao.getTable(key.getReferenceTableId()).getClassName();
 					if (semicoulumExists(values)) {
 						isListIncluded = true;
 						type = "List&lt;" + refClassName + "&gt;";
@@ -205,13 +205,13 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append(className);
 			constructor.append("(Dictionary&lt;string, string&gt; data) : base(data)<br>{");
 
-			List<Key> keys = dao.getKeys(storage.getId());
+			List<Key> keys = Dao.getKeys(storage.getId());
 			for (Key key : keys) {
 				String keyName = key.getName().replace(" ", "");
 				String type = "string";
 				String method = "GetString(\"" + keyName + "\");";
 
-				List<Value> values = dao.getValues(key);
+				List<Value> values = Dao.getValues(key);
 				if (key.getReferenceTableId() == 0) {
 					if (isBoolean(values)) {
 						type = "bool";
@@ -219,7 +219,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 					}
 				} else {
 					isDataHelperIncluded = true;
-					String refClassName = dao.getTable(key.getReferenceTableId()).getClassName();
+					String refClassName = Dao.getTable(key.getReferenceTableId()).getClassName();
 					if (semicoulumExists(values)) {
 						type = "List&lt;" + refClassName + "&gt;";
 						method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\"" + keyName

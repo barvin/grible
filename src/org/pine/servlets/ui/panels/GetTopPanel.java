@@ -68,7 +68,7 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("</div>");
 
 			} else {
-				Dao dao = new Dao();
+				
 				Integer tableId = null;
 				Integer preId = null;
 				Integer postId = null;
@@ -80,23 +80,23 @@ public class GetTopPanel extends HttpServlet {
 				switch (tableType) {
 				case TABLE:
 					tableId = Integer.parseInt(request.getParameter("tableid"));
-					preId = dao.getChildtable(tableId, TableType.PRECONDITION);
-					postId = dao.getChildtable(tableId, TableType.POSTCONDITION);
+					preId = Dao.getChildtable(tableId, TableType.PRECONDITION);
+					postId = Dao.getChildtable(tableId, TableType.POSTCONDITION);
 					generalSelected = " sheet-tab-selected";
 					break;
 
 				case PRECONDITION:
 					preId = Integer.parseInt(request.getParameter("tableid"));
-					tableId = dao.getTable(preId).getParentId();
-					postId = dao.getChildtable(tableId, TableType.POSTCONDITION);
+					tableId = Dao.getTable(preId).getParentId();
+					postId = Dao.getChildtable(tableId, TableType.POSTCONDITION);
 					preSelected = " sheet-tab-selected";
 					editButtonEnable = "button-disabled";
 					break;
 
 				case POSTCONDITION:
 					postId = Integer.parseInt(request.getParameter("tableid"));
-					tableId = dao.getTable(postId).getParentId();
-					preId = dao.getChildtable(tableId, TableType.PRECONDITION);
+					tableId = Dao.getTable(postId).getParentId();
+					preId = Dao.getChildtable(tableId, TableType.PRECONDITION);
 					postSelected = " sheet-tab-selected";
 					editButtonEnable = "button-disabled";
 					break;

@@ -50,7 +50,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 		try {
 			String content = request.getParameter("content").replace("'", "&#39;");
 			dao = new Dao();
-			Key key = dao.getKey(Integer.parseInt(request.getParameter("keyid")));
+			Key key = Dao.getKey(Integer.parseInt(request.getParameter("keyid")));
 			getDialog(out, key, content);
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
@@ -79,7 +79,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 				+ ">Data Storage: ");
 		out.println("<select class=\"select-storage\" " + storageSelectDisabled + ">");
 
-		List<Table> dataSotages = dao.getStorageTablesOfProductByKeyId(key.getId());
+		List<Table> dataSotages = Dao.getStorageTablesOfProductByKeyId(key.getId());
 		for (Table dataSotage : dataSotages) {
 			String selected = "";
 			if (key.getReferenceTableId() == dataSotage.getId()) {

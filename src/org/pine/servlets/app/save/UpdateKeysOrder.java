@@ -46,7 +46,7 @@ public class UpdateKeysOrder extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 
 			if (request.getParameterValues("modkeyids[]") != null) {
 				String[] strKeyIds = request.getParameterValues("modkeyids[]");
@@ -57,7 +57,7 @@ public class UpdateKeysOrder extends HttpServlet {
 					keyIds.add(Integer.parseInt(strKeyIds[i]));
 					keyNumbers.add(Integer.parseInt(strKeyNumbers[i]));
 				}
-				dao.updateKeys(keyIds, keyNumbers);
+				Dao.updateKeys(keyIds, keyNumbers);
 			}
 			out.print("success");
 

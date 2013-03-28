@@ -48,16 +48,16 @@ public class InsertRow extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
-			Dao dao = new Dao();
+			
 			int rowId = Integer.parseInt(request.getParameter("rowid"));
 
-			Row currentRow = dao.getRow(rowId);
+			Row currentRow = Dao.getRow(rowId);
 			int currentRowNumber = currentRow.getOrder();
 			int tableId = currentRow.getTableId();
 			List<Integer> rowIds = new ArrayList<Integer>();
 			List<Integer> rowNumbers = new ArrayList<Integer>();
 			List<Integer> oldRowNumbers = new ArrayList<Integer>();
-			List<Row> rows = dao.getRows(tableId);
+			List<Row> rows = Dao.getRows(tableId);
 			for (int i = 0; i < rows.size(); i++) {
 				rowIds.add(rows.get(i).getId());
 				if (rows.get(i).getOrder() >= currentRowNumber) {
@@ -67,12 +67,12 @@ public class InsertRow extends HttpServlet {
 				}
 				oldRowNumbers.add(i + 1);
 			}
-			dao.updateRows(rowIds, oldRowNumbers, rowNumbers);
+			Dao.updateRows(rowIds, oldRowNumbers, rowNumbers);
 			currentRow.setOrder(currentRowNumber);
-			int newRowId = dao.insertRowCopy(currentRow);
+			int newRowId = Dao.insertRowCopy(currentRow);
 
-			List<Key> keys = dao.getKeys(tableId);
-			List<Integer> ids = dao.insertValuesEmptyWithRowId(newRowId, keys);
+			List<Key> keys = Dao.getKeys(tableId);
+			List<Integer> ids = Dao.insertValuesEmptyWithRowId(newRowId, keys);
 
 			String result = newRowId + ";" + StringUtils.join(ids, ";");
 			out.print(result);

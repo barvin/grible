@@ -48,40 +48,40 @@ public class ApplyParameterType extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
-			Dao dao = new Dao();
+			
 
 			int keyId = Integer.parseInt(request.getParameter("keyId"));
 			int refStorageId = Integer.parseInt(request.getParameter("storageId"));
 			String type = request.getParameter("type"); // "cbx-text"
 														// "cbx-storage"
 
-			Key key = dao.getKey(keyId);
+			Key key = Dao.getKey(keyId);
 			if (((key.getReferenceTableId() == 0) && ("cbx-text".equals(type)))
 					|| ((key.getReferenceTableId() == refStorageId) && ("cbx-storage".equals(type)))) {
 				out.print("not-changed");
 			} else if ("cbx-text".equals(type)) {
 				key.setReferenceTableId(0);
-				dao.updateKey(key);
-				dao.updateValuesTypes(keyId, false, "NULL");
+				Dao.updateKey(key);
+				Dao.updateValuesTypes(keyId, false, "NULL");
 				out.print("success");
 			} else {
 				key.setReferenceTableId(refStorageId);
-				List<Value> values = dao.getValues(key);
+				List<Value> values = Dao.getValues(key);
 				for (Value value : values) {
 					String[] strRows = value.getValue().split(";");
 					for (int i = 0; i < strRows.length; i++) {
 						if (!StringUtils.isNumeric(strRows[i])) {
 							out.print("ERROR: One of indexes is not numeric. Row: "
-									+ dao.getRow(value.getRowId()).getOrder()
+									+ Dao.getRow(value.getRowId()).getOrder()
 									+ ".\nIf you want to set no index, set '0'.");
 							out.flush();
 							out.close();
 							return;
 						} else if ((!strRows[i].equals("0"))
-								&& (dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
-							out.print("ERROR: Data storage '" + dao.getTable(refStorageId).getName()
+								&& (Dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
+							out.print("ERROR: Data storage '" + Dao.getTable(refStorageId).getName()
 									+ "' does not contain row number " + strRows[i] + ".\nYou specified it in row: "
-									+ dao.getRow(value.getRowId()).getOrder()
+									+ Dao.getRow(value.getRowId()).getOrder()
 									+ ".\nYou must first create this row in specified data storage.");
 							out.flush();
 							out.close();
@@ -96,14 +96,14 @@ public class ApplyParameterType extends HttpServlet {
 						String[] strRows = value.getValue().split(";");
 						Integer[] intRows = new Integer[strRows.length];
 						for (int i = 0; i < strRows.length; i++) {
-							intRows[i] = dao.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
+							intRows[i] = Dao.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
 						}
 						value.setStorageIds(intRows);
 					}
 					value.setIsStorage(true);
-					dao.updateValue(value);
+					Dao.updateValue(value);
 				}
-				dao.updateKey(key);
+				Dao.updateKey(key);
 				out.print("success");
 			}
 		} catch (Exception e) {

@@ -45,7 +45,7 @@ public class UpdateProduct extends HttpServlet {
 		try {
 			response.setContentType("text/plain");
 			PrintWriter out = response.getWriter();
-			Dao dao = new Dao();
+			
 			String name = request.getParameter("name");
 
 			if ("".equals(name)) {
@@ -53,9 +53,9 @@ public class UpdateProduct extends HttpServlet {
 			} else {
 				int productId = Integer.parseInt(request.getParameter("id"));
 				Product product;
-				product = dao.getProduct(productId);
+				product = Dao.getProduct(productId);
 				product.setName(name);
-				dao.updateProduct(product);
+				Dao.updateProduct(product);
 				out.print("success");
 			}
 

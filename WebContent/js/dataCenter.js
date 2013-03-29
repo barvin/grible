@@ -4,11 +4,13 @@ $(window).on("load", function() {
 	var footerHeight = $("#footer").outerHeight();
 	var mainHeight = docHeight - breadcrumpHeight - footerHeight;	
 	$("#main").height(mainHeight);
+	$(".left-panel").height(mainHeight - 20);
+	$("#entities-list").height(mainHeight - 20);
 	
 	var topPanelHeight = $(".top-panel").height();
 	
-	$("#table-container").height(mainHeight - topPanelHeight);
-	$("#table-container").width($("#main").width() - $(".left-panel").width());
+	$("#table-container").height(mainHeight - topPanelHeight + 10);
+	$("#table-container").width($("#main").width() - $(".left-panel").width() - 10);
 });
 
 $().ready(initialize());
@@ -34,7 +36,7 @@ function initialize() {
 		$("#waiting-bg").remove();
 		$("#footer").removeClass("page-bottom");
 		$("#category-container").html(data);
-		$(".entities-list").append(
+		$("#entities-list").append(
 				'<div class="under-sections"><span class="top-panel-button button-enabled"'
 						+ 'id="btn-add-category"><img src="../img/add-icon.png"'
 						+ 'class="top-panel-icon">&nbsp;&nbsp;Add category</span></div>');
@@ -55,9 +57,10 @@ function initDataItemsPanel() {
 	$(".category-item").click(function() {
 		$(".category-item-selected").removeClass("category-item-selected");
 		$(this).addClass("category-item-selected");
-		$(".data-item-selected").removeClass("data-item-selected");
+		$(".data-item-selected").removeClass("data-item-selected");		
 		$(".top-panel").html("");
 		$(".entities-values").html("");
+	
 		history.pushState({
 			product : productId
 		}, "", "?product=" + productId);

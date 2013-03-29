@@ -111,6 +111,7 @@ public class Storages extends HttpServlet {
 					responseHtml.append("<div id=\"main\" class=\"table\">");
 					responseHtml.append("<div class=\"table-row\">");
 					responseHtml.append("<div class=\"table-cell left-panel\">");
+					responseHtml.append("<span class=\"lbl-categories\">Categories:</span>");
 					responseHtml.append("<div id=\"entities-list\">");
 					responseHtml.append("<div id=\"category-container\"></div>");
 					responseHtml.append("</div>");

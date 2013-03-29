@@ -48,8 +48,7 @@ public class GetTopPanel extends HttpServlet {
 			StringBuilder responseHtml = new StringBuilder();
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			if (tableType == TableType.STORAGE) {
-				responseHtml.append("<div class=\"table-row\">");
-				responseHtml.append("<div class=\"table-cell right\">");
+				responseHtml.append("<div id=\"manage-buttons\">");
 				responseHtml
 						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
 				responseHtml.append("&nbsp;&nbsp;");
@@ -64,7 +63,6 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-class-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/brackets.png\"> Class</span>");
-				responseHtml.append("</div>");
 				responseHtml.append("</div>");
 
 			} else {
@@ -104,34 +102,7 @@ public class GetTopPanel extends HttpServlet {
 				default:
 					break;
 				}
-
-				responseHtml.append("<div class=\"table-row\">");
-				responseHtml.append("<div class=\"table-cell sheet-tab-container left\">");
-				responseHtml.append("<div id=\"").append(tableId).append("\" class=\"sheet-tab")
-						.append(generalSelected).append("\" label=\"table\">General</div>");
-				responseHtml.append("</div>");
-
-				responseHtml.append("<div class=\"table-cell sheet-tab-container left\">");
-				if (preId != null) {
-					responseHtml.append("<div id=\"").append(preId).append("\" class=\"sheet-tab").append(preSelected)
-							.append("\" label=\"precondition\">Preconditions</div>");
-				} else {
-					responseHtml
-							.append("<span id=\"btn-add-preconditions\" class=\"add-tab-button\">Add preconditions</span>");
-				}
-				responseHtml.append("</div>");
-
-				responseHtml.append("<div class=\"table-cell sheet-tab-container left\">");
-				if (postId != null) {
-					responseHtml.append("<div id=\"").append(postId).append("\" class=\"sheet-tab")
-							.append(postSelected).append("\" label=\"postcondition\">Postconditions</div>");
-				} else {
-					responseHtml
-							.append("<span id=\"btn-add-postconditions\" class=\"add-tab-button\">Add postconditions</span>");
-				}
-				responseHtml.append("</div>");
-
-				responseHtml.append("<div class=\"table-cell right\">");
+				responseHtml.append("<div id=\"manage-buttons\">");
 				responseHtml
 						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
 				responseHtml.append("&nbsp;&nbsp;");
@@ -144,7 +115,34 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
-				responseHtml.append("</div></div>");
+				responseHtml.append("</div>");
+
+				responseHtml.append("<div id=\"table-tabs\">");
+				responseHtml.append("<div class=\"sheet-tab-container\">");
+				responseHtml.append("<div id=\"").append(tableId).append("\" class=\"sheet-tab")
+						.append(generalSelected).append("\" label=\"table\">General</div>");
+				responseHtml.append("</div>");
+
+				responseHtml.append("<div class=\"sheet-tab-container\">");
+				if (preId != null) {
+					responseHtml.append("<div id=\"").append(preId).append("\" class=\"sheet-tab").append(preSelected)
+							.append("\" label=\"precondition\">Preconditions</div>");
+				} else {
+					responseHtml
+							.append("<span id=\"btn-add-preconditions\" class=\"add-tab-button\">Add preconditions</span>");
+				}
+				responseHtml.append("</div>");
+
+				responseHtml.append("<div class=\"sheet-tab-container\">");
+				if (postId != null) {
+					responseHtml.append("<div id=\"").append(postId).append("\" class=\"sheet-tab")
+							.append(postSelected).append("\" label=\"postcondition\">Postconditions</div>");
+				} else {
+					responseHtml
+							.append("<span id=\"btn-add-postconditions\" class=\"add-tab-button\">Add postconditions</span>");
+				}
+				responseHtml.append("</div>");
+				responseHtml.append("</div>");
 			}
 			out.print(responseHtml.toString());
 		} catch (Exception e) {

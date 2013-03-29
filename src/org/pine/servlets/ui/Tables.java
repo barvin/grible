@@ -121,7 +121,6 @@ public class Tables extends HttpServlet {
 					responseHtml.append("var tableType = \"").append(tableType).append("\";");
 					responseHtml.append("</script>");
 					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
-					responseHtml.append("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
 
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");
@@ -130,13 +129,17 @@ public class Tables extends HttpServlet {
 
 					responseHtml.append("<div id=\"main\" class=\"table\">");
 					responseHtml.append("<div class=\"table-row\">");
-					responseHtml.append("<div class=\"table-cell entities-list\">");
+					responseHtml.append("<div class=\"table-cell left-panel\">");
+					responseHtml.append("<div id=\"entities-list\">");
 					responseHtml.append("<div id=\"category-container\"></div>");
+					responseHtml.append("</div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div id=\"waiting\" class=\"table-cell\">");
 					responseHtml.append("<img src=\"../img/ajax-loader.gif\" class=\"waiting-gif\" />");
-					responseHtml.append("<div class=\"table top-panel\"></div>");
-					responseHtml.append("<div class=\"table entities-values\" style=\"width: auto;\"></div>");
+					responseHtml.append("<div class=\"top-panel\"></div>");
+					responseHtml.append("<div id=\"table-container\">");
+					responseHtml.append("<div class=\"table entities-values\"></div>");
+					responseHtml.append("</div>");
 					responseHtml.append("</div>");
 					responseHtml.append("</div>");
 					responseHtml.append("</div>");
@@ -178,7 +181,5 @@ public class Tables extends HttpServlet {
 				.append("\">");
 		responseHtml.append("<span id=\"section-name\" class=\"header-text\">").append(sectionName)
 				.append("</span></a></div>");
-		responseHtml.append("<br />");
-
 	}
 }

@@ -28,7 +28,7 @@ img#logo-mini {
 }
 
 #footer {
-	margin-top: 15px;
+	margin-top: 20px;
 	margin-bottom: 10px;
 }
 
@@ -48,6 +48,7 @@ img#logo-mini {
 
 #main {
 	width: 100%;
+	margin-top: 10px;
 }
 
 a {
@@ -89,11 +90,23 @@ a:hover {
 	font-weight: bold;
 }
 
-.entities-list {
+.left-panel {
 	width: 250px;
 }
 
-.entities-values {
+#entities-list {
+	width: 250px;
+	height: 100%;
+	overflow: auto;
+}
+
+#manage-buttons {
+	float: right;
+	clear: both;
+}
+
+#table-container {
+	overflow: auto;
 	margin: 0 0 10px 10px;
 }
 
@@ -273,6 +286,7 @@ a:hover {
 
 .sheet-tab-container {
 	width: 150px;
+	float: left;
 }
 
 .top-panel {

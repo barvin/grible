@@ -731,8 +731,7 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted
-	 * to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -898,15 +897,23 @@ public class Dao {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
+
+		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE parentid=" + tableId);
+		while (rs.next()) {
+			deleteTable(rs.getInt("id"));
+		}
+		rs.close();
+
 		stmt.executeUpdate("DELETE FROM values WHERE rowid IN (SELECT id FROM rows WHERE tableid=" + tableId + ")");
 		stmt.executeUpdate("DELETE FROM keys WHERE tableid=" + tableId);
 		stmt.executeUpdate("DELETE FROM rows WHERE tableid=" + tableId);
 		stmt.executeUpdate("DELETE FROM tables WHERE id=" + tableId);
 
-		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE id=" + tableId);
-		if (!rs.next()) {
+		ResultSet rs2 = stmt.executeQuery("SELECT id FROM tables WHERE id=" + tableId);
+		if (!rs2.next()) {
 			result = true;
 		}
+		rs2.close();
 
 		stmt.close();
 		return result;

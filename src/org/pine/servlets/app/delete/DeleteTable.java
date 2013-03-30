@@ -39,15 +39,13 @@ public class DeleteTable extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
-			
 			int tableId = Integer.parseInt(request.getParameter("id"));
 			Table currentTable = Dao.getTable(tableId);
 
@@ -92,10 +90,11 @@ public class DeleteTable extends HttpServlet {
 				}
 			}
 
-			out.flush();
-			out.close();
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 }

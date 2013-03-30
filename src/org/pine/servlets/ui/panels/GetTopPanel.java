@@ -50,7 +50,7 @@ public class GetTopPanel extends HttpServlet {
 			if (tableType == TableType.STORAGE) {
 				responseHtml.append("<div id=\"manage-buttons\">");
 				responseHtml
-						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
+						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</span>");
 				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
@@ -104,7 +104,7 @@ public class GetTopPanel extends HttpServlet {
 				}
 				responseHtml.append("<div id=\"manage-buttons\">");
 				responseHtml
-						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable keys ordering</span>");
+						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</span>");
 				responseHtml.append("&nbsp;&nbsp;");
 				responseHtml
 						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");

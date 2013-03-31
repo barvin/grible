@@ -51,7 +51,6 @@ public class AddTable extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			
-
 			Integer categoryId = null;
 			if (request.getParameter("categoryid") != null) {
 				categoryId = Integer.parseInt(request.getParameter("categoryid"));

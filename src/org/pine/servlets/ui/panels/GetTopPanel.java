@@ -125,23 +125,29 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append(" label=\"table\">General</div>");
 				responseHtml.append("</div>");
 
-				responseHtml.append("<div class=\"sheet-tab-container\">");
+				responseHtml.append("<div class=\"sheet-tab-container");
+				responseHtml.append(preSelected).append("\">");
 				if (preId != null) {
-					responseHtml.append("<div id=\"").append(preId).append("\" class=\"sheet-tab").append(preSelected)
-							.append("\" label=\"precondition\">Preconditions</div>");
+					responseHtml.append("<div class=\"sheet-tab-top\"></div>");
+					responseHtml.append("<div id=\"").append(preId)
+							.append("\" class=\"sheet-tab\" label=\"precondition\">Preconditions</div>");
 				} else {
+					responseHtml.append("<div class=\"add-tab-top\"></div>");
 					responseHtml
-							.append("<span id=\"btn-add-preconditions\" class=\"add-tab-button\">Add preconditions</span>");
+							.append("<div id=\"btn-add-preconditions\" class=\"add-tab\">Add preconditions</div>");
 				}
 				responseHtml.append("</div>");
 
-				responseHtml.append("<div class=\"sheet-tab-container\">");
+				responseHtml.append("<div class=\"sheet-tab-container");
+				responseHtml.append(postSelected).append("\">");
 				if (postId != null) {
-					responseHtml.append("<div id=\"").append(postId).append("\" class=\"sheet-tab")
-							.append(postSelected).append("\" label=\"postcondition\">Postconditions</div>");
+					responseHtml.append("<div class=\"sheet-tab-top\"></div>");
+					responseHtml.append("<div id=\"").append(postId)
+							.append("\" class=\"sheet-tab\" label=\"postcondition\">Postconditions</div>");
 				} else {
+					responseHtml.append("<div class=\"add-tab-top\"></div>");
 					responseHtml
-							.append("<span id=\"btn-add-postconditions\" class=\"add-tab-button\">Add postconditions</span>");
+							.append("<div id=\"btn-add-postconditions\" class=\"add-tab\">Add postconditions</div>");
 				}
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");

@@ -1,61 +1,44 @@
-$(window).on(
-		"load",
-		function() {
-			var docHeight = $(window).height() - 88;
-			var breadcrumpHeight = $("#breadcrump").height();
-			var footerHeight = $("#footer").outerHeight();
-			var mainHeight = docHeight - breadcrumpHeight - footerHeight;
-			$("#main").height(mainHeight);
-			$(".left-panel").height(mainHeight - 20);
-			$("#entities-list").height(mainHeight - 20);
+$(window).on("load", function() {
+	var docHeight = $(window).height() - 88;
+	var breadcrumpHeight = $("#breadcrump").height();
+	var footerHeight = $("#footer").outerHeight();
+	var mainHeight = docHeight - breadcrumpHeight - footerHeight;
+	$("#main").height(mainHeight);
+	$(".left-panel").height(mainHeight - 20);
+	$("#entities-list").height(mainHeight - 20);
 
-			var topPanelHeight = $(".top-panel").height();
+	var topPanelHeight = $(".top-panel").height();
 
-			$("#table-container").height(mainHeight - topPanelHeight + 10);
-			$("#table-container").width(
-					$("#main").width() - $(".left-panel").width() - 10);
-		});
+	$("#table-container").height(mainHeight - topPanelHeight + 10);
+	$("#table-container").width($("#main").width() - $(".left-panel").width() - 10);
+});
 
 $().ready(initialize());
 
 function initialize() {
 
-	$(document)
-			.ajaxError(
-					function(e, xhr, settings, exception) {
-						var exrrorText = xhr.responseText
-								.substring(xhr.responseText.indexOf("<h1>"));
-						$("body")
-								.append(
-										'<div id="error-dialog" class="ui-dialog">'
-												+ '<div class="ui-dialog-title">Error</div>'
-												+ '<div class="ui-dialog-content">'
-												+ 'Location: '
-												+ settings.url
-												+ '<br><br>'
-												+ exrrorText
-												+ '<br><br>'
-												+ '<div class="right">'
-												+ '<button class="ui-button btn-cancel">OK</button>'
-												+ '</div></div></div>');
-						initOneButtonDialog(jQuery);
-					});
+	$(document).ajaxError(
+			function(e, xhr, settings, exception) {
+				var exrrorText = xhr.responseText.substring(xhr.responseText.indexOf("<h1>"));
+				$("body").append(
+						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>'
+								+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url + '<br><br>'
+								+ exrrorText + '<br><br>' + '<div class="right">'
+								+ '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
+				initOneButtonDialog(jQuery);
+			});
 
-	$
-			.post(
-					"../GetCategories",
-					{
-						productId : productId,
-						tableId : tableId,
-						tableType : tableType
-					},
-					function(data) {
-						$("#waiting-bg").remove();
-						$("#footer").removeClass("page-bottom");
-						$("#category-container").html(data);
+	$.post("../GetCategories", {
+		productId : productId,
+		tableId : tableId,
+		tableType : tableType
+	}, function(data) {
+		$("#waiting-bg").remove();
+		$("#footer").removeClass("page-bottom");
+		$("#category-container").html(data);
 
-						initDataItemsPanel(jQuery);
-					});
+		initDataItemsPanel(jQuery);
+	});
 
 }
 
@@ -141,8 +124,7 @@ function initDataItemsPanel() {
 								}, function(data) {
 									if (data == "success") {
 										alert("Category was deleted.");
-										window.location = "?product="
-												+ productId;
+										window.location = "?product=" + productId;
 									} else {
 										alert(data);
 									}
@@ -229,8 +211,7 @@ function initAddDataItemDialog() {
 				name : $("input.data-item-name").val(),
 				classname : $("input.data-storage-class-name").val(),
 				iscopy : $("input.copy-existing").is(':checked'),
-				copytableid : $("select.tables-list").find("option:selected")
-						.val(),
+				copytableid : $("select.tables-list").find("option:selected").val(),
 				isonlycolumns : $("input.only-columns").is(':checked')
 			};
 		} else {
@@ -239,8 +220,7 @@ function initAddDataItemDialog() {
 				categoryid : $id,
 				name : $("input.data-item-name").val(),
 				iscopy : $("input.copy-existing").is(':checked'),
-				copytableid : $("select.tables-list").find("option:selected")
-						.val(),
+				copytableid : $("select.tables-list").find("option:selected").val(),
 				isonlycolumns : $("input.only-columns").is(':checked')
 			};
 		}
@@ -379,8 +359,7 @@ function loadTopPanel(args) {
 
 function initTopPanel() {
 
-	if ((tableType == "table") || (tableType == "precondition")
-			|| (tableType == "postcondition")) {
+	if ((tableType == "table") || (tableType == "precondition") || (tableType == "postcondition")) {
 		$(".sheet-tab").click(function() {
 			$(".data-item-selected > .changed-sign").remove();
 			$(".sheet-tab-selected").removeClass("sheet-tab-selected");
@@ -398,140 +377,77 @@ function initTopPanel() {
 		});
 	}
 
-	$("#cbx-sort-keys")
-			.click(
-					function() {
-						if ($(this).is("input:checked")) {
-							$("#btn-sort-keys").removeClass("button-disabled");
-							$("#btn-sort-keys").addClass("checkbox-checked");
-							$(".key-cell").destroyContextMenu();
+	$("#cbx-sort-keys").click(
+			function() {
+				if ($(this).is("input:checked")) {
+					$("#btn-sort-keys").removeClass("button-disabled");
+					$("#btn-sort-keys").addClass("checkbox-checked");
+					$(".key-cell").destroyContextMenu();
 
-							$(".key-row")
-									.sortable(
-											{
-												cursor : "move",
-												delay : 50,
-												items : "> .key-cell",
-												forcePlaceholderSize : false,
-												containment : "parent",
-												axis : "x",
-												update : function(event, ui) {
-													$("#btn-sort-keys")
-															.removeClass(
-																	"checkbox-checked");
-													$("#btn-sort-keys")
-															.addClass(
-																	"button-disabled");
-													$('#cbx-sort-keys').attr(
-															"checked", false);
-													var keyIds = [];
-													var newOrder = [];
-													var oldOrder = [];
-													var modifiedStart = -1;
-													$(".ui-cell.key-cell")
-															.each(
-																	function(i) {
-																		if ($(
-																				this)
-																				.attr(
-																						'key-order') != (i + 1)) {
-																			if (modifiedStart == -1) {
-																				modifiedStart = i;
-																			}
-																			keyIds[i
-																					- modifiedStart] = $(
-																					this)
-																					.attr(
-																							'id');
-																			newOrder[i
-																					- modifiedStart] = i + 1;
-																			oldOrder[i
-																					- modifiedStart] = $(
-																					this)
-																					.attr(
-																							'key-order');
-																		}
-																	});
-													$
-															.post(
-																	"../UpdateKeysOrder",
-																	{
-																		modkeyids : keyIds,
-																		modkeynumbers : newOrder
-																	},
-																	function(
-																			data) {
-																		if (data == "success") {
-																			$(
-																					".key-cell")
-																					.each(
-																							function(
-																									i) {
-																								$(
-																										this)
-																										.attr(
-																												"key-order",
-																												(i + 1));
-																							});
-																			$(
-																					".value-row")
-																					.each(
-																							function(
-																									i) {
-																								var sortedCells = $(
-																										this)
-																										.find(
-																												".ui-cell.value-cell")
-																										.sort(
-																												function(
-																														a,
-																														b) {
-																													var contentA = parseInt($(
-																															".key-cell[id='"
-																																	+ $(
-																																			a)
-																																			.attr(
-																																					'keyid')
-																																	+ "']")
-																															.attr(
-																																	'key-order'));
-																													var contentB = parseInt($(
-																															".key-cell[id='"
-																																	+ $(
-																																			b)
-																																			.attr(
-																																					'keyid')
-																																	+ "']")
-																															.attr(
-																																	'key-order'));
-																													return (contentA < contentB) ? -1
-																															: (contentA > contentB) ? 1
-																																	: 0;
-																												});
-																								$(
-																										this)
-																										.find(
-																												".value-cell")
-																										.remove();
-																								$(
-																										this)
-																										.append(
-																												sortedCells);
-																							});
-																			initTableValues(jQuery);
-																		} else {
-																			alert(data);
-																		}
-																		enableKeyContextMenu(jQuery);
-																	});
-												}
+					$(".key-row").sortable(
+							{
+								cursor : "move",
+								delay : 50,
+								items : "> .key-cell",
+								forcePlaceholderSize : false,
+								containment : "parent",
+								axis : "x",
+								update : function(event, ui) {
+									$("#btn-sort-keys").removeClass("checkbox-checked");
+									$("#btn-sort-keys").addClass("button-disabled");
+									$('#cbx-sort-keys').attr("checked", false);
+									var keyIds = [];
+									var newOrder = [];
+									var oldOrder = [];
+									var modifiedStart = -1;
+									$(".ui-cell.key-cell").each(function(i) {
+										if ($(this).attr('key-order') != (i + 1)) {
+											if (modifiedStart == -1) {
+												modifiedStart = i;
+											}
+											keyIds[i - modifiedStart] = $(this).attr('id');
+											newOrder[i - modifiedStart] = i + 1;
+											oldOrder[i - modifiedStart] = $(this).attr('key-order');
+										}
+									});
+									$.post("../UpdateKeysOrder", {
+										modkeyids : keyIds,
+										modkeynumbers : newOrder
+									}, function(data) {
+										if (data == "success") {
+											$(".key-cell").each(function(i) {
+												$(this).attr("key-order", (i + 1));
 											});
-						} else {
-							$("#btn-sort-keys").removeClass("checkbox-checked");
-							$("#btn-sort-keys").addClass("button-disabled");
-							enableKeyContextMenu(jQuery);
-						}
-					});
+											$(".value-row").each(
+													function(i) {
+														var sortedCells = $(this).find(".ui-cell.value-cell").sort(
+																function(a, b) {
+																	var contentA = parseInt($(
+																			".key-cell[id='" + $(a).attr('keyid')
+																					+ "']").attr('key-order'));
+																	var contentB = parseInt($(
+																			".key-cell[id='" + $(b).attr('keyid')
+																					+ "']").attr('key-order'));
+																	return (contentA < contentB) ? -1
+																			: (contentA > contentB) ? 1 : 0;
+																});
+														$(this).find(".value-cell").remove();
+														$(this).append(sortedCells);
+													});
+											initTableValues(jQuery);
+										} else {
+											alert(data);
+										}
+										enableKeyContextMenu(jQuery);
+									});
+								}
+							});
+				} else {
+					$("#btn-sort-keys").removeClass("checkbox-checked");
+					$("#btn-sort-keys").addClass("button-disabled");
+					enableKeyContextMenu(jQuery);
+				}
+			});
 	$("#btn-add-preconditions").click(function() {
 		$.post("../AddTable", {
 			parentid : tableId,
@@ -552,27 +468,24 @@ function initTopPanel() {
 		});
 	});
 
-	$("#btn-delete-data-item")
-			.click(
-					function() {
-						if ($(this).hasClass("button-enabled")) {
-							var answer = confirm("Are you sure you want to delete this "
-									+ tableType + "?");
-							if (answer) {
-								$.post("../DeleteTable", {
-									id : tableId
-								}, function(data) {
-									if (data == "success") {
-										$("#section-name").click();
-									} else if (isNumber(data)) {
-										window.location = "?id=" + data;
-									} else {
-										alert(data);
-									}
-								});
-							}
-						}
-					});
+	$("#btn-delete-data-item").click(function() {
+		if ($(this).hasClass("button-enabled")) {
+			var answer = confirm("Are you sure you want to delete this " + tableType + "?");
+			if (answer) {
+				$.post("../DeleteTable", {
+					id : tableId
+				}, function(data) {
+					if (data == "success") {
+						$("#section-name").click();
+					} else if (isNumber(data)) {
+						window.location = "?id=" + data;
+					} else {
+						alert(data);
+					}
+				});
+			}
+		}
+	});
 
 	$("#btn-save-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
@@ -745,58 +658,43 @@ function initTableValues() {
 		}
 	});
 
-	$(".entities-values")
-			.sortable(
-					{
-						cursor : "move",
-						delay : 50,
-						items : "> .value-row",
-						forcePlaceholderSize : true,
-						update : function(event, ui) {
-							var rowIds = [];
-							var oldOrder = [];
-							var newOrder = [];
-							var modifiedStart = -1;
-							$(".ui-cell.index-cell")
-									.each(
-											function(i) {
-												if ($(this).text() != (i + 1)) {
-													if (modifiedStart == -1) {
-														modifiedStart = i;
-													}
-													rowIds[i - modifiedStart] = $(
-															this).attr('id');
-													oldOrder[i - modifiedStart] = $(
-															this).text();
-													newOrder[i - modifiedStart] = i + 1;
-												}
-											});
-							$
-									.post(
-											"../UpdateRowsOrder",
-											{
-												rowids : rowIds,
-												oldorder : oldOrder,
-												neworder : newOrder
-											},
-											function(data) {
-												if (data == "success") {
-													for ( var j = 0; j < rowIds.length; j++) {
-														var modifiedIndexCell = $(".ui-cell.index-cell[id='"
-																+ rowIds[j]
-																+ "']");
-														highlight(modifiedIndexCell);
-														modifiedIndexCell
-																.text(j
-																		+ modifiedStart
-																		+ 1);
-													}
-												} else {
-													alert(data);
-												}
-											});
-						}
-					});
+	$(".entities-values").sortable({
+		cursor : "move",
+		delay : 50,
+		items : "> .value-row",
+		forcePlaceholderSize : true,
+		update : function(event, ui) {
+			var rowIds = [];
+			var oldOrder = [];
+			var newOrder = [];
+			var modifiedStart = -1;
+			$(".ui-cell.index-cell").each(function(i) {
+				if ($(this).text() != (i + 1)) {
+					if (modifiedStart == -1) {
+						modifiedStart = i;
+					}
+					rowIds[i - modifiedStart] = $(this).attr('id');
+					oldOrder[i - modifiedStart] = $(this).text();
+					newOrder[i - modifiedStart] = i + 1;
+				}
+			});
+			$.post("../UpdateRowsOrder", {
+				rowids : rowIds,
+				oldorder : oldOrder,
+				neworder : newOrder
+			}, function(data) {
+				if (data == "success") {
+					for ( var j = 0; j < rowIds.length; j++) {
+						var modifiedIndexCell = $(".ui-cell.index-cell[id='" + rowIds[j] + "']");
+						highlight(modifiedIndexCell);
+						modifiedIndexCell.text(j + modifiedStart + 1);
+					}
+				} else {
+					alert(data);
+				}
+			});
+		}
+	});
 
 	initValueCells($(".value-cell:not(:has(> input.changed-value))"));
 	initTooltipCells($(".storage-cell"));
@@ -830,8 +728,7 @@ function initValueCells(cells) {
 		var $content = $cell.text().replace(/'/g, "&#39;");
 		var $width = $cell.width();
 		$cell.html("<input class='changed-value' value='" + $content
-				+ "' /><span class='old-value' style='display: none;'>"
-				+ $content + "</span>");
+				+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
 		$cell.find("input.changed-value").css("width", $width + "px");
 		$cell.find("input.changed-value").focus();
 		initEditableCell(jQuery);
@@ -865,91 +762,84 @@ function initKeysAndIndexes() {
 		});
 	});
 
-	$(".ui-cell.index-cell").contextMenu(
-			{
-				menu : "rowMenu"
-			},
-			function(action, el, pos) {
-				var $rowId = $(el).attr("id");
-				var $rowOrder = parseInt($(el).text());
-				var $row = $(el).parent();
-				if (action == "add") {
-					$.post("../InsertRow", {
-						rowid : $rowId
-					}, function(data) {
-						var newIds = data.split(";");
-						if (newIds.length > 1) {
-							$newRow = $row.clone(true);
-							$newRow.find(".ui-cell.index-cell").attr("id",
-									newIds[0]);
-							$newRow.find(".ui-cell.modified-value-cell")
-									.removeClass("modified-value-cell");
-							$newRow.find(".ui-cell.value-cell").text("");
-							$newRow.find(".ui-cell.storage-cell").text("0");
-							$newRow.find(".ui-cell.value-cell").each(
-									function(i) {
-										$(this).attr("rowid", newIds[0]);
-										$(this).attr("id", newIds[i + 1]);
-									});
-							$newRow.insertBefore($row);
-							highlight($newRow);
-							$(".ui-cell.index-cell").each(function(i) {
-								if ((i + 1) >= $rowOrder) {
-									$(this).text(i + 1);
-								}
-							});
-
-						} else {
-							alert(data);
+	$(".ui-cell.index-cell").contextMenu({
+		menu : "rowMenu"
+	}, function(action, el, pos) {
+		var $rowId = $(el).attr("id");
+		var $rowOrder = parseInt($(el).text());
+		var $row = $(el).parent();
+		if (action == "add") {
+			$.post("../InsertRow", {
+				rowid : $rowId
+			}, function(data) {
+				var newIds = data.split(";");
+				if (newIds.length > 1) {
+					$newRow = $row.clone(true);
+					$newRow.find(".ui-cell.index-cell").attr("id", newIds[0]);
+					$newRow.find(".ui-cell.modified-value-cell").removeClass("modified-value-cell");
+					$newRow.find(".ui-cell.value-cell").text("");
+					$newRow.find(".ui-cell.storage-cell").text("0");
+					$newRow.find(".ui-cell.value-cell").each(function(i) {
+						$(this).attr("rowid", newIds[0]);
+						$(this).attr("id", newIds[i + 1]);
+					});
+					$newRow.insertBefore($row);
+					highlight($newRow);
+					$(".ui-cell.index-cell").each(function(i) {
+						if ((i + 1) >= $rowOrder) {
+							$(this).text(i + 1);
 						}
 					});
-				} else if (action == "copy") {
-					$.post("../CopyRow", {
-						rowid : $rowId
-					}, function(data) {
-						var newIds = data.split(";");
-						if (newIds.length > 1) {
-							$newRow = $row.clone(true);
-							$newRow.find(".ui-cell.index-cell").attr("id",
-									newIds[0]);
-							$newRow.find(".ui-cell.value-cell").each(
-									function(i) {
-										$(this).attr("rowid", newIds[0]);
-										$(this).attr("id", newIds[i + 1]);
-									});
-							$newRow.insertAfter($row);
-							highlight($newRow);
-							$(".ui-cell.index-cell").each(function(i) {
-								if ((i + 1) > $rowOrder) {
-									$(this).text(i + 1);
-								}
-							});
 
-						} else {
-							alert(data);
-						}
-					});
-				} else if (action == "delete") {
-					$.post("../DeleteRow", {
-						rowid : $rowId
-					}, function(data) {
-						if (data == "success") {
-							$row.hide(400, function() {
-								$row.remove();
-								$(".ui-cell.index-cell").each(function(i) {
-									if ((i + 1) >= $rowOrder) {
-										highlight($(this));
-										$(this).text(i + 1);
-									}
-								});
-
-							});
-						} else {
-							alert(data);
-						}
-					});
+				} else {
+					alert(data);
 				}
 			});
+		} else if (action == "copy") {
+			$.post("../CopyRow", {
+				rowid : $rowId
+			}, function(data) {
+				var newIds = data.split(";");
+				if (newIds.length > 1) {
+					$newRow = $row.clone(true);
+					$newRow.find(".ui-cell.index-cell").attr("id", newIds[0]);
+					$newRow.find(".ui-cell.value-cell").each(function(i) {
+						$(this).attr("rowid", newIds[0]);
+						$(this).attr("id", newIds[i + 1]);
+					});
+					$newRow.insertAfter($row);
+					highlight($newRow);
+					$(".ui-cell.index-cell").each(function(i) {
+						if ((i + 1) > $rowOrder) {
+							$(this).text(i + 1);
+						}
+					});
+
+				} else {
+					alert(data);
+				}
+			});
+		} else if (action == "delete") {
+			$.post("../DeleteRow", {
+				rowid : $rowId
+			}, function(data) {
+				if (data == "success") {
+					$row.hide(400, function() {
+						$row.remove();
+						$(".ui-cell.index-cell").each(function(i) {
+							if ((i + 1) >= $rowOrder) {
+								highlight($(this));
+								$(this).text(i + 1);
+							}
+						});
+
+					});
+				} else {
+					alert(data);
+				}
+			});
+		}
+	});
 
 	$("#rowMenu").enableContextMenuItems("#add,#copy,#delete");
 
@@ -967,61 +857,36 @@ function enableKeyContextMenu() {
 						var $keyOrder = $(el).attr("key-order");
 						var $column = $("div[keyid='" + $keyId + "']");
 						if (action == "add") {
-							$
-									.post(
-											"../InsertKey",
-											{
-												keyid : $keyId
-											},
-											function(data) {
-												var newIds = data.split(";");
-												if (newIds.length > 1) {
-													$newKey = $(el).clone(true);
-													$newKey.attr("id",
-															newIds[0]);
-													$newKey.text("editme");
-													$newKey.insertBefore($(el));
-													highlight($newKey);
+							$.post("../InsertKey", {
+								keyid : $keyId
+							}, function(data) {
+								var newIds = data.split(";");
+								if (newIds.length > 1) {
+									$newKey = $(el).clone(true);
+									$newKey.attr("id", newIds[0]);
+									$newKey.text("editme");
+									$newKey.insertBefore($(el));
+									highlight($newKey);
 
-													$column
-															.each(function(i) {
-																$newCell = $(
-																		this)
-																		.clone(
-																				true);
-																$newCell
-																		.removeClass("modified-value-cell");
-																$newCell
-																		.removeClass("storage-cell");
-																$newCell
-																		.text("");
-																$newCell
-																		.attr(
-																				"keyid",
-																				newIds[0]);
-																$newCell
-																		.attr(
-																				"id",
-																				newIds[i + 1]);
-																$newCell
-																		.insertBefore($(this));
-																highlight($newCell);
-															});
-													$(".ui-cell.key-cell")
-															.each(
-																	function(i) {
-																		if ((i + 1) >= $keyOrder) {
-																			$(
-																					this)
-																					.attr(
-																							"key-order",
-																							(i + 1));
-																		}
-																	});
-												} else {
-													alert(data);
-												}
-											});
+									$column.each(function(i) {
+										$newCell = $(this).clone(true);
+										$newCell.removeClass("modified-value-cell");
+										$newCell.removeClass("storage-cell");
+										$newCell.text("");
+										$newCell.attr("keyid", newIds[0]);
+										$newCell.attr("id", newIds[i + 1]);
+										$newCell.insertBefore($(this));
+										highlight($newCell);
+									});
+									$(".ui-cell.key-cell").each(function(i) {
+										if ((i + 1) >= $keyOrder) {
+											$(this).attr("key-order", (i + 1));
+										}
+									});
+								} else {
+									alert(data);
+								}
+							});
 						} else if (action == "copy") {
 							$.post("../CopyKey", {
 								keyid : $keyId,
@@ -1058,14 +923,11 @@ function enableKeyContextMenu() {
 									$column.hide(400, function() {
 										$(el).remove();
 										$column.remove();
-										$(".ui-cell.key-cell").each(
-												function(i) {
-													if ((i + 1) >= $keyOrder) {
-														$(this).attr(
-																"key-order",
-																(i + 1));
-													}
-												});
+										$(".ui-cell.key-cell").each(function(i) {
+											if ((i + 1) >= $keyOrder) {
+												$(this).attr("key-order", (i + 1));
+											}
+										});
 									});
 								} else {
 									alert(data);
@@ -1102,10 +964,8 @@ function enableKeyContextMenu() {
 function initTooltipCells(elements) {
 	elements.hover(function() {
 		var $value = $(this);
-		if (($value.has("div.tooltip").length == 0)
-				&& ($value.has("span.old-value").length == 0)
-				&& ($value.text() != "0") && ($value.text() != "")
-				&& (!$value.hasClass("modified-value-cell"))) {
+		if (($value.has("div.tooltip").length == 0) && ($value.has("span.old-value").length == 0)
+				&& ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))) {
 			$("#waiting").addClass("loading");
 			var $content = $value.text();
 			var $args = {
@@ -1114,15 +974,13 @@ function initTooltipCells(elements) {
 			};
 			$.post("../GetStorageTooltip", $args, function(data) {
 				$("#waiting").removeClass("loading");
-				var $widthRight = $(document).width() - $value.position().left
-						- 35;
+				var $widthRight = $(document).width() - $value.position().left - 35;
 				// 35 - is width of scroll bar.
 				$value.html(data);
 				var $tooltip = $value.find("div.tooltip");
 				var $tooltipWidth = $tooltip.width();
 				if ($widthRight < $tooltipWidth) {
-					$tooltip.css("margin-left", "-"
-							+ ($tooltipWidth - $widthRight) + "px");
+					$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");
 				}
 			});
 		}

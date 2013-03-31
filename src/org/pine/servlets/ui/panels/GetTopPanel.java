@@ -66,7 +66,7 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("</div>");
 
 			} else {
-				
+
 				Integer tableId = null;
 				Integer preId = null;
 				Integer postId = null;
@@ -118,9 +118,11 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("</div>");
 
 				responseHtml.append("<div id=\"table-tabs\">");
-				responseHtml.append("<div class=\"sheet-tab-container\">");
-				responseHtml.append("<div id=\"").append(tableId).append("\" class=\"sheet-tab")
-						.append(generalSelected).append("\" label=\"table\">General</div>");
+				responseHtml.append("<div class=\"sheet-tab-container");
+				responseHtml.append(generalSelected).append("\">");
+				responseHtml.append("<div class=\"sheet-tab-top\"></div>");
+				responseHtml.append("<div id=\"").append(tableId).append("\" class=\"sheet-tab\"");
+				responseHtml.append(" label=\"table\">General</div>");
 				responseHtml.append("</div>");
 
 				responseHtml.append("<div class=\"sheet-tab-container\">");

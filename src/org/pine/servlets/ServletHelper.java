@@ -18,7 +18,9 @@ import java.io.IOException;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
+import org.pine.model.Product;
 import org.pine.model.User;
+import org.pine.uimodel.Sections;
 
 public class ServletHelper {
 	public static boolean isXlsx(String fileName) {
@@ -78,25 +80,79 @@ public class ServletHelper {
 	}
 
 	public static String getContextMenus(String tableType) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
-		builder.append("<li class=\"add\"><a href=\"#add\">Add data " + tableType + "</a></li>");
-		builder.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
-		builder.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
-		builder.append("</ul>");
+		StringBuilder responseHtml = new StringBuilder();
+		responseHtml.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
+		responseHtml.append("<li class=\"add\"><a href=\"#add\">Add data " + tableType + "</a></li>");
+		responseHtml.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
+		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
+		responseHtml.append("</ul>");
 
-		builder.append("<ul id=\"keyMenu\" class=\"contextMenu\">");
-		builder.append("<li class=\"add\"><a href=\"#add\">Insert column</a></li>");
-		builder.append("<li class=\"copy\"><a href=\"#copy\">Duplicate column</a></li>");
-		builder.append("<li class=\"fill\"><a href=\"#fill\">Fill column with...</a></li>");
-		builder.append("<li class=\"delete\"><a href=\"#delete\">Delete column</a></li>");
-		builder.append("</ul>");
+		responseHtml.append("<ul id=\"keyMenu\" class=\"contextMenu\">");
+		responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert column</a></li>");
+		responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate column</a></li>");
+		responseHtml.append("<li class=\"fill\"><a href=\"#fill\">Fill column with...</a></li>");
+		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete column</a></li>");
+		responseHtml.append("</ul>");
 
-		builder.append("<ul id=\"rowMenu\" class=\"contextMenu\">");
-		builder.append("<li class=\"add\"><a href=\"#add\">Insert row</a></li>");
-		builder.append("<li class=\"copy\"><a href=\"#copy\">Duplicate row</a></li>");
-		builder.append("<li class=\"delete\"><a href=\"#delete\">Delete row</a></li>");
-		builder.append("</ul>");
-		return builder.toString();
+		responseHtml.append("<ul id=\"rowMenu\" class=\"contextMenu\">");
+		responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert row</a></li>");
+		responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate row</a></li>");
+		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete row</a></li>");
+		responseHtml.append("</ul>");
+		return responseHtml.toString();
 	}
+
+	public static String getMain() {
+		StringBuilder responseHtml = new StringBuilder();
+		responseHtml.append("<div id=\"main\" class=\"table\">");
+
+		responseHtml.append("<div class=\"table-row\">");
+		responseHtml.append("<div class=\"table-cell\">");
+		responseHtml.append("<span class=\"lbl-categories\">Categories:</span>");
+		responseHtml.append("</div>");
+		responseHtml.append("<div class=\"table-cell\">");
+		responseHtml.append("<div class=\"top-panel\"></div>");
+		responseHtml.append("</div>");
+		responseHtml.append("</div>");
+
+		responseHtml.append("<div class=\"table-row\">");
+		responseHtml.append("<div class=\"table-cell left-panel\">");
+		responseHtml.append("<div id=\"entities-list\">");
+		responseHtml.append("<div id=\"category-container\"></div>");
+		responseHtml.append("<br><br><span class=\"top-panel-button button-enabled\"");
+		responseHtml.append("id=\"btn-add-category\"><img src=\"../img/add-icon.png\"");
+		responseHtml.append("class=\"top-panel-icon\">&nbsp;&nbsp;Add category</span>");
+		responseHtml.append("</div>");
+		responseHtml.append("</div>");
+		responseHtml.append("<div id=\"waiting\" class=\"table-cell\">");
+		responseHtml.append("<img src=\"../img/ajax-loader.gif\" class=\"waiting-gif\" />");
+		responseHtml.append("<div id=\"table-container\">");
+		responseHtml.append("<div class=\"table entities-values\"></div>");
+		responseHtml.append("</div>");
+		responseHtml.append("</div>");
+		responseHtml.append("</div>");
+		
+		responseHtml.append("</div>");
+		return responseHtml.toString();
+	}
+
+	public static String getBreadCrump(String sectionKey, Product product) {
+		StringBuilder responseHtml = new StringBuilder();
+		String productName = product.getName();
+		String sectionName = Sections.getNameByKey(sectionKey);
+
+		responseHtml.append("<div id=\"breadcrump\">");
+		responseHtml.append("<a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
+		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
+		responseHtml.append("<span id=\"product-name\" class=\"header-text\">");
+		responseHtml.append(productName).append("</span></a>");
+		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+		responseHtml.append("<a href=\"/pine/").append(sectionKey);
+		responseHtml.append("/?product=").append(product.getId()).append("\">");
+		responseHtml.append("<span id=\"section-name\" class=\"header-text\">");
+		responseHtml.append(sectionName).append("</span></a></div>");
+		return responseHtml.toString();
+	}
+
 }

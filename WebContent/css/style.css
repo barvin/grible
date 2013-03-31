@@ -93,12 +93,11 @@ a:hover {
 .lbl-categories {
 	float: left;
 	font-size: 15px;
-    padding: 10px 10px 0;
 }
 
 .left-panel {
 	width: 250px;
-	background-color: rgba(225, 225, 225, 0.9)
+	background-color: rgba(255, 255, 255, 0.4);
 }
 
 #entities-list {
@@ -155,45 +154,32 @@ a:hover {
 }
 
 .data-item {
-	background-color: #F0F0F0;
 	color: #367F86;
 	font-size: 13px;
-	font-weight: bold;
-	padding: 8px;
+	padding: 3px;
 	margin-left: 15px;
-	margin-bottom: 5px;
 }
 
 .data-item-selected {
-	background-color: #367F86;
-	color: #F0F0F0;
-	cursor: pointer;
+	font-weight: bold;
 }
 
 .data-item:hover {
-	background-color: #367F86;
-	color: #F0F0F0;
 	cursor: pointer;
 }
 
-.category-item {
-	background-color: #F0F0F0;
+h3.category-item {
+	font-weight: normal;
 	color: #49493E;
 	font-size: 15px;
+	padding: 3px;
+}
+
+h3.category-item-selected {
 	font-weight: bold;
-	margin: 10px 0;
-	padding: 8px;
 }
 
-.category-item-selected {
-	background-color: #89BEC4;
-	color: #204B4F;
-	cursor: pointer;
-}
-
-.category-item:hover {
-	background-color: #367F86;
-	color: #F0F0F0;
+h3.category-item:hover {
 	cursor: pointer;
 }
 
@@ -522,10 +508,6 @@ a:hover {
 
 .selected-cell {
 	background-color: #DAF0F0;
-}
-
-.under-sections {
-	margin-top: 35px;
 }
 
 .section-cell {

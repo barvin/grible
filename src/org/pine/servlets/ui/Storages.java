@@ -20,11 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
-import org.pine.model.Product;
 import org.pine.model.User;
 import org.pine.servlets.ServletHelper;
 import org.pine.settings.GlobalSettings;
-import org.pine.uimodel.Sections;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -41,7 +39,8 @@ public class Storages extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -53,7 +52,6 @@ public class Storages extends HttpServlet {
 				return;
 			}
 			StringBuilder responseHtml = new StringBuilder();
-			
 
 			if (request.getSession(false) == null) {
 				response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
@@ -106,26 +104,8 @@ public class Storages extends HttpServlet {
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");
 					responseHtml.append(ServletHelper.getUserPanel(user));
-					includeHeader(responseHtml, "storages", Dao.getProduct(productId));
-
-					responseHtml.append("<div id=\"main\" class=\"table\">");
-					responseHtml.append("<div class=\"table-row\">");
-					responseHtml.append("<div class=\"table-cell left-panel\">");
-					responseHtml.append("<span class=\"lbl-categories\">Categories:</span>");
-					responseHtml.append("<div id=\"entities-list\">");
-					responseHtml.append("<div id=\"category-container\"></div>");
-					responseHtml.append("</div>");
-					responseHtml.append("</div>");
-					responseHtml.append("<div id=\"waiting\" class=\"table-cell\">");
-					responseHtml.append("<img src=\"../img/ajax-loader.gif\" class=\"waiting-gif\" />");
-					responseHtml.append("<div class=\"top-panel\"></div>");
-					responseHtml.append("<div id=\"table-container\">");
-					responseHtml.append("<div class=\"table entities-values\"></div>");
-					responseHtml.append("</div>");
-					responseHtml.append("</div>");
-					responseHtml.append("</div>");
-					responseHtml.append("</div>");
-
+					responseHtml.append(ServletHelper.getBreadCrump("storages", Dao.getProduct(productId)));
+					responseHtml.append(ServletHelper.getMain());
 					responseHtml.append(ServletHelper.getContextMenus("storage"));
 					responseHtml.append(ServletHelper.getLoadingGif());
 				}
@@ -143,26 +123,10 @@ public class Storages extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
-	}
-
-	private void includeHeader(StringBuilder responseHtml, String sectionKey, Product product) {
-
-		String productName = product.getName();
-		String sectionName = Sections.getNameByKey(sectionKey);
-
-		responseHtml.append("<div id=\"breadcrump\"><a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
-		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
-		responseHtml.append("<span id=\"product-name\" class=\"header-text\">").append(productName)
-				.append("</span></a>");
-		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		responseHtml.append("<a href=\"/pine/").append(sectionKey).append("/?product=").append(product.getId())
-				.append("\">");
-		responseHtml.append("<span id=\"section-name\" class=\"header-text\">").append(sectionName)
-				.append("</span></a></div>");
 	}
 }

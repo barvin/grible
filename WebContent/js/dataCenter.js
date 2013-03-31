@@ -53,11 +53,6 @@ function initialize() {
 						$("#waiting-bg").remove();
 						$("#footer").removeClass("page-bottom");
 						$("#category-container").html(data);
-						$("#entities-list")
-								.append(
-										'<div class="under-sections"><span class="top-panel-button button-enabled"'
-												+ 'id="btn-add-category"><img src="../img/add-icon.png"'
-												+ 'class="top-panel-icon">&nbsp;&nbsp;Add category</span></div>');
 
 						initDataItemsPanel(jQuery);
 					});

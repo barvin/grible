@@ -72,12 +72,16 @@ public class GetCategories extends HttpServlet {
 				if (categorySelected) {
 					categorySelectedClass = " category-item-selected";
 				}
-				responseHtml.append("<h3 id=\"").append(category.getId()).append("\" class=\"category-item")
-						.append(categorySelectedClass).append("\">").append(category.getName()).append("</h3><div>");
+				responseHtml.append("<h3 id=\"").append(category.getId()).append("\" class=\"category-item");
+				responseHtml.append(categorySelectedClass).append("\">");
+				responseHtml.append("<img src=\"../img/category-icon.png\">&nbsp;");
+				responseHtml.append(category.getName()).append("</h3><div>");
 				for (Table table : tables) {
 					String selected = (table.getId() == tableId) ? " data-item-selected" : "";
-					responseHtml.append("<div id=\"").append(table.getId()).append("\" class=\"data-item")
-							.append(selected).append("\">").append(table.getName()).append("</div>");
+					responseHtml.append("<div id=\"").append(table.getId()).append("\" class=\"data-item");
+					responseHtml.append(selected).append("\">");
+					responseHtml.append("<img src=\"../img/table-icon.png\">&nbsp;");
+					responseHtml.append(table.getName()).append("</div>");
 				}
 				responseHtml.append("</div>");
 			}

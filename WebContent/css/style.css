@@ -96,19 +96,20 @@ a:hover {
 }
 
 .left-panel {
-	width: 250px;
+	width: 300px;
 	background-color: rgba(255, 255, 255, 0.4);
 }
 
 #entities-list {
-	width: 250px;
+	width: 300px;
 	overflow: auto;
 	padding-left: 5px;
 	padding-top: 5px;
 }
 
 #manage-buttons {
-	text-align: right;
+	float: right;
+	clear: left;
 }
 
 #manage-buttons>.icon-button {

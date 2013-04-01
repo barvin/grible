@@ -106,22 +106,21 @@ public class ServletHelper {
 		StringBuilder responseHtml = new StringBuilder();
 		responseHtml.append("<div id=\"main\" class=\"table\">");
 
-		responseHtml.append("<div class=\"table-row\">");
-		responseHtml.append("<div class=\"table-cell\">");
-		responseHtml.append("<span class=\"lbl-categories\">Categories:</span>");
+		responseHtml.append("<div class=\"table-row row-above-table\">");
+		responseHtml.append("<div class=\"table-cell top-left-cell\">");
+		responseHtml.append("<div class=\"icon-button button-enabled\"");
+		responseHtml.append("id=\"btn-add-category\"><img src=\"../img/add-icon.png\">");
+		responseHtml.append("<span class=\"icon-button-text\"> Add category</span></div>");
 		responseHtml.append("</div>");
 		responseHtml.append("<div class=\"table-cell\">");
 		responseHtml.append("<div class=\"top-panel\"></div>");
 		responseHtml.append("</div>");
 		responseHtml.append("</div>");
 
-		responseHtml.append("<div class=\"table-row\">");
+		responseHtml.append("<div class=\"table-row categories-and-table-row\">");
 		responseHtml.append("<div class=\"table-cell left-panel\">");
 		responseHtml.append("<div id=\"entities-list\">");
 		responseHtml.append("<div id=\"category-container\"></div>");
-		responseHtml.append("<br><br><span class=\"top-panel-button button-enabled\"");
-		responseHtml.append("id=\"btn-add-category\"><img src=\"../img/add-icon.png\"");
-		responseHtml.append("class=\"top-panel-icon\">&nbsp;&nbsp;Add category</span>");
 		responseHtml.append("</div>");
 		responseHtml.append("</div>");
 		responseHtml.append("<div id=\"waiting\" class=\"table-cell\">");

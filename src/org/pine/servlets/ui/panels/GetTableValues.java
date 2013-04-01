@@ -37,7 +37,6 @@ import org.pine.model.Value;
 public class GetTableValues extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private boolean showUsage;
-	private Dao dao;
 	private TableType tableType;
 
 	/**
@@ -56,7 +55,6 @@ public class GetTableValues extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			StringBuilder responseHtml = new StringBuilder();
-			dao = new Dao();
 			int tableId = Integer.parseInt(request.getParameter("id"));
 			Table table = Dao.getTable(tableId);
 			tableType = table.getType();

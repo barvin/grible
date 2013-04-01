@@ -103,17 +103,24 @@ a:hover {
 #entities-list {
 	width: 250px;
 	overflow: auto;
+	padding-left: 5px;
+	padding-top: 5px;
 }
 
 #manage-buttons {
-	float: right;
-	clear: both;
+	text-align: right;
+}
+
+#manage-buttons>.icon-button {
+	margin-left: 10px;
 }
 
 #table-container {
 	overflow: auto;
 	margin-left: 10px;
 	background-color: rgba(255, 255, 255, 0.4);
+	position: relative;
+	top: -17px;
 }
 
 .key-row {
@@ -157,7 +164,6 @@ a:hover {
 	color: #367F86;
 	font-size: 13px;
 	padding: 3px;
-	margin-left: 15px;
 }
 
 .data-item-selected {
@@ -182,6 +188,10 @@ h3.category-item-selected {
 
 h3.category-item:hover {
 	cursor: pointer;
+}
+
+.category-content-holder {
+	margin-left: 15px;
 }
 
 #waiting-bg {
@@ -257,42 +267,51 @@ h3.category-item:hover {
 	text-align: right;
 }
 
-.sheet-tab-container{
-    width:140px;
-    display: inline-table;
-    margin-left: 10px;
-    cursor: pointer;
+.sheet-tab-container {
+	width: 140px;
+	display: inline-table;
+	margin-left: 10px;
+	cursor: pointer;
 }
 
 .sheet-tab {
-    background:rgb(240,240,240);
-    text-align:center;
-    height:27px;
-    font-family: arial,sans-serif;
-    font-size: 14px;
+	background: rgb(240, 240, 240);
+	text-align: center;
+	height: 27px;
+	font-family: arial, sans-serif;
+	font-size: 14px;
 }
 
 .sheet-tab-top {
-    width: 120px;
-    border-bottom: 10px solid rgb(240,240,240);
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
+	width: 120px;
+	border-bottom: 10px solid rgb(240, 240, 240);
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
 }
 
-.sheet-tab-selected > .sheet-tab {
-    background:rgb(200,200,200);
+.sheet-tab-selected>.sheet-tab {
+	background: rgb(200, 200, 200);
 }
 
-.sheet-tab-selected > .sheet-tab-top {
-    border-bottom: 10px solid rgb(200,200,200);
+.sheet-tab-selected>.sheet-tab-top {
+	border-bottom: 10px solid rgb(200, 200, 200);
 }
 
-.top-panel {
-	width: 100%;
+.top-panel>div {
+	display: inline-table;
 }
 
-.top-panel-button {
-	padding: 10px;
+.top-left-cell {
+	padding-bottom: 10px;
+}
+
+.icon-button {
+	padding: 6px 5px 3px 10px;
+	display: inline-table;
+}
+
+.under-sections {
+	margin-top: 25px;
 }
 
 .button-disabled {
@@ -320,22 +339,25 @@ h3.category-item:hover {
 .add-tab {
 	background-color: rgba(240, 240, 240, 0.4);
 	color: #888888;
-	text-align:center;
-    height:27px;
-    font-family: arial,sans-serif;
-    font-size: 14px;
+	text-align: center;
+	height: 27px;
+	font-family: arial, sans-serif;
+	font-size: 14px;
 }
 
 .add-tab-top {
-    width: 120px;
-    border-bottom: 10px solid rgba(240, 240, 240, 0.4);
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
+	width: 120px;
+	border-bottom: 10px solid rgba(240, 240, 240, 0.4);
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
 }
 
-.top-panel-icon {
+.icon-button-text {
 	position: relative;
-	top: 7px;
+	top: -7px;
+	left: 4px;
+	font-size: 14px;
+	margin-right: 10px;
 }
 
 .changed-sign {

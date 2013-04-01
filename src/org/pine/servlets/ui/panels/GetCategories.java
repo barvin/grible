@@ -74,14 +74,14 @@ public class GetCategories extends HttpServlet {
 				}
 				responseHtml.append("<h3 id=\"").append(category.getId()).append("\" class=\"category-item");
 				responseHtml.append(categorySelectedClass).append("\">");
-				responseHtml.append("<img src=\"../img/category-icon.png\">&nbsp;");
-				responseHtml.append(category.getName()).append("</h3><div>");
+				responseHtml.append("<img src=\"../img/category-icon.png\"><span class=\"icon-button-text\">&nbsp;");
+				responseHtml.append(category.getName()).append("</span></h3><div class=\"category-content-holder\">");
 				for (Table table : tables) {
 					String selected = (table.getId() == tableId) ? " data-item-selected" : "";
 					responseHtml.append("<div id=\"").append(table.getId()).append("\" class=\"data-item");
 					responseHtml.append(selected).append("\">");
-					responseHtml.append("<img src=\"../img/table-icon.png\">&nbsp;");
-					responseHtml.append(table.getName()).append("</div>");
+					responseHtml.append("<img src=\"../img/table-icon.png\"><span class=\"icon-button-text\">&nbsp;");
+					responseHtml.append(table.getName()).append("<span></div>");
 				}
 				responseHtml.append("</div>");
 			}

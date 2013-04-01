@@ -56,7 +56,7 @@ public class Home extends HttpServlet {
 				response.sendRedirect("/pine/firstlaunch");
 				return;
 			}
-			
+
 			StringBuilder responseHtml = new StringBuilder();
 			responseHtml.append("<!DOCTYPE html>");
 			responseHtml.append("<html>");
@@ -106,7 +106,8 @@ public class Home extends HttpServlet {
 				User user = Dao.getUserByName(userName);
 
 				responseHtml.append(ServletHelper.getUserPanel(user));
-				responseHtml.append("<div id=\"breadcrump\"><a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
+				responseHtml
+						.append("<div id=\"breadcrump\"><a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
 
 				if (request.getParameter("product") != null) {
 					if (StringUtils.isNumeric(request.getParameter("product"))) {
@@ -117,7 +118,8 @@ public class Home extends HttpServlet {
 
 							responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 							responseHtml.append("<a href=\"?product=" + id
-									+ "\"><span id=\"product-name\" class=\"header-text\">" + product.getName()	+ "</span></a></div>");
+									+ "\"><span id=\"product-name\" class=\"header-text\">" + product.getName()
+									+ "</span></a></div>");
 
 							if (!user.hasAccessToProduct(product.getId())) {
 								responseHtml
@@ -152,9 +154,9 @@ public class Home extends HttpServlet {
 
 					if (user.isAdmin()) {
 						responseHtml.append("<div class=\"under-sections\">");
-						responseHtml.append("<span class=\"top-panel-button button-enabled\" id=\"btn-add-product\">"
-								+ "<img src=\"img/add-icon.png\" class=\"top-panel-icon\">"
-								+ "&nbsp;&nbsp;Add product</span>");
+						responseHtml.append("<div class=\"icon-button button-enabled\" id=\"btn-add-product\">");
+						responseHtml.append("<img src=\"img/add-icon.png\">");
+						responseHtml.append("<span class=\"icon-button-text\"> Add product</span></div>");
 						responseHtml.append("</div>");
 					}
 				}

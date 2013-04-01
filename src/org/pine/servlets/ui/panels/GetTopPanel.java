@@ -49,20 +49,20 @@ public class GetTopPanel extends HttpServlet {
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			if (tableType == TableType.STORAGE) {
 				responseHtml.append("<div id=\"manage-buttons\">");
-				responseHtml
-						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</span>");
-				responseHtml.append("&nbsp;&nbsp;");
-				responseHtml
-						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
-				responseHtml.append("&nbsp;&nbsp;");
-				responseHtml
-						.append("<span id=\"btn-edit-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
-				responseHtml.append("&nbsp;&nbsp;");
-				responseHtml
-						.append("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
-				responseHtml.append("&nbsp;&nbsp;");
-				responseHtml
-						.append("<span id=\"btn-class-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/brackets.png\"> Class</span>");
+				responseHtml.append("<div id=\"btn-sort-keys\" class=\"icon-button button-disabled\">");
+				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</div>");
+				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
+				responseHtml.append("<img src=\"../img/save-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
+				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button button-enabled\">");
+				responseHtml.append("<img src=\"../img/edit-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
+				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
+				responseHtml.append("<img src=\"../img/delete-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
+				responseHtml.append("<div id=\"btn-class-data-item\" class=\"icon-button button-enabled\">");
+				responseHtml.append("<img src=\"../img/brackets.png\">");
+				responseHtml.append("<span class=\"icon-button-text\"> Class</span></div>");
 				responseHtml.append("</div>");
 
 			} else {
@@ -102,21 +102,6 @@ public class GetTopPanel extends HttpServlet {
 				default:
 					break;
 				}
-				responseHtml.append("<div id=\"manage-buttons\">");
-				responseHtml
-						.append("<span id=\"btn-sort-keys\" class=\"top-panel-button button-disabled\"><input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</span>");
-				responseHtml.append("&nbsp;&nbsp;");
-				responseHtml
-						.append("<span id=\"btn-save-data-item\" class=\"top-panel-button button-disabled\"><img class=\"top-panel-icon\" src=\"../img/save-icon.png\"> Save</span>");
-				responseHtml.append("&nbsp;&nbsp;");
-				responseHtml.append("<span id=\"btn-edit-data-item\" class=\"top-panel-button ")
-						.append(editButtonEnable)
-						.append("\"><img class=\"top-panel-icon\" src=\"../img/edit-icon.png\"> Edit</span>");
-				responseHtml.append("&nbsp;&nbsp;");
-				responseHtml
-						.append("<span id=\"btn-delete-data-item\" class=\"top-panel-button button-enabled\"><img class=\"top-panel-icon\" src=\"../img/delete-icon.png\"> Delete</span>");
-				responseHtml.append("</div>");
-
 				responseHtml.append("<div id=\"table-tabs\">");
 				responseHtml.append("<div class=\"sheet-tab-container");
 				responseHtml.append(generalSelected).append("\">");
@@ -133,8 +118,7 @@ public class GetTopPanel extends HttpServlet {
 							.append("\" class=\"sheet-tab\" label=\"precondition\">Preconditions</div>");
 				} else {
 					responseHtml.append("<div class=\"add-tab-top\"></div>");
-					responseHtml
-							.append("<div id=\"btn-add-preconditions\" class=\"add-tab\">Add preconditions</div>");
+					responseHtml.append("<div id=\"btn-add-preconditions\" class=\"add-tab\">Add preconditions</div>");
 				}
 				responseHtml.append("</div>");
 
@@ -150,6 +134,21 @@ public class GetTopPanel extends HttpServlet {
 							.append("<div id=\"btn-add-postconditions\" class=\"add-tab\">Add postconditions</div>");
 				}
 				responseHtml.append("</div>");
+				responseHtml.append("</div>");
+				
+				responseHtml.append("<div id=\"manage-buttons\">");
+				responseHtml.append("<div id=\"btn-sort-keys\" class=\"icon-button button-disabled\">");
+				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</div>");
+				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
+				responseHtml.append("<img src=\"../img/save-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
+				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button ");
+				responseHtml.append(editButtonEnable).append("\">");
+				responseHtml.append("<img src=\"../img/edit-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
+				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
+				responseHtml.append("<img src=\"../img/delete-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
 				responseHtml.append("</div>");
 			}
 			out.print(responseHtml.toString());

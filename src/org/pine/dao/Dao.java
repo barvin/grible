@@ -458,7 +458,7 @@ public class Dao {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
 				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
-				+ "ON t.type=tt.id AND t.categoryid=" + categoryId + " ORDER BY t.id");
+				+ "ON t.type=tt.id AND t.categoryid=" + categoryId + " ORDER BY t.name");
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}

@@ -290,10 +290,6 @@ h3.category-item:hover {
 	border-right: 10px solid transparent;
 }
 
-.sheet-tab-top-border {
-	display: none;
-}
-
 .sheet-tab-selected>.sheet-tab {
 	background: #F0F0F0;
 	border-left: 1px solid #BBBBBB;
@@ -307,7 +303,7 @@ h3.category-item:hover {
 	position: relative;
 }
 
-.sheet-tab-selected>.sheet-tab-top-border {
+.sheet-tab-top-border {
 	display: block;
 	position: relative;
 	top: 10px;
@@ -323,18 +319,14 @@ h3.category-item:hover {
 	display: inline-table;
 }
 
-.top-left-cell {
-	padding-bottom: 10px;
+.under-sections {
+	margin-top: 25px;
 }
 
 .icon-button {
 	padding: 6px 5px 3px 10px;
 	display: inline-table;
 	border: 1px solid #BBBBBB;
-}
-
-.under-sections {
-	margin-top: 25px;
 }
 
 .button-disabled {
@@ -372,6 +364,22 @@ h3.category-item:hover {
 		endColorstr='#ededed', GradientType=0);
 }
 
+.icon-button.button-enabled>.icon-enabled {
+	display: inherit;
+}
+
+.icon-button.button-enabled>.icon-disabled {
+	display: none;
+}
+
+.icon-button.button-disabled>.icon-enabled {
+	display: none;
+}
+
+.icon-button.button-disabled>.icon-disabled {
+	display: inherit;
+}
+
 .checkbox-checked {
 	background-color: #F0F0F0;
 	color: #151B1B;
@@ -395,7 +403,7 @@ h3.category-item:hover {
 
 .icon-button-text {
 	position: relative;
-	top: -7px;
+	top: -3px;
 	left: 4px;
 	font-size: 13px;
 	margin-right: 10px;

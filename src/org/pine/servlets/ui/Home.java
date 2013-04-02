@@ -155,7 +155,7 @@ public class Home extends HttpServlet {
 					if (user.isAdmin()) {
 						responseHtml.append("<div class=\"under-sections\">");
 						responseHtml.append("<div class=\"icon-button button-enabled\" id=\"btn-add-product\">");
-						responseHtml.append("<img src=\"img/add-icon.png\">");
+						responseHtml.append("<img src=\"img/add-icon.png\" class=\"icon-enabled\">");
 						responseHtml.append("<span class=\"icon-button-text\"> Add product</span></div>");
 						responseHtml.append("</div>");
 					}

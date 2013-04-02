@@ -1,8 +1,8 @@
 /* Generic context menu styles */
 .contextMenu {
 	position: absolute;
-	width: 160px;
-	z-index: 99999;
+	width: 140px;
+	z-index: 999;
 	border: solid 1px #CCC;
 	background: #EEE;
 	padding: 0px;
@@ -21,10 +21,9 @@
 	background-repeat: no-repeat;
 	color: #333333;
 	display: block;
-	height: 30px;
-	line-height: 30px;
+	line-height: 24px;
 	outline: medium none;
-	padding: 5px 5px 5px 40px;
+	padding: 5px 5px 5px 30px;
 	text-decoration: none;
 }
 

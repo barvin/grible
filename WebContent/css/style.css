@@ -119,9 +119,10 @@ a:hover {
 	overflow: auto;
 	margin-left: 10px;
 	background-color: #F0F0F0;
-	position: relative;
-	top: -10px;
 	border: 1px solid #BBBBBB;
+	position: relative; top : -1px;
+	padding: 2px;
+	top: -1px;
 }
 
 .key-row {
@@ -275,7 +276,7 @@ h3.category-item:hover {
 }
 
 .sheet-tab {
-	background: #D1D1D1;
+	background: #DDDDDD;
 	text-align: center;
 	height: 27px;
 	font-family: arial, sans-serif;
@@ -285,7 +286,7 @@ h3.category-item:hover {
 
 .sheet-tab-top {
 	width: 120px;
-	border-bottom: 10px solid #D1D1D1;
+	border-bottom: 10px solid #DDDDDD;
 	border-left: 10px solid transparent;
 	border-right: 10px solid transparent;
 }
@@ -294,13 +295,16 @@ h3.category-item:hover {
 	background: #F0F0F0;
 	border-left: 1px solid #BBBBBB;
 	border-right: 1px solid #BBBBBB;
+	border-bottom: 1px solid #F0F0F0;
 	color: #151B1B;
+	z-index: 1001;
 }
 
 .sheet-tab-selected>.sheet-tab-top {
 	border-bottom: 10px solid #F0F0F0;
 	left: 1px;
 	position: relative;
+	z-index: 1001;
 }
 
 .sheet-tab-top-border {
@@ -312,10 +316,15 @@ h3.category-item:hover {
 	border-left: 11px solid transparent;
 	border-right: 11px solid transparent;
 	width: 120px;
-	z-index: -1;
+	z-index: -5;
 }
 
-.top-panel>div {
+.top-panel {
+	height: 40px;
+	display: table-row-group;
+}
+
+.top-panel>div.sheet-tab-container {
 	display: inline-table;
 }
 
@@ -345,7 +354,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(   startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(    startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -360,7 +369,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(    startColorstr='#234e56',
+	filter: progid:DXImageTransform.Microsoft.gradient(     startColorstr='#234e56',
 		endColorstr='#ededed', GradientType=0);
 }
 

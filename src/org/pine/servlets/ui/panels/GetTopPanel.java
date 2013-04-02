@@ -105,6 +105,7 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div id=\"table-tabs\">");
 				responseHtml.append("<div class=\"sheet-tab-container");
 				responseHtml.append(generalSelected).append("\">");
+				responseHtml.append("<div class=\"sheet-tab-top-border\"></div>");
 				responseHtml.append("<div class=\"sheet-tab-top\"></div>");
 				responseHtml.append("<div id=\"").append(tableId).append("\" class=\"sheet-tab\"");
 				responseHtml.append(" label=\"table\">General</div>");
@@ -113,6 +114,7 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div class=\"sheet-tab-container");
 				responseHtml.append(preSelected).append("\">");
 				if (preId != null) {
+					responseHtml.append("<div class=\"sheet-tab-top-border\"></div>");
 					responseHtml.append("<div class=\"sheet-tab-top\"></div>");
 					responseHtml.append("<div id=\"").append(preId)
 							.append("\" class=\"sheet-tab\" label=\"precondition\">Preconditions</div>");
@@ -125,6 +127,7 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div class=\"sheet-tab-container");
 				responseHtml.append(postSelected).append("\">");
 				if (postId != null) {
+					responseHtml.append("<div class=\"sheet-tab-top-border\"></div>");
 					responseHtml.append("<div class=\"sheet-tab-top\"></div>");
 					responseHtml.append("<div id=\"").append(postId)
 							.append("\" class=\"sheet-tab\" label=\"postcondition\">Postconditions</div>");

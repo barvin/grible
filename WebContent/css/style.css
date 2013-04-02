@@ -121,6 +121,7 @@ a:hover {
 	background-color: #F0F0F0;
 	position: relative;
 	top: -10px;
+	border: 1px solid #BBBBBB;
 }
 
 .key-row {
@@ -270,29 +271,52 @@ h3.category-item:hover {
 	display: inline-table;
 	margin-left: 10px;
 	cursor: pointer;
+	z-index: 100;
 }
 
 .sheet-tab {
-	background: rgb(221, 221, 221);
+	background: #D1D1D1;
 	text-align: center;
 	height: 27px;
 	font-family: arial, sans-serif;
 	font-size: 14px;
+	color: #777777;
 }
 
 .sheet-tab-top {
 	width: 120px;
-	border-bottom: 10px solid rgb(221, 221, 221);
+	border-bottom: 10px solid #D1D1D1;
 	border-left: 10px solid transparent;
 	border-right: 10px solid transparent;
 }
 
+.sheet-tab-top-border {
+	display: none;
+}
+
 .sheet-tab-selected>.sheet-tab {
-	background: rgb(240, 240, 240);
+	background: #F0F0F0;
+	border-left: 1px solid #BBBBBB;
+	border-right: 1px solid #BBBBBB;
+	color: #151B1B;
 }
 
 .sheet-tab-selected>.sheet-tab-top {
-	border-bottom: 10px solid rgb(240, 240, 240);
+	border-bottom: 10px solid #F0F0F0;
+	left: 1px;
+	position: relative;
+}
+
+.sheet-tab-selected>.sheet-tab-top-border {
+	display: block;
+	position: relative;
+	top: 10px;
+	left: 0;
+	border-bottom: 11px solid #BBBBBB;
+	border-left: 11px solid transparent;
+	border-right: 11px solid transparent;
+	width: 120px;
+	z-index: -1;
 }
 
 .top-panel>div {
@@ -306,6 +330,7 @@ h3.category-item:hover {
 .icon-button {
 	padding: 6px 5px 3px 10px;
 	display: inline-table;
+	border: 1px solid #BBBBBB;
 }
 
 .under-sections {
@@ -320,7 +345,6 @@ h3.category-item:hover {
 
 .button-enabled {
 	color: #151B1B;
-	border: 1px solid #BBBBBB;
 	background: #f9f9f9;
 	background: -moz-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f9f9f9),
@@ -329,7 +353,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(  startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(   startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -344,7 +368,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(   startColorstr='#234e56',
+	filter: progid:DXImageTransform.Microsoft.gradient(    startColorstr='#234e56',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -379,7 +403,7 @@ h3.category-item:hover {
 
 .tree-item-text {
 	position: relative;
-	top: -3px;
+	top: -2px;
 	left: 2px;
 	font-size: 14px;
 	margin-right: 10px;

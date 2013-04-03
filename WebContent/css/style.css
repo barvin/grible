@@ -118,7 +118,8 @@ a:hover {
 	margin-left: 10px;
 	background-color: #F0F0F0;
 	border: 1px solid #BBBBBB;
-	position: relative; top : -1px;
+	position: relative;
+	top: -1px;
 	padding: 2px;
 	top: -1px;
 }
@@ -354,7 +355,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(    startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(      startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -369,7 +370,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(     startColorstr='#234e56',
+	filter: progid:DXImageTransform.Microsoft.gradient(       startColorstr='#234e56',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -389,9 +390,33 @@ h3.category-item:hover {
 	display: inherit;
 }
 
-.checkbox-checked {
+#data-item-options {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	border: 1px solid #BBBBBB;
+}
+
+#data-item-options>div {
+	display: block;
+}
+
+.checkbox-option {
+	padding: 5px;
 	background-color: #F0F0F0;
 	color: #151B1B;
+}
+
+.checkbox-option:hover {
+	background-color: #367F86;
+	color: #F0F0F0;
+}
+
+.checkbox-option>img {
+	padding-left: 3px;
+	padding-right: 1px;
 }
 
 .add-tab {

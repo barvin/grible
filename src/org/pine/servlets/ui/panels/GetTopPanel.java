@@ -49,24 +49,37 @@ public class GetTopPanel extends HttpServlet {
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			if (tableType == TableType.STORAGE) {
 				responseHtml.append("<div id=\"manage-buttons\">");
-				responseHtml.append("<div id=\"btn-sort-keys\" class=\"icon-button button-disabled\">");
-				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</div>");
+				
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
 				responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
+				
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
+				
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
-				responseHtml.append("<div id=\"btn-class-data-item\" class=\"icon-button button-enabled\">");
-				responseHtml.append("<img src=\"../img/brackets.png\" class=\"icon-enabled\">");
-				responseHtml.append("<img src=\"../img/brackets.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> Class</span></div>");
+								
+				responseHtml.append("<div id=\"btn-more\" class=\"icon-button button-enabled\">");
+				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
+				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
+				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
+				
+				responseHtml.append("<div id=\"data-item-options\">");
+				responseHtml.append("<div id=\"btn-sort-keys\" class=\"checkbox-option\">");
+				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" />");
+				responseHtml.append("<span class=\"icon-button-text\">Enable columns moving</span></div>");
+				responseHtml.append("<div id=\"btn-class-data-item\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/brackets.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
+				
+				responseHtml.append("</div></div>");
+
 				responseHtml.append("</div>");
 
 			} else {
@@ -107,21 +120,33 @@ public class GetTopPanel extends HttpServlet {
 					break;
 				}				
 				responseHtml.append("<div id=\"manage-buttons\">");
-				responseHtml.append("<div id=\"btn-sort-keys\" class=\"icon-button button-disabled\">");
-				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" /> Enable columns moving</div>");
+
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
 				responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
+
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button ");
 				responseHtml.append(editButtonEnable).append("\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
+				
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
+
+				responseHtml.append("<div id=\"btn-more\" class=\"icon-button button-enabled\">");
+				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
+				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
+				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
+				responseHtml.append("<div id=\"data-item-options\">");
+				responseHtml.append("<div id=\"btn-sort-keys\" class=\"checkbox-option\">");
+				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" />");
+				responseHtml.append("<span class=\"icon-button-text\">Enable columns moving</span></div>");
+				responseHtml.append("</div></div>");
+				
 				responseHtml.append("</div>");
 				
 				responseHtml.append("<div id=\"table-tabs\">");

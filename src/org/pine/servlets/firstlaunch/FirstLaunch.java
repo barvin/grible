@@ -31,8 +31,7 @@ public class FirstLaunch extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -61,10 +60,10 @@ public class FirstLaunch extends HttpServlet {
 				out.println("</head>");
 				out.println("<body>");
 				out.println("<a href=\".\"><img id=\"logo-mini\" src=\"img/pine_logo_mini.png\"></a>");
-				out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
 				out.println("<br/><br/><div class=\"error-message\">You cannot access this page!"
 						+ "<br>Your database information is stored in config.xml file and seems to be valid."
-						+ "<br>If you really need to reset your database information and/or Pine administrator credentials, delete config.xml file on the server.</div>");
+						+ "<br>If you really need to reset your database information and/or Pine administrator credentials"
+						+ ", delete config.xml file on the server.</div>");
 				out.println(ServletHelper.getFooter(getServletContext().getRealPath(""), "img"));
 				out.println("</body>");
 				out.println("</html>");
@@ -78,8 +77,7 @@ public class FirstLaunch extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

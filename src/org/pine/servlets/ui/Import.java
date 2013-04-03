@@ -23,12 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.pine.dao.Dao;
 import org.pine.excel.TempVars;
 import org.pine.model.Category;
-import org.pine.model.Product;
 import org.pine.model.TableType;
 import org.pine.model.User;
 import org.pine.servlets.ServletHelper;
 import org.pine.settings.GlobalSettings;
-import org.pine.uimodel.Sections;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -45,8 +43,7 @@ public class Import extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -57,7 +54,6 @@ public class Import extends HttpServlet {
 				response.sendRedirect("/pine/firstlaunch");
 				return;
 			}
-			
 
 			if (request.getSession(false) == null) {
 				response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
@@ -83,11 +79,10 @@ public class Import extends HttpServlet {
 
 				if (!user.hasAccessToProduct(productId)) {
 					out.println("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
-					out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
 					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
 					out.print(ServletHelper.getUserPanel(user));
-					includeHeader(out, "import", Dao.getProduct(productId));
+					out.print(ServletHelper.getBreadCrump("import", Dao.getProduct(productId)));
 
 					out.print("<br />");
 					out.print("<span class=\"medium-header\">Data Table Import</span>");
@@ -155,26 +150,9 @@ public class Import extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
-	}
-
-	private void includeHeader(PrintWriter out, String sectionKey, Product product) {
-
-		String productName = product.getName();
-		String sectionName = Sections.getNameByKey(sectionKey);
-
-		out.print("<div id=\"breadcrump\"><a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
-		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		out.print("<a href=\"/pine/?product=" + product.getId() + "\">");
-		out.print("<span id=\"product-name\" class=\"header-text\">" + productName + "</span></a>");
-		out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		out.print("<a href=\"/pine/" + sectionKey + "/?product=" + product.getId() + "\">");
-		out.print("<span id=\"section-name\" class=\"header-text\">" + sectionName + "</span></a></div>");
-		out.print("<br />");
-
 	}
 }

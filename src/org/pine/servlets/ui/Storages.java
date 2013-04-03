@@ -39,8 +39,7 @@ public class Storages extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -89,10 +88,8 @@ public class Storages extends HttpServlet {
 
 				if (!user.hasAccessToProduct(productId)) {
 					responseHtml.append("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
-					responseHtml
-							.append("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
-					responseHtml
-							.append("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
+					responseHtml.append("<br/><br/>"
+							+ "<div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
 					responseHtml.append("<script type=\"text/javascript\">");
 					responseHtml.append("var productId = \"").append(productId).append("\";");
@@ -123,8 +120,7 @@ public class Storages extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

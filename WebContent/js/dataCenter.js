@@ -377,12 +377,13 @@ function initTopPanel() {
 
 	if ((tableType == "table") || (tableType == "precondition")
 			|| (tableType == "postcondition")) {
-		$(".sheet-tab").click(function() {
+		$(".sheet-tab-container").click(function() {
+			var $tab = $(this).find(".sheet-tab");
 			$(".data-item-selected > .changed-sign").remove();
 			$(".sheet-tab-selected").removeClass("sheet-tab-selected");
-			$(this).addClass("sheet-tab-selected");
-			tableId = $(this).attr('id');
-			tableType = $(this).attr('label');
+			$tab.addClass("sheet-tab-selected");
+			tableId = $tab.attr('id');
+			tableType = $tab.attr('label');
 			history.pushState({
 				id : tableId
 			}, "", "?id=" + tableId);

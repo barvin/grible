@@ -82,9 +82,9 @@ public class Admin extends HttpServlet {
 				out.print("</head>");
 				out.print("<body>");
 
-				out.print("<div id=\"breadcrump\"><a href=\"/pine\"><span id=\"home\" class=\"header-text\">Home</span></a>");
+				out.print("<div id=\"breadcrump\" class=\"header-text\"><a href=\"/pine\"><span id=\"home\">Home</span></a>");
 				out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-				out.print("<span id=\"product-name\" class=\"header-text\">Admin</span></div>");
+				out.print("<span id=\"product-name\">Admin</span></div>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User currentUser = Dao.getUserByName(userName);

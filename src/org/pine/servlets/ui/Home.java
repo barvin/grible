@@ -107,7 +107,7 @@ public class Home extends HttpServlet {
 
 				responseHtml.append(ServletHelper.getUserPanel(user));
 				responseHtml
-						.append("<div id=\"breadcrump\"><a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
+						.append("<div id=\"breadcrump\" class=\"header-text\"><a href=\".\"><span id=\"home\">Home</span></a>");
 
 				if (request.getParameter("product") != null) {
 					if (StringUtils.isNumeric(request.getParameter("product"))) {
@@ -118,7 +118,7 @@ public class Home extends HttpServlet {
 
 							responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 							responseHtml.append("<a href=\"?product=" + id
-									+ "\"><span id=\"product-name\" class=\"header-text\">" + product.getName()
+									+ "\"><span id=\"product-name\">" + product.getName()
 									+ "</span></a></div>");
 
 							if (!user.hasAccessToProduct(product.getId())) {

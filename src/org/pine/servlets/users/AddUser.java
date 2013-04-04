@@ -37,8 +37,7 @@ public class AddUser extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -49,24 +48,28 @@ public class AddUser extends HttpServlet {
 		String strPass = request.getParameter("pass");
 		boolean isAdmin = Boolean.parseBoolean(request.getParameter("isadmin"));
 
-		MessageDigest md;
-		try {
-			
-			md = MessageDigest.getInstance("MD5");
-			md.update(strPass.getBytes());
-			String hashPass = new String(md.digest());
-			int userId = Dao.insertUser(userName, hashPass, isAdmin);
-			if (userId > 0) {
-				if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
-					String[] productIds = request.getParameterValues("productIds[]");
-					Dao.insertUserPermissions(userId, productIds);
+		if (!strPass.equals("password")) {
+			MessageDigest md;
+			try {
+
+				md = MessageDigest.getInstance("MD5");
+				md.update(strPass.getBytes());
+				String hashPass = new String(md.digest());
+				int userId = Dao.insertUser(userName, hashPass, isAdmin);
+				if (userId > 0) {
+					if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
+						String[] productIds = request.getParameterValues("productIds[]");
+						Dao.insertUserPermissions(userId, productIds);
+					}
+					out.print("success");
+				} else {
+					out.print("ERROR: User was not added. See server logs for details.");
 				}
-				out.print("success");
-			} else {
-				out.print("ERROR: User was not added. See server logs for details.");
+			} catch (Exception e) {
+				e.printStackTrace(out);
 			}
-		} catch (Exception e) {
-			e.printStackTrace(out);
+		} else {
+			out.print("ERROR: Password 'password' is not permitted. It is too obvious.");
 		}
 		out.flush();
 		out.close();

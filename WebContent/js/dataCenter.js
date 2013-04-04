@@ -369,7 +369,8 @@ function initTopPanel() {
 		}
 	});
 
-	$("#cbx-sort-keys").click(function() {
+	$("#cbx-sort-keys").click(function(event) {
+		event.stopPropagation();
 		if ($(this).is("input:checked")) {
 			enableCoulumnsMoving();
 		} else {

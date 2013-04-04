@@ -321,8 +321,11 @@ h3.category-item:hover {
 }
 
 .top-panel {
-	height: 40px;
 	display: table-row-group;
+}
+
+.top-left-cell {
+	margin-top: 11px;
 }
 
 .top-panel>div.sheet-tab-container {

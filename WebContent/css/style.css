@@ -95,6 +95,7 @@ a:hover {
 
 .left-panel {
 	width: 300px;
+	margin-top: 10px;
 }
 
 #entities-list {

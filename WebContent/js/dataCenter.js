@@ -398,8 +398,8 @@ function initTopPanel() {
 	});
 
 	$("#btn-more").mouseenter(function() {
-		var optionsTop = $("#btn-more").offset().top + $("#btn-more").height() + 11;
-		var optionsLeft = $("#btn-more").offset().left + $("#btn-more").width() - $("#data-item-options").width() + 17;
+		var optionsTop = Math.floor($("#btn-more").offset().top) + $("#btn-more").height() + 11;
+		var optionsLeft = $("#btn-more").offset().left + $("#btn-more").width() - $("#data-item-options").width() + 15;
 		$("#data-item-options").css("top", optionsTop + "px");
 		$("#data-item-options").css("left", optionsLeft + "px");
 		$("#data-item-options").slideDown(150);

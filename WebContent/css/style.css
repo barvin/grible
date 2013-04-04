@@ -321,6 +321,7 @@ h3.category-item:hover {
 }
 
 .top-panel {
+	height: 49px;
 	display: table-row-group;
 }
 

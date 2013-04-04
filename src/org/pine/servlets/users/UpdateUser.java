@@ -47,12 +47,13 @@ public class UpdateUser extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			
 
 			String userId = request.getParameter("userid");
 			String userName = request.getParameter("username");
 			String strPass = request.getParameter("pass");
 			boolean isAdmin = Boolean.parseBoolean(request.getParameter("isadmin"));
+
+			boolean noErrors = true;
 
 			User user;
 			user = Dao.getUserById(Integer.parseInt(userId));
@@ -62,15 +63,21 @@ public class UpdateUser extends HttpServlet {
 			}
 
 			if (!strPass.equals("")) {
-				MessageDigest md;
-				try {
-					md = MessageDigest.getInstance("MD5");
-					md.update(strPass.getBytes());
-					String hashPass = new String(md.digest());
-					Dao.updateUserPassword(user.getId(), hashPass);
-				} catch (NoSuchAlgorithmException e) {
-					out.print("ERROR: " + e.getMessage());
-					e.printStackTrace();
+				if (!strPass.equals("password")) {
+					MessageDigest md;
+					try {
+						md = MessageDigest.getInstance("MD5");
+						md.update(strPass.getBytes());
+						String hashPass = new String(md.digest());
+						Dao.updateUserPassword(user.getId(), hashPass);
+					} catch (NoSuchAlgorithmException e) {
+						out.print("ERROR: " + e.getMessage());
+						noErrors = false;
+						e.printStackTrace();
+					}
+				} else {
+					out.print("ERROR: Password 'password' is not permitted. It is too obvious.");
+					noErrors = false;
 				}
 			}
 
@@ -82,7 +89,9 @@ public class UpdateUser extends HttpServlet {
 				String[] productIds = request.getParameterValues("productIds[]");
 				Dao.updateUserPermissions(user.getId(), productIds);
 			}
-			out.print("success");
+			if (noErrors) {
+				out.print("success");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

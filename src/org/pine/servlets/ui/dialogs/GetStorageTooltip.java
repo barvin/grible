@@ -33,7 +33,6 @@ import org.pine.model.Value;
 @WebServlet("/GetStorageTooltip")
 public class GetStorageTooltip extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Dao dao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -68,7 +67,6 @@ public class GetStorageTooltip extends HttpServlet {
 			}
 
 			if (correctFormat) {
-				dao = new Dao();
 				Value value = Dao.getValue(Integer.parseInt(request.getParameter("id")));
 				Integer[] storageIds = value.getStorageIds();
 				out.print(content + getStorageTooltip(storageIds));
@@ -90,9 +88,11 @@ public class GetStorageTooltip extends HttpServlet {
 
 			List<Key> keys = Dao.getKeys(tableId);
 			result.append("<div class=\"table-row key-row\">");
+			result.append("<div class=\"table-cell ui-cell-mini index-header-cell\">Index</div>");
 			for (Key key : keys) {
-				result.append("<div class=\"table-cell ui-cell-mini key-cell\">").append(key.getName())
-						.append("</div>");
+				result.append("<div class=\"table-cell ui-cell-mini key-cell\">");
+				result.append(key.getName());
+				result.append("</div>");
 			}
 			result.append("</div>");
 
@@ -100,10 +100,16 @@ public class GetStorageTooltip extends HttpServlet {
 				Row row = Dao.getRow(integers[i]);
 				List<Value> values = Dao.getValues(row);
 				result.append("<div class=\"table-row value-row\">");
+				result.append("<div id=\"").append(row.getId());
+				result.append("\" class=\"table-cell ui-cell-mini index-cell\">");
+				result.append(row.getOrder());
+				result.append("</div>");
 				for (Value value : values) {
 					String storageCell = (value.isStorage()) ? " storage-cell" : "";
-					result.append("<div class=\"table-cell ui-cell-mini value-cell ").append(storageCell).append("\">")
-							.append(value.getValue()).append("</div>");
+					result.append("<div class=\"table-cell ui-cell-mini value-cell ");
+					result.append(storageCell).append("\">");
+					result.append(value.getValue());
+					result.append("</div>");
 				}
 				result.append("</div>");
 			}

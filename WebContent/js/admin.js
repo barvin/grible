@@ -14,6 +14,14 @@ $()
 								initOneButtonDialog(jQuery);
 							});
 
+					$("input.isadmin").click(function() {
+						if ($(this).is("input:checked")) {
+							$("input.access-product").attr("disabled", "disabled");
+						} else {
+							$("input.access-product").removeAttr("disabled");
+						}
+					});
+
 					$("#add-user").click(function() {
 						var isFormCorrect = true;
 
@@ -63,7 +71,7 @@ $()
 								userid : $userid
 							}, function(data) {
 								if (data == "success") {
-									alert("User was deleted.");									
+									alert("User was deleted.");
 									location.reload(true);
 								} else if (data == "gohome") {
 									alert("User was deleted.");

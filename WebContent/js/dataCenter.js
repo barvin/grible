@@ -774,6 +774,7 @@ function initValueCells(cells) {
 				+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
 		$cell.find("input.changed-value").css("width", $width + "px");
 		$cell.find("input.changed-value").focus();
+		$cell.find("input.changed-value").select();
 		initEditableCell(jQuery);
 	});
 }

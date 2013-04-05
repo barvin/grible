@@ -20,8 +20,10 @@ function initialize() {
 			function(e, xhr, settings, exception) {
 				var exrrorText = xhr.responseText.substring(xhr.responseText.indexOf("<h1>"));
 				$("body").append(
-						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>' + '<div class="ui-dialog-content">' + 'Location: ' + settings.url + '<br><br>'
-								+ exrrorText + '<br><br>' + '<div class="right">' + '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
+						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>'
+								+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url + '<br><br>'
+								+ exrrorText + '<br><br>' + '<div class="right">'
+								+ '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
 				initOneButtonDialog(jQuery);
 			});
 
@@ -60,79 +62,126 @@ function initDataItemsPanel() {
 		}, "", "?product=" + productId);
 	});
 
-	$(".data-item").click(function() {
-		$("#waiting").addClass("loading");
-		$(".data-item-selected").find(".changed-sign").remove();
-		$(".data-item-selected").removeClass("data-item-selected");
-		$("#btn-edit-data-item").removeClass("button-disabled");
-		$("#btn-edit-data-item").addClass("button-enabled");
-		$(this).addClass("data-item-selected");
-		tableId = $(this).attr('id');
-		if ((tableType == "precondition") || (tableType == "postcondition")) {
-			tableType = "table";
-		}
-		history.pushState({
-			id : tableId
-		}, "", "?id=" + tableId);
-		$("#table-container").show();
-		loadTableValues(tableId);
-		loadTopPanel({
-			tabletype : tableType,
-			tableid : tableId
-		});
-	});
-
-	$(".category-item").contextMenu(
-			{
-				menu : 'categoryMenu'
-			},
-			function(action, el, pos) {
-				var $id = $(el).attr("id");
-				if (action == "add") {
-					$.post("../GetAddTableDialog", {
-						categoryid : $id
-					}, function(data) {
-						$("body").append(data);
-						initAddDataItemDialog(jQuery);
-					});
-				} else if (action == "edit") {
-					$("body").append(
-							'<div id="edit-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Edit category</div>' + '<div class="ui-dialog-content">' + '<div class="table">'
-									+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-									+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="' + $(el).text() + '"></div>' + '</div>' + '</div>'
-									+ '<div class="dialog-buttons right">' + '<button id="dialog-btn-edit-category" category-id="' + $id
-									+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>' + '</div></div></div>');
-					initEditCategoryDialog(jQuery);
-				} else if (action == "delete") {
-					var answer = confirm("Are you sure you want to delete this category?");
-					if (answer) {
-						$.post("../DeleteCategory", {
-							id : $id
-						}, function(data) {
-							if (data == "success") {
-								alert("Category was deleted.");
-								window.location = "?product=" + productId;
-							} else {
-								alert(data);
-							}
-						});
-					}
-				}
-			});
-
-	$("#btn-add-category").click(
+	$(".data-item").click(
 			function() {
-				$("body").append(
-						'<div id="add-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Add category</div>' + '<div class="ui-dialog-content">' + '<div class="table">'
-								+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-								+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>' + '</div>' + '</div>'
-								+ '<div class="dialog-buttons right">' + '<button id="dialog-btn-add-category" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-								+ '</div></div></div>');
-				initAddCategoryDialog(jQuery);
+				$("#waiting").addClass("loading");
+				$(".data-item-selected").find(".changed-sign").remove();
+				$(".data-item-selected").removeClass("data-item-selected");
+				$("#btn-edit-data-item").removeClass("button-disabled");
+				$("#btn-edit-data-item").addClass("button-enabled");
+				$(this).addClass("data-item-selected");
+				tableId = $(this).attr('id');
+				if ((tableType == "precondition") || (tableType == "postcondition")) {
+					tableType = "table";
+				}
+				history.pushState({
+					id : tableId
+				}, "", "?id=" + tableId);
+
+				var name = $(this).find("span.tree-item-text").text().trim();
+				document.title = name + " - " + $("#section-name").text() + " - Pine";
+				$("#section-name").addClass("link-infront");
+
+				var $breadCrump = $("#breadcrump");
+				if ($("#" + tableType + "-name").length > 0) {
+					var $tableName = $("#" + tableType + "-name");
+					$tableName.parent().attr("href", "/pine/" + tableType + "s/?id=" + tableId);
+					$tableName.text(name);
+				} else {
+					$breadCrump.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
+					$breadCrump.append("<a href='/pine/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType
+							+ "-name'>" + name + "</span></a>");
+				}
+
+				$("#table-container").show();
+				loadTableValues(tableId);
+				loadTopPanel({
+					tabletype : tableType,
+					tableid : tableId
+				});
 			});
+
+	$(".category-item")
+			.contextMenu(
+					{
+						menu : 'categoryMenu'
+					},
+					function(action, el, pos) {
+						var $id = $(el).attr("id");
+						if (action == "add") {
+							$.post("../GetAddTableDialog", {
+								categoryid : $id
+							}, function(data) {
+								$("body").append(data);
+								initAddDataItemDialog(jQuery);
+							});
+						} else if (action == "edit") {
+							$("body")
+									.append(
+											'<div id="edit-category-dialog" class="ui-dialog">'
+													+ '<div class="ui-dialog-title">Edit category</div>'
+													+ '<div class="ui-dialog-content">'
+													+ '<div class="table">'
+													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="'
+													+ $(el).text()
+													+ '"></div>'
+													+ '</div>'
+													+ '</div>'
+													+ '<div class="dialog-buttons right">'
+													+ '<button id="dialog-btn-edit-category" category-id="'
+													+ $id
+													+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
+													+ '</div></div></div>');
+							initEditCategoryDialog(jQuery);
+						} else if (action == "delete") {
+							var answer = confirm("Are you sure you want to delete this category?");
+							if (answer) {
+								$.post("../DeleteCategory", {
+									id : $id
+								}, function(data) {
+									if (data == "success") {
+										alert("Category was deleted.");
+										window.location = "?product=" + productId;
+									} else {
+										alert(data);
+									}
+								});
+							}
+						}
+					});
+
+	$("#btn-add-category")
+			.click(
+					function() {
+						$("body")
+								.append(
+										'<div id="add-category-dialog" class="ui-dialog">'
+												+ '<div class="ui-dialog-title">Add category</div>'
+												+ '<div class="ui-dialog-content">'
+												+ '<div class="table">'
+												+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+												+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>'
+												+ '</div>'
+												+ '</div>'
+												+ '<div class="dialog-buttons right">'
+												+ '<button id="dialog-btn-add-category" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
+												+ '</div></div></div>');
+						initAddCategoryDialog(jQuery);
+					});
 
 	if (tableId > 0) {
 		$("#waiting").addClass("loading");
+
+		var name = $(".data-item-selected").find("span.tree-item-text").text().trim();
+		document.title = name + " - " + $("#section-name").text() + " - Pine";
+		$("#section-name").addClass("link-infront");
+
+		var $breadCrump = $("#breadcrump");
+		$breadCrump.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
+		$breadCrump.append("<a href='/pine/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>"
+				+ name + "</span></a>");
+
 		loadTableValues(tableId);
 		loadTopPanel({
 			tabletype : tableType,
@@ -721,7 +770,8 @@ function initValueCells(cells) {
 		}
 		var $content = $cell.text().replace(/'/g, "&#39;");
 		var $width = $cell.width();
-		$cell.html("<input class='changed-value' value='" + $content + "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
+		$cell.html("<input class='changed-value' value='" + $content
+				+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
 		$cell.find("input.changed-value").css("width", $width + "px");
 		$cell.find("input.changed-value").focus();
 		initEditableCell(jQuery);
@@ -840,101 +890,111 @@ function initKeysAndIndexes() {
 }
 
 function enableKeyContextMenu() {
-	$(".key-cell").contextMenu(
-			{
-				menu : "keyMenu"
-			},
-			function(action, el, pos) {
-				var $keyId = $(el).attr("id");
-				var $keyOrder = $(el).attr("key-order");
-				var $column = $("div[keyid='" + $keyId + "']");
-				if (action == "add") {
-					$.post("../InsertKey", {
-						keyid : $keyId
-					}, function(data) {
-						var newIds = data.split(";");
-						if (newIds.length > 1) {
-							$newKey = $(el).clone(true);
-							$newKey.attr("id", newIds[0]);
-							$newKey.text("editme");
-							$newKey.insertBefore($(el));
-							highlight($newKey);
+	$(".key-cell")
+			.contextMenu(
+					{
+						menu : "keyMenu"
+					},
+					function(action, el, pos) {
+						var $keyId = $(el).attr("id");
+						var $keyOrder = $(el).attr("key-order");
+						var $column = $("div[keyid='" + $keyId + "']");
+						if (action == "add") {
+							$.post("../InsertKey", {
+								keyid : $keyId
+							}, function(data) {
+								var newIds = data.split(";");
+								if (newIds.length > 1) {
+									$newKey = $(el).clone(true);
+									$newKey.attr("id", newIds[0]);
+									$newKey.text("editme");
+									$newKey.insertBefore($(el));
+									highlight($newKey);
 
-							$column.each(function(i) {
-								$newCell = $(this).clone(true);
-								$newCell.removeClass("modified-value-cell");
-								$newCell.removeClass("storage-cell");
-								$newCell.text("");
-								$newCell.attr("keyid", newIds[0]);
-								$newCell.attr("id", newIds[i + 1]);
-								$newCell.insertBefore($(this));
-								highlight($newCell);
-							});
-							$(".ui-cell.key-cell").each(function(i) {
-								if ((i + 1) >= $keyOrder) {
-									$(this).attr("key-order", (i + 1));
+									$column.each(function(i) {
+										$newCell = $(this).clone(true);
+										$newCell.removeClass("modified-value-cell");
+										$newCell.removeClass("storage-cell");
+										$newCell.text("");
+										$newCell.attr("keyid", newIds[0]);
+										$newCell.attr("id", newIds[i + 1]);
+										$newCell.insertBefore($(this));
+										highlight($newCell);
+									});
+									$(".ui-cell.key-cell").each(function(i) {
+										if ((i + 1) >= $keyOrder) {
+											$(this).attr("key-order", (i + 1));
+										}
+									});
+								} else {
+									alert(data);
 								}
 							});
-						} else {
-							alert(data);
-						}
-					});
-				} else if (action == "copy") {
-					$.post("../CopyKey", {
-						keyid : $keyId,
-					}, function(data) {
-						var newIds = data.split(";");
-						if (newIds.length > 1) {
-							$newKey = $(el).clone(true);
-							$newKey.attr("id", newIds[0]);
-							$newKey.insertAfter($(el));
-							highlight($newKey);
+						} else if (action == "copy") {
+							$.post("../CopyKey", {
+								keyid : $keyId,
+							}, function(data) {
+								var newIds = data.split(";");
+								if (newIds.length > 1) {
+									$newKey = $(el).clone(true);
+									$newKey.attr("id", newIds[0]);
+									$newKey.insertAfter($(el));
+									highlight($newKey);
 
-							$column.each(function(i) {
-								$newCell = $(this).clone(true);
-								$newCell.attr("keyid", newIds[0]);
-								$newCell.attr("id", newIds[i + 1]);
-								$newCell.insertAfter($(this));
-								highlight($newCell);
-							});
-							$(".ui-cell.key-cell").each(function(i) {
-								if ((i + 1) > $keyOrder) {
-									$(this).attr("key-order", (i + 1));
+									$column.each(function(i) {
+										$newCell = $(this).clone(true);
+										$newCell.attr("keyid", newIds[0]);
+										$newCell.attr("id", newIds[i + 1]);
+										$newCell.insertAfter($(this));
+										highlight($newCell);
+									});
+									$(".ui-cell.key-cell").each(function(i) {
+										if ((i + 1) > $keyOrder) {
+											$(this).attr("key-order", (i + 1));
+										}
+									});
+								} else {
+									alert(data);
 								}
 							});
-						} else {
-							alert(data);
-						}
-					});
-				} else if (action == "delete") {
-					$.post("../DeleteKey", {
-						keyid : $keyId,
-					}, function(data) {
-						if (data == "success") {
-							$(el).hide(400);
-							$column.hide(400, function() {
-								$(el).remove();
-								$column.remove();
-								$(".ui-cell.key-cell").each(function(i) {
-									if ((i + 1) >= $keyOrder) {
-										$(this).attr("key-order", (i + 1));
-									}
-								});
+						} else if (action == "delete") {
+							$.post("../DeleteKey", {
+								keyid : $keyId,
+							}, function(data) {
+								if (data == "success") {
+									$(el).hide(400);
+									$column.hide(400, function() {
+										$(el).remove();
+										$column.remove();
+										$(".ui-cell.key-cell").each(function(i) {
+											if ((i + 1) >= $keyOrder) {
+												$(this).attr("key-order", (i + 1));
+											}
+										});
+									});
+								} else {
+									alert(data);
+								}
 							});
-						} else {
-							alert(data);
+						} else if (action == "fill") {
+							$("body")
+									.append(
+											'<div id="fill-dialog" class="ui-dialog">'
+													+ '<div class="ui-dialog-title">Fill column with value</div>'
+													+ '<div class="ui-dialog-content">'
+													+ '<div class="table">'
+													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Value: </div><div class="table-cell dialog-cell dialog-edit"><input class="fill-value dialog-edit"></div>'
+													+ '</div>'
+													+ '</div>'
+													+ '<div class="dialog-buttons right">'
+													+ '<button id="dialog-btn-fill" keyid="'
+													+ $keyId
+													+ '" class="ui-button">Fill</button> <button class="ui-button btn-cancel">Cancel</button>'
+													+ '</div></div></div>');
+							initFillDialog(jQuery);
 						}
 					});
-				} else if (action == "fill") {
-					$("body").append(
-							'<div id="fill-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Fill column with value</div>' + '<div class="ui-dialog-content">' + '<div class="table">'
-									+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-									+ 'Value: </div><div class="table-cell dialog-cell dialog-edit"><input class="fill-value dialog-edit"></div>' + '</div>' + '</div>'
-									+ '<div class="dialog-buttons right">' + '<button id="dialog-btn-fill" keyid="' + $keyId
-									+ '" class="ui-button">Fill</button> <button class="ui-button btn-cancel">Cancel</button>' + '</div></div></div>');
-					initFillDialog(jQuery);
-				}
-			});
 
 	if ((tableType == "table") || (tableType == "storage")) {
 		$("#keyMenu").enableContextMenuItems("#add,#copy,#fill,#delete");
@@ -947,7 +1007,8 @@ function enableKeyContextMenu() {
 function initTooltipCells(elements) {
 	elements.hover(function() {
 		var $value = $(this);
-		if (($value.has("div.tooltip").length == 0) && ($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))) {
+		if (($value.has("div.tooltip").length == 0) && ($value.has("span.old-value").length == 0)
+				&& ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))) {
 			$("#waiting").addClass("loading");
 			var $content = $value.text();
 			var $args = {
@@ -1086,7 +1147,8 @@ function modifyValueCell() {
 }
 
 function enableSaveButton() {
-	$(".data-item-selected:not(:has(> img.changed-sign))").append(" <img class='changed-sign' src='../img/modified.png'>");
+	$(".data-item-selected:not(:has(> img.changed-sign))").append(
+			" <img class='changed-sign' src='../img/modified.png'>");
 	$("#btn-save-data-item").removeClass("button-disabled");
 	$("#btn-save-data-item").addClass("button-enabled");
 }

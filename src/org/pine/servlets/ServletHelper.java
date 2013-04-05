@@ -141,12 +141,12 @@ public class ServletHelper {
 		String sectionName = Sections.getNameByKey(sectionKey);
 
 		responseHtml.append("<div id=\"breadcrump\" class=\"header-text\">");
-		responseHtml.append("<a href=\"/pine\"><span id=\"home\">Home</span></a>");
-		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+		responseHtml.append("<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+		responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
-		responseHtml.append("<span id=\"product-name\">");
+		responseHtml.append("<span id=\"product-name\" class=\"link-infront\">");
 		responseHtml.append(productName).append("</span></a>");
-		responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+		responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		responseHtml.append("<a href=\"/pine/").append(sectionKey);
 		responseHtml.append("/?product=").append(product.getId()).append("\">");
 		responseHtml.append("<span id=\"section-name\">");

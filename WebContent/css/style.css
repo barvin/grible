@@ -23,6 +23,10 @@ img#logo-mini {
 	font-weight: bold;
 }
 
+.link-infront {
+	color: rgba(54, 127, 134, 0.6);
+}
+
 #title {
 	color: #367F86;
 }
@@ -32,16 +36,8 @@ img#logo-mini {
 	margin-bottom: 10px;
 }
 
-#product-name {
-	color: #367F86;
-}
-
-#section-name {
-	color: #367F86;
-}
-
-#extends-symbol {
-	color: #49493E;
+.extends-symbol {
+	color: #999999;
 }
 
 #main {
@@ -54,7 +50,7 @@ a {
 	text-decoration: none;
 }
 
-a:hover {
+a:hover,a:hover>.link-infront {
 	color: #367F86;
 }
 
@@ -360,7 +356,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(      startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(        startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -375,7 +371,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(       startColorstr='#234e56',
+	filter: progid:DXImageTransform.Microsoft.gradient(         startColorstr='#234e56',
 		endColorstr='#ededed', GradientType=0);
 }
 

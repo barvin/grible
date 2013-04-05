@@ -106,8 +106,8 @@ public class Home extends HttpServlet {
 				User user = Dao.getUserByName(userName);
 
 				responseHtml.append(ServletHelper.getUserPanel(user));
-				responseHtml
-						.append("<div id=\"breadcrump\" class=\"header-text\"><a href=\".\"><span id=\"home\">Home</span></a>");
+				responseHtml.append("<div id=\"breadcrump\" class=\"header-text\">");
+				responseHtml.append("<a href=\".\"><span id=\"home\">Home</span></a>");
 
 				if (request.getParameter("product") != null) {
 					if (StringUtils.isNumeric(request.getParameter("product"))) {
@@ -115,15 +115,17 @@ public class Home extends HttpServlet {
 						int id = Integer.parseInt(request.getParameter("product"));
 						Product product = Dao.getProduct(id);
 						if (product != null) {
-
-							responseHtml.append("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-							responseHtml.append("<a href=\"?product=" + id
-									+ "\"><span id=\"product-name\">" + product.getName()
-									+ "</span></a></div>");
+							responseHtml.replace(responseHtml.indexOf(">Home"), responseHtml.indexOf(">Home") + 1,
+									" class=\"link-infront\">");
+							responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+							responseHtml.append("<a href=\"?product=" + id + "\"><span id=\"product-name\">");
+							responseHtml.append(product.getName());
+							responseHtml.append("</span></a></div>");
 
 							if (!user.hasAccessToProduct(product.getId())) {
-								responseHtml
-										.append("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
+								responseHtml.append("<br/><br/>");
+								responseHtml.append("<div class=\"error-message\">");
+								responseHtml.append("You do not have permissions to access this page.</div>");
 							} else {
 								includeSections(responseHtml, product);
 							}

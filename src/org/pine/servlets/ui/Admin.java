@@ -53,7 +53,7 @@ public class Admin extends HttpServlet {
 				response.sendRedirect("/pine/firstlaunch");
 				return;
 			}
-			
+
 			if (request.getSession(false).getAttribute("userName") == null) {
 				response.sendRedirect("/pine");
 			} else {
@@ -82,14 +82,15 @@ public class Admin extends HttpServlet {
 				out.print("</head>");
 				out.print("<body>");
 
-				out.print("<div id=\"breadcrump\" class=\"header-text\"><a href=\"/pine\"><span id=\"home\">Home</span></a>");
-				out.print("<span id=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+				out.print("<div id=\"breadcrump\" class=\"header-text\">" +
+						"<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+				out.print("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 				out.print("<span id=\"product-name\">Admin</span></div>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User currentUser = Dao.getUserByName(userName);
 				if (!currentUser.isAdmin()) {
-					out.println("<span id=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
+					out.println("<span class=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
 					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
 					out.print("<br /><br />");

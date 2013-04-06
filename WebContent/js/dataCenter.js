@@ -802,6 +802,7 @@ function initKeysAndIndexes() {
 			$key.html(data);
 			$key.find("input.changed-value").css("width", $width + "px");
 			$key.find("input.changed-value").focus();
+			$key.find("input.changed-value").select();
 			initEditableKeyCell(jQuery);
 		});
 	});

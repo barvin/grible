@@ -80,7 +80,7 @@ public class GetEditTableDialog extends HttpServlet {
 				out.println("<div class=\"table-cell dialog-cell\">");
 				out.println("<select class=\"categories dialog-edit\" \">");
 
-				List<Category> categories = Dao.getCategories(Dao.getCategory(categoryId).getProductId(),
+				List<Category> categories = Dao.getAllCategories(Dao.getCategory(categoryId).getProductId(),
 						table.getType());
 				for (Category category : categories) {
 					String selected = "";

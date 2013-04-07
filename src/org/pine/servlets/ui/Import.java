@@ -98,7 +98,7 @@ public class Import extends HttpServlet {
 					out.print("enctype=\"multipart/form-data\">");
 					out.print("Select category: &nbsp;<select name=\"category\">");
 
-					List<Category> categories = Dao.getCategories(productId, TableType.TABLE);
+					List<Category> categories = Dao.getAllCategories(productId, TableType.TABLE);
 					for (Category category : categories) {
 						out.print("<option value=\"" + category.getId() + "\">" + category.getName() + "</option>");
 					}
@@ -122,7 +122,7 @@ public class Import extends HttpServlet {
 							+ "enctype=\"multipart/form-data\">");
 					out.print("Select category: &nbsp;<select name=\"category\">");
 
-					List<Category> storageCategories = Dao.getCategories(productId, TableType.STORAGE);
+					List<Category> storageCategories = Dao.getAllCategories(productId, TableType.STORAGE);
 					for (Category category : storageCategories) {
 						out.print("<option value=\"" + category.getId() + "\">" + category.getName() + "</option>");
 					}

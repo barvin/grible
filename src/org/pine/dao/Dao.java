@@ -184,13 +184,47 @@ public class Dao {
 		return result;
 	}
 
-	public static List<Category> getCategories(int productId, TableType type) throws SQLException {
+	public static List<Category> getAllCategories(int productId, TableType type) throws SQLException {
 		List<Category> result = new ArrayList<Category>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT c.id, c.name, c.productid, c.parentid, tt.name as type "
 				+ " FROM categories as c JOIN tabletypes as tt ON c.type=tt.id AND c.productid=" + productId
 				+ " AND c.type=" + type.getId() + " ORDER BY c.name");
+
+		while (rs.next()) {
+			result.add(initCategory(rs));
+		}
+
+		rs.close();
+		stmt.close();
+		return result;
+	}
+
+	public static List<Category> getTopLevelCategories(int productId, TableType type) throws SQLException {
+		List<Category> result = new ArrayList<Category>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT c.id, c.name, c.productid, c.parentid, tt.name as type "
+				+ " FROM categories as c JOIN tabletypes as tt ON c.type=tt.id AND c.productid=" + productId
+				+ " AND c.type=" + type.getId() + " AND c.parentid is null ORDER BY c.name");
+
+		while (rs.next()) {
+			result.add(initCategory(rs));
+		}
+
+		rs.close();
+		stmt.close();
+		return result;
+	}
+
+	public static List<Category> getChildCategories(int categoryId) throws SQLException {
+		List<Category> result = new ArrayList<Category>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT c.id, c.name, c.productid, c.parentid, tt.name as type "
+				+ " FROM categories as c JOIN tabletypes as tt ON c.type=tt.id AND c.parentid=" + categoryId
+				+ " ORDER BY c.name");
 
 		while (rs.next()) {
 			result.add(initCategory(rs));
@@ -637,12 +671,18 @@ public class Dao {
 
 	}
 
-	public static Integer getCategoryId(String name, int productId, TableType type) throws SQLException {
+	public static Integer getCategoryId(String name, int productId, TableType type, Integer parentId)
+			throws SQLException {
 		Integer result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
+		String parent = " is null";
+		if (parentId != null) {
+			parent = "=" + parentId;
+		}
 		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE productid=" + productId + " AND name='"
-				+ name + "' AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase() + "')");
+				+ name + "' AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
+				+ "') AND parentid" + parent);
 		if (rs.next()) {
 			result = rs.getInt("id");
 		}
@@ -731,7 +771,8 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted
+	 * to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.

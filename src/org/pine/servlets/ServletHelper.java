@@ -83,6 +83,7 @@ public class ServletHelper {
 		StringBuilder responseHtml = new StringBuilder();
 		responseHtml.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
 		responseHtml.append("<li class=\"add\"><a href=\"#add\">Add data " + tableType + "</a></li>");
+		responseHtml.append("<li class=\"add\"><a href=\"#add-category\">Add category</a></li>");
 		responseHtml.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
 		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
 		responseHtml.append("</ul>");
@@ -115,7 +116,7 @@ public class ServletHelper {
 		responseHtml.append("</div>");
 		responseHtml.append("<div class=\"left-panel\">");
 		responseHtml.append("<div id=\"entities-list\">");
-		responseHtml.append("<div id=\"category-container\"></div>");
+		responseHtml.append("<div id=\"category-container\" class=\"categories\"></div>");
 		responseHtml.append("</div>");
 		responseHtml.append("</div>");
 		responseHtml.append("</div>");

@@ -159,9 +159,13 @@ a:hover,a:hover>.link-infront {
 }
 
 .data-item {
+	background-image: url("../img/table-icon.png");
+	background-position: 6px center;
+	background-repeat: no-repeat;
 	color: #367F86;
 	font-size: 13px;
 	padding: 3px;
+	background-repeat: no-repeat;
 }
 
 .data-item-selected {
@@ -173,6 +177,9 @@ a:hover,a:hover>.link-infront {
 }
 
 h3.category-item {
+	background-image: url("../img/category-icon.png");
+	background-position: 6px center;
+	background-repeat: no-repeat;
 	font-weight: normal;
 	color: #49493E;
 	font-size: 15px;
@@ -356,7 +363,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(        startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(          startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -371,7 +378,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(         startColorstr='#234e56',
+	filter: progid:DXImageTransform.Microsoft.gradient(           startColorstr='#234e56',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -446,8 +453,8 @@ h3.category-item:hover {
 
 .tree-item-text {
 	position: relative;
-	top: -2px;
-	left: 2px;
+	top: 1px;
+	left: 20px;
 	font-size: 14px;
 	margin-right: 10px;
 }
@@ -638,4 +645,8 @@ h3.category-item:hover {
 
 .gap {
 	width: 15px;
+}
+
+#delimiter {
+	width: 10px;
 }

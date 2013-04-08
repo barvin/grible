@@ -82,7 +82,7 @@ public class GetCategories extends HttpServlet {
 
 		responseHtml.append("<h3 id=\"").append(category.getId()).append("\" class=\"category-item");
 		responseHtml.append(categorySelectedClass).append("\">");
-		responseHtml.append("<img src=\"../img/category-icon.png\"><span class=\"tree-item-text\">&nbsp;");
+		responseHtml.append("<span class=\"tree-item-text\">&nbsp;");
 		responseHtml.append(category.getName()).append("</span></h3>");
 		responseHtml.append("<div class=\"category-content-holder\">");
 
@@ -100,7 +100,7 @@ public class GetCategories extends HttpServlet {
 			String selected = (table.getId() == tableId) ? " data-item-selected" : "";
 			responseHtml.append("<div id=\"").append(table.getId()).append("\" class=\"data-item");
 			responseHtml.append(selected).append("\">");
-			responseHtml.append("<img src=\"../img/table-icon.png\"><span class=\"tree-item-text\">&nbsp;");
+			responseHtml.append("<span class=\"tree-item-text\">&nbsp;");
 			responseHtml.append(table.getName()).append("</span></div>");
 		}
 		responseHtml.append("</div>");

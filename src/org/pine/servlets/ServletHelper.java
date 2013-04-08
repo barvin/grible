@@ -121,6 +121,8 @@ public class ServletHelper {
 		responseHtml.append("</div>");
 		responseHtml.append("</div>");
 
+		responseHtml.append("<div id=\"delimiter\" class=\"table-cell\"></div>");
+
 		responseHtml.append("<div class=\"table-cell\">");
 		responseHtml.append("<div class=\"top-panel\"></div>");
 		responseHtml.append("<div id=\"waiting\" class=\"table-cell\">");

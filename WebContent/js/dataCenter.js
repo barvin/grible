@@ -54,6 +54,11 @@ function initDataItemsPanel() {
 		$(".data-item-selected").removeClass("data-item-selected");
 		$(".top-panel").find("div").hide();
 		$("#table-container").hide();
+		if ($("#breadcrump>a").length > 3) {
+			$(".extends-symbol").last().remove();
+			$("#breadcrump>a").last().remove();
+			$("#section-name").removeClass("link-infront");
+		}
 
 		history.pushState({
 			product : productId

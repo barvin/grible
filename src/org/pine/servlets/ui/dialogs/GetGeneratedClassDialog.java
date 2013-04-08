@@ -33,7 +33,6 @@ import org.pine.model.Value;
 @WebServlet("/GetGeneratedClassDialog")
 public class GetGeneratedClassDialog extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Dao dao;
 	private Table storage;
 	private String className;
 
@@ -55,7 +54,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		try {
-			dao = new Dao();
 			storage = Dao.getTable(id);
 		} catch (Exception e) {
 			e.printStackTrace(out);

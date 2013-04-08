@@ -31,7 +31,6 @@ import org.pine.model.Table;
 @WebServlet("/GetParameterTypeDialog")
 public class GetParameterTypeDialog extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Dao dao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -49,7 +48,6 @@ public class GetParameterTypeDialog extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			String content = request.getParameter("content").replace("'", "&#39;");
-			dao = new Dao();
 			Key key = Dao.getKey(Integer.parseInt(request.getParameter("keyid")));
 			getDialog(out, key, content);
 		} catch (Exception e) {

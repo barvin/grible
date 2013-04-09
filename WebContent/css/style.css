@@ -112,7 +112,6 @@ a:hover,a:hover>.link-infront {
 
 #table-container {
 	overflow: auto;
-	margin-left: 10px;
 	background-color: #F0F0F0;
 	border: 1px solid #BBBBBB;
 	position: relative;
@@ -273,7 +272,7 @@ h3.category-item:hover {
 .sheet-tab-container {
 	width: 140px;
 	display: inline-table;
-	margin-left: 10px;
+	margin-right: 10px;
 	cursor: pointer;
 	z-index: 100;
 	position: relative;
@@ -652,4 +651,5 @@ h3.category-item:hover {
 
 #delimiter {
 	width: 10px;
+	cursor: e-resize;
 }

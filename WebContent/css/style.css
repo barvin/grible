@@ -363,7 +363,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(          startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(            startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -378,7 +378,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(           startColorstr='#234e56',
+	filter: progid:DXImageTransform.Microsoft.gradient(             startColorstr='#234e56',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -462,6 +462,9 @@ h3.category-item:hover {
 .changed-sign {
 	color: #A5A5A5;
 	font-size: 15px;
+	position: relative;
+	left: 10px;
+	top: 3px;
 }
 
 .changed-value {

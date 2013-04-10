@@ -232,18 +232,36 @@ h3.category-item:hover {
 }
 
 .ui-button {
-	background-color: #F0F0F0;
 	border: 1px solid #888888;
 	padding: 5px;
 	color: #49493E;
+	color: #151B1B;
+	background: #f9f9f9;
+	background: -moz-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f9f9f9),
+		color-stop(100%, #ededed));
+	background: -webkit-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
+	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
+	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
+	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(            startColorstr='#f9f9f9',
+		endColorstr='#ededed', GradientType=0);
 }
 
 .ui-button:hover {
-	background-color: #367F86;
-	border: 1px solid #F0F0F0;
-	padding: 5px;
 	color: #F0F0F0;
 	cursor: pointer;
+	background: #234e56;
+	background: -moz-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #234e56),
+		color-stop(100%, #367f86), color-stop(100%, #ededed));
+	background: -webkit-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
+	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
+	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
+	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(             startColorstr='#234e56',
+		endColorstr='#ededed', GradientType=0);
+	border: 1px solid #F0F0F0;
 }
 
 .storage-cell div.tooltip {
@@ -495,6 +513,7 @@ h3.category-item:hover {
 	border: 1px solid #888888;
 	position: absolute;
 	padding: 5px;
+	font-size: 14px;
 }
 
 .ui-dialog-title {

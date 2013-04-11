@@ -417,20 +417,22 @@ function initTopPanel() {
 
 	if ((tableType == "table") || (tableType == "precondition") || (tableType == "postcondition")) {
 		$(".sheet-tab-container").click(function() {
-			var $tab = $(this).find(".sheet-tab");
-			$(".data-item-selected > .changed-sign").remove();
-			$(".sheet-tab-selected").removeClass("sheet-tab-selected");
-			$tab.addClass("sheet-tab-selected");
-			tableId = $tab.attr('id');
-			tableType = $tab.attr('label');
-			history.pushState({
-				id : tableId
-			}, "", "?id=" + tableId);
-			loadTableValues(tableId);
-			loadTopPanel({
-				tabletype : tableType,
-				tableid : tableId
-			});
+			if ($(this).find(".sheet-tab").length > 0) {
+				var $tab = $(this).find(".sheet-tab");
+				$(".data-item-selected > .changed-sign").remove();
+				$(".sheet-tab-selected").removeClass("sheet-tab-selected");
+				$tab.addClass("sheet-tab-selected");
+				tableId = $tab.attr('id');
+				tableType = $tab.attr('label');
+				history.pushState({
+					id : tableId
+				}, "", "?id=" + tableId);
+				loadTableValues(tableId);
+				loadTopPanel({
+					tabletype : tableType,
+					tableid : tableId
+				});
+			}
 		});
 	}
 

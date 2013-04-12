@@ -157,4 +157,18 @@ public class ServletHelper {
 		return responseHtml.toString();
 	}
 
+	public static String getIncludes() {
+		StringBuilder responseHtml = new StringBuilder();
+		responseHtml.append("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
+		responseHtml.append("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
+		responseHtml.append("<link href=\"../css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-ui-1.10.2.custom.min.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/default.js\"></script>");
+		return responseHtml.toString();
+	}
+
 }

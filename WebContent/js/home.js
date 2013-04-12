@@ -67,10 +67,18 @@ $(window)
 													id : $id
 												}, function(data) {
 													if (data == "success") {
-														alert("Product was deleted.");
+														noty({
+															type : "success",
+															text : "Product was deleted.",
+															timeout : 5000,
+															modal : true
+														});
 														location.reload(true);
 													} else {
-														alert(data);
+														noty({
+															type : "error",
+															text : data
+														});
 													}
 												});
 											}
@@ -105,7 +113,10 @@ $(window)
 									$("#add-product-dialog").remove();
 									location.reload(true);
 								} else {
-									alert(data);
+									noty({
+										type : "error",
+										text : data
+									});
 								}
 							});
 						}
@@ -147,7 +158,10 @@ $(window)
 									$("#edit-product-dialog").remove();
 									location.reload(true);
 								} else {
-									alert(data);
+									noty({
+										type : "error",
+										text : data
+									});
 								}
 							});
 						}

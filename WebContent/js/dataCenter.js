@@ -3,13 +3,13 @@ $(window).on("load", function() {
 	var docWidth = $(window).width() - 45;
 	var breadcrumpHeight = $("#breadcrump").height();
 	var footerHeight = $("#footer").outerHeight();
-	var mainHeight = docHeight - breadcrumpHeight - footerHeight;
+	var mainHeight = docHeight - breadcrumpHeight - footerHeight - 27;
 	$("#main").height(mainHeight);
-	$(".categories-and-table-row").height(mainHeight - 45);
-	$("#table-container").height(mainHeight - 40);
+	$(".categories-and-table-row").height(mainHeight);
+	$("#table-container").height(mainHeight - $(".top-panel").height() - 2);
 	$("#table-container").width(docWidth - $("#delimiter").width() - $(".left-panel").width() - 10);
-	$(".left-panel").height(mainHeight - 27);
-	$("#entities-list").height(mainHeight - 27);
+	$(".left-panel").height(mainHeight);
+	$("#entities-list").height(mainHeight);
 });
 
 $().ready(initialize());
@@ -35,6 +35,7 @@ function initialize() {
 		initDataItemsPanel(jQuery);
 	});
 
+	initNoty();
 }
 
 function initDataItemsPanel() {
@@ -133,19 +134,45 @@ function initDataItemsPanel() {
 									+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>' + '</div></div></div>');
 					initEditCategoryDialog(jQuery);
 				} else if (action == "delete") {
-					var answer = confirm("Are you sure you want to delete this category?");
-					if (answer) {
-						$.post("../DeleteCategory", {
-							id : $id
-						}, function(data) {
-							if (data == "success") {
-								alert("Category was deleted.");
-								window.location = "?product=" + productId;
-							} else {
-								alert(data);
+					noty({
+						type : "confirm",
+						text : "Are you sure you want to delete this category?",
+						buttons : [ {
+							addClass : 'btn btn-primary ui-button',
+							text : 'Delete',
+							onClick : function($noty) {
+								$noty.close();
+								$.post("../DeleteCategory", {
+									id : $id
+								}, function(data) {
+									if (data == "success") {
+										noty({
+											type : "success",
+											text : "Category was deleted.",
+											timeout : 5000,
+											callback : {
+												afterClose : function() {
+													//TODO: make it with js
+													window.location = "?product=" + productId;
+												}
+											}
+										});
+									} else {
+										noty({
+											type : "error",
+											text : data
+										});
+									}
+								});
 							}
-						});
-					}
+						}, {
+							addClass : 'btn btn-danger ui-button',
+							text : 'Cancel',
+							onClick : function($noty) {
+								$noty.close();
+							}
+						} ]
+					});
 				}
 			});
 
@@ -181,6 +208,44 @@ function initDataItemsPanel() {
 	} else {
 		$("#table-container").hide();
 	}
+}
+
+function initNoty() {
+	$.noty.defaults = {
+		layout : 'top',
+		theme : 'defaultTheme',
+		type : 'alert',
+		text : '',
+		dismissQueue : true,
+		template : '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+		animation : {
+			open : {
+				height : 'toggle'
+			},
+			close : {
+				height : 'toggle'
+			},
+			easing : 'swing',
+			speed : 200
+		},
+		timeout : false, // delay for closing event. Set false for sticky
+		// notifications
+		force : false, // adds notification to the beginning of queue when set
+		// to true
+		modal : false,
+		closeWith : [ 'click', 'button' ], // ['click', 'button', 'hover']
+		callback : {
+			onShow : function() {
+			},
+			afterShow : function() {
+			},
+			onClose : function() {
+			},
+			afterClose : function() {
+			}
+		},
+		buttons : false
+	};
 }
 
 function initDelimiter() {
@@ -273,7 +338,10 @@ function initAddDataItemDialog() {
 		}
 		$.post("../AddTable", $args, function(newTableId) {
 			if (isNaN(newTableId)) {
-				alert(newTableId);
+				noty({
+					type : "error",
+					text : newTableId
+				});
 			} else {
 				$("#add-category-dialog").remove();
 				window.location = "?id=" + newTableId;
@@ -355,7 +423,10 @@ function initAddCategoryDialog() {
 				$("#add-category-dialog").remove();
 				location.reload(true);
 			} else {
-				alert(data);
+				noty({
+					type : "error",
+					text : data
+				});
 			}
 		});
 	}
@@ -389,7 +460,10 @@ function initEditCategoryDialog() {
 				$("#edit-category-dialog").remove();
 				location.reload(true);
 			} else {
-				alert(data);
+				noty({
+					type : "error",
+					text : data
+				});
 			}
 		});
 	}
@@ -501,7 +575,10 @@ function initTopPanel() {
 					} else if (isNumber(data)) {
 						window.location = "?id=" + data;
 					} else {
-						alert(data);
+						noty({
+							type : "error",
+							text : data
+						});
 					}
 				});
 			}
@@ -528,7 +605,10 @@ function initTopPanel() {
 					if (data == "success") {
 						$cell.removeClass("modified-value-cell");
 					} else {
-						alert(data);
+						noty({
+							type : "error",
+							text : data
+						});
 					}
 				});
 			});
@@ -547,7 +627,10 @@ function initTopPanel() {
 					if (data == "success") {
 						$key.removeClass("modified-key-cell");
 					} else {
-						alert(data);
+						noty({
+							type : "error",
+							text : data
+						});
 					}
 				});
 			});
@@ -620,7 +703,10 @@ function enableCoulumnsMoving() {
 					});
 					initTableValues(jQuery);
 				} else {
-					alert(data);
+					noty({
+						type : "error",
+						text : data
+					});
 				}
 				enableKeyContextMenu(jQuery);
 			});
@@ -671,7 +757,10 @@ function initEditDataItemDialog() {
 				$(".ui-dialog").remove();
 				location.reload(true);
 			} else {
-				alert(data);
+				noty({
+					type : "error",
+					text : data
+				});
 			}
 		});
 	}
@@ -761,7 +850,10 @@ function initTableValues() {
 						modifiedIndexCell.text(j + modifiedStart + 1);
 					}
 				} else {
-					alert(data);
+					noty({
+						type : "error",
+						text : data
+					});
 				}
 			});
 		}
@@ -864,7 +956,10 @@ function initKeysAndIndexes() {
 					});
 
 				} else {
-					alert(data);
+					noty({
+						type : "error",
+						text : data
+					});
 				}
 			});
 		} else if (action == "copy") {
@@ -888,7 +983,10 @@ function initKeysAndIndexes() {
 					});
 
 				} else {
-					alert(data);
+					noty({
+						type : "error",
+						text : data
+					});
 				}
 			});
 		} else if (action == "delete") {
@@ -907,7 +1005,10 @@ function initKeysAndIndexes() {
 
 					});
 				} else {
-					alert(data);
+					noty({
+						type : "error",
+						text : data
+					});
 				}
 			});
 		}
@@ -955,7 +1056,10 @@ function enableKeyContextMenu() {
 								}
 							});
 						} else {
-							alert(data);
+							noty({
+								type : "error",
+								text : data
+							});
 						}
 					});
 				} else if (action == "copy") {
@@ -982,7 +1086,10 @@ function enableKeyContextMenu() {
 								}
 							});
 						} else {
-							alert(data);
+							noty({
+								type : "error",
+								text : data
+							});
 						}
 					});
 				} else if (action == "delete") {
@@ -1001,7 +1108,10 @@ function enableKeyContextMenu() {
 								});
 							});
 						} else {
-							alert(data);
+							noty({
+								type : "error",
+								text : data
+							});
 						}
 					});
 				} else if (action == "fill") {
@@ -1096,7 +1206,11 @@ function initEditableKeyCell() {
 			storageId : $storageId
 		}, function(data) {
 			if (data == "success") {
-				alert("New type was successfully applied.");
+				noty({
+					type : "success",
+					text : "New type was successfully applied.",
+					timeout : 5000
+				});
 				var $column = $("div[keyid='" + $id + "']");
 				if ($type == "cbx-text") {
 					$column.find("div.tooltip").remove();
@@ -1110,9 +1224,15 @@ function initEditableKeyCell() {
 					modifyKeyCell();
 				}
 			} else if (data == "not-changed") {
-				alert("This parameter is already has this type.");
+				noty({
+					text : "This parameter is already has this type.",
+					timeout : 5000
+				});
 			} else {
-				alert(data);
+				noty({
+					type : "error",
+					text : data
+				});
 			}
 		});
 	});

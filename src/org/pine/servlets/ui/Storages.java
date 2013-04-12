@@ -64,14 +64,7 @@ public class Storages extends HttpServlet {
 				responseHtml.append("<html>");
 				responseHtml.append("<head>");
 				responseHtml.append("<title>Data Storages - Pine</title>");
-				responseHtml.append("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
-				responseHtml.append("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
-				responseHtml
-						.append("<link href=\"../css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
-				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
-				responseHtml
-						.append("<script type=\"text/javascript\" src=\"../js/jquery-ui-1.10.2.custom.min.js\"></script>");
-				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
+				responseHtml.append(ServletHelper.getIncludes());
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User user = Dao.getUserByName(userName);

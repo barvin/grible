@@ -77,7 +77,10 @@ $()
 									alert("User was deleted.");
 									window.location = "../";
 								} else {
-									alert(data);
+									noty({
+										type : "error",
+										text : data
+									});
 								}
 							});
 						}
@@ -181,7 +184,10 @@ function initEditUserDialog() {
 				if (data == "success") {
 					location.reload(true);
 				} else {
-					alert(data);
+					noty({
+						type : "error",
+						text : data
+					});
 				}
 			});
 		}

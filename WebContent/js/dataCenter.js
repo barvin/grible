@@ -60,7 +60,6 @@ function initDataItemsPanel() {
 			$("#breadcrump>a").last().remove();
 			$("#section-name").removeClass("link-infront");
 		}
-
 		history.pushState({
 			product : productId
 		}, "", "?product=" + productId);
@@ -149,14 +148,12 @@ function initDataItemsPanel() {
 										noty({
 											type : "success",
 											text : "Category was deleted.",
-											timeout : 5000,
-											callback : {
-												afterClose : function() {
-													//TODO: make it with js
-													window.location = "?product=" + productId;
-												}
-											}
+											timeout : 5000
 										});
+										$(el).remove();
+										history.pushState({
+											product : productId
+										}, "", "?product=" + productId);
 									} else {
 										noty({
 											type : "error",
@@ -565,23 +562,52 @@ function initTopPanel() {
 
 	$("#btn-delete-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
-			var answer = confirm("Are you sure you want to delete this " + tableType + "?");
-			if (answer) {
-				$.post("../DeleteTable", {
-					id : tableId
-				}, function(data) {
-					if (data == "success") {
-						$("#section-name").click();
-					} else if (isNumber(data)) {
-						window.location = "?id=" + data;
-					} else {
-						noty({
-							type : "error",
-							text : data
+			noty({
+				type : "confirm",
+				text : "Are you sure you want to delete this " + tableType + "?",
+				buttons : [ {
+					addClass : 'btn btn-primary ui-button',
+					text : 'Delete',
+					onClick : function($noty) {
+						$noty.close();
+						$.post("../DeleteTable", {
+							id : tableId
+						}, function(data) {
+							if (data == "success") {
+								noty({
+									type : "success",
+									text : "Table was deleted.",
+									timeout : 5000
+								});
+								$(".data-item-selected").remove();
+								$(".top-panel").find("div").hide();
+								$("#table-container").hide();
+								if ($("#breadcrump>a").length > 3) {
+									$(".extends-symbol").last().remove();
+									$("#breadcrump>a").last().remove();
+									$("#section-name").removeClass("link-infront");
+								}
+								history.pushState({
+									product : productId
+								}, "", "?product=" + productId);
+							} else if (isNumber(data)) {
+								window.location = "?id=" + data;
+							} else {
+								noty({
+									type : "error",
+									text : data
+								});
+							}
 						});
 					}
-				});
-			}
+				}, {
+					addClass : 'btn btn-danger ui-button',
+					text : 'Cancel',
+					onClick : function($noty) {
+						$noty.close();
+					}
+				} ]
+			});
 		}
 	});
 

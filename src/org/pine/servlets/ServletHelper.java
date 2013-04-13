@@ -14,11 +14,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
+import org.pine.dao.Dao;
 import org.pine.model.Product;
+import org.pine.model.Table;
+import org.pine.model.TableType;
 import org.pine.model.User;
 import org.pine.uimodel.Sections;
 
@@ -169,6 +174,46 @@ public class ServletHelper {
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/default.js\"></script>");
 		return responseHtml.toString();
+	}
+
+	public static String deleteTable(int tableId) throws SQLException {
+		Table currentTable = Dao.getTable(tableId);
+
+		boolean isUsedByTables = false;
+		String error = "";
+		if (currentTable.getType() == TableType.STORAGE) {
+			List<Table> tablesUsingThisStorage = Dao.getTablesUsingStorage(tableId);
+
+			if (!tablesUsingThisStorage.isEmpty()) {
+				isUsedByTables = true;
+				error = "ERROR: Storage '" + currentTable.getName() + "' is used by:";
+				for (Table table : tablesUsingThisStorage) {
+					error += "<br>- " + table.getName() + " (" + table.getType().toString().toLowerCase() + ");";
+				}
+			}
+
+		}
+		if (isUsedByTables) {
+			return error;
+		}
+		boolean deleted = Dao.deleteTable(tableId);
+		if (deleted) {
+			switch (currentTable.getType()) {
+			case TABLE:
+			case STORAGE:
+				return "success";
+
+			case PRECONDITION:
+			case POSTCONDITION:
+				return String.valueOf(currentTable.getParentId());
+
+			default:
+				return "success";
+			}
+		}
+
+		return "ERROR: " + currentTable.getType().toString().toLowerCase()
+				+ " was not deleted. See server logs for details.";
 	}
 
 }

@@ -68,7 +68,7 @@ public class DeleteRow extends HttpServlet {
 						} else {
 							tableName = "-";
 						}
-						error += "\n- " + tableName + " (" + table.getType().toString().toLowerCase() + ");";
+						error += "<br>- " + tableName + " (" + table.getType().toString().toLowerCase() + ");";
 					}
 				}
 			}

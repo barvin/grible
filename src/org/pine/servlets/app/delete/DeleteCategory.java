@@ -12,6 +12,7 @@ package org.pine.servlets.app.delete;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Table;
+import org.pine.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -41,23 +44,37 @@ public class DeleteCategory extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
-			
-			int categoryId = Integer.parseInt(request.getParameter("id"));
 
-			boolean deleted = Dao.deleteCategory(categoryId);
-			if (deleted) {
-				out.print("success");
-			} else {
-				out.print("ERROR: Category was not deleted. See server logs for details.");
+			int categoryId = Integer.parseInt(request.getParameter("id"));
+			List<Table> tables = Dao.getTablesByCategoryId(categoryId);
+
+			StringBuilder error = new StringBuilder();
+			for (Table table : tables) {
+				String result = ServletHelper.deleteTable(table.getId());
+				if (!result.equals("success")) {
+					error.append(result).append("<br>");
+				}
 			}
 
-			out.flush();
-			out.close();
+			if (error.length() > 0) {
+				out.print(error.toString());
+			} else {
+				boolean deleted = Dao.deleteCategory(categoryId);
+				if (deleted) {
+					out.print("success");
+				} else {
+					out.print("ERROR: Category was not deleted. See server logs for details.");
+				}
+			}
+
 		} catch (Exception e) {
+			out.println(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 }

@@ -890,32 +890,16 @@ public class Dao {
 	public static boolean deleteCategory(int categoryId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt
-				.executeQuery("SELECT id FROM tables WHERE parentid IN (SELECT id FROM tables WHERE categoryid="
-						+ categoryId + ")");
-		while (rs.next()) {
-			if (!deleteTable(rs.getInt("id"))) {
-
-				rs.close();
-				stmt.close();
-				return false;
-			}
+		stmt.executeUpdate("DELETE FROM categories WHERE id=" + categoryId);
+		boolean result = false;
+		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE id=" + categoryId);
+		if (!rs.next()) {
+			result = true;
 		}
 		rs.close();
-		ResultSet rs2 = stmt.executeQuery("SELECT id FROM tables WHERE categoryid=" + categoryId);
-		while (rs2.next()) {
-			if (!deleteTable(rs2.getInt("id"))) {
-
-				rs2.close();
-				stmt.close();
-				return false;
-			}
-		}
-		stmt.executeUpdate("DELETE FROM categories WHERE id=" + categoryId);
-
-		rs2.close();
+		rs.close();
 		stmt.close();
-		return true;
+		return result;
 	}
 
 	public static List<Table> getTablesUsingStorage(int storageId) throws SQLException {

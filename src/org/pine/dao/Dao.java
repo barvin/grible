@@ -381,8 +381,8 @@ public class Dao {
 
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("INSERT INTO users(login, password, isadmin) VALUES ('" + userName + "', '" + hashPass
-				+ "', " + isAdmin + ")");
+		stmt.executeUpdate("INSERT INTO users(login, password, isadmin) VALUES ('" + userName + "', '"
+				+ hashPass.replace("'", "''") + "', " + isAdmin + ")");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM users ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {
 			id = rs.getInt("id");

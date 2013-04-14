@@ -69,6 +69,9 @@ public class Home extends HttpServlet {
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/footer.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/jquery.noty.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/top.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/default.js\"></script>");
 			responseHtml.append("</head>");
 			responseHtml.append("<body>");
 

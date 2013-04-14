@@ -66,6 +66,9 @@ public class Admin extends HttpServlet {
 				out.print("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/admin.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/noty/default.js\"></script>");
 				out.println("<script type=\"text/javascript\">");
 
 				out.println("function getProductsCheckboxes() {");
@@ -82,13 +85,14 @@ public class Admin extends HttpServlet {
 				out.print("</head>");
 				out.print("<body>");
 
+				String userName = (String) request.getSession(false).getAttribute("userName");
+				User currentUser = Dao.getUserByName(userName);
+				out.print(ServletHelper.getUserPanel(currentUser));
 				out.print("<div id=\"breadcrump\" class=\"header-text\">" +
 						"<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 				out.print("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-				out.print("<span id=\"product-name\">Admin</span></div>");
+				out.print("<a href=\"/pine/admin/\"><span id=\"product-name\">Admin</span></a></div>");
 
-				String userName = (String) request.getSession(false).getAttribute("userName");
-				User currentUser = Dao.getUserByName(userName);
 				if (!currentUser.isAdmin()) {
 					out.println("<span class=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
 					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");

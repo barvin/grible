@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.User;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -44,16 +45,26 @@ public class DeleteUser extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			
 
 			String userId = request.getParameter("userid");
+			User currUser = Dao.getUserById(Integer.parseInt(userId));
+
+			boolean deletingSelf = false;
+			if (request.getSession(false).getAttribute("userName").equals(currUser.getName())) {
+				deletingSelf = true;
+			}
+			
 			boolean isLastAdmin = Dao.getAdminsCount() == 1;
-			if (isLastAdmin) {
+			if (deletingSelf && isLastAdmin) {
 				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
 			} else {
 				boolean deleted = Dao.deleteUser(userId);
 				if (deleted) {
-					out.print("success");
+					if (deletingSelf) {
+						out.print("gohome");	
+					} else {
+						out.print("success");
+					}
 				} else {
 					out.print("ERROR: User was not deleted. See server logs for details.");
 				}

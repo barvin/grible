@@ -66,7 +66,8 @@ public class AddUser extends HttpServlet {
 					out.print("ERROR: User was not added. See server logs for details.");
 				}
 			} catch (Exception e) {
-				e.printStackTrace(out);
+				out.print(e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 		} else {
 			out.print("ERROR: Password 'password' is not permitted. It is too obvious.");

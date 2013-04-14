@@ -50,7 +50,8 @@ $(window)
 																	+ '<div class="table">'
 																	+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
 																	+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="product-name dialog-edit" value="'
-																	+ $(el).text()
+																	+ $(el)
+																			.text()
 																	+ '"></div>'
 																	+ '</div>'
 																	+ '</div>'
@@ -61,35 +62,63 @@ $(window)
 																	+ '</div></div></div>');
 											initEditProductDialog(jQuery);
 										} else if (action == "delete") {
-											var answer = confirm("Are you sure you want to delete this product?");
-											if (answer) {
-												$.post("DeleteProduct", {
-													id : $id
-												}, function(data) {
-													if (data == "success") {
-														noty({
-															type : "success",
-															text : "Product was deleted.",
-															timeout : 5000,
-															modal : true
-														});
-														location.reload(true);
-													} else {
-														noty({
-															type : "error",
-															text : data
-														});
-													}
-												});
-											}
+											noty({
+												type : "confirm",
+												text : "Are you sure you want to delete this product?",
+												buttons : [
+														{
+															addClass : 'btn btn-primary ui-button',
+															text : 'Delete',
+															onClick : function(
+																	$noty) {
+																$noty.close();
+																$
+																		.post(
+																				"DeleteProduct",
+																				{
+																					id : $id
+																				},
+																				function(
+																						data) {
+																					if (data == "success") {
+																						noty({
+																							type : "success",
+																							text : "The product was deleted.",
+																							timeout : 5000
+																						});
+																						$(
+																								el)
+																								.parents(
+																										".table-row")
+																								.remove();
+																					} else {
+																						noty({
+																							type : "error",
+																							text : data
+																						});
+																					}
+																				});
+															}
+														},
+														{
+															addClass : 'btn btn-danger ui-button',
+															text : 'Cancel',
+															onClick : function(
+																	$noty) {
+																$noty.close();
+															}
+														} ]
+											});
 										}
 									});
 
-					$(".section").each(function(i) {
-						if ($(this).width() < 250) {
-							$(this).css("padding-right", (250 - $(this).width()) + "px");
-						}
-					});
+					$(".section").each(
+							function(i) {
+								if ($(this).width() < 250) {
+									$(this).css("padding-right",
+											(250 - $(this).width()) + "px");
+								}
+							});
 
 					function initAddProductDialog() {
 						initDialog();
@@ -149,7 +178,8 @@ $(window)
 						});
 
 						function submitEditProduct() {
-							var $id = $("#dialog-btn-edit-product").attr("product-id");
+							var $id = $("#dialog-btn-edit-product").attr(
+									"product-id");
 							$.post("UpdateProduct", {
 								id : $id,
 								name : $("input.product-name").val()

@@ -147,7 +147,7 @@ function initDataItemsPanel() {
 									if (data == "success") {
 										noty({
 											type : "success",
-											text : "Category was deleted.",
+											text : "The category was deleted.",
 											timeout : 5000
 										});
 										$(el).remove();
@@ -576,7 +576,7 @@ function initTopPanel() {
 							if (data == "success") {
 								noty({
 									type : "success",
-									text : "Table was deleted.",
+									text : "The " + tableType + " was deleted.",
 									timeout : 5000
 								});
 								$(".data-item-selected").remove();

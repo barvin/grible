@@ -2,95 +2,164 @@ $()
 		.ready(
 				function() {
 
-					$(document).ajaxError(
-							function(e, xhr, settings, exception) {
-								$("body").append(
-										'<div id="error-dialog" class="ui-dialog">'
-												+ '<div class="ui-dialog-title">Error</div>'
-												+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url
-												+ '<br><br>' + xhr.responseText + '<br><br>' + '<div class="right">'
-												+ '<button class="ui-button btn-cancel">OK</button>'
-												+ '</div></div></div>');
-								initOneButtonDialog(jQuery);
-							});
+					$(document)
+							.ajaxError(
+									function(e, xhr, settings, exception) {
+										$("body")
+												.append(
+														'<div id="error-dialog" class="ui-dialog">'
+																+ '<div class="ui-dialog-title">Error</div>'
+																+ '<div class="ui-dialog-content">'
+																+ 'Location: '
+																+ settings.url
+																+ '<br><br>'
+																+ xhr.responseText
+																+ '<br><br>'
+																+ '<div class="right">'
+																+ '<button class="ui-button btn-cancel">OK</button>'
+																+ '</div></div></div>');
+										initOneButtonDialog(jQuery);
+									});
 
-					$("input.isadmin").click(function() {
-						if ($(this).is("input:checked")) {
-							$("input.access-product").attr("disabled", "disabled");
-						} else {
-							$("input.access-product").removeAttr("disabled");
-						}
-					});
-
-					$("#add-user").click(function() {
-						var isFormCorrect = true;
-
-						if ($("input.username").val() == "") {
-							alert("ERROR: User name cannot be empty.");
-							isFormCorrect = false;
-						}
-
-						if ($("input.pass").val() == "") {
-							alert("ERROR: Password cannot be empty.");
-							isFormCorrect = false;
-						}
-
-						if ($("input.pass").val() != $("input.retype-pass").val()) {
-							alert("ERROR: Passwords are different.");
-							isFormCorrect = false;
-						}
-
-						if (isFormCorrect) {
-
-							var productIds = [];
-							$(".access-product:checked").each(function(i) {
-								productIds[i] = $(this).attr("id");
-							});
-
-							$args = {
-								username : $("input.username").val(),
-								pass : $("input.pass").val(),
-								isadmin : $("input.isadmin").is(":checked"),
-								productIds : productIds
-							};
-							$.post("../AddUser", $args, function(data) {
-								if (data == "success") {
-									location.reload(true);
+					$("input.isadmin").click(
+							function() {
+								if ($(this).is("input:checked")) {
+									$("input.access-product").attr("disabled",
+											"disabled");
 								} else {
-									alert(data);
+									$("input.access-product").removeAttr(
+											"disabled");
 								}
 							});
-						}
-					});
 
-					$(".btn-delete-user").click(function() {
-						var $userid = $(this).attr("userid");
-						var answer = confirm("Are you sure you want to delete this user?");
-						if (answer) {
-							$.post("../DeleteUser", {
-								userid : $userid
-							}, function(data) {
-								if (data == "success") {
-									alert("User was deleted.");
-									location.reload(true);
-								} else if (data == "gohome") {
-									alert("User was deleted.");
-									window.location = "../";
-								} else {
+					$("#add-user").click(
+							function() {
+								var isFormCorrect = true;
+
+								if ($("input.username").val() == "") {
 									noty({
 										type : "error",
-										text : data
+										text : "ERROR: User name cannot be empty."
+									});
+									isFormCorrect = false;
+								}
+
+								if ($("input.pass").val() == "") {
+									noty({
+										type : "error",
+										text : "ERROR: Password cannot be empty."
+									});
+									isFormCorrect = false;
+								}
+
+								if ($("input.pass").val() != $(
+										"input.retype-pass").val()) {
+									noty({
+										type : "error",
+										text : "ERROR: Passwords are different."
+									});
+									isFormCorrect = false;
+								}
+
+								if (isFormCorrect) {
+
+									var productIds = [];
+									$(".access-product:checked").each(
+											function(i) {
+												productIds[i] = $(this).attr(
+														"id");
+											});
+
+									$args = {
+										username : $("input.username").val(),
+										pass : $("input.pass").val(),
+										isadmin : $("input.isadmin").is(
+												":checked"),
+										productIds : productIds
+									};
+									$.post("../AddUser", $args, function(data) {
+										if (data == "success") {
+											location.reload(true);
+										} else {
+											noty({
+												type : "error",
+												text : data
+											});
+										}
 									});
 								}
 							});
-						}
-					});
+
+					$(".btn-delete-user")
+							.click(
+									function() {
+										var $userid = $(this).attr("userid");
+										var $parentRow = $(this).parents(
+												".table-row");
+										noty({
+											type : "confirm",
+											text : "Are you sure you want to delete this user?",
+											buttons : [
+													{
+														addClass : 'btn btn-primary ui-button',
+														text : 'Delete',
+														onClick : function(
+																$noty) {
+															$noty.close();
+															$
+																	.post(
+																			"../DeleteUser",
+																			{
+																				userid : $userid
+																			},
+																			function(
+																					data) {
+																				if (data == "success") {
+																					noty({
+																						type : "success",
+																						text : "The user was deleted.",
+																						timeout : 5000
+																					});
+																					$parentRow.remove();
+																				} else if (data == "gohome") {
+																					noty({
+																						type : "success",
+																						text : "The user was deleted.",
+																						timeout : 5000,
+																						modal : true,
+																						callback : {
+																							afterClose : function() {
+																								window.location = "../";
+																							}
+																						}
+																					});
+																				} else {
+																					noty({
+																						type : "error",
+																						text : data
+																					});
+																				}
+																			});
+														}
+													},
+													{
+														addClass : 'btn btn-danger ui-button',
+														text : 'Cancel',
+														onClick : function(
+																$noty) {
+															$noty.close();
+														}
+													} ]
+										});
+									});
 
 					$(".btn-edit-user")
 							.click(
 									function() {
 										var $userid = $(this).attr("userid");
-										var $userName = $("div[userid=\"" + $userid + "\"]").text();
+										var $userName = $(
+												"div[userid=\"" + $userid
+														+ "\"]").text();
 										$("body")
 												.append(
 														'<div id="edit-user-dialog" class="ui-dialog">'
@@ -153,45 +222,56 @@ function initDialog() {
 
 function initEditUserDialog() {
 	initDialog();
-	$(".btn-update-user").click(function() {
-		var isFormCorrect = true;
+	$(".btn-update-user").click(
+			function() {
+				var isFormCorrect = true;
 
-		if ($("div#edit-user-dialog input.username").val() == "") {
-			alert("ERROR: User name cannot be empty.");
-			isFormCorrect = false;
-		}
-
-		if ($("div#edit-user-dialog input.pass").val() != $("div#edit-user-dialog input.retype-pass").val()) {
-			alert("ERROR: Passwords are different.");
-			isFormCorrect = false;
-		}
-
-		if (isFormCorrect) {
-
-			var productIds = [];
-			$("div#edit-user-dialog .access-product:checked").each(function(i) {
-				productIds[i] = $(this).attr("id");
-			});
-
-			$args = {
-				userid : $(".btn-update-user").attr("id"),
-				username : $("div#edit-user-dialog input.username").val(),
-				pass : $("div#edit-user-dialog input.pass").val(),
-				isadmin : $("div#edit-user-dialog input.isadmin").is(":checked"),
-				productIds : productIds
-			};
-			$.post("../UpdateUser", $args, function(data) {
-				if (data == "success") {
-					location.reload(true);
-				} else {
+				if ($("div#edit-user-dialog input.username").val() == "") {
 					noty({
 						type : "error",
-						text : data
+						text : "ERROR: User name cannot be empty."
+					});
+					isFormCorrect = false;
+				}
+
+				if ($("div#edit-user-dialog input.pass").val() != $(
+						"div#edit-user-dialog input.retype-pass").val()) {
+					noty({
+						type : "error",
+						text : "ERROR: Passwords are different."
+					});
+					isFormCorrect = false;
+				}
+
+				if (isFormCorrect) {
+
+					var productIds = [];
+					$("div#edit-user-dialog .access-product:checked").each(
+							function(i) {
+								productIds[i] = $(this).attr("id");
+							});
+
+					$args = {
+						userid : $(".btn-update-user").attr("id"),
+						username : $("div#edit-user-dialog input.username")
+								.val(),
+						pass : $("div#edit-user-dialog input.pass").val(),
+						isadmin : $("div#edit-user-dialog input.isadmin").is(
+								":checked"),
+						productIds : productIds
+					};
+					$.post("../UpdateUser", $args, function(data) {
+						if (data == "success") {
+							location.reload(true);
+						} else {
+							noty({
+								type : "error",
+								text : data
+							});
+						}
 					});
 				}
 			});
-		}
-	});
 
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();

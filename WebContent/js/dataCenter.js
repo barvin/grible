@@ -34,8 +34,6 @@ function initialize() {
 		$("#category-container").html(data);
 		initDataItemsPanel(jQuery);
 	});
-
-	initNoty();
 }
 
 function initDataItemsPanel() {
@@ -205,44 +203,6 @@ function initDataItemsPanel() {
 	} else {
 		$("#table-container").hide();
 	}
-}
-
-function initNoty() {
-	$.noty.defaults = {
-		layout : 'top',
-		theme : 'defaultTheme',
-		type : 'alert',
-		text : '',
-		dismissQueue : true,
-		template : '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
-		animation : {
-			open : {
-				height : 'toggle'
-			},
-			close : {
-				height : 'toggle'
-			},
-			easing : 'swing',
-			speed : 200
-		},
-		timeout : false, // delay for closing event. Set false for sticky
-		// notifications
-		force : false, // adds notification to the beginning of queue when set
-		// to true
-		modal : false,
-		closeWith : [ 'click', 'button' ], // ['click', 'button', 'hover']
-		callback : {
-			onShow : function() {
-			},
-			afterShow : function() {
-			},
-			onClose : function() {
-			},
-			afterClose : function() {
-			}
-		},
-		buttons : false
-	};
 }
 
 function initDelimiter() {
@@ -587,6 +547,7 @@ function initTopPanel() {
 									$("#breadcrump>a").last().remove();
 									$("#section-name").removeClass("link-infront");
 								}
+								document.title = $("#section-name").text() + " - Pine";
 								history.pushState({
 									product : productId
 								}, "", "?product=" + productId);

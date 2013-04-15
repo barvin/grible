@@ -68,6 +68,7 @@ public class Admin extends HttpServlet {
 				out.print("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
+				out.print("<script type=\"text/javascript\" src=\"../js/noty/defaultVars.js\"></script>");
 				out.print("<script type=\"text/javascript\" src=\"../js/noty/default.js\"></script>");
 				out.println("<script type=\"text/javascript\">");
 

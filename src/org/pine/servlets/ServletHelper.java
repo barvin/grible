@@ -172,6 +172,7 @@ public class ServletHelper {
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/defaultVars.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/default.js\"></script>");
 		return responseHtml.toString();
 	}

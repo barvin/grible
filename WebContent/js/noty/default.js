@@ -22,12 +22,11 @@
 		},
 		style : function() {
 
-			this.$bar
-					.css({
-						overflow : 'hidden',
-						backgroundPosition: '10px center',
-						backgroundRepeat: 'no-repeat'
-					});
+			this.$bar.css({
+				overflow : 'hidden',
+				backgroundPosition : '10px center',
+				backgroundRepeat : 'no-repeat'
+			});
 
 			this.$message.css({
 				fontSize : '13px',
@@ -138,7 +137,7 @@
 					backgroundColor : '#367F86',
 					borderColor : '#F0F0F0',
 					color : '#F0F0F0',
-					backgroundImage: 'url(../img/info-icon.png)'
+					backgroundImage : imgInfoIcon
 				});
 				break;
 			case 'warning':
@@ -146,7 +145,7 @@
 					backgroundColor : '#367F86',
 					borderColor : '#F0F0F0',
 					color : '#F0F0F0',
-					backgroundImage: 'url(../img/warning-icon.png)'
+					backgroundImage : imgWarningIcon
 				});
 				break;
 			case 'error':
@@ -154,7 +153,7 @@
 					backgroundColor : '#367F86',
 					borderColor : '#F0F0F0',
 					color : '#F0F0F0',
-					backgroundImage: 'url(../img/error-icon.png)'
+					backgroundImage : imgErrorIcon
 				});
 				break;
 			case 'information':
@@ -163,7 +162,7 @@
 					backgroundColor : '#367F86',
 					borderColor : '#F0F0F0',
 					color : '#F0F0F0',
-					backgroundImage: 'url(../img/success-icon.png)'
+					backgroundImage : imgSuccessIcon
 				});
 				this.$buttons.css({
 					borderTop : '1px solid #50C24E'
@@ -174,8 +173,8 @@
 					backgroundColor : '#367F86',
 					borderColor : '#F0F0F0',
 					color : '#F0F0F0',
-					backgroundImage: 'url(../img/question-icon.png)',
-					backgroundPosition: '10px 16px'
+					backgroundImage : imgQuestionIcon,
+					backgroundPosition : '10px 16px'
 				});
 			default:
 				this.$bar.css({
@@ -197,3 +196,39 @@
 	};
 
 })(jQuery);
+
+$.noty.defaults = {
+	layout : 'top',
+	theme : 'defaultTheme',
+	type : 'alert',
+	text : '',
+	dismissQueue : true,
+	template : '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+	animation : {
+		open : {
+			height : 'toggle'
+		},
+		close : {
+			height : 'toggle'
+		},
+		easing : 'swing',
+		speed : 200
+	},
+	timeout : false, // delay for closing event. Set false for sticky
+	// notifications
+	force : false, // adds notification to the beginning of queue when set
+	// to true
+	modal : false,
+	closeWith : [ 'click', 'button' ], // ['click', 'button', 'hover']
+	callback : {
+		onShow : function() {
+		},
+		afterShow : function() {
+		},
+		onClose : function() {
+		},
+		afterClose : function() {
+		}
+	},
+	buttons : false
+};

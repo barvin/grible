@@ -1,7 +1,7 @@
 /* Generic context menu styles */
 .contextMenu {
 	position: absolute;
-	width: 140px;
+	width: 150px;
 	z-index: 999;
 	border: solid 1px #CCC;
 	background: #EEE;
@@ -73,4 +73,8 @@
 
 .contextMenu LI.copy A {
 	background-image: url(../img/copy-icon.png);
+}
+
+.contextMenu LI.import A {
+	background-image: url(../img/import-icon.png);
 }

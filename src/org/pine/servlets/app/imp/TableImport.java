@@ -26,7 +26,6 @@ import javax.servlet.http.Part;
 
 import org.pine.dao.Dao;
 import org.pine.excel.ExcelFile;
-import org.pine.excel.TempVars;
 import org.pine.model.TableType;
 import org.pine.servlets.ServletHelper;
 
@@ -46,8 +45,7 @@ public class TableImport extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -56,7 +54,6 @@ public class TableImport extends HttpServlet {
 			String fileName = ServletHelper.getFilename(filePart);
 			InputStream filecontent = filePart.getInputStream();
 			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
-			
 
 			String tableName = fileName.substring(0, fileName.lastIndexOf(".xls"));
 			int categoryId = Integer.parseInt(request.getParameter("category"));
@@ -85,16 +82,15 @@ public class TableImport extends HttpServlet {
 				Dao.insertValues(postcondRowIds, postcondKeyIds, postcondValues);
 			}
 
-			int productId = Integer.parseInt(request.getParameter("product"));
-			String destination = "/pine/import/?product=" + productId;
+			String destination = "/pine/tables/?id=" + tableId;
 			String message = "'" + tableName + "' storage was successfully imported.";
-			TempVars.setTableImportResult(message);
+			request.getSession(false).setAttribute("importResult", message);
 			response.sendRedirect(destination);
 		} catch (Exception e) {
 			int productId = Integer.parseInt(request.getParameter("product"));
-			String destination = "/pine/import/?product=" + productId;
+			String destination = "/pine/tables/?product=" + productId;
 			String message = "ERROR: " + e.getMessage();
-			TempVars.setTableImportResult(message);
+			request.getSession(false).setAttribute("importResult", message);
 			response.sendRedirect(destination);
 		}
 	}

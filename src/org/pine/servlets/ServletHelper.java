@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
@@ -88,6 +89,7 @@ public class ServletHelper {
 		StringBuilder responseHtml = new StringBuilder();
 		responseHtml.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
 		responseHtml.append("<li class=\"add\"><a href=\"#add\">Add data " + tableType + "</a></li>");
+		responseHtml.append("<li class=\"import\"><a href=\"#import\">Import data " + tableType + "</a></li>");
 		responseHtml.append("<li class=\"add\"><a href=\"#add-category\">Add category</a></li>");
 		responseHtml.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
 		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
@@ -217,4 +219,13 @@ public class ServletHelper {
 				+ " was not deleted. See server logs for details.";
 	}
 
+	public static void showImportResult(HttpServletRequest request, StringBuilder responseHtml) {
+		if (request.getSession(false).getAttribute("importResult") != null) {
+			String importResult = (String) request.getSession(false).getAttribute("importResult");
+			responseHtml.append("<script type=\"text/javascript\">");
+			responseHtml.append("$(window).on('load', function() { showImportResult(\"" + importResult + "\"); });");
+			responseHtml.append("</script>");
+			request.getSession(false).setAttribute("importResult", null);
+		}
+	}
 }

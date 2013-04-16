@@ -25,7 +25,6 @@ import javax.servlet.http.Part;
 
 import org.pine.dao.Dao;
 import org.pine.excel.ExcelFile;
-import org.pine.excel.TempVars;
 import org.pine.model.TableType;
 import org.pine.servlets.ServletHelper;
 
@@ -54,37 +53,42 @@ public class StorageImport extends HttpServlet {
 		try {
 			String className = request.getParameter("class");
 			String message = "";
+			int storageId = 0;
+
+			Part filePart = request.getPart("file");
+			String fileName = ServletHelper.getFilename(filePart);
+			InputStream filecontent = filePart.getInputStream();
+			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));	
+			
+			String storageName = fileName.substring(0, fileName.lastIndexOf(".xls"));
+			int categoryId = Integer.parseInt(request.getParameter("category"));
+			storageId = Dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
+			
+			List<Integer> keyIds = Dao.insertKeys(storageId, excelFile.getKeys());
+			ArrayList<ArrayList<String>> values = excelFile.getValues();
+			List<Integer> rowIds = Dao.insertRows(storageId, values.size());
+			Dao.insertValues(rowIds, keyIds, values);
 
 			if (!className.endsWith("Info")) {
-				message = "ERROR: class name does not end with 'Info'.";
+				message = "Class name does not end with 'Info'.";
 			} else {
-				Part filePart = request.getPart("file");
-				String fileName = ServletHelper.getFilename(filePart);
-				InputStream filecontent = filePart.getInputStream();
-				ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
-				
-				
-				String storageName = fileName.substring(0, fileName.lastIndexOf(".xls"));
-				int categoryId = Integer.parseInt(request.getParameter("category"));
-				int storageId = Dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
-				
-				List<Integer> keyIds = Dao.insertKeys(storageId, excelFile.getKeys());
-				ArrayList<ArrayList<String>> values = excelFile.getValues();
-				List<Integer> rowIds = Dao.insertRows(storageId, values.size());
-				Dao.insertValues(rowIds, keyIds, values);
-
 				message = "'" + storageName + "' storage was successfully imported.";
 			}
 
-			int productId = Integer.parseInt(request.getParameter("product"));
-			String destination = "/pine/import/?product=" + productId;
-			TempVars.setStorageImportResult(message);
+			String destination = "";
+			if (storageId > 0) {
+				destination = "/pine/storages/?id=" + storageId;
+			} else {
+				int productId = Integer.parseInt(request.getParameter("product"));
+				destination = "/pine/storages/?product=" + productId;
+			}
+			request.getSession(false).setAttribute("importResult", message);
 			response.sendRedirect(destination);
 		} catch (Exception e) {
 			int productId = Integer.parseInt(request.getParameter("product"));
-			String destination = "/pine/import/?product=" + productId;
+			String destination = "/pine/storages/?product=" + productId;
 			String message = "ERROR: " + e.getMessage();
-			TempVars.setStorageImportResult(message);
+			request.getSession(false).setAttribute("importResult", message);
 			response.sendRedirect(destination);
 		}
 	}

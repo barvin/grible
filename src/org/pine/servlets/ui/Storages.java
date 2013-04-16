@@ -90,6 +90,7 @@ public class Storages extends HttpServlet {
 					responseHtml.append("var tableType = \"storage\";");
 					responseHtml.append("</script>");
 					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
+					ServletHelper.showImportResult(request, responseHtml);
 
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");

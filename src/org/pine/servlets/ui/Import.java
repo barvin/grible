@@ -24,7 +24,7 @@ import org.pine.settings.GlobalSettings;
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/import/")
+@WebServlet("/import")
 public class Import extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -69,12 +69,5 @@ public class Import extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doPost(request, response);
 	}
 }

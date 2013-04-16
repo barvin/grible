@@ -57,33 +57,37 @@ public class StorageImport extends HttpServlet {
 
 			Part filePart = request.getPart("file");
 			String fileName = ServletHelper.getFilename(filePart);
-			InputStream filecontent = filePart.getInputStream();
-			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));	
-			
 			String storageName = fileName.substring(0, fileName.lastIndexOf(".xls"));
 			int categoryId = Integer.parseInt(request.getParameter("category"));
-			storageId = Dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
 			
-			List<Integer> keyIds = Dao.insertKeys(storageId, excelFile.getKeys());
-			ArrayList<ArrayList<String>> values = excelFile.getValues();
-			List<Integer> rowIds = Dao.insertRows(storageId, values.size());
-			Dao.insertValues(rowIds, keyIds, values);
-
-			if (!className.endsWith("Info")) {
-				message = "Class name does not end with 'Info'.";
+			if (Dao.isTableInProductExist(storageName, TableType.STORAGE, categoryId)) {
+				request.getRequestDispatcher("/import").forward(request, response);
 			} else {
-				message = "'" + storageName + "' storage was successfully imported.";
-			}
+				InputStream filecontent = filePart.getInputStream();
+				ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));	
+				storageId = Dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
+				
+				List<Integer> keyIds = Dao.insertKeys(storageId, excelFile.getKeys());
+				ArrayList<ArrayList<String>> values = excelFile.getValues();
+				List<Integer> rowIds = Dao.insertRows(storageId, values.size());
+				Dao.insertValues(rowIds, keyIds, values);
 
-			String destination = "";
-			if (storageId > 0) {
-				destination = "/pine/storages/?id=" + storageId;
-			} else {
-				int productId = Integer.parseInt(request.getParameter("product"));
-				destination = "/pine/storages/?product=" + productId;
-			}
-			request.getSession(false).setAttribute("importResult", message);
-			response.sendRedirect(destination);
+				if (!className.endsWith("Info")) {
+					message = "Class name does not end with 'Info'.";
+				} else {
+					message = "'" + storageName + "' storage was successfully imported.";
+				}
+
+				String destination = "";
+				if (storageId > 0) {
+					destination = "/pine/storages/?id=" + storageId;
+				} else {
+					int productId = Integer.parseInt(request.getParameter("product"));
+					destination = "/pine/storages/?product=" + productId;
+				}
+				request.getSession(false).setAttribute("importResult", message);
+				response.sendRedirect(destination);
+			}			
 		} catch (Exception e) {
 			int productId = Integer.parseInt(request.getParameter("product"));
 			String destination = "/pine/storages/?product=" + productId;

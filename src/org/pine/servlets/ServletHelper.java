@@ -22,6 +22,8 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 import org.pine.dao.Dao;
+import org.pine.excel.ExcelFile;
+import org.pine.model.Key;
 import org.pine.model.Product;
 import org.pine.model.Table;
 import org.pine.model.TableType;
@@ -90,7 +92,7 @@ public class ServletHelper {
 		responseHtml.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
 		responseHtml.append("<li class=\"add\"><a href=\"#add\">Add data " + tableType + "</a></li>");
 		responseHtml.append("<li class=\"import\"><a href=\"#import\">Import data " + tableType + "</a></li>");
-		responseHtml.append("<li class=\"add\"><a href=\"#add-category\">Add category</a></li>");
+		responseHtml.append("<li class=\"add separator\"><a href=\"#add-category\">Add subcategory</a></li>");
 		responseHtml.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
 		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
 		responseHtml.append("</ul>");
@@ -219,13 +221,46 @@ public class ServletHelper {
 				+ " was not deleted. See server logs for details.";
 	}
 
-	public static void showImportResult(HttpServletRequest request, StringBuilder responseHtml) {
+	public static void showImportResult(HttpServletRequest request, StringBuilder responseHtml, int tableId)
+			throws SQLException {
 		if (request.getSession(false).getAttribute("importResult") != null) {
 			String importResult = (String) request.getSession(false).getAttribute("importResult");
+
+			String applyPart = "var keyIds=new Array(); var refIds=new Array(); ";
+			List<Key> keys = Dao.getKeys(tableId);
+			int i = 0;
+			for (Key key : keys) {
+				if (key.getReferenceTableId() != 0) {
+					applyPart += "keyIds[" + i + "]=" + key.getId() + "; refIds[" + i + "]="
+							+ key.getReferenceTableId() + "; ";
+					i++;
+					key.setReferenceTableId(0);
+					Dao.updateKey(key);
+					Dao.updateValuesTypes(key.getId(), false, "NULL");
+				}
+			}
+			if (i > 0) {
+				applyPart += "applyParameterTypesAfterImport(keyIds, refIds);";
+			} else {
+				applyPart = "";
+			}
 			responseHtml.append("<script type=\"text/javascript\">");
-			responseHtml.append("$(window).on('load', function() { showImportResult(\"" + importResult + "\"); });");
+			responseHtml.append("$(window).on('load', function() { showImportResult(\"" + importResult + "\"); "
+					+ applyPart + "});");
 			responseHtml.append("</script>");
 			request.getSession(false).setAttribute("importResult", null);
+		}
+	}
+
+	public static void showAdvancedImportDialog(HttpServletRequest request, StringBuilder responseHtml)
+			throws SQLException {
+		if (request.getSession(false).getAttribute("importedTable") != null) {
+			Table currTable = (Table) request.getSession(false).getAttribute("importedTable");
+			ExcelFile excelFile = (ExcelFile) request.getSession(false).getAttribute("importedFile");
+			responseHtml.append("<script type=\"text/javascript\">");
+			responseHtml.append("$(window).on('load', function() { showAdvancedImportDialog("
+					+ Dao.getRows(currTable.getId()).size() + ", " + excelFile.getValues().size() + "); });");
+			responseHtml.append("</script>");
 		}
 	}
 }

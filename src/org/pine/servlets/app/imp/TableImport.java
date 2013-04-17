@@ -26,6 +26,7 @@ import javax.servlet.http.Part;
 
 import org.pine.dao.Dao;
 import org.pine.excel.ExcelFile;
+import org.pine.model.Table;
 import org.pine.model.TableType;
 import org.pine.servlets.ServletHelper;
 
@@ -45,8 +46,7 @@ public class TableImport extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -55,13 +55,24 @@ public class TableImport extends HttpServlet {
 			String fileName = ServletHelper.getFilename(filePart);
 			String tableName = fileName.substring(0, fileName.lastIndexOf(".xls"));
 			int categoryId = Integer.parseInt(request.getParameter("category"));
+			InputStream filecontent = filePart.getInputStream();
+			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
 
 			if (Dao.isTableInProductExist(tableName, TableType.TABLE, categoryId)) {
-				request.getRequestDispatcher("/import").forward(request, response);
-			} else {
-				InputStream filecontent = filePart.getInputStream();
-				ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
+				Table table = Dao.getTable(tableName, categoryId);
 
+				int currentKeysCount = Dao.getKeys(table.getId()).size();
+				int importedKeysCount = excelFile.getKeys().size();
+				if (currentKeysCount != importedKeysCount) {
+					throw new Exception("Parameters number is different.<br>In the current table: " + currentKeysCount
+							+ ". In the Excel file: " + importedKeysCount + ".");
+				}
+
+				request.getSession(false).setAttribute("importedTable", table);
+				request.getSession(false).setAttribute("importedFile", excelFile);
+				String destination = "/pine/tables/?id=" + table.getId();
+				response.sendRedirect(destination);
+			} else {
 				int tableId = Dao.insertTable(tableName, TableType.TABLE, categoryId, null, null);
 				List<Integer> keyIds = Dao.insertKeys(tableId, excelFile.getKeys());
 				ArrayList<ArrayList<String>> values = excelFile.getValues();
@@ -86,15 +97,16 @@ public class TableImport extends HttpServlet {
 					Dao.insertValues(postcondRowIds, postcondKeyIds, postcondValues);
 				}
 
-				String destination = "/pine/tables/?id=" + tableId;
 				String message = "'" + tableName + "' storage was successfully imported.";
 				request.getSession(false).setAttribute("importResult", message);
+				String destination = "/pine/tables/?id=" + tableId;
 				response.sendRedirect(destination);
 			}
 		} catch (Exception e) {
 			int productId = Integer.parseInt(request.getParameter("product"));
 			String destination = "/pine/tables/?product=" + productId;
 			String message = "ERROR: " + e.getMessage();
+			e.printStackTrace();
 			request.getSession(false).setAttribute("importResult", message);
 			response.sendRedirect(destination);
 		}

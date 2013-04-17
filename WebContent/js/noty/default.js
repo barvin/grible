@@ -174,7 +174,7 @@
 					borderColor : '#F0F0F0',
 					color : '#F0F0F0',
 					backgroundImage : imgQuestionIcon,
-					backgroundPosition : '10px 16px'
+					backgroundPosition : '10px 13%'
 				});
 			default:
 				this.$bar.css({

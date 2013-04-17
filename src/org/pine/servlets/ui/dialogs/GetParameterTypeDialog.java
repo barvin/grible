@@ -71,9 +71,9 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.println("<span class=\"parameter-type-dialog\">");
 		out.println("Choose parameter type:");
 		out.println("<br><br>");
-		out.println("<input type=\"radio\" value=\"cbx-text\" name=\"parameter-type\"" + textChecked + ">Text");
+		out.println("<input type=\"radio\" value=\"text\" name=\"parameter-type\"" + textChecked + ">Text");
 		out.println("<br><br>");
-		out.println("<input type=\"radio\" value=\"cbx-storage\" name=\"parameter-type\"" + storageChecked
+		out.println("<input type=\"radio\" value=\"storage\" name=\"parameter-type\"" + storageChecked
 				+ ">Data Storage: ");
 		out.println("<select class=\"select-storage\" " + storageSelectDisabled + ">");
 

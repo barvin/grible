@@ -109,7 +109,8 @@ public class Tables extends HttpServlet {
 					responseHtml.append("var tableType = \"").append(tableType).append("\";");
 					responseHtml.append("</script>");
 					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
-					ServletHelper.showImportResult(request, responseHtml);
+					ServletHelper.showImportResult(request, responseHtml, tableId);
+					ServletHelper.showAdvancedImportDialog(request, responseHtml);
 
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");
@@ -127,6 +128,9 @@ public class Tables extends HttpServlet {
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
+			request.getSession(false).setAttribute("importResult", null);
+			request.getSession(false).setAttribute("importedTable", null);
+			request.getSession(false).setAttribute("importedFile", null);
 		}
 		out.flush();
 		out.close();

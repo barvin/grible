@@ -513,6 +513,7 @@ h3.category-item:hover {
 	position: absolute;
 	padding: 5px;
 	font-size: 14px;
+	z-index: 10000;
 }
 
 .ui-dialog-title {

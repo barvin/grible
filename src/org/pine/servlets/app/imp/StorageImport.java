@@ -25,9 +25,9 @@ import javax.servlet.http.Part;
 
 import org.pine.dao.Dao;
 import org.pine.excel.ExcelFile;
+import org.pine.model.Table;
 import org.pine.model.TableType;
 import org.pine.servlets.ServletHelper;
-
 
 /**
  * Servlet implementation class DataFileImport
@@ -45,8 +45,7 @@ public class StorageImport extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -59,21 +58,36 @@ public class StorageImport extends HttpServlet {
 			String fileName = ServletHelper.getFilename(filePart);
 			String storageName = fileName.substring(0, fileName.lastIndexOf(".xls"));
 			int categoryId = Integer.parseInt(request.getParameter("category"));
-			
+			InputStream filecontent = filePart.getInputStream();
+			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
+
 			if (Dao.isTableInProductExist(storageName, TableType.STORAGE, categoryId)) {
-				request.getRequestDispatcher("/import").forward(request, response);
+				Table table = Dao.getTable(storageName, categoryId);
+
+				int currentKeysCount = Dao.getKeys(table.getId()).size();
+				int importedKeysCount = excelFile.getKeys().size();
+				if (currentKeysCount != importedKeysCount) {
+					throw new Exception("Parameters number is different.<br>In the current storage: " + currentKeysCount
+							+ ". In the Excel file: " + importedKeysCount + ".");
+				}
+
+				request.getSession(false).setAttribute("importedTable", table);
+				request.getSession(false).setAttribute("importedFile", excelFile);
+				String destination = "/pine/storages/?id=" + table.getId();
+				response.sendRedirect(destination);
 			} else {
-				InputStream filecontent = filePart.getInputStream();
-				ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));	
 				storageId = Dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
-				
+
 				List<Integer> keyIds = Dao.insertKeys(storageId, excelFile.getKeys());
 				ArrayList<ArrayList<String>> values = excelFile.getValues();
 				List<Integer> rowIds = Dao.insertRows(storageId, values.size());
 				Dao.insertValues(rowIds, keyIds, values);
 
-				if (!className.endsWith("Info")) {
-					message = "Class name does not end with 'Info'.";
+				if (className.equals("")) {
+					message = "'" + storageName + "' storage was successfully imported. WARNING: Class name is empty.";
+				} else if (!className.endsWith("Info")) {
+					message = "'" + storageName
+							+ "' storage was successfully imported. WARNING: Class name does not end with 'Info'.";
 				} else {
 					message = "'" + storageName + "' storage was successfully imported.";
 				}
@@ -87,11 +101,12 @@ public class StorageImport extends HttpServlet {
 				}
 				request.getSession(false).setAttribute("importResult", message);
 				response.sendRedirect(destination);
-			}			
+			}
 		} catch (Exception e) {
 			int productId = Integer.parseInt(request.getParameter("product"));
 			String destination = "/pine/storages/?product=" + productId;
 			String message = "ERROR: " + e.getMessage();
+			e.printStackTrace();
 			request.getSession(false).setAttribute("importResult", message);
 			response.sendRedirect(destination);
 		}

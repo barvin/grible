@@ -452,6 +452,24 @@ public class Dao {
 		return result;
 	}
 
+	public static Table getTable(String name, Integer categoryId) throws SQLException {
+		Table result = null;
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, t.showusage, tt.name as type "
+						+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.name='"
+						+ name
+						+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id="
+						+ categoryId + "))");
+		if (rs.next()) {
+			result = initTable(rs);
+		}
+
+		stmt.close();
+		return result;
+	}
+
 	/**
 	 * Method for 'tables' or 'storages'.
 	 */
@@ -771,8 +789,7 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted
-	 * to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -981,6 +998,22 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < rowsNumber; i++) {
+			stmt.executeUpdate("INSERT INTO rows(tableid, \"order\") VALUES (" + tableId + ", " + (i + 1) + ")");
+			ResultSet rs = stmt.executeQuery("SELECT id FROM rows ORDER BY id DESC LIMIT 1");
+			if (rs.next()) {
+				result.add(rs.getInt("id"));
+			}
+		}
+
+		stmt.close();
+		return result;
+	}
+
+	public static List<Integer> addRows(int tableId, int currRowsNumber, int rowsNumberToAdd) throws SQLException {
+		List<Integer> result = new ArrayList<Integer>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		for (int i = currRowsNumber; i < currRowsNumber + rowsNumberToAdd; i++) {
 			stmt.executeUpdate("INSERT INTO rows(tableid, \"order\") VALUES (" + tableId + ", " + (i + 1) + ")");
 			ResultSet rs = stmt.executeQuery("SELECT id FROM rows ORDER BY id DESC LIMIT 1");
 			if (rs.next()) {

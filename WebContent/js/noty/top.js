@@ -9,9 +9,9 @@
 			style: function() {
 				$(this).css({
 					top: 0,
-					left: $(window).width() / 2 - 150,
+					left: $(window).width() / 2 - 250,
 					position: 'fixed',
-					width: '300px',
+					width: '500px',
 					height: 'auto',
 					margin: 0,
 					padding: 0,

@@ -1264,11 +1264,11 @@ function initEditableKeyCell() {
 		event.stopPropagation();
 	});
 
-	$("input[value='cbx-storage']").click(function() {
+	$("input[value='storage']").click(function() {
 		$(".select-storage").prop("disabled", false);
 	});
 
-	$("input[value='cbx-text']").click(function() {
+	$("input[value='text']").click(function() {
 		$(".select-storage").prop("disabled", true);
 	});
 
@@ -1290,14 +1290,14 @@ function initEditableKeyCell() {
 			type : $type,
 			storageId : $storageId
 		}, function(data) {
-			if (data == "success") {
+			if (data.indexOf("success") == 0) {
 				noty({
 					type : "success",
 					text : "New type was successfully applied.",
 					timeout : 5000
 				});
 				var $column = $("div[keyid='" + $id + "']");
-				if ($type == "cbx-text") {
+				if ($type == "text") {
 					$column.find("div.tooltip").remove();
 					$column.off();
 					$column.removeClass("storage-cell");
@@ -1376,15 +1376,19 @@ function enableSaveButton() {
 }
 
 function showImportResult(message) {
-	if (message.indexOf("successfully") > 0) {
+	if (message.indexOf("WARNING") > 0) {
 		noty({
 			type : "success",
-			text : message,
+			text : message.substring(0, message.indexOf("WARNING")),
 			timeout : 5000
 		});
-	} else if (message.indexOf("Info") > 0) {
 		noty({
 			type : "warning",
+			text : message.substring(message.indexOf("WARNING"))
+		});
+	} else if (message.indexOf("successfully") > 0) {
+		noty({
+			type : "success",
 			text : message,
 			timeout : 5000
 		});
@@ -1392,6 +1396,86 @@ function showImportResult(message) {
 		noty({
 			type : "error",
 			text : message
+		});
+	}
+}
+
+function showAdvancedImportDialog(currentRowsCount, importedRowsCount) {
+	var noteText = "";
+	if (tableType == "storage") {
+	} else {
+		noteText = "Note: Only General table will change. Preconditions and Postconditions are ignored.<br /><br />";
+	}
+	var options = '<br/><br/><input type="radio" value="addtoend" name="import-option" checked="checked">Add to the end of the table'
+			+ '<br/><br/><input type="radio" value="addfromrow" name="import-option">Replace from row: '
+			+ '<input id="start-row" size="4" disabled="disabled" value="1"/>';
+	$("body").append(
+			'<div id="advanced-import-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Import existing data ' + tableType + '</div>'
+					+ '<div class="ui-dialog-content">' + '<br />Data ' + tableType + ' with the same name was found.<br /><br /><br />'
+					+ '<div class="table"><div class="table-row">' + '<div class="table-cell dialog-cell dialog-label">Rows in the current '
+					+ tableType + ':</div><div class="table-cell dialog-cell">' + currentRowsCount
+					+ '</div></div><div class="table-row"><div class="table-cell dialog-cell dialog-label">Rows in the file being imported:</div>'
+					+ '<div class="table-cell dialog-cell">' + importedRowsCount + '</div></div></div>'
+					+ '<br/><br/>How would you like to apply changes?' + options + '<br /><br />' + noteText
+					+ '<div class="dialog-buttons right"><button class="ui-button btn-apply">Apply</button> '
+					+ '<button class="ui-button btn-cancel">Cancel</button></div></div></div>');
+	initAdvancedImportDialog(jQuery);
+}
+
+function initAdvancedImportDialog() {
+	initDialog();
+	$(".btn-cancel").click(function() {
+		$(".ui-dialog").remove();
+	});
+
+	$("input[value='addfromrow']").click(function() {
+		$("#start-row").prop("disabled", false);
+	});
+
+	$("input[value='addtoend']").click(function() {
+		$("#start-row").prop("disabled", true);
+	});
+
+	$("#advanced-import-dialog .btn-apply").click(function() {
+		var $dialog = $("#advanced-import-dialog");
+		var $option = $dialog.find("input:checked").val();
+		var $startrow = $dialog.find("#start-row").val();
+		$.post("../AnvancedImport", {
+			option : $option,
+			startrow : $startrow
+		}, function(data) {
+			if (data == "success") {
+				location.reload(true);
+			} else {
+				noty({
+					type : "error",
+					text : data
+				});
+			}
+		});
+	});
+}
+
+function applyParameterTypesAfterImport(keyIds, refIds) {
+	for ( var i = 0; i < keyIds.length; i++) {
+		var $id = keyIds[i];
+		var $type = "storage";
+		var $storageId = refIds[i];
+		$.post("../ApplyParameterType", {
+			keyId : $id,
+			type : $type,
+			storageId : $storageId
+		}, function(data) {
+			if (data.indexOf("success") == 0) {
+				var $column = $("div[keyid='" + data.substring(7) + "']");
+				$column.addClass("storage-cell");
+				initTooltipCells($column);
+			} else if (data != "not-changed") {
+				noty({
+					type : "error",
+					text : data
+				});
+			}
 		});
 	}
 }

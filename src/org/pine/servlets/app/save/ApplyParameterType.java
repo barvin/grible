@@ -40,26 +40,24 @@ public class ApplyParameterType extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
-			
 
 			int keyId = Integer.parseInt(request.getParameter("keyId"));
 			int refStorageId = Integer.parseInt(request.getParameter("storageId"));
-			String type = request.getParameter("type"); // "cbx-text"
-														// "cbx-storage"
+			String type = request.getParameter("type"); // "text"
+														// "storage"
 
 			Key key = Dao.getKey(keyId);
-			if (((key.getReferenceTableId() == 0) && ("cbx-text".equals(type)))
-					|| ((key.getReferenceTableId() == refStorageId) && ("cbx-storage".equals(type)))) {
+			if (((key.getReferenceTableId() == 0) && ("text".equals(type)))
+					|| ((key.getReferenceTableId() == refStorageId) && ("storage".equals(type)))) {
 				out.print("not-changed");
-			} else if ("cbx-text".equals(type)) {
+			} else if ("text".equals(type)) {
 				key.setReferenceTableId(0);
 				Dao.updateKey(key);
 				Dao.updateValuesTypes(keyId, false, "NULL");
@@ -73,16 +71,16 @@ public class ApplyParameterType extends HttpServlet {
 						if (!StringUtils.isNumeric(strRows[i])) {
 							out.print("ERROR: One of indexes is not numeric. Row: "
 									+ Dao.getRow(value.getRowId()).getOrder()
-									+ ".\nIf you want to set no index, set '0'.");
+									+ ".<br>If you want to set no index, set '0'.");
 							out.flush();
 							out.close();
 							return;
 						} else if ((!strRows[i].equals("0"))
 								&& (Dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
 							out.print("ERROR: Data storage '" + Dao.getTable(refStorageId).getName()
-									+ "' does not contain row number " + strRows[i] + ".\nYou specified it in row: "
+									+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
 									+ Dao.getRow(value.getRowId()).getOrder()
-									+ ".\nYou must first create this row in specified data storage.");
+									+ ".<br>You must first create this row in specified data storage.");
 							out.flush();
 							out.close();
 							return;
@@ -104,10 +102,11 @@ public class ApplyParameterType extends HttpServlet {
 					Dao.updateValue(value);
 				}
 				Dao.updateKey(key);
-				out.print("success");
+				out.print("success" + keyId);
 			}
 		} catch (Exception e) {
-			e.printStackTrace(out);
+			out.print(e.getLocalizedMessage());
+			e.printStackTrace();
 		}
 		out.flush();
 		out.close();

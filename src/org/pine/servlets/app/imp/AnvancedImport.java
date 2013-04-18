@@ -79,7 +79,11 @@ public class AnvancedImport extends HttpServlet {
 				if (startRow > rowsCount) {
 					throw new Exception("ERROR: Start row is out of range.");
 				}
-				for (int i = startRow - 1; i < newValuesCount; i++) {
+				int limit = rowsCount;
+				if (rowsCount > (startRow + newValuesCount - 1)) {
+					limit = newValuesCount;
+				}
+				for (int i = startRow - 1; i < limit; i++) {
 					List<Value> currValues = Dao.getValues(rows.get(i));
 					for (int j = 0; j < currValues.size(); j++) {
 						Value value = currValues.get(j);

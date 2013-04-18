@@ -119,7 +119,7 @@ a:hover,a:hover>.link-infront {
 	top: -1px;
 }
 
-.key-row {
+.key-cell, .index-header-cell {
 	background-color: #444444;
 	color: #F0F0F0;
 	font-weight: bold;

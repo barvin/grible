@@ -90,20 +90,22 @@ public class ServletHelper {
 	public static String getContextMenus(String tableType) {
 		StringBuilder responseHtml = new StringBuilder();
 		responseHtml.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
-		responseHtml.append("<li class=\"add\"><a href=\"#add\">Add data " + tableType + "</a></li>");
-		responseHtml.append("<li class=\"import\"><a href=\"#import\">Import data " + tableType + "</a></li>");
+		responseHtml.append("<li class=\"add\"><a href=\"#add\">Add " + tableType + "</a></li>");
+		responseHtml.append("<li class=\"import\"><a href=\"#import\">Import " + tableType + "</a></li>");
 		responseHtml.append("<li class=\"add separator\"><a href=\"#add-category\">Add subcategory</a></li>");
 		responseHtml.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
 		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
 		responseHtml.append("</ul>");
 
-		responseHtml.append("<ul id=\"keyMenu\" class=\"contextMenu\">");
-		responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert column</a></li>");
-		responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate column</a></li>");
-		responseHtml.append("<li class=\"fill\"><a href=\"#fill\">Fill column with...</a></li>");
-		responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete column</a></li>");
-		responseHtml.append("</ul>");
-
+		if (!"enumeration".equals(tableType)) {
+			responseHtml.append("<ul id=\"keyMenu\" class=\"contextMenu\">");
+			responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert column</a></li>");
+			responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate column</a></li>");
+			responseHtml.append("<li class=\"fill\"><a href=\"#fill\">Fill column with...</a></li>");
+			responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete column</a></li>");
+			responseHtml.append("</ul>");
+		}
+		
 		responseHtml.append("<ul id=\"rowMenu\" class=\"contextMenu\">");
 		responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert row</a></li>");
 		responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate row</a></li>");

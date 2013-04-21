@@ -21,6 +21,7 @@ public class Sections {
 			sections = new ArrayList<Section>();
 			sections.add(new Section("tables", "Data Tables", "Tables of input test data for test cases. One test case = one data table. The number of the rows in the table defines the number of the test iterations."));
 			sections.add(new Section("storages", "Data Storages", "Reusable sets of parameters. Normally, they represent entities from the application. Each storage can be used by data tables or other storages."));
+			sections.add(new Section("enumerations", "Enumerations", "Predefined sets of strings that can be used in tables and storages."));
 		}
 		return sections;
 	}

@@ -1,5 +1,5 @@
 -- Pine database dump
--- Pine version 0.5
+-- Pine version 0.8
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -210,11 +210,11 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 ALTER TABLE ONLY "values" ALTER COLUMN id SET DEFAULT nextval('values_id_seq'::regclass);
 
 
-
 INSERT INTO tabletypes VALUES (1, 'storage');
 INSERT INTO tabletypes VALUES (2, 'table');
 INSERT INTO tabletypes VALUES (3, 'precondition');
 INSERT INTO tabletypes VALUES (4, 'postcondition');
+INSERT INTO tabletypes VALUES (5, 'enumearion');
 
 
 ALTER TABLE ONLY categories

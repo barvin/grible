@@ -11,7 +11,7 @@
 package org.pine.model;
 
 public enum TableType {
-	STORAGE(1), TABLE(2), PRECONDITION(3), POSTCONDITION(4);
+	STORAGE(1), TABLE(2), PRECONDITION(3), POSTCONDITION(4), ENUMERATION(5);
 
 	private int id;
 

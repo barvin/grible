@@ -334,6 +334,15 @@ function initAddDataItemDialog() {
 				copytableid : $("select.tables-list").find("option:selected").val(),
 				isonlycolumns : $("input.only-columns").is(':checked')
 			};
+		} else if (tableType == "enumeration") {
+			$args = {
+				tabletype : tableType,
+				categoryid : $id,
+				name : $("input.data-item-name").val(),
+				iscopy : $("input.copy-existing").is(':checked'),
+				copytableid : $("select.tables-list").find("option:selected").val(),
+				isonlycolumns : $("input.only-columns").is(':checked')
+			};
 		} else {
 			$args = {
 				tabletype : "table",
@@ -737,7 +746,11 @@ function enableCoulumnsMoving() {
 							return (contentA < contentB) ? -1 : (contentA > contentB) ? 1 : 0;
 						});
 						$(this).find(".value-cell").remove();
-						$(this).append(sortedCells);
+						if ($(this).find(".info-cell").length > 0) {
+							sortedCells.insertBefore($(this).find(".info-cell").first());
+						} else {
+							$(this).append(sortedCells);
+						}
 					});
 					initTableValues(jQuery);
 				} else {

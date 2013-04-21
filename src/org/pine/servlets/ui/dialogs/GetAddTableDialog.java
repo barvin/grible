@@ -46,19 +46,11 @@ public class GetAddTableDialog extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			
+
 			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
 			Category category = Dao.getCategory(categoryId);
-			/*
-			 * + '</div>' + '<br/>The data ' + tableType + ' will be added to
-			 * the category "' + $(el).text() + '".' + '<div
-			 * class="dialog-buttons right">' + '<button
-			 * id="dialog-btn-add-data-item" category-id="' + $id + '"
-			 * class="ui-button">Add</button> <button
-			 * class="ui-button btn-cancel">Cancel</button>' +
-			 * '</div></div></div>');
-			 */
-			if ((category.getType() == TableType.TABLE) || (category.getType() == TableType.STORAGE)) {
+			if ((category.getType() == TableType.TABLE) || (category.getType() == TableType.STORAGE)
+					|| (category.getType() == TableType.ENUMERATION)) {
 				response.setContentType("text/html");
 				PrintWriter out = response.getWriter();
 				String tableType = category.getType().toString().toLowerCase();
@@ -67,7 +59,7 @@ public class GetAddTableDialog extends HttpServlet {
 				responseHtml.append("<div id=\"add-data-");
 				responseHtml.append(tableType);
 				responseHtml.append("-dialog\" class=\"ui-dialog\">");
-				responseHtml.append("<div class=\"ui-dialog-title\">Add data ");
+				responseHtml.append("<div class=\"ui-dialog-title\">Add ");
 				responseHtml.append(tableType);
 				responseHtml.append("</div>");
 				responseHtml.append("<div class=\"ui-dialog-content\">");

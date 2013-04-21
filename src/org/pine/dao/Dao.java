@@ -658,7 +658,7 @@ public class Dao {
 		return result;
 	}
 
-	public static List<Table> getStorageTablesOfProductByKeyId(int keyId) throws SQLException {
+	public static List<Table> getRefTablesOfProductByKeyId(int keyId, TableType type) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -675,11 +675,11 @@ public class Dao {
 				categoryId = rs2.getInt("categoryid");
 			}
 		}
-		ResultSet rs3 = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
-						+ "ON t.type=tt.id AND tt.name='storage' AND t.categoryid IN (SELECT id FROM categories WHERE productid="
-						+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.name");
+		ResultSet rs3 = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
+				+ "ON t.type=tt.id AND tt.name='" + type.toString().toLowerCase()
+				+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid="
+				+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.name");
 		while (rs3.next()) {
 			result.add(initTable(rs3));
 		}
@@ -789,7 +789,8 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted
+	 * to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -1329,7 +1330,18 @@ public class Dao {
 						+ "(SELECT id FROM keys WHERE tableid=" + oldTableId + " AND \"order\"=" + key.getOrder() + ")");
 			}
 		}
-
 		stmt.close();
+	}
+
+	public static boolean isTableTypeExist(String name) throws SQLException {
+		boolean result = false;
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT id FROM tabletypes WHERE name ='" + name.toLowerCase() + "'");
+		if (rs.next()) {
+			result = true;
+		}
+		stmt.close();
+		return result;
 	}
 }

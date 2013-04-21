@@ -47,7 +47,9 @@ public class InitDB extends HttpServlet {
 				Dao.execute(query);
 				Dao.executeSelect(querySetSeqVal);
 			} else {
-				// TODO: validate existing database.
+				if (!Dao.isTableTypeExist("enumeration")) {
+					Dao.execute("INSERT INTO tabletypes(name) VALUES ('enumeration')");
+				}
 			}
 			out.print("Done.");
 		} catch (Exception e) {

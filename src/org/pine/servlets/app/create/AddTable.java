@@ -93,7 +93,11 @@ public class AddTable extends HttpServlet {
 				}
 			} else {
 				List<String> keys = new ArrayList<String>();
-				keys.add("editme");
+				if (type == TableType.ENUMERATION) {
+					keys.add(name);
+				} else {
+					keys.add("editme");
+				}
 				int keyId = Dao.insertKeys(tableId, keys).get(0);
 				Dao.insertRow(tableId, 1);
 				List<Row> rows = Dao.getRows(tableId);

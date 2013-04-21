@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.pine.dao.Dao;
 import org.pine.model.Key;
 import org.pine.model.Table;
+import org.pine.model.TableType;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -40,7 +41,8 @@ public class GetParameterTypeDialog extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -62,11 +64,21 @@ public class GetParameterTypeDialog extends HttpServlet {
 		String textChecked = "";
 		String storageChecked = "";
 		String storageSelectDisabled = "";
+		String enumChecked = "";
+		String enumSelectDisabled = "";
 		if (key.getReferenceTableId() == 0) {
 			textChecked = " checked=\"checked\" ";
 			storageSelectDisabled = "disabled=\"disabled\" ";
+			enumSelectDisabled = "disabled=\"disabled\" ";
 		} else {
-			storageChecked = " checked=\"checked\" ";
+			Table refTable = Dao.getTable(key.getReferenceTableId());
+			if (refTable.getType() == TableType.STORAGE) {
+				storageChecked = " checked=\"checked\" ";
+				enumSelectDisabled = "disabled=\"disabled\" ";
+			} else if (refTable.getType() == TableType.ENUMERATION) {
+				enumChecked = " checked=\"checked\" ";
+				storageSelectDisabled = "disabled=\"disabled\" ";
+			}
 		}
 		out.println("<span class=\"parameter-type-dialog\">");
 		out.println("Choose parameter type:");
@@ -77,13 +89,30 @@ public class GetParameterTypeDialog extends HttpServlet {
 				+ ">Data Storage: ");
 		out.println("<select class=\"select-storage\" " + storageSelectDisabled + ">");
 
-		List<Table> dataSotages = Dao.getStorageTablesOfProductByKeyId(key.getId());
+		List<Table> dataSotages = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.STORAGE);
 		for (Table dataSotage : dataSotages) {
 			String selected = "";
 			if (key.getReferenceTableId() == dataSotage.getId()) {
 				selected = "selected=\"selected\" ";
 			}
 			out.println("<option value=\"" + dataSotage.getId() + "\" " + selected + ">" + dataSotage.getName()
+					+ "</option>");
+		}
+
+		out.println("</select>");
+
+		out.println("<br><br>");
+		out.println("<input type=\"radio\" value=\"enumeration\" name=\"parameter-type\"" + enumChecked
+				+ ">Enumeration: ");
+		out.println("<select class=\"select-enum\" " + enumSelectDisabled + ">");
+
+		List<Table> enums = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.ENUMERATION);
+		for (Table enumeration : enums) {
+			String selected = "";
+			if (key.getReferenceTableId() == enumeration.getId()) {
+				selected = "selected=\"selected\" ";
+			}
+			out.println("<option value=\"" + enumeration.getId() + "\" " + selected + ">" + enumeration.getName()
 					+ "</option>");
 		}
 

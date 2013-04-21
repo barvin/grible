@@ -1232,10 +1232,17 @@ function initEditableKeyCell() {
 
 	$("input[value='storage']").click(function() {
 		$(".select-storage").prop("disabled", false);
+		$(".select-enum").prop("disabled", true);
 	});
 
 	$("input[value='text']").click(function() {
 		$(".select-storage").prop("disabled", true);
+		$(".select-enum").prop("disabled", true);
+	});
+
+	$("input[value='enumeration']").click(function() {
+		$(".select-storage").prop("disabled", true);
+		$(".select-enum").prop("disabled", false);
 	});
 
 	$('html').click(function() {
@@ -1250,11 +1257,17 @@ function initEditableKeyCell() {
 		var $id = $(this).parent().parent().attr('id');
 		var $dialog = $(this).parent();
 		var $type = $dialog.find("input:checked").val();
-		var $storageId = $dialog.find("option:selected").val();
+		var $select;
+		if ($type == "storage") {
+			$select = $dialog.find("select.select-storage");
+		} else {
+			$select = $dialog.find("select.select-enum");
+		}
+		var $refId = $select.find("option:selected").val();
 		$.post("../ApplyParameterType", {
 			keyId : $id,
 			type : $type,
-			storageId : $storageId
+			refId : $refId
 		}, function(data) {
 			if (data.indexOf("success") == 0) {
 				noty({
@@ -1269,9 +1282,14 @@ function initEditableKeyCell() {
 					$column.removeClass("storage-cell");
 					initValueCells($column);
 					modifyKeyCell();
-				} else {
+				} else if ($type == "storage") {
 					$column.addClass("storage-cell");
 					initTooltipCells($column);
+					modifyKeyCell();
+				} else {
+					$column.addClass("storage-cell");
+					//TODO: make enum cells
+					//initEnumCells($column);
 					modifyKeyCell();
 				}
 			} else if (data == "not-changed") {

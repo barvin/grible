@@ -47,7 +47,8 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -80,7 +81,7 @@ public class GetTableValues extends HttpServlet {
 
 	private void writeKeys(StringBuilder responseHtml, List<Key> keys) {
 		responseHtml.append("<div class=\"table-row key-row\">");
-		if (tableType == TableType.STORAGE || tableType == TableType.TABLE) {
+		if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
 			responseHtml.append("<div class=\"table-cell ui-cell index-header-cell\">Index</div>");
 		}
 		for (Key key : keys) {
@@ -96,18 +97,21 @@ public class GetTableValues extends HttpServlet {
 
 	private void writeValues(StringBuilder responseHtml, ArrayList<ArrayList<Value>> values) throws SQLException {
 		int i = 1;
+		String storageCell = "";
+		String enumCell = "";
 		for (ArrayList<Value> valuesRow : values) {
 			responseHtml.append("<div class=\"table-row value-row\">");
-			if (tableType == TableType.STORAGE || tableType == TableType.TABLE) {
+			if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
 				responseHtml.append("<div id=\"").append(valuesRow.get(0).getRowId())
 						.append("\" class=\"table-cell ui-cell index-cell\">").append(i++).append("</div>");
 			}
 			for (Value value : valuesRow) {
-				String storageCell = (value.isStorage()) ? " storage-cell" : "";
+				storageCell = (value.isStorage()) ? " storage-cell" : "";
+				enumCell = (isEnumValue(value)) ? " enum-cell" : "";
 				responseHtml.append("<div id=\"").append(value.getId()).append("\" keyid=\"").append(value.getKeyId())
 						.append("\" rowid=\"").append(value.getRowId())
-						.append("\" class=\"table-cell ui-cell value-cell").append(storageCell).append("\">")
-						.append(StringEscapeUtils.escapeHtml4(value.getValue())).append("</div>");
+						.append("\" class=\"table-cell ui-cell value-cell").append(storageCell).append(enumCell)
+						.append("\">").append(StringEscapeUtils.escapeHtml4(value.getValue())).append("</div>");
 			}
 			if (showUsage) {
 				if (!valuesRow.isEmpty()) {
@@ -120,6 +124,18 @@ public class GetTableValues extends HttpServlet {
 			}
 			responseHtml.append("</div>");
 		}
+	}
+
+	private boolean isEnumValue(Value value) throws SQLException {
+		boolean result = false;
+		Key key = Dao.getKey(value.getKeyId());
+		if (key.getReferenceTableId() != 0) {
+			Table refTable = Dao.getTable(key.getReferenceTableId());
+			if (refTable.getType() == TableType.ENUMERATION) {
+				result = true;
+			}
+		}
+		return result;
 	}
 
 	private String getOccurences(List<Table> tables, TableType type) throws SQLException {

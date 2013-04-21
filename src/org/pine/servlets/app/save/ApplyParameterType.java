@@ -40,7 +40,8 @@ public class ApplyParameterType extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -49,21 +50,21 @@ public class ApplyParameterType extends HttpServlet {
 		try {
 
 			int keyId = Integer.parseInt(request.getParameter("keyId"));
-			int refStorageId = Integer.parseInt(request.getParameter("storageId"));
-			String type = request.getParameter("type"); // "text"
-														// "storage"
-
+			int refTableId = Integer.parseInt(request.getParameter("refId"));
+			// "text", "storage", "enumeration"
+			String type = request.getParameter("type");
 			Key key = Dao.getKey(keyId);
 			if (((key.getReferenceTableId() == 0) && ("text".equals(type)))
-					|| ((key.getReferenceTableId() == refStorageId) && ("storage".equals(type)))) {
+					|| ((key.getReferenceTableId() == refTableId) && ("storage".equals(type) || "enumeration"
+							.equals(type)))) {
 				out.print("not-changed");
 			} else if ("text".equals(type)) {
 				key.setReferenceTableId(0);
 				Dao.updateKey(key);
 				Dao.updateValuesTypes(keyId, false, "NULL");
 				out.print("success");
-			} else {
-				key.setReferenceTableId(refStorageId);
+			} else if ("storage".equals(type)) {
+				key.setReferenceTableId(refTableId);
 				List<Value> values = Dao.getValues(key);
 				for (Value value : values) {
 					String[] strRows = value.getValue().split(";");
@@ -76,8 +77,8 @@ public class ApplyParameterType extends HttpServlet {
 							out.close();
 							return;
 						} else if ((!strRows[i].equals("0"))
-								&& (Dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
-							out.print("ERROR: Data storage '" + Dao.getTable(refStorageId).getName()
+								&& (Dao.getRow(refTableId, Integer.parseInt(strRows[i]))) == null) {
+							out.print("ERROR: Data storage '" + Dao.getTable(refTableId).getName()
 									+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
 									+ Dao.getRow(value.getRowId()).getOrder()
 									+ ".<br>You must first create this row in specified data storage.");
@@ -94,12 +95,35 @@ public class ApplyParameterType extends HttpServlet {
 						String[] strRows = value.getValue().split(";");
 						Integer[] intRows = new Integer[strRows.length];
 						for (int i = 0; i < strRows.length; i++) {
-							intRows[i] = Dao.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
+							intRows[i] = Dao.getRow(refTableId, Integer.parseInt(strRows[i])).getId();
 						}
 						value.setStorageIds(intRows);
 					}
 					value.setIsStorage(true);
 					Dao.updateValue(value);
+				}
+				Dao.updateKey(key);
+				out.print("success" + keyId);
+			} else {
+				key.setReferenceTableId(refTableId);
+				Key enumKey = Dao.getKeys(refTableId).get(0);
+				List<Value> enumValues = Dao.getValues(enumKey);
+				List<Value> values = Dao.getValues(key);
+				for (Value value : values) {
+					boolean valid = false;
+					for (Value enumValue : enumValues) {
+						if (value.getValue().equals(enumValue.getValue())) {
+							valid = true;
+							break;
+						}
+					}
+					if (!valid) {
+						out.print("ERROR: One of values is not from the enumeration. Row: "
+								+ Dao.getRow(value.getRowId()).getOrder() + ".");
+						out.flush();
+						out.close();
+						return;
+					}
 				}
 				Dao.updateKey(key);
 				out.print("success" + keyId);

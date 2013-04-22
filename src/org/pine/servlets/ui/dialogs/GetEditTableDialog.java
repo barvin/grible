@@ -40,24 +40,24 @@ public class GetEditTableDialog extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
-			
+
 			int id = Integer.parseInt(request.getParameter("id"));
-			
+
 			Table table = Dao.getTable(id);
-			if ((table.getType() == TableType.TABLE) || (table.getType() == TableType.STORAGE)) {
+			if ((table.getType() == TableType.TABLE) || (table.getType() == TableType.STORAGE)
+					|| (table.getType() == TableType.ENUMERATION)) {
 				response.setContentType("text/html");
 				PrintWriter out = response.getWriter();
 				String name = table.getName();
 				int categoryId = table.getCategoryId();
 
 				out.println("<div id=\"edit-table-dialog\" class=\"ui-dialog\">");
-				out.println("<div class=\"ui-dialog-title\">Edit data " + table.getType().toString().toLowerCase()
+				out.println("<div class=\"ui-dialog-title\">Edit " + table.getType().toString().toLowerCase()
 						+ "</div>");
 				out.println("<div class=\"ui-dialog-content\">");
 				out.println("<div class=\"table\">");

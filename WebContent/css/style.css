@@ -731,3 +731,7 @@ h3.category-item:hover {
 	vertical-align: middle;
 	width: 375px;
 }
+
+.no-padding {
+	padding: 0px;
+}

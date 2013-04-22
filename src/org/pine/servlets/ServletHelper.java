@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
 import org.pine.excel.ExcelFile;
 import org.pine.model.Key;
@@ -105,7 +106,7 @@ public class ServletHelper {
 			responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete column</a></li>");
 			responseHtml.append("</ul>");
 		}
-		
+
 		responseHtml.append("<ul id=\"rowMenu\" class=\"contextMenu\">");
 		responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert row</a></li>");
 		responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate row</a></li>");
@@ -188,17 +189,16 @@ public class ServletHelper {
 
 		boolean isUsedByTables = false;
 		String error = "";
-		if (currentTable.getType() == TableType.STORAGE) {
+		if ((currentTable.getType() == TableType.STORAGE) || (currentTable.getType() == TableType.ENUMERATION)) {
 			List<Table> tablesUsingThisStorage = Dao.getTablesUsingStorage(tableId);
-
 			if (!tablesUsingThisStorage.isEmpty()) {
 				isUsedByTables = true;
-				error = "ERROR: Storage '" + currentTable.getName() + "' is used by:";
+				error = "ERROR: " + StringUtils.capitalize(currentTable.getType().toString().toLowerCase()) + " '"
+						+ currentTable.getName() + "' is used by:";
 				for (Table table : tablesUsingThisStorage) {
 					error += "<br>- " + table.getName() + " (" + table.getType().toString().toLowerCase() + ");";
 				}
 			}
-
 		}
 		if (isUsedByTables) {
 			return error;
@@ -228,13 +228,14 @@ public class ServletHelper {
 		if (request.getSession(false).getAttribute("importResult") != null) {
 			String importResult = (String) request.getSession(false).getAttribute("importResult");
 
-			String applyPart = "var keyIds=new Array(); var refIds=new Array(); ";
+			String applyPart = "var keyIds=new Array(); var refIds=new Array(); var types=new Array(); ";
 			List<Key> keys = Dao.getKeys(tableId);
 			int i = 0;
 			for (Key key : keys) {
 				if (key.getReferenceTableId() != 0) {
+					String type = Dao.getTable(key.getReferenceTableId()).getType().toString().toLowerCase();
 					applyPart += "keyIds[" + i + "]=" + key.getId() + "; refIds[" + i + "]="
-							+ key.getReferenceTableId() + "; ";
+							+ key.getReferenceTableId() + "; types[" + i + "]='" + type + "'; ";
 					i++;
 					key.setReferenceTableId(0);
 					Dao.updateKey(key);
@@ -242,7 +243,7 @@ public class ServletHelper {
 				}
 			}
 			if (i > 0) {
-				applyPart += "applyParameterTypesAfterImport(keyIds, refIds);";
+				applyPart += "applyParameterTypesAfterImport(keyIds, refIds, types);";
 			} else {
 				applyPart = "";
 			}

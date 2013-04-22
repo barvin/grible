@@ -103,7 +103,7 @@ public class ApplyParameterType extends HttpServlet {
 					Dao.updateValue(value);
 				}
 				Dao.updateKey(key);
-				out.print("success" + keyId);
+				out.print("success|" + keyId + "|storage");
 			} else {
 				key.setReferenceTableId(refTableId);
 				Key enumKey = Dao.getKeys(refTableId).get(0);
@@ -126,7 +126,7 @@ public class ApplyParameterType extends HttpServlet {
 					}
 				}
 				Dao.updateKey(key);
-				out.print("success" + keyId);
+				out.print("success|" + keyId + "|enum");
 			}
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());

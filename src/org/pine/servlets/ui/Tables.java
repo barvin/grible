@@ -64,7 +64,7 @@ public class Tables extends HttpServlet {
 				responseHtml.append("<!DOCTYPE html>");
 				responseHtml.append("<html>");
 				responseHtml.append("<head>");
-				responseHtml.append("<title>Data Tables - Pine</title>");
+				responseHtml.append("<title>Test Tables - Pine</title>");
 				responseHtml.append(ServletHelper.getIncludes());
 
 				String userName = (String) request.getSession(false).getAttribute("userName");

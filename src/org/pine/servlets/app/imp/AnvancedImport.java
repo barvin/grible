@@ -99,7 +99,7 @@ public class AnvancedImport extends HttpServlet {
 			}
 			request.getSession(false).setAttribute("importedTable", null);
 			request.getSession(false).setAttribute("importedFile", null);
-			String message = "Data " + currTable.getType().toString().toLowerCase() + " imported successfully.";
+			String message = StringUtils.capitalize(currTable.getType().toString().toLowerCase()) + " imported successfully.";
 			request.getSession(false).setAttribute("importResult", message);
 			out.print("success");
 		} catch (Exception e) {

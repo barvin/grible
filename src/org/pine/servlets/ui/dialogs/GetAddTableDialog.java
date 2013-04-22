@@ -105,7 +105,7 @@ public class GetAddTableDialog extends HttpServlet {
 				responseHtml.append("</div>");
 
 				responseHtml.append("</div>");
-				responseHtml.append("<br/>The data ");
+				responseHtml.append("<br/>This ");
 				responseHtml.append(tableType);
 				responseHtml.append(" will be added to the category \"");
 				responseHtml.append(category.getName());

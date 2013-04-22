@@ -789,7 +789,8 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted
+	 * to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -887,8 +888,14 @@ public class Dao {
 			value.setRowId(rowId);
 			value.setStorageIds(null);
 			if (key.getReferenceTableId() != 0) {
-				value.setIsStorage(true);
-				value.setValue("0");
+				Table refTable = getTable(key.getReferenceTableId());
+				if (refTable.getType() == TableType.STORAGE) {
+					value.setIsStorage(true);
+					value.setValue("0");
+				} else if (refTable.getType() == TableType.ENUMERATION) {
+					String firstValue = getValues(getKeys(refTable.getId()).get(0)).get(0).getValue();
+					value.setValue(firstValue);
+				}
 			}
 
 			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("

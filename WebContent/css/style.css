@@ -117,6 +117,7 @@ a:hover,a:hover>.link-infront {
 	top: -1px;
 	padding: 2px;
 	top: -1px;
+	cursor: default;
 }
 
 .key-cell, .index-header-cell {

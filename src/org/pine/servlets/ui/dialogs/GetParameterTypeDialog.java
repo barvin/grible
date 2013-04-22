@@ -51,7 +51,11 @@ public class GetParameterTypeDialog extends HttpServlet {
 		try {
 			String content = request.getParameter("content").replace("'", "&#39;");
 			Key key = Dao.getKey(Integer.parseInt(request.getParameter("keyid")));
-			getDialog(out, key, content);
+			if (Dao.getTable(key.getTableId()).getType() != TableType.ENUMERATION) {
+				getDialog(out, key, content);
+			}
+			out.println("<input class='changed-value' value='" + content
+					+ "' /><span class='old-value' style='display: none;'>" + content + "</span>");
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
@@ -120,8 +124,6 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.println("<br><br>");
 		out.println("<button class=\"ui-button btn-apply-type\">Apply type</button>");
 		out.println("</span>");
-		out.println("<input class='changed-value' value='" + content
-				+ "' /><span class='old-value' style='display: none;'>" + content + "</span>");
 	}
 
 }

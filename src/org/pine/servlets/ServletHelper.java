@@ -29,6 +29,7 @@ import org.pine.model.Product;
 import org.pine.model.Table;
 import org.pine.model.TableType;
 import org.pine.model.User;
+import org.pine.model.Value;
 import org.pine.uimodel.Sections;
 
 public class ServletHelper {
@@ -266,4 +267,17 @@ public class ServletHelper {
 			responseHtml.append("</script>");
 		}
 	}
+	
+	public static boolean isEnumValue(Value value) throws SQLException {
+		boolean result = false;
+		Key key = Dao.getKey(value.getKeyId());
+		if (key.getReferenceTableId() != 0) {
+			Table refTable = Dao.getTable(key.getReferenceTableId());
+			if (refTable.getType() == TableType.ENUMERATION) {
+				result = true;
+			}
+		}
+		return result;
+	}
+
 }

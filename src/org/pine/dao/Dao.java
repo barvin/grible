@@ -789,8 +789,7 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted
-	 * to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -1340,6 +1339,20 @@ public class Dao {
 		ResultSet rs = stmt.executeQuery("SELECT id FROM tabletypes WHERE name ='" + name.toLowerCase() + "'");
 		if (rs.next()) {
 			result = true;
+		}
+		stmt.close();
+		return result;
+	}
+
+	public static List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws SQLException {
+		int enumId = Dao.getTable(Dao.getKey(enumValue.getKeyId()).getTableId()).getId();
+		List<Value> result = new ArrayList<Value>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT * FROM values WHERE value='" + oldValue
+				+ "' AND keyid IN (SELECT id FROM keys WHERE reftable=" + enumId + ")");
+		while (rs.next()) {
+			result.add(initValue(rs));
 		}
 		stmt.close();
 		return result;

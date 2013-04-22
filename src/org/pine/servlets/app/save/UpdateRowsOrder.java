@@ -46,8 +46,6 @@ public class UpdateRowsOrder extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			
-
 			if (request.getParameterValues("rowids[]") != null) {
 				String[] strRowIds = request.getParameterValues("rowids[]");
 				String[] strOldOrder = request.getParameterValues("oldorder[]");

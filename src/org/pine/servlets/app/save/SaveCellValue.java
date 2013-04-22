@@ -12,6 +12,8 @@ package org.pine.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
+import org.pine.model.TableType;
 import org.pine.model.Value;
 
 /**
@@ -47,13 +50,13 @@ public class SaveCellValue extends HttpServlet {
 		try {
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
-			
 
 			String strId = request.getParameter("id");
 			String strValue = request.getParameter("value");
 			int id = Integer.parseInt(strId);
 
 			Value value = Dao.getValue(id);
+			String oldValue = value.getValue();
 			value.setValue(StringEscapeUtils.unescapeHtml4(strValue));
 
 			if (value.isStorage()) {
@@ -61,17 +64,17 @@ public class SaveCellValue extends HttpServlet {
 				int refStorageId = Dao.getRefStorageId(value.getKeyId());
 				for (int i = 0; i < strRows.length; i++) {
 					if (!StringUtils.isNumeric(strRows[i])) {
-						out.print("\nERROR: Indexes is not numeric. Row: "
-								+ Dao.getRow(value.getRowId()).getOrder() + ".\nIf you want to set no index, set '0'.");
+						out.print("<br>ERROR: Indexes is not numeric. Row: "
+								+ Dao.getRow(value.getRowId()).getOrder() + ".<br>If you want to set no index, set '0'.");
 						out.flush();
 						out.close();
 						return;
 					} else if ((!strRows[i].equals("0"))
 							&& (Dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
-						out.print("\nERROR: Data storage '" + Dao.getTable(refStorageId).getName()
-								+ "' does not contain row number " + strRows[i] + ".\nYou specified it in row: "
+						out.print("<br>ERROR: Data storage '" + Dao.getTable(refStorageId).getName()
+								+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
 								+ Dao.getRow(value.getRowId()).getOrder()
-								+ ".\nYou must first create this row in specified data storage.");
+								+ ".<br>You must first create this row in specified data storage.");
 						out.flush();
 						out.close();
 						return;
@@ -87,6 +90,12 @@ public class SaveCellValue extends HttpServlet {
 					value.setStorageIds(intRows);
 				}
 				value.setIsStorage(true);
+			} else if (isValueOfEnumeration(value)) {
+				List<Value> dependedValues = Dao.getValuesByEnumValue(value, oldValue);
+				for (Value dependedValue : dependedValues) {
+					dependedValue.setValue(value.getValue());
+					Dao.updateValue(dependedValue);
+				}
 			}
 			Dao.updateValue(value);
 			out.print("success");
@@ -96,6 +105,10 @@ public class SaveCellValue extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private boolean isValueOfEnumeration(Value value) throws SQLException {
+		return TableType.ENUMERATION == Dao.getTable(Dao.getKey(value.getKeyId()).getTableId()).getType();
 	}
 
 	/**

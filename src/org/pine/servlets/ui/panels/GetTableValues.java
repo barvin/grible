@@ -29,6 +29,7 @@ import org.pine.model.Row;
 import org.pine.model.Table;
 import org.pine.model.TableType;
 import org.pine.model.Value;
+import org.pine.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -107,7 +108,7 @@ public class GetTableValues extends HttpServlet {
 			}
 			for (Value value : valuesRow) {
 				storageCell = (value.isStorage()) ? " storage-cell" : "";
-				enumCell = (isEnumValue(value)) ? " enum-cell" : "";
+				enumCell = (ServletHelper.isEnumValue(value)) ? " enum-cell" : "";
 				responseHtml.append("<div id=\"").append(value.getId()).append("\" keyid=\"").append(value.getKeyId())
 						.append("\" rowid=\"").append(value.getRowId())
 						.append("\" class=\"table-cell ui-cell value-cell").append(storageCell).append(enumCell)
@@ -124,18 +125,6 @@ public class GetTableValues extends HttpServlet {
 			}
 			responseHtml.append("</div>");
 		}
-	}
-
-	private boolean isEnumValue(Value value) throws SQLException {
-		boolean result = false;
-		Key key = Dao.getKey(value.getKeyId());
-		if (key.getReferenceTableId() != 0) {
-			Table refTable = Dao.getTable(key.getReferenceTableId());
-			if (refTable.getType() == TableType.ENUMERATION) {
-				result = true;
-			}
-		}
-		return result;
 	}
 
 	private String getOccurences(List<Table> tables, TableType type) throws SQLException {

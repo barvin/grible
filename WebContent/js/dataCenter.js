@@ -224,7 +224,7 @@ function initLeftPanel() {
 
 		var $breadCrump = $("#breadcrump");
 		$breadCrump.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-		$breadCrump.append("<a href='/pine/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
+		$breadCrump.append("<a href='" + window.location + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
 
 		loadTableValues(tableId);
 		loadTopPanel({

@@ -1219,11 +1219,22 @@ function initTooltipCells(elements) {
 			};
 			$.post("../GetStorageTooltip", $args, function(data) {
 				$("#waiting").removeClass("loading");
-				var $widthRight = $(document).width() - $value.position().left - 35;
-				// 35 - is width of scroll bar.
+				var $widthRight = $("#table-container").width() - $value.position().left - 17;
+				var $heightBottom = $("#table-container").height() - $value.position().top - 17;
 				$value.html(data);
 				var $tooltip = $value.find("div.tooltip");
 				var $tooltipWidth = $tooltip.width();
+				var $tooltipHeight = $tooltip.height();
+				if ($heightBottom < $tooltipHeight) {
+					if ($tooltip.position().top - $tooltipHeight - 35 < $("#table-container").position().top) {
+						$tooltip.find(".ui-cell-mini").css("padding", "2px");
+						if ($tooltip.position().top - $tooltip.height() - 35 < $("#table-container").position().top) {
+							$tooltip.css("font-size", "8px");
+						}
+						$tooltipHeight = $tooltip.height();
+					}
+					$tooltip.css("margin-top", "-" + ($tooltipHeight + 35) + "px");
+				}
 				if ($widthRight < $tooltipWidth) {
 					$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");
 				}

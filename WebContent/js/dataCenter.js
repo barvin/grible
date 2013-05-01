@@ -1219,24 +1219,44 @@ function initTooltipCells(elements) {
 			};
 			$.post("../GetStorageTooltip", $args, function(data) {
 				$("#waiting").removeClass("loading");
-				var $widthRight = $("#table-container").width() - $value.position().left - 17;
-				var $heightBottom = $("#table-container").height() - $value.position().top - 17;
 				$value.html(data);
 				var $tooltip = $value.find("div.tooltip");
+				
+				$tooltip.mousedown(function(event) {
+					event.stopPropagation();
+				});
+
+				var $widthRight = $("#table-container").width() - $value.position().left - 17;
 				var $tooltipWidth = $tooltip.width();
-				var $tooltipHeight = $tooltip.height();
-				if ($heightBottom < $tooltipHeight) {
-					if ($tooltip.position().top - $tooltipHeight - 35 < $("#table-container").position().top) {
-						$tooltip.find(".ui-cell-mini").css("padding", "2px");
-						if ($tooltip.position().top - $tooltip.height() - 35 < $("#table-container").position().top) {
-							$tooltip.css("font-size", "8px");
-						}
-						$tooltipHeight = $tooltip.height();
-					}
-					$tooltip.css("margin-top", "-" + ($tooltipHeight + 35) + "px");
-				}
 				if ($widthRight < $tooltipWidth) {
-					$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");
+					if ($tooltipWidth > $("#table-container").width()) {
+						$tooltip.css("max-width", ($("#table-container").width() - 20) + "px");
+						$tooltip.css("left", "0px");
+					} else {
+						$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");	
+					}
+				}
+
+				var $heightToBorder;
+				if ($value.position().top < $("#table-container").height() * 0.7) {
+					$heightToBorder = $("#table-container").height() - $value.position().top - 17;
+					$tooltip.addClass("down");
+				} else {
+					$heightToBorder = $value.position().top;
+					$tooltip.addClass("up");
+				}
+				if ($heightToBorder < $tooltip.height()) {
+					if ($tooltip.hasClass("up")) {
+						$tooltip.css("margin-top", "-" + ($heightToBorder + 25) + "px");	
+						$tooltip.css("max-height", ($heightToBorder - 10) + "px");
+					} else {
+						$tooltip.css("max-height", ($heightToBorder - 35) + "px");
+					}					
+					$tooltip.css("padding-right", "15px");
+				} else {
+					if ($tooltip.hasClass("up")) {
+						$tooltip.css("margin-top", "-" + ($tooltip.height() + 35) + "px");	
+					}					
 				}
 			});
 		}

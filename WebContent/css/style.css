@@ -4,7 +4,6 @@ html {
 	overflow-y: scroll;
 	font-family: arial, sans-serif;
 	font-size: 12px;
-	overflow-y: scroll;
 	color: #151B1B;
 }
 
@@ -273,6 +272,7 @@ h3.category-item:hover {
 	position: absolute;
 	border: 1px solid #ADB5C4;
 	background: #F0F0F0;
+	overflow: auto;
 }
 
 .storage-cell:hover div.tooltip {

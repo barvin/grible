@@ -157,10 +157,14 @@ $(window)
 
 					function initDialog() {
 						var $dialog = $(".ui-dialog");
-						var $posTop = ($(window).height() - $dialog.height()) / 2;
+						var $posTop = ($(window).height() - $dialog.height()) * 0.3;
 						var $posLeft = ($(window).width() - $dialog.width()) / 2;
 						$dialog.css("top", $posTop);
 						$dialog.css("left", $posLeft);
+						$(".ui-dialog").draggable({
+							handle : ".ui-dialog-title",
+							cursor : "move"
+						});
 					}
 
 					function initEditProductDialog() {

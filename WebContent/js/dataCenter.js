@@ -6,7 +6,7 @@ $(window).on("load", function() {
 	var mainHeight = docHeight - breadcrumpHeight - footerHeight - 27;
 	$("#main").height(mainHeight);
 	$(".categories-and-table-row").height(mainHeight);
-	$("#table-container").height(mainHeight - $(".top-panel").height() - 2);
+	$("#table-container").height(mainHeight);
 	$("#table-container").width(docWidth - $("#delimiter").width() - $(".left-panel").width() - 10);
 	$(".left-panel").height(mainHeight);
 	$("#entities-list").height(mainHeight);
@@ -289,7 +289,7 @@ function initDelimiter() {
 
 function initDialog() {
 	var $dialog = $(".ui-dialog");
-	var $posTop = ($(window).height() - $dialog.height()) / 2;
+	var $posTop = ($(window).height() - $dialog.height()) * 0.3;
 	var $posLeft = ($(window).width() - $dialog.width()) / 2;
 	$dialog.css("top", $posTop);
 	$dialog.css("left", $posLeft);
@@ -1247,8 +1247,8 @@ function initTooltipCells(elements) {
 				}
 				if ($heightToBorder < $tooltip.height()) {
 					if ($tooltip.hasClass("up")) {
-						$tooltip.css("margin-top", "-" + ($heightToBorder + 25) + "px");	
-						$tooltip.css("max-height", ($heightToBorder - 10) + "px");
+						$tooltip.css("margin-top", "-" + ($heightToBorder + 15) + "px");	
+						$tooltip.css("max-height", ($heightToBorder - 20) + "px");
 					} else {
 						$tooltip.css("max-height", ($heightToBorder - 35) + "px");
 					}					

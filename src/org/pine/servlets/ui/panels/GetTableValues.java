@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
 import org.pine.model.Key;
 import org.pine.model.Row;
@@ -118,25 +119,40 @@ public class GetTableValues extends HttpServlet {
 				if (!valuesRow.isEmpty()) {
 					List<Table> tables = Dao.getTablesUsingRow(valuesRow.get(0).getRowId());
 					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")
-							.append(getOccurences(tables, TableType.TABLE)).append("</div>");
+							.append(getTestTableOccurences(tables)).append("</div>");
 					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")
-							.append(getOccurences(tables, TableType.STORAGE)).append("</div>");
+							.append(getDataStorageOccurences(tables)).append("</div>");
 				}
 			}
 			responseHtml.append("</div>");
 		}
 	}
 
-	private String getOccurences(List<Table> tables, TableType type) throws SQLException {
-		StringBuilder result = new StringBuilder();
+	private String getTestTableOccurences(List<Table> tables) throws SQLException {
+		List<String> tableNames = new ArrayList<String>();
 		for (int i = 0; i < tables.size(); i++) {
-			if (type == tables.get(i).getType()) {
-				result.append(tables.get(i).getName()).append(", ");
+			if (TableType.TABLE == tables.get(i).getType()) {
+				if (!tableNames.contains(tables.get(i).getName())) {
+					tableNames.add(tables.get(i).getName());
+				}
+			} else if (TableType.PRECONDITION == tables.get(i).getType()
+					|| TableType.POSTCONDITION == tables.get(i).getType()) {
+				String tableName = Dao.getTable(tables.get(i).getParentId()).getName();
+				if (!tableNames.contains(tableName)) {
+					tableNames.add(tableName);
+				}
 			}
 		}
-		if (result.toString().length() > 2) {
-			return result.substring(0, result.length() - 2);
-		} // remove ", "
-		return result.toString();
+		return StringUtils.join(tableNames, ", ");
+	}
+
+	private String getDataStorageOccurences(List<Table> tables) throws SQLException {
+		List<String> tableNames = new ArrayList<String>();
+		for (int i = 0; i < tables.size(); i++) {
+			if (TableType.STORAGE == tables.get(i).getType()) {
+				tableNames.add(tables.get(i).getName());
+			}
+		}
+		return StringUtils.join(tableNames, ", ");
 	}
 }

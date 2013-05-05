@@ -25,14 +25,14 @@ import org.pine.model.Table;
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/EditTable")
-public class EditTable extends HttpServlet {
+@WebServlet("/SetDuplicateWarning")
+public class SetDuplicateWarning extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public EditTable() {
+	public SetDuplicateWarning() {
 		super();
 	}
 
@@ -42,30 +42,25 @@ public class EditTable extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
-			
 			int id = Integer.parseInt(request.getParameter("id"));
 			Table table = Dao.getTable(id);
-			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
-			String name = request.getParameter("name");
-			String className = request.getParameter("classname");
-
-			if ("".equals(name)) {
-				out.print("ERROR: Name cannot be empty.");
-			} else {
-				table.setCategoryId(categoryId);
-				table.setName(name);
-				table.setClassName(className);
-				Dao.updateTable(table);
-				out.print("success");
+			boolean show = false;
+			if (request.getParameter("show") != null) {
+				show = Boolean.parseBoolean(request.getParameter("show"));
 			}
 
-			out.flush();
-			out.close();
+			table.setShowWarning(show);
+			Dao.updateTable(table);
+			out.print("success");
+
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 }

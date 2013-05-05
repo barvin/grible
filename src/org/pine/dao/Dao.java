@@ -96,6 +96,7 @@ public class Dao {
 		}
 		result.setClassName(rs.getString("className"));
 		result.setShowUsage(rs.getBoolean("showusage"));
+		result.setShowWarning(rs.getBoolean("showwarning"));
 		return result;
 	}
 
@@ -440,7 +441,7 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, t.showusage, tt.name as type "
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, t.showusage, t.showwarning, tt.name as type "
 						+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.id=" + id);
 
 		if (rs.next()) {
@@ -457,7 +458,7 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, t.showusage, tt.name as type "
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, t.showusage, t.showwarning, tt.name as type "
 						+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.name='"
 						+ name
 						+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id="
@@ -509,7 +510,7 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
+				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
 				+ "ON t.type=tt.id AND t.categoryid=" + categoryId + " ORDER BY t.name");
 		while (rs.next()) {
 			result.add(initTable(rs));
@@ -565,7 +566,7 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
+				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
 				+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM rows WHERE id IN "
 				+ "(SELECT rowid FROM values WHERE " + rowId + " = ANY (storagerows))) ORDER BY t.id");
 		while (rs.next()) {
@@ -676,7 +677,7 @@ public class Dao {
 			}
 		}
 		ResultSet rs3 = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
+				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
 				+ "ON t.type=tt.id AND tt.name='" + type.toString().toLowerCase()
 				+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid="
 				+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.name");
@@ -931,7 +932,7 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
+				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
 				+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + storageId
 				+ ") ORDER BY t.id");
 		while (rs.next()) {
@@ -1059,7 +1060,8 @@ public class Dao {
 		}
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
-				+ table.getParentId() + ", showusage=" + table.isShowUsage() + " WHERE id=" + table.getId());
+				+ table.getParentId() + ", showusage=" + table.isShowUsage() + ", showwarning=" + table.isShowWarning()
+				+ " WHERE id=" + table.getId());
 
 		stmt.close();
 	}
@@ -1278,7 +1280,7 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, tt.name as type FROM tables as t JOIN tabletypes as tt "
+				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
 				+ "ON t.type=tt.id AND t.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
 				+ " AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
 				+ "')) ORDER BY t.name");
@@ -1363,5 +1365,17 @@ public class Dao {
 		}
 		stmt.close();
 		return result;
+	}
+
+	public static boolean columnExist(String table, String column) {
+		try {
+			Connection conn = getConnection();
+			Statement stmt = conn.createStatement();
+			stmt.executeQuery("SELECT " + column + " FROM " + table + " LIMIT 1");
+			stmt.close();
+		} catch (SQLException e) {
+			return false;
+		}
+		return true;
 	}
 }

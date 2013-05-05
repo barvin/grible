@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Table;
 import org.pine.model.TableType;
 
 /**
@@ -48,65 +49,84 @@ public class GetTopPanel extends HttpServlet {
 			StringBuilder responseHtml = new StringBuilder();
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			if (tableType == TableType.STORAGE) {
+				int tableId = Integer.parseInt(request.getParameter("tableid"));
+				Table table = Dao.getTable(tableId);
 				responseHtml.append("<div id=\"manage-buttons\">");
-				
+
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
 				responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
-				
+
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
-				
+
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
-								
+
 				responseHtml.append("<div id=\"btn-more\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
-				
+
 				responseHtml.append("<div id=\"data-item-options\">");
 				responseHtml.append("<div id=\"btn-sort-keys\" class=\"checkbox-option\">");
 				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" />");
 				responseHtml.append("<span class=\"icon-button-text\">Enable columns moving</span></div>");
+
+				String usage = "";
+				if (table.isShowUsage()) {
+					usage = "checked=\"checked\"";
+				}
+				responseHtml.append("<div id=\"btn-show-usage\" class=\"checkbox-option\">");
+				responseHtml.append("<input id=\"cbx-show-usage\" type=\"checkbox\" ").append(usage).append(" />");
+				responseHtml.append("<span class=\"icon-button-text\">Show rows usage</span></div>");
+
+				String warning = "";
+				if (table.isShowWarning()) {
+					warning = "checked=\"checked\"";
+				}
+				responseHtml.append("<div id=\"btn-show-warning\" class=\"checkbox-option\">");
+				responseHtml.append("<input id=\"cbx-show-warning\" type=\"checkbox\" ").append(warning).append(" />");
+				responseHtml.append("<span class=\"icon-button-text\">Show duplication warning</span></div>");
+
 				responseHtml.append("<div id=\"btn-class-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/brackets.png\">");
 				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
-				
+
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");
 
 			} else if (tableType == TableType.ENUMERATION) {
 				responseHtml.append("<div id=\"manage-buttons\">");
-				
+
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
 				responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
-				
+
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
-				
+
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
-								
+
 				responseHtml.append("<div id=\"btn-more\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
-				
+
 				responseHtml.append("<div id=\"data-item-options\">");
-				
+
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");
@@ -119,6 +139,7 @@ public class GetTopPanel extends HttpServlet {
 				String preSelected = "";
 				String postSelected = "";
 				String editButtonEnable = "button-enabled";
+				String showWarning = "";
 
 				switch (tableType) {
 				case TABLE:
@@ -126,6 +147,14 @@ public class GetTopPanel extends HttpServlet {
 					preId = Dao.getChildtable(tableId, TableType.PRECONDITION);
 					postId = Dao.getChildtable(tableId, TableType.POSTCONDITION);
 					generalSelected = " sheet-tab-selected";
+
+					String warning = "";
+					if (Dao.getTable(tableId).isShowWarning()) {
+						warning = "checked=\"checked\"";
+					}
+					showWarning += "<div id=\"btn-show-warning\" class=\"checkbox-option\">";
+					showWarning += "<input id=\"cbx-show-warning\" type=\"checkbox\" " + warning + " />";
+					showWarning += "<span class=\"icon-button-text\">Show duplication warning</span></div>";
 					break;
 
 				case PRECONDITION:
@@ -146,7 +175,7 @@ public class GetTopPanel extends HttpServlet {
 
 				default:
 					break;
-				}				
+				}
 				responseHtml.append("<div id=\"manage-buttons\">");
 
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
@@ -159,7 +188,7 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
-				
+
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
@@ -173,10 +202,11 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div id=\"btn-sort-keys\" class=\"checkbox-option\">");
 				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" />");
 				responseHtml.append("<span class=\"icon-button-text\">Enable columns moving</span></div>");
+				responseHtml.append(showWarning);
 				responseHtml.append("</div></div>");
-				
+
 				responseHtml.append("</div>");
-				
+
 				responseHtml.append("<div id=\"table-tabs\">");
 				responseHtml.append("<div class=\"sheet-tab-container");
 				responseHtml.append(generalSelected).append("\">");

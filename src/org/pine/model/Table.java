@@ -18,6 +18,7 @@ public class Table {
 	private String name;
 	private String className;
 	private boolean showUsage;
+	private boolean showWarning;
 
 	public Table(int id) {
 		this.id = id;
@@ -76,4 +77,13 @@ public class Table {
 	public void setType(TableType type) {
 		this.type = type;
 	}
+
+	public boolean isShowWarning() {
+		return showWarning;
+	}
+
+	public void setShowWarning(boolean showWarning) {
+		this.showWarning = showWarning;
+	}
+	
 }

@@ -50,6 +50,9 @@ public class InitDB extends HttpServlet {
 				if (!Dao.isTableTypeExist("enumeration")) {
 					Dao.execute("INSERT INTO tabletypes(name) VALUES ('enumeration')");
 				}
+				if (!Dao.columnExist("tables", "showwarning")) {
+					Dao.execute("ALTER TABLE tables ADD COLUMN showwarning boolean NOT NULL DEFAULT true;");
+				}
 			}
 			out.print("Done.");
 		} catch (Exception e) {

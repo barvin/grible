@@ -40,7 +40,8 @@ public class GetEditTableDialog extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -94,17 +95,6 @@ public class GetEditTableDialog extends HttpServlet {
 				out.print("</select></div>");
 				out.println("</div>");
 
-				if (table.getType() == TableType.STORAGE) {
-					out.println("<div class=\"table-row\">");
-					out.println("<div class=\"table-cell dialog-cell dialog-label\">Show rows usage:</div>");
-					String usage = "";
-					if (table.isShowUsage()) {
-						usage = "checked=\"checked\"";
-					}
-					out.println("<div class=\"table-cell dialog-cell\"><input class=\"usage\" type=\"checkbox\" "
-							+ usage + "></div>");
-					out.println("</div>");
-				}
 				out.println("</div>");
 				out.println("<div class=\"dialog-buttons right\">");
 				out.println("<button id=\"dialog-btn-edit-data-item\" class=\"ui-button\">Save</button> ");

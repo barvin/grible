@@ -554,6 +554,44 @@ function initTopPanel() {
 		}
 	});
 
+	$("#btn-show-usage").click(function() {
+		if ($("#cbx-show-usage").is("input:checked")) {
+			$("#cbx-show-usage").prop("checked", false);
+			setRowsUsage(false);
+		} else {
+			$("#cbx-show-usage").prop("checked", true);
+			setRowsUsage(true);
+		}
+	});
+
+	$("#cbx-show-usage").click(function(event) {
+		event.stopPropagation();
+		if ($(this).is("input:checked")) {
+			setRowsUsage(false);
+		} else {
+			setRowsUsage(true);
+		}
+	});
+
+	$("#btn-show-warning").click(function() {
+		if ($("#cbx-show-warning").is("input:checked")) {
+			$("#cbx-show-warning").prop("checked", false);
+			setDuplicateWarning(false);
+		} else {
+			$("#cbx-show-warning").prop("checked", true);
+			setDuplicateWarning(true);
+		}
+	});
+
+	$("#cbx-show-warning").click(function(event) {
+		event.stopPropagation();
+		if ($(this).is("input:checked")) {
+			setDuplicateWarning(false);
+		} else {
+			setDuplicateWarning(true);
+		}
+	});
+
 	$("#btn-add-preconditions").click(function() {
 		$.post("../AddTable", {
 			parentid : tableId,
@@ -689,6 +727,19 @@ function initTopPanel() {
 					}
 				});
 			});
+			$.post("../CheckForDuplicatedRows", {
+				id : tableId
+			}, function(data) {
+				var message = data.split("|");
+				if (message[0] == "true") {
+					for ( var i = 1; i < message.length; i++) {
+						noty({
+							type : "warning",
+							text : message[i]
+						});
+					}
+				}
+			});
 		}
 	});
 
@@ -710,6 +761,36 @@ function initTopPanel() {
 			$("body").append(data);
 			initGeneratedClassDialog(jQuery);
 		});
+	});
+}
+
+function setRowsUsage(usage) {
+	$.post("../SetRowsUsage", {
+		id : tableId,
+		usage : usage
+	}, function(data) {
+		if (data == "success") {
+			loadTableValues(tableId);
+		} else {
+			noty({
+				type : "error",
+				text : data
+			});
+		}
+	});
+}
+
+function setDuplicateWarning(show) {
+	$.post("../SetDuplicateWarning", {
+		id : tableId,
+		show : show
+	}, function(data) {
+		if (data != "success") {
+			noty({
+				type : "error",
+				text : data
+			});
+		}
 	});
 }
 
@@ -1221,7 +1302,7 @@ function initTooltipCells(elements) {
 				$("#waiting").removeClass("loading");
 				$value.html(data);
 				var $tooltip = $value.find("div.tooltip");
-				
+
 				$tooltip.mousedown(function(event) {
 					event.stopPropagation();
 				});
@@ -1233,7 +1314,7 @@ function initTooltipCells(elements) {
 						$tooltip.css("max-width", ($("#table-container").width() - 20) + "px");
 						$tooltip.css("left", "0px");
 					} else {
-						$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");	
+						$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");
 					}
 				}
 
@@ -1247,16 +1328,16 @@ function initTooltipCells(elements) {
 				}
 				if ($heightToBorder < $tooltip.height()) {
 					if ($tooltip.hasClass("up")) {
-						$tooltip.css("margin-top", "-" + ($heightToBorder + 15) + "px");	
+						$tooltip.css("margin-top", "-" + ($heightToBorder + 15) + "px");
 						$tooltip.css("max-height", ($heightToBorder - 20) + "px");
 					} else {
 						$tooltip.css("max-height", ($heightToBorder - 35) + "px");
-					}					
+					}
 					$tooltip.css("padding-right", "15px");
 				} else {
 					if ($tooltip.hasClass("up")) {
-						$tooltip.css("margin-top", "-" + ($tooltip.height() + 35) + "px");	
-					}					
+						$tooltip.css("margin-top", "-" + ($tooltip.height() + 35) + "px");
+					}
 				}
 			});
 		}

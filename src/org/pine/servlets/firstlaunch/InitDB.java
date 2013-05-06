@@ -40,7 +40,7 @@ public class InitDB extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			boolean createNewDb = Boolean.parseBoolean(request.getParameter("createnew"));
-			
+
 			if (createNewDb) {
 				String query = getSQLQuery("/WEB-INF/sql/pine_init.sql");
 				String querySetSeqVal = getSQLQuery("/WEB-INF/sql/pine_setseqval.sql");
@@ -52,6 +52,9 @@ public class InitDB extends HttpServlet {
 				}
 				if (!Dao.columnExist("tables", "showwarning")) {
 					Dao.execute("ALTER TABLE tables ADD COLUMN showwarning boolean NOT NULL DEFAULT true;");
+				}
+				if (!Dao.columnExist("tables", "modifiedtime")) {
+					Dao.execute("ALTER TABLE tables ADD COLUMN modifiedtime timestamp without time zone NOT NULL DEFAULT '2013-01-01 00:00:00';");
 				}
 			}
 			out.print("Done.");

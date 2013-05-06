@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.pine.model;
 
+import java.util.Date;
+
 public class Table {
 	private int id;
 	private TableType type;
@@ -19,6 +21,7 @@ public class Table {
 	private String className;
 	private boolean showUsage;
 	private boolean showWarning;
+	private Date modifiedTime;
 
 	public Table(int id) {
 		this.id = id;
@@ -84,6 +87,14 @@ public class Table {
 
 	public void setShowWarning(boolean showWarning) {
 		this.showWarning = showWarning;
+	}
+
+	public Date getModifiedTime() {
+		return modifiedTime;
+	}
+
+	public void setModifiedTime(Date dateTime) {
+		this.modifiedTime = dateTime;
 	}
 	
 }

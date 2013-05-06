@@ -15,13 +15,14 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.pine.model.Category;
 import org.pine.model.Key;
 import org.pine.model.Product;
-import org.pine.model.Category;
 import org.pine.model.Row;
 import org.pine.model.Table;
 import org.pine.model.TableType;
@@ -97,6 +98,7 @@ public class Dao {
 		result.setClassName(rs.getString("className"));
 		result.setShowUsage(rs.getBoolean("showusage"));
 		result.setShowWarning(rs.getBoolean("showwarning"));
+		result.setModifiedTime(rs.getTimestamp("modifiedtime"));
 		return result;
 	}
 
@@ -440,9 +442,9 @@ public class Dao {
 		Table result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, t.showusage, t.showwarning, tt.name as type "
-						+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.id=" + id);
+		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+				+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type "
+				+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.id=" + id);
 
 		if (rs.next()) {
 			result = initTable(rs);
@@ -458,7 +460,8 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, t.showusage, t.showwarning, tt.name as type "
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, "
+						+ "t.showusage, t.showwarning, t.modifiedtime, tt.name as type "
 						+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.name='"
 						+ name
 						+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id="
@@ -509,9 +512,10 @@ public class Dao {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
-				+ "ON t.type=tt.id AND t.categoryid=" + categoryId + " ORDER BY t.name");
+		ResultSet rs = stmt
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "ON t.type=tt.id AND t.categoryid=" + categoryId + " ORDER BY t.name");
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
@@ -565,10 +569,11 @@ public class Dao {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
-				+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM rows WHERE id IN "
-				+ "(SELECT rowid FROM values WHERE " + rowId + " = ANY (storagerows))) ORDER BY t.id");
+		ResultSet rs = stmt
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM rows WHERE id IN "
+						+ "(SELECT rowid FROM values WHERE " + rowId + " = ANY (storagerows))) ORDER BY t.id");
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
@@ -676,11 +681,12 @@ public class Dao {
 				categoryId = rs2.getInt("categoryid");
 			}
 		}
-		ResultSet rs3 = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
-				+ "ON t.type=tt.id AND tt.name='" + type.toString().toLowerCase()
-				+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid="
-				+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.name");
+		ResultSet rs3 = stmt
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "ON t.type=tt.id AND tt.name='" + type.toString().toLowerCase()
+						+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid="
+						+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.name");
 		while (rs3.next()) {
 			result.add(initTable(rs3));
 		}
@@ -931,10 +937,11 @@ public class Dao {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
-				+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + storageId
-				+ ") ORDER BY t.id");
+		ResultSet rs = stmt
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + storageId
+						+ ") ORDER BY t.id");
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
@@ -1061,7 +1068,8 @@ public class Dao {
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
 				+ table.getParentId() + ", showusage=" + table.isShowUsage() + ", showwarning=" + table.isShowWarning()
-				+ " WHERE id=" + table.getId());
+				+ ", modifiedtime='" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(table.getModifiedTime())
+				+ "' WHERE id=" + table.getId());
 
 		stmt.close();
 	}
@@ -1279,11 +1287,12 @@ public class Dao {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, t.showwarning, tt.name as type FROM tables as t JOIN tabletypes as tt "
-				+ "ON t.type=tt.id AND t.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
-				+ " AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
-				+ "')) ORDER BY t.name");
+		ResultSet rs = stmt
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "ON t.type=tt.id AND t.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
+						+ " AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
+						+ "')) ORDER BY t.name");
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}

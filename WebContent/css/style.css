@@ -736,3 +736,7 @@ h3.category-item:hover {
 .no-padding {
 	padding: 0px;
 }
+
+.entities-values {
+	margin-bottom: 60px;
+}

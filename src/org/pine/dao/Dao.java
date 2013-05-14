@@ -796,8 +796,7 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted
-	 * to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -1253,7 +1252,14 @@ public class Dao {
 	public static boolean deleteProduct(int productId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("ALTER TABLE ONLY keys DROP CONSTRAINT keys_reftable_fkey");
+
+		try {
+			stmt.executeUpdate("ALTER TABLE ONLY keys DROP CONSTRAINT keys_reftable_fkey");
+		} catch (Exception e) {
+			if (!e.getMessage().contains("constraint \"keys_reftable_fkey\" of relation \"keys\" does not exist")) {
+				throw e;
+			}
+		}
 
 		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE productid=" + productId);
 

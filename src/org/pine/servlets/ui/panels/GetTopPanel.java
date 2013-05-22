@@ -127,6 +127,10 @@ public class GetTopPanel extends HttpServlet {
 
 				responseHtml.append("<div id=\"data-item-options\">");
 
+				responseHtml.append("<div id=\"btn-class-data-item\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/brackets.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
+
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");

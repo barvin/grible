@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
 import org.pine.model.Key;
 import org.pine.model.Table;
+import org.pine.model.TableType;
 import org.pine.model.Value;
 
 /**
@@ -33,7 +34,7 @@ import org.pine.model.Value;
 @WebServlet("/GetGeneratedClassDialog")
 public class GetGeneratedClassDialog extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Table storage;
+	private Table table;
 	private String className;
 
 	/**
@@ -54,38 +55,111 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		try {
-			storage = Dao.getTable(id);
+			table = Dao.getTable(id);
 		} catch (Exception e) {
 			e.printStackTrace(out);
 		}
-		className = storage.getClassName();
 
-		out.println("<div id=\"generated-class-dialog\" class=\"ui-dialog\">");
-		out.println("<div class=\"ui-dialog-title\">Generated class</div>");
-		out.println("<div class=\"ui-dialog-content\">");
-		out.println("<div id=\"tabs\">");
-		out.println("<ul>");
-		out.println("<li><a href=\"#tabs-1\"><span class=\"dialog-tab\">Java</span></a></li>");
-		out.println("<li><a href=\"#tabs-2\"><span class=\"dialog-tab\">C#</span></a></li>");
-		out.println("<li><a href=\"#tabs-3\"><span class=\"dialog-tab\">Objective-C</span></a></li>");
-		out.println("</ul>");
-		out.println("<div id=\"tabs-1\" class=\"tab-content\">");
-		out.println(getJavaClass());
-		out.println("</div>");
-		out.println("<div id=\"tabs-2\" class=\"tab-content\">");
-		out.println(getCSharpClass());
-		out.println("</div>");
-		out.println("<div id=\"tabs-3\" class=\"tab-content\">");
-		out.println("<br>In progress.");
-		out.println("</div>");
-		out.println("</div>");
-		out.println("<div class=\"dialog-buttons right\">");
-		out.println("<button class=\"ui-button btn-cancel\">Close</button> ");
-		out.println("</div></div></div>");
+		if (table.getType() == TableType.STORAGE) {
+			className = table.getClassName();
+			out.println("<div id=\"generated-class-dialog\" class=\"ui-dialog\">");
+			out.println("<div class=\"ui-dialog-title\">Generated class</div>");
+			out.println("<div class=\"ui-dialog-content\">");
+			out.println("<div id=\"tabs\">");
+			out.println("<ul>");
+			out.println("<li><a href=\"#tabs-1\"><span class=\"dialog-tab\">Java</span></a></li>");
+			out.println("<li><a href=\"#tabs-2\"><span class=\"dialog-tab\">C#</span></a></li>");
+			out.println("</ul>");
+			out.println("<div id=\"tabs-1\" class=\"tab-content\">");
+			out.println(getJavaClass());
+			out.println("</div>");
+			out.println("<div id=\"tabs-2\" class=\"tab-content\">");
+			out.println(getCSharpClass());
+			out.println("</div>");
+			out.println("</div>");
+			out.println("<div class=\"dialog-buttons right\">");
+			out.println("<button class=\"ui-button btn-cancel\">Close</button> ");
+			out.println("</div></div></div>");
+		} else if (table.getType() == TableType.ENUMERATION) {
+			out.println("<div id=\"generated-class-dialog\" class=\"ui-dialog\">");
+			out.println("<div class=\"ui-dialog-title\">Generated enum</div>");
+			out.println("<div class=\"ui-dialog-content\">");
+			out.println("<div id=\"tabs\">");
+			out.println("<ul>");
+			out.println("<li><a href=\"#tabs-1\"><span class=\"dialog-tab\">Java</span></a></li>");
+			out.println("<li><a href=\"#tabs-2\"><span class=\"dialog-tab\">C#</span></a></li>");
+			out.println("</ul>");
+			out.println("<div id=\"tabs-1\" class=\"tab-content\">");
+			out.println(getJavaEnum());
+			out.println("</div>");
+			out.println("<div id=\"tabs-2\" class=\"tab-content\">");
+			out.println(getCSharpEnum());
+			out.println("</div>");
+			out.println("</div>");
+			out.println("<div class=\"dialog-buttons right\">");
+			out.println("<button class=\"ui-button btn-cancel\">Close</button> ");
+			out.println("</div></div></div>");
+		}
 
 		out.flush();
 		out.close();
 
+	}
+
+	private String getJavaEnum() {
+		StringBuilder pack = new StringBuilder();
+		try {
+			pack.append("<br>package com.company.enums;");
+
+			StringBuilder header = new StringBuilder();
+			header.append("<br><br>public enum ");
+			header.append(table.getName());
+			header.append(" {");
+
+			StringBuilder fields = new StringBuilder("<br>");
+
+			Key key = Dao.getKeys(table.getId()).get(0);
+			List<Value> values = Dao.getValues(key);
+			List<String> strValues = getStringValues(values);
+			fields.append(StringUtils.join(strValues, ", "));
+			fields.append(";<br>}");
+			pack.append(header).append(fields);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return pack.toString();
+	}
+
+	private List<String> getStringValues(List<Value> values) {
+		List<String> result = new ArrayList<String>();
+		for (Value value : values) {
+			result.add(value.getValue());
+		}
+		return result;
+	}
+
+	private String getCSharpEnum() {
+		StringBuilder pack = new StringBuilder();
+		try {
+			StringBuilder header = new StringBuilder();
+			header.append("<br>public enum ");
+			header.append(table.getName());
+			header.append("<br>{");
+
+			StringBuilder fields = new StringBuilder("<br>");
+
+			Key key = Dao.getKeys(table.getId()).get(0);
+			List<Value> values = Dao.getValues(key);
+			List<String> strValues = getStringValues(values);
+			fields.append(StringUtils.join(strValues, ", "));
+			fields.append("<br>}");
+			pack.append(header).append(fields);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return pack.toString();
 	}
 
 	private String getJavaClass() {
@@ -112,7 +186,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append("(HashMap&lt;String, String&gt; data) {");
 			constructor.append("<br>super(data);");
 
-			List<Key> keys = Dao.getKeys(storage.getId());
+			List<Key> keys = Dao.getKeys(table.getId());
 			for (Key key : keys) {
 				String keyName = key.getName();
 				String fieldName = StringUtils.uncapitalize(keyName).replace(" ", "");
@@ -126,18 +200,23 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						method = "getBoolean(\"" + keyName + "\");";
 					}
 				} else {
-					isDataHelperIncluded = true;
-					String refClassName;
-					refClassName = Dao.getTable(key.getReferenceTableId()).getClassName();
-					if (semicoulumExists(values)) {
-						isListIncluded = true;
-						type = "List&lt;" + refClassName + "&gt;";
-						method = "DataStorage.getDescriptors(" + refClassName + ".class, getString(\"" + keyName
-								+ "\"));";
+					Table refTable = Dao.getTable(key.getReferenceTableId());
+					if (refTable.getType() == TableType.STORAGE) {
+						isDataHelperIncluded = true;
+						String refClassName = refTable.getClassName();
+						if (semicolumnExists(values)) {
+							isListIncluded = true;
+							type = "List&lt;" + refClassName + "&gt;";
+							method = "DataStorage.getDescriptors(" + refClassName + ".class, getString(\"" + keyName
+									+ "\"));";
+						} else {
+							type = refClassName;
+							method = "DataStorage.getDescriptor(" + refClassName + ".class, getString(\"" + keyName
+									+ "\"));";
+						}
 					} else {
-						type = refClassName;
-						method = "DataStorage.getDescriptor(" + refClassName + ".class, getString(\"" + keyName
-								+ "\"));";
+						type = refTable.getName();
+						method = refTable.getName() + ".valueOf(getString(\"" + keyName + "\"));";
 					}
 				}
 				fields.append("<br>private ").append(type).append(" ").append(fieldName).append(";");
@@ -164,7 +243,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 		return pack.toString();
 	}
 
-	private boolean semicoulumExists(List<Value> values) {
+	private boolean semicolumnExists(List<Value> values) {
 		List<String> strValues = new ArrayList<String>();
 		for (Value value : values) {
 			strValues.add(value.getValue());
@@ -203,7 +282,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append(className);
 			constructor.append("(Dictionary&lt;string, string&gt; data) : base(data)<br>{");
 
-			List<Key> keys = Dao.getKeys(storage.getId());
+			List<Key> keys = Dao.getKeys(table.getId());
 			for (Key key : keys) {
 				String keyName = key.getName().replace(" ", "");
 				String type = "string";
@@ -216,16 +295,22 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						method = "GetBoolean(\"" + keyName + "\");";
 					}
 				} else {
-					isDataHelperIncluded = true;
-					String refClassName = Dao.getTable(key.getReferenceTableId()).getClassName();
-					if (semicoulumExists(values)) {
-						type = "List&lt;" + refClassName + "&gt;";
-						method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\"" + keyName
-								+ "\"));";
+					Table refTable = Dao.getTable(key.getReferenceTableId());
+					if (refTable.getType() == TableType.STORAGE) {
+						isDataHelperIncluded = true;
+						String refClassName = Dao.getTable(key.getReferenceTableId()).getClassName();
+						if (semicolumnExists(values)) {
+							type = "List&lt;" + refClassName + "&gt;";
+							method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+									+ "\"));";
+						} else {
+							type = refClassName;
+							method = "DataStorage.GetDescriptor&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+									+ "\"));";
+						}
 					} else {
-						type = refClassName;
-						method = "DataStorage.GetDescriptor&lt;" + refClassName + "&gt;(GetString(\"" + keyName
-								+ "\"));";
+						type = refTable.getName();
+						method = "("+refTable.getName()+") Enum.Parse(typeof("+refTable.getName()+"), GetString(\"" + keyName + "\"));";
 					}
 				}
 				properties.append("<br>public ").append(type).append(" ").append(keyName)

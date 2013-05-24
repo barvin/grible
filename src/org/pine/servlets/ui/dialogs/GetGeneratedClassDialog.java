@@ -265,7 +265,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 		StringBuilder imp = new StringBuilder();
 		try {
 			imp.append("<br>using System.Collections.Generic;");
-			imp.append("<br>using Your.Namespase.For.Descriptors;");
+			imp.append("<br>using PineAdaptor;");
 
 			StringBuilder namespace = new StringBuilder();
 			namespace.append("<br><br>namespace Your.Namespase.For.Descriptors<br>{");

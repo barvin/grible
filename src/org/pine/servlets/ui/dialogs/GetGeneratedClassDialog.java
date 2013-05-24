@@ -270,8 +270,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			StringBuilder namespace = new StringBuilder();
 			namespace.append("<br><br>namespace Your.Namespase.For.Descriptors<br>{");
 
-			boolean isDataHelperIncluded = false;
-
 			StringBuilder header = new StringBuilder();
 			header.append("<br>public class ");
 			header.append(className);
@@ -297,7 +295,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				} else {
 					Table refTable = Dao.getTable(key.getReferenceTableId());
 					if (refTable.getType() == TableType.STORAGE) {
-						isDataHelperIncluded = true;
 						String refClassName = Dao.getTable(key.getReferenceTableId()).getClassName();
 						if (semicolumnExists(values)) {
 							type = "List&lt;" + refClassName + "&gt;";
@@ -316,10 +313,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				properties.append("<br>public ").append(type).append(" ").append(keyName)
 						.append(" { get; private set; }");
 				constructor.append("<br>").append(keyName).append(" = ").append(method);
-			}
-
-			if (isDataHelperIncluded) {
-				imp.append("<br>using Pine.Adaptor;");
 			}
 
 			constructor.append("<br>}");

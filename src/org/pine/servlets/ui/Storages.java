@@ -96,7 +96,7 @@ public class Storages extends HttpServlet {
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");
 					responseHtml.append(ServletHelper.getUserPanel(user));
-					responseHtml.append(ServletHelper.getBreadCrump("storages", Dao.getProduct(productId)));
+					responseHtml.append(ServletHelper.getBreadCrumb("storages", Dao.getProduct(productId)));
 					responseHtml.append(ServletHelper.getMain());
 					responseHtml.append(ServletHelper.getContextMenus("storage"));
 					responseHtml.append(ServletHelper.getLoadingGif());

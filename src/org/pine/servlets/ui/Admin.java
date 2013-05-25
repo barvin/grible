@@ -89,8 +89,8 @@ public class Admin extends HttpServlet {
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User currentUser = Dao.getUserByName(userName);
 				out.print(ServletHelper.getUserPanel(currentUser));
-				out.print("<div id=\"breadcrump\" class=\"header-text\">" +
-						"<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+				out.print("<div id=\"breadcrumb\" class=\"header-text\">"
+						+ "<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 				out.print("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 				out.print("<a href=\"/pine/admin/\"><span id=\"product-name\">Admin</span></a></div>");
 
@@ -99,6 +99,9 @@ public class Admin extends HttpServlet {
 					out.println("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
 					out.print("<br /><br />");
+					out.print("<div id=\"admin-page\" class=\"table\">");
+					out.print("<div class=\"table-row\">");
+					out.print("<div id=\"admin-users\" class=\"table-cell border-right\">");
 					out.print("<span class=\"medium-header\">Users</span>");
 					out.print("<br /><br />");
 					out.print("<div class=\"table users-list\">");
@@ -156,6 +159,57 @@ public class Admin extends HttpServlet {
 					out.print("</div>");
 					out.print("</div>");
 					out.print("<br><button id=\"add-user\" class=\"ui-button\">Add</button>");
+
+					out.print("</div>"); // cell
+					out.print("<div id=\"admin-database\" class=\"table-cell border-right border-left\">");
+					out.print("<span class=\"medium-header\">Database</span>");
+					out.print("<br /><br />");
+					out.print("<div class=\"table users-list\">");
+					out.print("<div class=\"table-row users-header-row\">");
+					out.print("<div class=\"table-cell users-header-cell\">Property</div>");
+					out.print("<div class=\"table-cell users-header-cell\">Value</div>");
+					out.print("</div>");
+					out.print("<div class=\"table-row users-row\">");
+					out.print("<div class=\"table-cell users-cell\">Database host:</div>");
+					out.print("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbhost\" value=\""
+							+ GlobalSettings.getInstance().getDbHost() + "\"></div>");
+					out.print("</div>");
+					out.print("<div class=\"table-row users-row\">");
+					out.print("<div class=\"table-cell users-cell\">Database port:</div>");
+					out.print("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbport\" value=\""
+							+ GlobalSettings.getInstance().getDbPort() + "\"></div>");
+					out.print("</div>");
+					out.print("<div class=\"table-row users-row\">");
+					out.print("<div class=\"table-cell users-cell\">Database name:</div>");
+					out.print("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbname\" value=\""
+							+ GlobalSettings.getInstance().getDbName() + "\"></div>");
+					out.print("</div>");
+					out.print("<div class=\"table-row users-row\">");
+					out.print("<div class=\"table-cell users-cell\">Database login:</div>");
+					out.print("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dblogin\" value=\""
+							+ GlobalSettings.getInstance().getDbLogin() + "\"></div>");
+					out.print("</div>");
+					out.print("<div class=\"table-row users-row\">");
+					out.print("<div class=\"table-cell users-cell\">Database password:</div>");
+					out.print("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbpswd\" value=\""
+							+ GlobalSettings.getInstance().getDbPswd() + "\"></div>");
+					out.print("</div>");
+					out.print("</div>");
+					out.print("<br><button id=\"savedbsettings\" class=\"ui-button\">Save</button>");
+					out.print("</div>"); // cell
+
+					out.print("<div id=\"admin-pine-version\" class=\"table-cell border-left\">");
+					out.print("<span class=\"medium-header\">Pine version</span>");
+					out.print("<br /><br />");
+					out.print("Current Pine version: "
+							+ ServletHelper.getBuildNumber(getServletContext().getRealPath("")));
+					out.print("<br /><br />");
+					out.print("<button id=\"check-for-updates\" class=\"ui-button\">Check for updates</button>");
+					out.print("<br /><br />");
+					out.print("<div id=\"update-result\"></div>");
+					out.print("</div>"); // cell
+					out.print("</div>"); // row
+					out.print("</div>"); // page
 
 				}
 				out.println(ServletHelper.getFooter(getServletContext().getRealPath(""), "../img"));

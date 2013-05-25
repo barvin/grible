@@ -111,7 +111,7 @@ public class Home extends HttpServlet {
 				User user = Dao.getUserByName(userName);
 
 				responseHtml.append(ServletHelper.getUserPanel(user));
-				responseHtml.append("<div id=\"breadcrump\" class=\"header-text\">");
+				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
 				responseHtml.append("<a href=\".\"><span id=\"home\">Home</span></a>");
 
 				if (request.getParameter("product") != null) {

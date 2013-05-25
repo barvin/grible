@@ -96,7 +96,7 @@ public class Enumerations extends HttpServlet {
 					responseHtml.append("</head>");
 					responseHtml.append("<body>");
 					responseHtml.append(ServletHelper.getUserPanel(user));
-					responseHtml.append(ServletHelper.getBreadCrump("enumerations", Dao.getProduct(productId)));
+					responseHtml.append(ServletHelper.getBreadCrumb("enumerations", Dao.getProduct(productId)));
 					responseHtml.append(ServletHelper.getMain());
 					responseHtml.append(ServletHelper.getContextMenus("enumeration"));
 					responseHtml.append(ServletHelper.getLoadingGif());

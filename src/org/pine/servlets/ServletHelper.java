@@ -52,8 +52,12 @@ public class ServletHelper {
 
 	public static String getFooter(String realPath, String pathToImg) {
 		return "<div id=\"footer\" class=\"page-bottom\"><hr><img src=\"" + pathToImg
-				+ "/pine_logo_mini.png\"><span class=\"build\">Build: " + getContents(realPath + "/VERSION.txt")
+				+ "/pine_logo_mini.png\"><span class=\"build\">Build: " + getBuildNumber(realPath)
 				+ "</span></div>";
+	}
+	
+	public static String getBuildNumber(String realPath) {
+		return getContents(realPath + "/VERSION.txt");
 	}
 
 	private static String getContents(String path) {
@@ -151,12 +155,12 @@ public class ServletHelper {
 		return responseHtml.toString();
 	}
 
-	public static String getBreadCrump(String sectionKey, Product product) {
+	public static String getBreadCrumb(String sectionKey, Product product) {
 		StringBuilder responseHtml = new StringBuilder();
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
-		responseHtml.append("<div id=\"breadcrump\" class=\"header-text\">");
+		responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
 		responseHtml.append("<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 		responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");

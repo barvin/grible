@@ -577,6 +577,17 @@ h3.category-item:hover {
 	font-size: 15px;
 }
 
+.border-right {
+	border-right-color: #DDDDDD;
+	border-right-style: solid;
+	border-right-width: 1px;
+	padding-right: 15px;
+}
+
+.border-left {
+	padding-left: 15px;
+}
+
 .dialog-buttons {
 	padding-top: 10px;
 }
@@ -739,4 +750,8 @@ h3.category-item:hover {
 
 .entities-values {
 	margin-bottom: 60px;
+}
+
+#admin-pine-version {
+	font-size: 14px;
 }

@@ -1080,6 +1080,7 @@ function initKeysAndIndexes() {
 				var newIds = data.split(";");
 				if (newIds.length > 1) {
 					$newRow = $row.clone(true);
+					$newRow.find(".ui-cell.selected-cell").removeClass("selected-cell");
 					$newRow.find(".ui-cell.index-cell").attr("id", newIds[0]);
 					$newRow.find(".ui-cell.modified-value-cell").removeClass("modified-value-cell");
 					$newRow.find(".ui-cell.value-cell:not(.enum-cell)").text("");
@@ -1192,6 +1193,7 @@ function enableKeyContextMenu() {
 								$newCell = $(this).clone(true);
 								$newCell.removeClass("modified-value-cell");
 								$newCell.removeClass("storage-cell");
+								$newCell.removeClass("selected-cell");
 								$newCell.text("");
 								$newCell.attr("keyid", newIds[0]);
 								$newCell.attr("id", newIds[i + 1]);

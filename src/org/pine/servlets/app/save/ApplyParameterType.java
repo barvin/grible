@@ -50,7 +50,10 @@ public class ApplyParameterType extends HttpServlet {
 		try {
 
 			int keyId = Integer.parseInt(request.getParameter("keyId"));
-			int refTableId = Integer.parseInt(request.getParameter("refId"));
+			int refTableId = 0;
+			if ((request.getParameter("refId") != null) && StringUtils.isNumeric(request.getParameter("refId"))) {
+				refTableId = Integer.parseInt(request.getParameter("refId"));
+			}
 			// "text", "storage", "enumeration"
 			String type = request.getParameter("type");
 			Key key = Dao.getKey(keyId);

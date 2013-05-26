@@ -49,13 +49,10 @@ public class GetParameterTypeDialog extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			String content = request.getParameter("content").replace("'", "&#39;");
 			Key key = Dao.getKey(Integer.parseInt(request.getParameter("keyid")));
 			if (Dao.getTable(key.getTableId()).getType() != TableType.ENUMERATION) {
-				getDialog(out, key, content);
+				getDialog(out, key);
 			}
-			out.println("<input class='changed-value' value='" + content
-					+ "' /><span class='old-value' style='display: none;'>" + content + "</span>");
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
@@ -64,11 +61,13 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.close();
 	}
 
-	private void getDialog(PrintWriter out, Key key, String content) throws SQLException {
+	private void getDialog(PrintWriter out, Key key) throws SQLException {
 		String textChecked = "";
 		String storageChecked = "";
+		String storageDisabled = "";
 		String storageSelectDisabled = "";
 		String enumChecked = "";
+		String enumDisabled = "";
 		String enumSelectDisabled = "";
 		if (key.getReferenceTableId() == 0) {
 			textChecked = " checked=\"checked\" ";
@@ -84,16 +83,27 @@ public class GetParameterTypeDialog extends HttpServlet {
 				storageSelectDisabled = "disabled=\"disabled\" ";
 			}
 		}
-		out.println("<span class=\"parameter-type-dialog\">");
-		out.println("Choose parameter type:");
-		out.println("<br><br>");
+
+		List<Table> dataSotages = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.STORAGE);
+		if (dataSotages.isEmpty()) {
+			storageDisabled = " disabled=\"disabled\" ";
+		}
+
+		List<Table> enums = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.ENUMERATION);
+		if (enums.isEmpty()) {
+			enumDisabled = " disabled=\"disabled\" ";
+		}
+
+		out.println("<div id=\"parameter-type-dialog\" class=\"ui-dialog\">");
+		out.println("<div class=\"ui-dialog-title\">Change parameter type</div>");
+		out.println("<div class=\"ui-dialog-content\">");
+		out.println("<br>");
 		out.println("<input type=\"radio\" value=\"text\" name=\"parameter-type\"" + textChecked + ">Text");
 		out.println("<br><br>");
 		out.println("<input type=\"radio\" value=\"storage\" name=\"parameter-type\"" + storageChecked
-				+ ">Data Storage: ");
+				+ storageDisabled + ">Data Storage: ");
 		out.println("<select class=\"select-storage\" " + storageSelectDisabled + ">");
 
-		List<Table> dataSotages = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.STORAGE);
 		for (Table dataSotage : dataSotages) {
 			String selected = "";
 			if (key.getReferenceTableId() == dataSotage.getId()) {
@@ -106,11 +116,10 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.println("</select>");
 
 		out.println("<br><br>");
-		out.println("<input type=\"radio\" value=\"enumeration\" name=\"parameter-type\"" + enumChecked
+		out.println("<input type=\"radio\" value=\"enumeration\" name=\"parameter-type\"" + enumChecked + enumDisabled
 				+ ">Enumeration: ");
 		out.println("<select class=\"select-enum\" " + enumSelectDisabled + ">");
 
-		List<Table> enums = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.ENUMERATION);
 		for (Table enumeration : enums) {
 			String selected = "";
 			if (key.getReferenceTableId() == enumeration.getId()) {
@@ -122,8 +131,10 @@ public class GetParameterTypeDialog extends HttpServlet {
 
 		out.println("</select>");
 		out.println("<br><br>");
-		out.println("<button class=\"ui-button btn-apply-type\">Apply type</button>");
-		out.println("</span>");
+		out.println("<div class=\"dialog-buttons right\">");
+		out.println("<button id=\"btn-apply-type\" class=\"ui-button\" keyid=\"" + key.getId() + "\">Apply</button>");
+		out.println("<button class=\"ui-button btn-cancel\">Cancel</button> ");
+		out.println("</div></div></div>");
 	}
 
 }

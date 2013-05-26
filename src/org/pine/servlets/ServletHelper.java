@@ -108,6 +108,7 @@ public class ServletHelper {
 			responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert column</a></li>");
 			responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate column</a></li>");
 			responseHtml.append("<li class=\"fill\"><a href=\"#fill\">Fill column with...</a></li>");
+			responseHtml.append("<li class=\"parameter\"><a href=\"#parameter\">Change parameter type</a></li>");
 			responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete column</a></li>");
 			responseHtml.append("</ul>");
 		}

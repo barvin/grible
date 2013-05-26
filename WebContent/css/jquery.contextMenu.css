@@ -1,7 +1,7 @@
 /* Generic context menu styles */
 .contextMenu {
 	position: absolute;
-	width: 150px;
+	width: 170px;
 	z-index: 999;
 	border: solid 1px #CCC;
 	background: #EEE;
@@ -77,4 +77,8 @@
 
 .contextMenu LI.import A {
 	background-image: url(../img/import-icon.png);
+}
+
+.contextMenu LI.parameter A {
+	background-image: url(../img/parameter-icon.png);
 }

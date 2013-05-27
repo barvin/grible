@@ -52,7 +52,7 @@ public class ServletHelper {
 
 	public static String getFooter(String realPath, String pathToImg) {
 		return "<div id=\"footer\" class=\"page-bottom\"><hr><img src=\"" + pathToImg
-				+ "/pine_logo_mini.png\"><span class=\"build\">Build: " + getBuildNumber(realPath)
+				+ "/pine_logo_mini.png\"><span class=\"build\">Version: " + getBuildNumber(realPath)
 				+ "</span></div>";
 	}
 	

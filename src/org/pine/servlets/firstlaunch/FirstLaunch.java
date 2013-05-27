@@ -46,7 +46,9 @@ public class FirstLaunch extends HttpServlet {
 				for (String line : lines) {
 					content.append(line).append("\n");
 				}
-				out.print(content.toString());
+				String finalContent = content.toString().replace("Version:",
+						"Version: " + ServletHelper.getBuildNumber(getServletContext().getRealPath("")));
+				out.print(finalContent);
 			} else {
 				out.println("<!DOCTYPE html>");
 				out.println("<html>");

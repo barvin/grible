@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project basedir="." default="compile" name="pine">
 
-	<property name="version" value="0.8.0" />
-
 	<!-- Configure the directory into which the web application is built -->
 	<property name="build" value="${basedir}/build/classes" />
 
@@ -21,12 +19,7 @@
 		<mkdir dir="${build}" />
 	</target>
 
-	<target name="build-number" depends="clean">
-		<property environment="env" />
-		<echo append="false" file="${basedir}/WebContent/VERSION.txt">${version}.${env.BUILD_NUMBER}</echo>
-	</target>
-
-	<target name="compile" depends="build-number" description="Compile web application">
+	<target name="compile" depends="clean" description="Compile web application">
 		<javac debug="true" destdir="${build}" includeantruntime="false">
 			<src path="src" />
 			<classpath refid="pine.classpath" />

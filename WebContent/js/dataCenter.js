@@ -63,6 +63,7 @@ function initLeftPanel() {
 		history.pushState({
 			product : productId
 		}, "", "?product=" + productId);
+		document.title = $("#section-name").text() + " - Pine";
 	});
 
 	$(".category-item").mousedown(function(event) {
@@ -722,6 +723,7 @@ function initTopPanel() {
 			$(".data-item-selected > .changed-sign").remove();
 			$(this).removeClass("button-enabled");
 			$(this).addClass("button-disabled");
+			var valuesWaiting = $(".modified-value-cell").length;
 			$(".modified-value-cell").each(function(i) {
 				var $cell = $(this);
 				if ($cell.has("span")) {
@@ -740,6 +742,22 @@ function initTopPanel() {
 						noty({
 							type : "error",
 							text : data
+						});
+					}
+					valuesWaiting--;
+					if (valuesWaiting == 0) {
+						$.post("../CheckForDuplicatedRows", {
+							id : tableId
+						}, function(data) {
+							var message = data.split("|");
+							if (message[0] == "true") {
+								for ( var i = 1; i < message.length; i++) {
+									noty({
+										type : "warning",
+										text : message[i]
+									});
+								}
+							}
 						});
 					}
 				});
@@ -765,19 +783,6 @@ function initTopPanel() {
 						});
 					}
 				});
-			});
-			$.post("../CheckForDuplicatedRows", {
-				id : tableId
-			}, function(data) {
-				var message = data.split("|");
-				if (message[0] == "true") {
-					for ( var i = 1; i < message.length; i++) {
-						noty({
-							type : "warning",
-							text : message[i]
-						});
-					}
-				}
 			});
 		}
 	});

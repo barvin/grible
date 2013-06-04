@@ -45,8 +45,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -216,7 +215,8 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						}
 					} else {
 						type = refTable.getName();
-						method = refTable.getName() + ".valueOf(getString(\"" + keyName + "\"));";
+						method = "(getString(\"" + keyName + "\")) != null) ? " + refTable.getName()
+								+ ".valueOf(getString(\"" + keyName + "\")) : null;";
 					}
 				}
 				fields.append("<br>private ").append(type).append(" ").append(fieldName).append(";");
@@ -307,7 +307,8 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						}
 					} else {
 						type = refTable.getName();
-						method = "("+refTable.getName()+") Enum.Parse(typeof("+refTable.getName()+"), GetString(\"" + keyName + "\"));";
+						method = "(" + refTable.getName() + ") Enum.Parse(typeof(" + refTable.getName()
+								+ "), GetString(\"" + keyName + "\"));";
 					}
 				}
 				properties.append("<br>public ").append(type).append(" ").append(keyName)

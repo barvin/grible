@@ -273,6 +273,7 @@ h3.category-item:hover {
 	border: 1px solid #ADB5C4;
 	background: #F0F0F0;
 	overflow: auto;
+	box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 }
 
 .storage-cell:hover div.tooltip {

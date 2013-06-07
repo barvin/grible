@@ -271,9 +271,15 @@ ALTER TABLE ONLY keys
 ALTER TABLE ONLY keys
     ADD CONSTRAINT keys_tableid_fkey FOREIGN KEY (tableid) REFERENCES tables(id);
 
+ALTER TABLE ONLY keys
+    ADD CONSTRAINT keys_tableid_order_key UNIQUE (tableid, "order");
 
+    
 ALTER TABLE ONLY rows
     ADD CONSTRAINT rows_tableid_fkey FOREIGN KEY (tableid) REFERENCES tables(id);
+
+ALTER TABLE ONLY rows
+    ADD CONSTRAINT rows_tableid_order_key UNIQUE (tableid, "order");
 
 
 ALTER TABLE ONLY tables
@@ -302,6 +308,9 @@ ALTER TABLE ONLY "values"
 
 ALTER TABLE ONLY "values"
     ADD CONSTRAINT values_rowid_fkey FOREIGN KEY (rowid) REFERENCES rows(id);
+
+ALTER TABLE ONLY "values"
+    ADD CONSTRAINT values_rowid_keyid_key UNIQUE (rowid, keyid);
 
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;

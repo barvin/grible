@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,6 +24,7 @@ import org.pine.servlets.ServletHelper;
 @WebServlet("/CheckForUpdates")
 public class CheckForUpdates extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final String host = "http://www.pine-project.org";
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
@@ -38,10 +40,12 @@ public class CheckForUpdates extends HttpServlet {
 			if (currentVersion.equals(latestVersion)) {
 				out.print("Current Pine version is up to date.");
 			} else {
-				out.print("New version ("
-						+ latestVersion
-						+ ") is available to download at <a href=\"http://pine-project.org/download.php\" target=\"_blank\">http://pine-project.org</a>.");
+				out.print("New version (" + latestVersion + ") is available to download at " + "<a href=\"" + host
+						+ "/download.php\" target=\"_blank\">" + host + "</a>.");
 			}
+		} catch (UnknownHostException e) {
+			out.print("ERROR: Cannot connect to host " + host + ". Please, check your internet connection.");
+			e.printStackTrace();
 		} catch (Exception e) {
 			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
@@ -52,7 +56,7 @@ public class CheckForUpdates extends HttpServlet {
 	}
 
 	private String getLatestVersion() throws Exception {
-		String url = "http://pine-project.org/updates/latestversion.php";
+		String url = host + "/updates/latestversion.php";
 		String charset = "UTF-8";
 		String result = "";
 
@@ -67,7 +71,8 @@ public class CheckForUpdates extends HttpServlet {
 			if (output != null)
 				try {
 					output.close();
-				} catch (IOException logOrIgnore) {
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 		}
 		InputStream response = connection.getInputStream();

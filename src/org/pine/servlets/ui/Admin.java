@@ -191,7 +191,7 @@ public class Admin extends HttpServlet {
 					out.print("</div>");
 					out.print("<div class=\"table-row users-row\">");
 					out.print("<div class=\"table-cell users-cell\">Database password:</div>");
-					out.print("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbpswd\" value=\""
+					out.print("<div class=\"table-cell users-cell\"><input type=\"password\" class=\"dialog-edit\" name=\"dbpswd\" value=\""
 							+ GlobalSettings.getInstance().getDbPswd() + "\"></div>");
 					out.print("</div>");
 					out.print("</div>");

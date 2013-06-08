@@ -12,6 +12,7 @@ package org.pine.servlets.ui.dialogs;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
 import org.pine.model.Category;
 import org.pine.model.Table;
@@ -45,15 +47,14 @@ public class GetEditTableDialog extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-
 			int id = Integer.parseInt(request.getParameter("id"));
 
 			Table table = Dao.getTable(id);
 			if ((table.getType() == TableType.TABLE) || (table.getType() == TableType.STORAGE)
 					|| (table.getType() == TableType.ENUMERATION)) {
-				response.setContentType("text/html");
-				PrintWriter out = response.getWriter();
 				String name = table.getName();
 				int categoryId = table.getCategoryId();
 
@@ -84,6 +85,10 @@ public class GetEditTableDialog extends HttpServlet {
 				List<Category> categories = Dao.getAllCategories(Dao.getCategory(categoryId).getProductId(),
 						table.getType());
 				for (Category category : categories) {
+					category.setName(addParents(category));
+				}
+				Collections.sort(categories);
+				for (Category category : categories) {
 					String selected = "";
 					if (categoryId == category.getId()) {
 						selected = "selected=\"selected\" ";
@@ -100,12 +105,22 @@ public class GetEditTableDialog extends HttpServlet {
 				out.println("<button id=\"dialog-btn-edit-data-item\" class=\"ui-button\">Save</button> ");
 				out.println("<button class=\"ui-button btn-cancel\">Cancel</button> ");
 				out.println("</div></div></div>");
-
-				out.flush();
-				out.close();
 			}
 		} catch (Exception e) {
+			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
+	}
+
+	private String addParents(Category category) throws Exception {
+		Category currCategory = category;
+		String fullPath = category.getName();
+		while (currCategory.getParentId() != 0) {
+			currCategory = Dao.getCategory(currCategory.getParentId());
+			fullPath = StringUtils.join(currCategory.getName(), "/", fullPath);
+		}
+		return fullPath;
 	}
 }

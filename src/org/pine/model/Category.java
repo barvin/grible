@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.pine.model;
 
-public class Category {
+public class Category implements Comparable<Category> {
 	private int id;
 	private TableType type;
 	private String name;
@@ -56,6 +56,11 @@ public class Category {
 
 	public void setType(TableType type) {
 		this.type = type;
+	}
+
+	@Override
+	public int compareTo(Category compareCategory) {
+		return this.name.compareTo(compareCategory.getName());
 	}
 	
 }

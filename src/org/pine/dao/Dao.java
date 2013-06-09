@@ -753,7 +753,7 @@ public class Dao {
 	public static void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		for (int i = 0; i < keyIds.size(); i++) {
+		for (int i = keyIds.size() - 1; i >= 0; i--) {
 			stmt.executeUpdate("UPDATE keys SET \"order\"=" + keyNumbers.get(i) + " " + "WHERE id=" + keyIds.get(i));
 		}
 
@@ -796,7 +796,8 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted
+	 * to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -810,7 +811,7 @@ public class Dao {
 		List<Value> values = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		for (int i = 0; i < rowIds.size(); i++) {
+		for (int i = rowIds.size() - 1; i >= 0; i--) {
 			stmt.executeUpdate("UPDATE rows SET \"order\"=" + modifiedRowNumbers.get(i) + " " + "WHERE id="
 					+ rowIds.get(i));
 

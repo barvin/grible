@@ -489,7 +489,7 @@ h3.category-item:hover {
 	min-width: 60px;
 	width: 100%;
 	margin: -3px;
-	border: 2px inset #eee;
+	border: 1px inset #eee;
 }
 
 .modified-value-cell {

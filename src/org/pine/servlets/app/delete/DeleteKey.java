@@ -44,10 +44,9 @@ public class DeleteKey extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
-			
 			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
 			int tableId = Dao.getKey(keyId).getTableId();
@@ -64,11 +63,11 @@ public class DeleteKey extends HttpServlet {
 			} else {
 				out.print("Could not delete the column. See server log for detail.");
 			}
-
-			out.flush();
-			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
 		}
+		out.flush();
+		out.close();
 	}
 }

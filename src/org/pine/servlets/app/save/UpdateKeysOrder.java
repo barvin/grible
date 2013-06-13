@@ -43,11 +43,9 @@ public class UpdateKeysOrder extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
-			
-
 			if (request.getParameterValues("modkeyids[]") != null) {
 				String[] strKeyIds = request.getParameterValues("modkeyids[]");
 				String[] strKeyNumbers = request.getParameterValues("modkeynumbers[]");
@@ -61,11 +59,12 @@ public class UpdateKeysOrder extends HttpServlet {
 			}
 			out.print("success");
 
-			out.flush();
-			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
 		}
+		out.flush();
+		out.close();
 	}
 
 	/**

@@ -753,7 +753,10 @@ public class Dao {
 	public static void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		for (int i = keyIds.size() - 1; i >= 0; i--) {
+		for (int i = 0; i < keyIds.size(); i++) {
+			stmt.executeUpdate("UPDATE keys SET \"order\"=-" + (i + 1) + " " + "WHERE id=" + keyIds.get(i));
+		}
+		for (int i = 0; i < keyIds.size(); i++) {
 			stmt.executeUpdate("UPDATE keys SET \"order\"=" + keyNumbers.get(i) + " " + "WHERE id=" + keyIds.get(i));
 		}
 
@@ -811,7 +814,10 @@ public class Dao {
 		List<Value> values = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		for (int i = rowIds.size() - 1; i >= 0; i--) {
+		for (int i = 0; i < rowIds.size(); i++) {
+			stmt.executeUpdate("UPDATE rows SET \"order\"=-" + (i + 1) + " " + "WHERE id=" + rowIds.get(i));
+		}
+		for (int i = 0; i < rowIds.size(); i++) {
 			stmt.executeUpdate("UPDATE rows SET \"order\"=" + modifiedRowNumbers.get(i) + " " + "WHERE id="
 					+ rowIds.get(i));
 
@@ -1232,11 +1238,22 @@ public class Dao {
 		return result;
 	}
 
-	public static void execute(String query) throws SQLException {
+	public static void executeUpdate(String query) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(query);
 
+		stmt.close();
+	}
+
+	public static void executeUpdateNoFail(String query) throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		try {
+			stmt.executeUpdate(query);
+		} catch (Exception e) {
+			System.out.println("INFO: Exception ignored: " + e.getLocalizedMessage());
+		}
 		stmt.close();
 	}
 

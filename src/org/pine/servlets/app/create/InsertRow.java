@@ -58,7 +58,7 @@ public class InsertRow extends HttpServlet {
 			List<Integer> rowNumbers = new ArrayList<Integer>();
 			List<Integer> oldRowNumbers = new ArrayList<Integer>();
 			List<Row> rows = Dao.getRows(tableId);
-			for (int i = 0; i < rows.size(); i++) {
+			for (int i = rows.size() - 1; i >= 0; i--) {
 				rowIds.add(rows.get(i).getId());
 				if (rows.get(i).getOrder() >= currentRowNumber) {
 					rowNumbers.add(i + 2);

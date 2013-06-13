@@ -41,14 +41,14 @@ public class DeleteRow extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
-			
 			int rowId = Integer.parseInt(request.getParameter("rowid"));
 			Row row = Dao.getRow(rowId);
 			int tableId = row.getTableId();
@@ -91,10 +91,11 @@ public class DeleteRow extends HttpServlet {
 					out.print("Could not delete the row. See server log for details.");
 				}
 			}
-			out.flush();
-			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
 		}
+		out.flush();
+		out.close();
 	}
 }

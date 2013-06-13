@@ -44,17 +44,20 @@ public class InitDB extends HttpServlet {
 			if (createNewDb) {
 				String query = getSQLQuery("/WEB-INF/sql/pine_init.sql");
 				String querySetSeqVal = getSQLQuery("/WEB-INF/sql/pine_setseqval.sql");
-				Dao.execute(query);
+				Dao.executeUpdate(query);
 				Dao.executeSelect(querySetSeqVal);
 			} else {
+				Dao.executeUpdateNoFail("ALTER TABLE ONLY keys ADD CONSTRAINT keys_tableid_order_key UNIQUE (tableid, \"order\");");
+				Dao.executeUpdateNoFail("ALTER TABLE ONLY rows ADD CONSTRAINT rows_tableid_order_key UNIQUE (tableid, \"order\");");
+				Dao.executeUpdateNoFail("ALTER TABLE ONLY \"values\" ADD CONSTRAINT values_rowid_keyid_key UNIQUE (rowid, keyid);");
 				if (!Dao.isTableTypeExist("enumeration")) {
-					Dao.execute("INSERT INTO tabletypes(name) VALUES ('enumeration')");
+					Dao.executeUpdate("INSERT INTO tabletypes(name) VALUES ('enumeration')");
 				}
 				if (!Dao.columnExist("tables", "showwarning")) {
-					Dao.execute("ALTER TABLE tables ADD COLUMN showwarning boolean NOT NULL DEFAULT true;");
+					Dao.executeUpdate("ALTER TABLE tables ADD COLUMN showwarning boolean NOT NULL DEFAULT true;");
 				}
 				if (!Dao.columnExist("tables", "modifiedtime")) {
-					Dao.execute("ALTER TABLE tables ADD COLUMN modifiedtime timestamp without time zone NOT NULL DEFAULT '2013-01-01 00:00:00';");
+					Dao.executeUpdate("ALTER TABLE tables ADD COLUMN modifiedtime timestamp without time zone NOT NULL DEFAULT '2013-01-01 00:00:00';");
 				}
 			}
 			out.print("Done.");

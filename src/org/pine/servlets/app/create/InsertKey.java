@@ -49,7 +49,7 @@ public class InsertKey extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
-			
+
 			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
 			Key currentKey = Dao.getKey(keyId);
@@ -58,7 +58,7 @@ public class InsertKey extends HttpServlet {
 			List<Integer> keyIds = new ArrayList<Integer>();
 			List<Integer> keyNumbers = new ArrayList<Integer>();
 			List<Key> keys = Dao.getKeys(tableId);
-			for (int i = 0; i < keys.size(); i++) {
+			for (int i = keys.size() - 1; i >= 0; i--) {
 				keyIds.add(keys.get(i).getId());
 				if (keys.get(i).getOrder() >= currentKeyNumber) {
 					keyNumbers.add(i + 2);

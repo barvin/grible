@@ -44,8 +44,7 @@ public class Home extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -82,16 +81,16 @@ public class Home extends HttpServlet {
 				responseHtml.append("<div id=\"login-form\">");
 				responseHtml.append("<img id=\"login-logo\" src=\"img/pine_logo.png\"><br>");
 				responseHtml.append("<form method=\"post\" action=\"Login\">");
-				responseHtml.append("<div class=\"table\">");
+				responseHtml.append("<div id=\"login-form\" class=\"table\">");
 				responseHtml.append("<div class=\"table-row\">");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Username:</div>");
 				responseHtml
-						.append("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"dialog-edit\" name=\"username\"></div>");
+						.append("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"dialog-edit\" name=\"username\" size=\"30\"></div>");
 				responseHtml.append("</div>");
 				responseHtml.append("<div class=\"table-row\">");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Password:</div>");
 				responseHtml
-						.append("<div class=\"table-cell dialog-cell dialog-edit\"><input type=\"password\" class=\"dialog-edit\" name=\"pass\"></div>");
+						.append("<div class=\"table-cell dialog-cell dialog-edit\"><input type=\"password\" class=\"dialog-edit\" name=\"pass\" size=\"30\"></div>");
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");
 				if (request.getParameter("url") != null) {
@@ -99,7 +98,7 @@ public class Home extends HttpServlet {
 							+ "\">");
 				}
 				responseHtml
-						.append("<div class=\"dialog-buttons right\"><input type=\"submit\" value=\"Log in\" class=\"ui-button\"></div></form>");
+						.append("<div class=\"login-dialog-buttons right\"><input type=\"submit\" value=\"Log in\" class=\"ui-button\"></div></form>");
 				if (request.getSession(false).getAttribute("loginFailed") != null) {
 					String message = (String) request.getSession(false).getAttribute("loginFailed");
 					responseHtml.append("<br><span class=\"dialog-error-message\">" + message + "</span>");
@@ -184,8 +183,7 @@ public class Home extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

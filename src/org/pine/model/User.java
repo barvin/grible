@@ -19,6 +19,7 @@ public class User {
 	private String password;
 	private boolean isAdmin;
 	private List<UserPermission> permissions;
+	private boolean isTooltipOnClick;
 
 	public User(int id) {
 		this.id = id;
@@ -93,4 +94,14 @@ public class User {
 		}
 		return false;
 	}
+
+	public boolean isTooltipOnClick() {
+		return isTooltipOnClick;
+	}
+
+	public void setTooltipOnClick(boolean isTooltipOnClick) {
+		this.isTooltipOnClick = isTooltipOnClick;
+	}
+	
+	
 }

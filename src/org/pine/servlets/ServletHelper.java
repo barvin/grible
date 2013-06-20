@@ -52,10 +52,9 @@ public class ServletHelper {
 
 	public static String getFooter(String realPath, String pathToImg) {
 		return "<div id=\"footer\" class=\"page-bottom\"><hr><img src=\"" + pathToImg
-				+ "/pine_logo_mini.png\"><span class=\"build\">Version: " + getBuildNumber(realPath)
-				+ "</span></div>";
+				+ "/pine_logo_mini.png\"><span class=\"build\">Version: " + getBuildNumber(realPath) + "</span></div>";
 	}
-	
+
 	public static String getBuildNumber(String realPath) {
 		return getContents(realPath + "/VERSION.txt");
 	}
@@ -88,7 +87,8 @@ public class ServletHelper {
 		if (user.isAdmin()) {
 			builder.append(" | <a href=\"/pine/admin/\">Admin page</a>");
 		}
-		builder.append("</span><span id=\"lnk-logout\"> | <a href=\"/pine/logout\">Log out</a></span></div>");
+		builder.append("</span><span id=\"lnk-settings\"> | <a href=\"/pine/settings/\">Settings</a></span>").append(
+				"<span id=\"lnk-logout\"> | <a href=\"/pine/logout\">Log out</a></span></div>");
 
 		return builder.toString();
 	}
@@ -272,7 +272,7 @@ public class ServletHelper {
 			responseHtml.append("</script>");
 		}
 	}
-	
+
 	public static boolean isEnumValue(Value value) throws SQLException {
 		boolean result = false;
 		Key key = Dao.getKey(value.getKeyId());

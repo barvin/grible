@@ -47,7 +47,7 @@ public class CreateAdmin extends HttpServlet {
 				MessageDigest md = MessageDigest.getInstance("MD5");
 				md.update(pinePswd.getBytes());
 				String hashPass = new String(md.digest());
-				int userId = Dao.insertUser(pineLogin, hashPass, true);
+				int userId = Dao.insertUser(pineLogin, hashPass, true, false);
 				if (userId > 0) {
 					out.print("Done.");
 				} else {

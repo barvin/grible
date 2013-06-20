@@ -81,7 +81,7 @@ public class Home extends HttpServlet {
 				responseHtml.append("<div id=\"login-form\">");
 				responseHtml.append("<img id=\"login-logo\" src=\"img/pine_logo.png\"><br>");
 				responseHtml.append("<form method=\"post\" action=\"Login\">");
-				responseHtml.append("<div id=\"login-form\" class=\"table\">");
+				responseHtml.append("<div id=\"credentials\" class=\"table\">");
 				responseHtml.append("<div class=\"table-row\">");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Username:</div>");
 				responseHtml

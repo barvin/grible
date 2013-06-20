@@ -55,7 +55,7 @@ public class AddUser extends HttpServlet {
 				md = MessageDigest.getInstance("MD5");
 				md.update(strPass.getBytes());
 				String hashPass = new String(md.digest());
-				int userId = Dao.insertUser(userName, hashPass, isAdmin);
+				int userId = Dao.insertUser(userName, hashPass, isAdmin, false);
 				if (userId > 0) {
 					if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
 						String[] productIds = request.getParameterValues("productIds[]");

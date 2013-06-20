@@ -20,19 +20,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
-import org.pine.model.Table;
+import org.pine.model.User;
 
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/EditTable")
-public class EditTable extends HttpServlet {
+@WebServlet("/SaveSettings")
+public class SaveSettings extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public EditTable() {
+	public SaveSettings() {
 		super();
 	}
 
@@ -45,21 +45,11 @@ public class EditTable extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {			
-			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = Dao.getTable(id);
-			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
-			String name = request.getParameter("name");
-			String className = request.getParameter("classname");
-
-			if ("".equals(name)) {
-				out.print("ERROR: Name cannot be empty.");
-			} else {
-				table.setCategoryId(categoryId);
-				table.setName(name);
-				table.setClassName(className);
-				Dao.updateTable(table);
-				out.print("success");
-			}
+			String userName = (String) request.getSession(false).getAttribute("userName");
+			User user = Dao.getUserByName(userName);
+			boolean isTooltipOnClick = Boolean.parseBoolean(request.getParameter("tooltiponclick"));
+			Dao.updateUserIsTooltipOnClick(user.getId(), isTooltipOnClick);
+			out.print("success");
 
 		} catch (Exception e) {
 			e.printStackTrace();

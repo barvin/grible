@@ -109,6 +109,7 @@ public class Dao {
 		user.setAdmin(rs.getBoolean("isadmin"));
 		List<UserPermission> permissions = getUserPermissions(rs.getInt("id"));
 		user.setPermissions(permissions);
+		user.setTooltipOnClick(rs.getBoolean("tooltiponclick"));
 		return user;
 	}
 
@@ -358,7 +359,7 @@ public class Dao {
 	public static void updateUserName(int id, String userName) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE users " + "SET login='" + userName + "' WHERE id=" + id);
+		stmt.executeUpdate("UPDATE users SET login='" + userName + "' WHERE id=" + id);
 
 		stmt.close();
 	}
@@ -366,7 +367,7 @@ public class Dao {
 	public static void updateUserPassword(int id, String hashPass) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE users " + "SET password='" + hashPass + "' WHERE id=" + id);
+		stmt.executeUpdate("UPDATE users SET password='" + hashPass + "' WHERE id=" + id);
 
 		stmt.close();
 	}
@@ -374,18 +375,27 @@ public class Dao {
 	public static void updateUserIsAdmin(int id, boolean isAdmin) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE users " + "SET isadmin=" + isAdmin + " WHERE id=" + id);
+		stmt.executeUpdate("UPDATE users SET isadmin=" + isAdmin + " WHERE id=" + id);
 
 		stmt.close();
 	}
 
-	public static int insertUser(String userName, String hashPass, boolean isAdmin) throws SQLException {
+	public static void updateUserIsTooltipOnClick(int id, boolean isTooltipOnClick) throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate("UPDATE users SET tooltiponclick=" + isTooltipOnClick + " WHERE id=" + id);
+
+		stmt.close();
+	}
+
+	public static int insertUser(String userName, String hashPass, boolean isAdmin, boolean isTooltipOnClick)
+			throws SQLException {
 		int id = 0;
 
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("INSERT INTO users(login, password, isadmin) VALUES ('" + userName + "', '"
-				+ hashPass.replace("'", "''") + "', " + isAdmin + ")");
+		stmt.executeUpdate("INSERT INTO users(login, password, isadmin, tooltiponclick) VALUES ('" + userName + "', '"
+				+ hashPass.replace("'", "''") + "', " + isAdmin + ", " + isTooltipOnClick + ")");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM users ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {
 			id = rs.getInt("id");

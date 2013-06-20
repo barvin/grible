@@ -147,7 +147,8 @@ CREATE TABLE users (
     id integer NOT NULL,
     login character varying(100) NOT NULL,
     password character varying(255) NOT NULL,
-    isadmin boolean DEFAULT false NOT NULL
+    isadmin boolean DEFAULT false NOT NULL,
+    tooltiponclick boolean DEFAULT false NOT NULL
 );
 ALTER TABLE public.users OWNER TO postgres;
 

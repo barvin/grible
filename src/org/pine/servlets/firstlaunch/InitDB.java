@@ -59,6 +59,9 @@ public class InitDB extends HttpServlet {
 				if (!Dao.columnExist("tables", "modifiedtime")) {
 					Dao.executeUpdate("ALTER TABLE tables ADD COLUMN modifiedtime timestamp without time zone NOT NULL DEFAULT '2013-01-01 00:00:00';");
 				}
+				if (!Dao.columnExist("users", "tooltiponclick")) {
+					Dao.executeUpdate("ALTER TABLE users ADD COLUMN tooltiponclick boolean NOT NULL DEFAULT false;");
+				}
 			}
 			out.print("Done.");
 		} catch (Exception e) {

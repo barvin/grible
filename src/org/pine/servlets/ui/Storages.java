@@ -39,7 +39,8 @@ public class Storages extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -88,6 +89,7 @@ public class Storages extends HttpServlet {
 					responseHtml.append("var productId = \"").append(productId).append("\";");
 					responseHtml.append("var tableId = \"").append(tableId).append("\";");
 					responseHtml.append("var tableType = \"storage\";");
+					responseHtml.append("var isTooltipOnClick = ").append(user.isTooltipOnClick()).append(";");
 					responseHtml.append("</script>");
 					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
 					ServletHelper.showImportResult(request, responseHtml, tableId);
@@ -118,7 +120,8 @@ public class Storages extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

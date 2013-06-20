@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
-import org.pine.model.Table;
 import org.pine.model.User;
 import org.pine.servlets.ServletHelper;
 import org.pine.settings.GlobalSettings;
@@ -28,19 +27,20 @@ import org.pine.settings.GlobalSettings;
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/tables/")
-public class Tables extends HttpServlet {
+@WebServlet("/settings/")
+public class Settings extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public Tables() {
+	public Settings() {
 		super();
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -57,70 +57,52 @@ public class Tables extends HttpServlet {
 				response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
 			} else if (request.getSession(false).getAttribute("userName") == null) {
 				response.sendRedirect("/pine/?url=" + request.getRequestURI() + "?" + request.getQueryString());
-			} else if ((request.getParameter("product") == null) && (request.getParameter("id") == null)) {
-				response.sendRedirect("/pine");
 			} else {
-
 				responseHtml.append("<!DOCTYPE html>");
 				responseHtml.append("<html>");
 				responseHtml.append("<head>");
-				responseHtml.append("<title>Test Tables - Pine</title>");
-				responseHtml.append(ServletHelper.getIncludes());
+				responseHtml.append("<title>Settings - Pine</title>");
+				responseHtml.append("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
+				responseHtml.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/style.css\" />");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/settings.js\"></script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/defaultVars.js\"></script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/default.js\"></script>");
+				responseHtml.append("</head>");
+				responseHtml.append("<body>");
 
 				String userName = (String) request.getSession(false).getAttribute("userName");
-				User user = Dao.getUserByName(userName);
+				User currentUser = Dao.getUserByName(userName);
+				responseHtml.append(ServletHelper.getUserPanel(currentUser));
+				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">"
+						+ "<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+				responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
+				responseHtml.append("<a href=\"/pine/settings/\"><span id=\"product-name\">Settings</span></a></div>");
 
-				int productId = 0;
-				int tableId = 0;
-				String tableType = "table";
-				if (request.getParameter("id") != null) {
-					tableId = Integer.parseInt(request.getParameter("id"));
-					Table table = Dao.getTable(tableId);
-					switch (table.getType()) {
-					case TABLE:
-						productId = Dao.getProductIdByPrimaryTableId(tableId);
-						break;
+				responseHtml.append("<br /><br />");
+				responseHtml.append("<div id=\"settings-page\" class=\"table\">");
+				responseHtml.append("<div class=\"table-row\">");
+				responseHtml.append("<div id=\"admin-users\" class=\"table-cell border-right\">");
+				responseHtml.append("<span class=\"medium-header\">Table view</span>");
+				responseHtml.append("<br /><br />");
 
-					case PRECONDITION:
-						productId = Dao.getProductIdBySecondaryTableId(tableId);
-						break;
-
-					case POSTCONDITION:
-						productId = Dao.getProductIdBySecondaryTableId(tableId);
-						break;
-
-					default:
-						break;
-					}
-					tableType = table.getType().toString().toLowerCase();
-				} else {
-					productId = Integer.parseInt(request.getParameter("product"));
+				String tooltipOnClick = "";
+				if (currentUser.isTooltipOnClick()) {
+					tooltipOnClick = "checked=\"checked\"";
 				}
+				responseHtml.append("<input id=\"cbx-tooltiponclick\" type=\"checkbox\" ").append(tooltipOnClick)
+						.append(" />");
+				responseHtml.append(" Show storage cell info on click");
 
-				if (!user.hasAccessToProduct(productId)) {
-					responseHtml.append("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
-					responseHtml.append("<br/><br/>"
-							+ "<div class=\"error-message\">You do not have permissions to access this page.</div>");
-				} else {
+				responseHtml.append("<br><br><button id=\"btn-save-settings\" class=\"ui-button\">Save</button>");
 
-					responseHtml.append("<script type=\"text/javascript\">");
-					responseHtml.append("var productId = \"").append(productId).append("\";");
-					responseHtml.append("var tableId = \"").append(tableId).append("\";");
-					responseHtml.append("var tableType = \"").append(tableType).append("\";");
-					responseHtml.append("var isTooltipOnClick = ").append(user.isTooltipOnClick()).append(";");
-					responseHtml.append("</script>");
-					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
-					ServletHelper.showImportResult(request, responseHtml, tableId);
-					ServletHelper.showAdvancedImportDialog(request, responseHtml);
+				responseHtml.append("</div>"); // cell
+				responseHtml.append("</div>"); // row
+				responseHtml.append("</div>"); // page
 
-					responseHtml.append("</head>");
-					responseHtml.append("<body>");
-					responseHtml.append(ServletHelper.getUserPanel(user));
-					responseHtml.append(ServletHelper.getBreadCrumb("tables", Dao.getProduct(productId)));
-					responseHtml.append(ServletHelper.getMain());
-					responseHtml.append(ServletHelper.getContextMenus("table"));
-					responseHtml.append(ServletHelper.getLoadingGif());
-				}
 				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath(""), "../img"));
 				responseHtml.append("</body>");
 				responseHtml.append("</html>");
@@ -138,7 +120,8 @@ public class Tables extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

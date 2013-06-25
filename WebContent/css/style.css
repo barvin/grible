@@ -204,12 +204,18 @@ h3.category-item:hover {
 	height: 100%;
 	width: 100%;
 	background-color: rgba(210, 210, 210, 0.6);
+	z-index: 100000;
+	display: none;
+}
+
+#waiting-bg.loading {
+	display: block;
 }
 
 .waiting-gif {
 	display: none;
 	position: absolute;
-	z-index: 101;
+	z-index: 100001;
 	top: 50%;
 	left: 45%;
 }
@@ -243,7 +249,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(                    startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(                     startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -258,8 +264,9 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(                     startColorstr='#234e56',
-		endColorstr='#ededed', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(
+		                     startColorstr='#234e56', endColorstr='#ededed',
+		GradientType=0);
 	border: 1px solid #F0F0F0;
 }
 
@@ -377,7 +384,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: -ms-linear-gradient(top, #f9f9f9 0%, #ededed 100%);
 	background: linear-gradient(to bottom, #f9f9f9 0%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(                    startColorstr='#f9f9f9',
+	filter: progid:DXImageTransform.Microsoft.gradient(                     startColorstr='#f9f9f9',
 		endColorstr='#ededed', GradientType=0);
 }
 
@@ -392,8 +399,9 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: -ms-linear-gradient(top, #234e56 0%, #367f86 100%, #ededed 100%);
 	background: linear-gradient(to bottom, #234e56 0%, #367f86 100%, #ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(                     startColorstr='#234e56',
-		endColorstr='#ededed', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(
+		                     startColorstr='#234e56', endColorstr='#ededed',
+		GradientType=0);
 }
 
 .icon-button.button-enabled>.icon-enabled {
@@ -524,7 +532,7 @@ h3.category-item:hover {
 	background: -o-linear-gradient(top, #367f86 0%, #234e56 100%);
 	background: -ms-linear-gradient(top, #367f86 0%, #234e56 100%);
 	background: linear-gradient(to bottom, #367f86 0%, #234e56 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(         startColorstr='#367f86',
+	filter: progid:DXImageTransform.Microsoft.gradient(          startColorstr='#367f86',
 		endColorstr='#234e56', GradientType=0);
 	color: #F0F0F0;
 	padding: 10px;
@@ -711,7 +719,7 @@ h3.category-item:hover {
 	left: 0;
 	width: 1px;
 	-moz-opacity: 0;
-	filter: alpha(opacity =             0);
+	filter: alpha(opacity =               0);
 	opacity: 0;
 	font-size: 15px;
 	height: 26px;

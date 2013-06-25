@@ -2,6 +2,8 @@ $(window)
 		.on(
 				'load',
 				function() {
+					$("#waiting-bg").removeClass("loading");
+
 					var $loginForm = $("#login-form");
 					if ($loginForm.height() < $(window).height()) {
 						var $posTop = $(window).height() * 0.2;

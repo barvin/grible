@@ -30,7 +30,7 @@ function initialize() {
 		tableId : tableId,
 		tableType : tableType
 	}, function(data) {
-		$("#waiting-bg").remove();
+		$("#waiting-bg").removeClass("loading");
 		$("#category-container").html(data);
 		initLeftPanel(jQuery);
 	});
@@ -73,7 +73,7 @@ function initLeftPanel() {
 	});
 
 	$(".data-item").click(function() {
-		$("#waiting").addClass("loading");
+		$("#waiting-bg").addClass("loading");
 		$(".data-item-selected").find(".changed-sign").remove();
 		$(".data-item-selected").removeClass("data-item-selected");
 		$("#btn-edit-data-item").removeClass("button-disabled");
@@ -217,7 +217,7 @@ function initLeftPanel() {
 	initDelimiter();
 
 	if (tableId > 0) {
-		$("#waiting").addClass("loading");
+		$("#waiting-bg").addClass("loading");
 
 		var name = $(".data-item-selected").find("span.tree-item-text").text().trim();
 		document.title = name + " - " + $("#section-name").text() + " - Pine";
@@ -767,6 +767,9 @@ function initTopPanel() {
 			initGeneratedClassDialog(jQuery);
 		});
 	});
+	
+	$("#waiting-bg").removeClass("loading");
+
 }
 
 function setRowsUsage(usage) {
@@ -1070,9 +1073,11 @@ function initKeysAndIndexes() {
 		var $rowOrder = parseInt($(el).text());
 		var $row = $(el).parent();
 		if (action == "add") {
+			$("#waiting-bg").addClass("loading");
 			$.post("../InsertRow", {
 				rowid : $rowId
 			}, function(data) {
+				$("#waiting-bg").removeClass("loading");
 				var newIds = data.split(";");
 				if (newIds.length > 1) {
 					$newRow = $row.clone(true);
@@ -1101,9 +1106,11 @@ function initKeysAndIndexes() {
 				}
 			});
 		} else if (action == "copy") {
+			$("#waiting-bg").addClass("loading");
 			$.post("../CopyRow", {
 				rowid : $rowId
 			}, function(data) {
+				$("#waiting-bg").removeClass("loading");
 				var newIds = data.split(";");
 				if (newIds.length > 1) {
 					$newRow = $row.clone(true);
@@ -1309,14 +1316,14 @@ function initTooltipCells(elements) {
 		var $value = value;
 		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))) {
 			if ($value.has("div.tooltip").length == 0) {
-				$("#waiting").addClass("loading");
+				$("#waiting-bg").addClass("loading");
 				var $content = $value.text();
 				var $args = {
 					id : $value.attr('id'),
 					content : $content
 				};
 				$.post("../GetStorageTooltip", $args, function(data) {
-					$("#waiting").removeClass("loading");
+					$("#waiting-bg").removeClass("loading");
 					$value.html(data);
 					var $tooltip = $value.find("div.tooltip");
 

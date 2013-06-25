@@ -38,6 +38,8 @@ function initialize() {
 
 function initLeftPanel() {
 
+	$("#waiting-bg").removeClass("loading");
+	
 	$(".categories").accordion({
 		collapsible : true,
 		animate : 200,

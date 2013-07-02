@@ -98,10 +98,11 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.println("<div class=\"ui-dialog-title\">Change parameter type</div>");
 		out.println("<div class=\"ui-dialog-content\">");
 		out.println("<br>");
-		out.println("<input type=\"radio\" value=\"text\" name=\"parameter-type\"" + textChecked + ">Text");
+		out.println("<input type=\"radio\" value=\"text\" name=\"parameter-type\"" + textChecked
+				+ "><span id=\"label-option-text\" class=\"label-option\">Text</span>");
 		out.println("<br><br>");
 		out.println("<input type=\"radio\" value=\"storage\" name=\"parameter-type\"" + storageChecked
-				+ storageDisabled + ">Data Storage: ");
+				+ storageDisabled + "><span id=\"label-option-storage\" class=\"label-option\">Data Storage: </span>");
 		out.println("<select class=\"select-storage\" " + storageSelectDisabled + ">");
 
 		for (Table dataSotage : dataSotages) {
@@ -117,7 +118,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 
 		out.println("<br><br>");
 		out.println("<input type=\"radio\" value=\"enumeration\" name=\"parameter-type\"" + enumChecked + enumDisabled
-				+ ">Enumeration: ");
+				+ "><span id=\"label-option-enumeration\" class=\"label-option\">Enumeration: </span>");
 		out.println("<select class=\"select-enum\" " + enumSelectDisabled + ">");
 
 		for (Table enumeration : enums) {

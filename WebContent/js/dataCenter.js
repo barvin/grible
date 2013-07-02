@@ -1482,19 +1482,46 @@ function initEditableKeyCell() {
 function initParameterTypeDialog() {
 	initDialog();
 	$("input[value='storage']").click(function() {
+		onStorageClick();
+	});
+	
+	$("#label-option-storage").click(function() {
+		$("input[value='storage']").click();
+		onStorageClick();
+	});
+
+	function onStorageClick() {
 		$(".select-storage").prop("disabled", false);
 		$(".select-enum").prop("disabled", true);
-	});
+	}
 
 	$("input[value='text']").click(function() {
-		$(".select-storage").prop("disabled", true);
-		$(".select-enum").prop("disabled", true);
+		onTextClick();
 	});
 
+	$("#label-option-text").click(function() {
+		$("input[value='text']").click();
+		onTextClick();
+	});
+
+	function onTextClick() {
+		$(".select-storage").prop("disabled", true);
+		$(".select-enum").prop("disabled", true);
+	}
+
 	$("input[value='enumeration']").click(function() {
+		onEnumClick();
+	});
+	
+	$("#label-option-enumeration").click(function() {
+		$("input[value='enumeration']").click();
+		onEnumClick();
+	});
+
+	function onEnumClick() {
 		$(".select-storage").prop("disabled", true);
 		$(".select-enum").prop("disabled", false);
-	});
+	}
 
 	$("#btn-apply-type").click(function() {
 		var $id = $(this).attr("keyid");

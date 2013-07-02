@@ -95,7 +95,7 @@ public class Settings extends HttpServlet {
 				}
 				responseHtml.append("<input id=\"cbx-tooltiponclick\" type=\"checkbox\" ").append(tooltipOnClick)
 						.append(" />");
-				responseHtml.append(" Show storage cell info on click");
+				responseHtml.append("<span id=\"option-tooltiponclick\" class=\"label-option\"> Show storage cell info on click</span>");
 
 				responseHtml.append("<br><br><button id=\"btn-save-settings\" class=\"ui-button\">Save</button>");
 

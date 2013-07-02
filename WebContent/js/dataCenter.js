@@ -831,8 +831,12 @@ function initTopPanel() {
 }
 
 function setRowsUsage(usage) {
-	$("#data-item-options").slideUp(150);
+	$("#data-item-options").off("mouseleave");
+	$("#data-item-options").hide(1);
 	$("#waiting-bg").addClass("loading");
+	$("#data-item-options").on("mouseleave", function() {
+		$("#data-item-options").slideUp(150);
+	});	
 	$.post("../SetRowsUsage", {
 		id : tableId,
 		usage : usage

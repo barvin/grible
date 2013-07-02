@@ -203,7 +203,7 @@ h3.category-item:hover {
 	left: 0px;
 	height: 100%;
 	width: 100%;
-	background-color: rgba(210, 210, 210, 0.4);
+	background-color: rgba(230, 230, 230, 0.4);
 	z-index: 100000;
 	display: none;
 }

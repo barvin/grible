@@ -85,10 +85,11 @@ public class ServletHelper {
 		builder.append("<div id=\"user-panel\"><span id=\"lbl-user\">User: </span><span id=\"userName\">"
 				+ user.getName() + "</span><span id=\"lnk-admin-page\">");
 		if (user.isAdmin()) {
-			builder.append(" | <a href=\"/pine/admin/\">Admin page</a>");
+			builder.append(" | <a class=\"confirm-needed\" href=\"/pine/admin/\">Admin page</a>");
 		}
-		builder.append("</span><span id=\"lnk-settings\"> | <a href=\"/pine/settings/\">Settings</a></span>").append(
-				"<span id=\"lnk-logout\"> | <a href=\"/pine/logout\">Log out</a></span></div>");
+		builder.append(
+				"</span><span id=\"lnk-settings\"> | <a class=\"confirm-needed\" href=\"/pine/settings/\">Settings</a></span>")
+				.append("<span id=\"lnk-logout\"> | <a class=\"confirm-needed\" href=\"/pine/logout\">Log out</a></span></div>");
 
 		return builder.toString();
 	}
@@ -161,13 +162,15 @@ public class ServletHelper {
 		String sectionName = Sections.getNameByKey(sectionKey);
 
 		responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
-		responseHtml.append("<a href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+		responseHtml.append("<a class=\"confirm-needed\" ");
+		responseHtml.append("href=\"/pine\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 		responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		responseHtml.append("<a href=\"/pine/?product=").append(product.getId()).append("\">");
+		responseHtml.append("<a class=\"confirm-needed\" href=\"/pine/?product=");
+		responseHtml.append(product.getId()).append("\">");
 		responseHtml.append("<span id=\"product-name\" class=\"link-infront\">");
 		responseHtml.append(productName).append("</span></a>");
 		responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-		responseHtml.append("<a href=\"/pine/").append(sectionKey);
+		responseHtml.append("<a class=\"confirm-needed\" href=\"/pine/").append(sectionKey);
 		responseHtml.append("/?product=").append(product.getId()).append("\">");
 		responseHtml.append("<span id=\"section-name\">");
 		responseHtml.append(sectionName).append("</span></a></div>");

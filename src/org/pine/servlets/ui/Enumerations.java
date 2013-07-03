@@ -88,6 +88,7 @@ public class Enumerations extends HttpServlet {
 					responseHtml.append("var productId = \"").append(productId).append("\";");
 					responseHtml.append("var tableId = \"").append(tableId).append("\";");
 					responseHtml.append("var tableType = \"enumeration\";");
+					responseHtml.append("var isTooltipOnClick = ").append(user.isTooltipOnClick()).append(";");
 					responseHtml.append("</script>");
 					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
 					ServletHelper.showImportResult(request, responseHtml, tableId);

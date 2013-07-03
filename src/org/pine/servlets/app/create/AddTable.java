@@ -83,7 +83,15 @@ public class AddTable extends HttpServlet {
 			if (isCopy) {
 				int copyTableId = Integer.parseInt(request.getParameter("copytableid"));
 				boolean isOnlyColumns = Boolean.parseBoolean(request.getParameter("isonlycolumns"));
-				List<Key> keys = Dao.insertKeysFromOneTableToAnother(copyTableId, tableId);
+				List<Key> keys = null;
+				if (type == TableType.ENUMERATION) {
+					List<String> keyName = new ArrayList<String>();
+					keyName.add(name);
+					Dao.insertKeys(tableId, keyName);
+					keys = Dao.getKeys(tableId);
+				} else {
+					keys = Dao.insertKeysFromOneTableToAnother(copyTableId, tableId);
+				}
 				if (isOnlyColumns) {
 					int rowId = Dao.insertRow(tableId, 1);
 					Dao.insertValuesEmptyWithRowId(rowId, keys);

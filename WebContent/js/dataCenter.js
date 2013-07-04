@@ -244,7 +244,7 @@ function initLeftPanel() {
 													+ '<div class="table">'
 													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
 													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="'
-													+ $(el).text() + '"></div>' + '</div>' + '</div>' + '<div class="dialog-buttons right">'
+													+ $(el).text().trim() + '"></div>' + '</div>' + '</div>' + '<div class="dialog-buttons right">'
 													+ '<button id="dialog-btn-edit-category" category-id="' + $id
 													+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
 													+ '</div></div></div>');

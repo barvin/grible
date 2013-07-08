@@ -44,8 +44,7 @@ public class Home extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -164,6 +163,14 @@ public class Home extends HttpServlet {
 						responseHtml.append("<span class=\"icon-button-text\"> Add product</span></div>");
 						responseHtml.append("</div>");
 					}
+
+					responseHtml.append("<div id=\"video-tutorial-msg\">");
+					responseHtml.append("<img src=\"img/info-icon.png\"> ");
+					responseHtml.append("<span class=\"msg-text\">New to Pine? ");
+					responseHtml.append("Watch <a href=\"http://www.pine-project.org/docs.php#video\" ");
+					responseHtml.append("target=\"_blank\">video tutorial</a> ");
+					responseHtml.append("on the official website.</span>");
+					responseHtml.append("</div>");
 				}
 			}
 
@@ -182,8 +189,7 @@ public class Home extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

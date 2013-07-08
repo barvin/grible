@@ -4,10 +4,14 @@ $(window).on("load", function() {
 	var breadcrumbHeight = $("#breadcrumb").height();
 	var footerHeight = $("#footer").outerHeight();
 	var mainHeight = docHeight - breadcrumbHeight - footerHeight - 27;
-	$("#main").height(mainHeight);
-	$(".categories-and-table-row").height(mainHeight);
-	$("#table-container").height(mainHeight);
 	$("#table-container").width(docWidth - $("#delimiter").width() - $(".left-panel").width() - 10);
+	
+	if (isChrome()) {
+		$("#main .table-cell").addClass("floatleft");
+	}
+	
+	$("#main").height(mainHeight);
+	$("#table-container").height(mainHeight);
 	$(".left-panel").height(mainHeight);
 	$("#entities-list").height(mainHeight);
 });
@@ -130,6 +134,9 @@ function initLeftPanel() {
 	});
 
 	function onDataItemClick(thisDataItem) {
+		if (isChrome()) {
+			$("#main .table-cell").addClass("floatleft");
+		}
 		$("#waiting-bg").addClass("loading");
 		$(".data-item-selected").find(".changed-sign").remove();
 		$(".data-item-selected").removeClass("data-item-selected");
@@ -634,6 +641,10 @@ function initTopPanel() {
 				});
 			}
 		});
+	} else {
+		if (isChrome()) {
+			$("#table-container").css("top", "19px");
+		}
 	}
 
 	$("#btn-sort-keys").click(function() {
@@ -1056,6 +1067,9 @@ function loadTableValues(id) {
 		$(".entities-values").html(data);
 		initTableValues(jQuery);
 		initKeysAndIndexes(jQuery);
+		if (isChrome()) {
+			$("#main .table-cell").removeClass("floatleft");
+		}		
 	});
 }
 
@@ -1898,4 +1912,8 @@ function confirmLeavingUnsavedTable(url) {
 	} else {
 		window.location = url;
 	}
+}
+
+function isChrome() {
+	return /chrome/.test(navigator.userAgent.toLowerCase());
 }

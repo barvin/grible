@@ -12,6 +12,8 @@ package org.pine.servlets.app.delete;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,6 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.pine.dao.Dao;
+import org.pine.model.Category;
+import org.pine.model.Table;
+import org.pine.model.TableType;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -36,16 +41,19 @@ public class DeleteProduct extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
-			
 			int productId = Integer.parseInt(request.getParameter("id"));
+
+			Dao.turnOffKeyReftableConstraint();
+			deleteCategories(out, productId, TableType.TABLE);
+			deleteCategories(out, productId, TableType.STORAGE);
+			deleteCategories(out, productId, TableType.ENUMERATION);
 
 			boolean deleted = Dao.deleteProduct(productId);
 			if (deleted) {
@@ -54,10 +62,43 @@ public class DeleteProduct extends HttpServlet {
 				out.print("ERROR: Product was not deleted. See server logs for details.");
 			}
 
-			out.flush();
-			out.close();
+			Dao.turnOnKeyReftableConstraint();
+
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
+			try {
+				Dao.turnOnKeyReftableConstraint();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+				out.print(e1.getLocalizedMessage());
+			}
+		}
+		out.flush();
+		out.close();
+	}
+
+	public void deleteCategories(PrintWriter out, int productId, TableType tableType) throws SQLException {
+		List<Category> categories = Dao.getAllCategories(productId, tableType);
+		for (Category category : categories) {
+			List<Table> tables = Dao.getTablesByCategoryId(category.getId());
+
+			StringBuilder error = new StringBuilder();
+			for (Table table : tables) {
+				boolean deleted = Dao.deleteTable(table.getId());
+				if (!deleted) {
+					out.print("ERROR: Table was not deleted. See server logs for details.");
+				}
+			}
+
+			if (error.length() > 0) {
+				out.print(error.toString());
+			} else {
+				boolean deleted = Dao.deleteCategory(category.getId());
+				if (!deleted) {
+					out.print("ERROR: Category was not deleted. See server logs for details.");
+				}
+			}
 		}
 	}
 }

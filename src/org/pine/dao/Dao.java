@@ -1281,14 +1281,6 @@ public class Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 
-		try {
-			stmt.executeUpdate("ALTER TABLE ONLY keys DROP CONSTRAINT keys_reftable_fkey");
-		} catch (Exception e) {
-			if (!e.getMessage().contains("constraint \"keys_reftable_fkey\" of relation \"keys\" does not exist")) {
-				throw e;
-			}
-		}
-
 		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE productid=" + productId);
 
 		while (rs.next()) {
@@ -1302,11 +1294,36 @@ public class Dao {
 		}
 		stmt.executeUpdate("DELETE FROM userpermissions WHERE productid=" + productId);
 		stmt.executeUpdate("DELETE FROM products WHERE id=" + productId);
-		stmt.executeUpdate("ALTER TABLE ONLY keys ADD CONSTRAINT keys_reftable_fkey FOREIGN KEY (reftable) REFERENCES tables(id)");
 
 		rs.close();
 		stmt.close();
 		return true;
+	}
+	
+	public static void turnOffKeyReftableConstraint() throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		try {
+			stmt.executeUpdate("ALTER TABLE ONLY keys DROP CONSTRAINT keys_reftable_fkey");
+		} catch (Exception e) {
+			if (!e.getMessage().contains("constraint \"keys_reftable_fkey\" of relation \"keys\" does not exist")) {
+				throw e;
+			}
+		}
+		stmt.close();
+	}
+
+	public static void turnOnKeyReftableConstraint() throws SQLException {
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		try {
+			stmt.executeUpdate("ALTER TABLE ONLY keys ADD CONSTRAINT keys_reftable_fkey FOREIGN KEY (reftable) REFERENCES tables(id)");
+		} catch (Exception e) {
+			if (!e.getMessage().contains("constraint \"keys_reftable_fkey\" for relation \"keys\" already exists")) {
+				throw e;
+			}
+		}
+		stmt.close();
 	}
 
 	public static void updateProduct(Product product) throws SQLException {

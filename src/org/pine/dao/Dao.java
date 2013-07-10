@@ -898,7 +898,7 @@ public class Dao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesEmptyWithRowId(int rowId, List<Value> values) throws SQLException {
+	public static List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -912,6 +912,41 @@ public class Dao {
 				Key key = Dao.getKey(value.getKeyId());
 				if (key.getReferenceTableId() == 0) {
 					value.setValue("");
+				}
+			}
+
+			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
+					+ value.getRowId() + ", " + value.getKeyId() + ", '" + escape(value.getValue()) + "', "
+					+ value.isStorage() + ", " + value.getStorageIdsAsString() + ")");
+			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
+			if (rs.next()) {
+				result.add(rs.getInt("id"));
+			}
+		}
+
+		stmt.close();
+		return result;
+	}
+
+	public static List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
+		List<Integer> result = new ArrayList<Integer>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		for (Key key : keys) {
+			Value value = new Value(0);
+			value.setIsStorage(false);
+			value.setValue("");
+			value.setKeyId(key.getId());
+			value.setRowId(rowId);
+			value.setStorageIds(null);
+			if (key.getReferenceTableId() != 0) {
+				Table refTable = getTable(key.getReferenceTableId());
+				if (refTable.getType() == TableType.STORAGE) {
+					value.setIsStorage(true);
+					value.setValue("0");
+				} else if (refTable.getType() == TableType.ENUMERATION) {
+					String firstValue = getValues(getKeys(refTable.getId()).get(0)).get(0).getValue();
+					value.setValue(firstValue);
 				}
 			}
 

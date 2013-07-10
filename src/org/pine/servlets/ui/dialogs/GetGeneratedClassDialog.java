@@ -215,7 +215,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						}
 					} else {
 						type = refTable.getName();
-						method = "(getString(\"" + keyName + "\")) != null) ? " + refTable.getName()
+						method = "(getString(\"" + keyName + "\") != null) ? " + refTable.getName()
 								+ ".valueOf(getString(\"" + keyName + "\")) : null;";
 					}
 				}

@@ -72,7 +72,7 @@ public class InsertRow extends HttpServlet {
 			int newRowId = Dao.insertRowCopy(currentRow);
 
 			List<Value> values = Dao.getValues(currentRow);
-			List<Integer> ids = Dao.insertValuesEmptyWithRowId(newRowId, values);
+			List<Integer> ids = Dao.insertValuesEmptyByRowIdFromExistingRow(newRowId, values);
 
 			String result = newRowId + ";" + StringUtils.join(ids, ";");
 			out.print(result);

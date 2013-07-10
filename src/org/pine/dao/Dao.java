@@ -809,8 +809,7 @@ public class Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted
-	 * to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -899,25 +898,20 @@ public class Dao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
+	public static List<Integer> insertValuesEmptyWithRowId(int rowId, List<Value> values) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		for (Key key : keys) {
-			Value value = new Value(0);
-			value.setIsStorage(false);
-			value.setValue("");
-			value.setKeyId(key.getId());
+		for (Value value : values) {
 			value.setRowId(rowId);
 			value.setStorageIds(null);
-			if (key.getReferenceTableId() != 0) {
-				Table refTable = getTable(key.getReferenceTableId());
-				if (refTable.getType() == TableType.STORAGE) {
-					value.setIsStorage(true);
-					value.setValue("0");
-				} else if (refTable.getType() == TableType.ENUMERATION) {
-					String firstValue = getValues(getKeys(refTable.getId()).get(0)).get(0).getValue();
-					value.setValue(firstValue);
+
+			if (value.isStorage()) {
+				value.setValue("0");
+			} else {
+				Key key = Dao.getKey(value.getKeyId());
+				if (key.getReferenceTableId() == 0) {
+					value.setValue("");
 				}
 			}
 
@@ -1299,7 +1293,7 @@ public class Dao {
 		stmt.close();
 		return true;
 	}
-	
+
 	public static void turnOffKeyReftableConstraint() throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();

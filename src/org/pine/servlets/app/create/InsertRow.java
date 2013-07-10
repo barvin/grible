@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.pine.dao.Dao;
-import org.pine.model.Key;
 import org.pine.model.Row;
+import org.pine.model.Value;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -71,8 +71,8 @@ public class InsertRow extends HttpServlet {
 			currentRow.setOrder(currentRowNumber);
 			int newRowId = Dao.insertRowCopy(currentRow);
 
-			List<Key> keys = Dao.getKeys(tableId);
-			List<Integer> ids = Dao.insertValuesEmptyWithRowId(newRowId, keys);
+			List<Value> values = Dao.getValues(currentRow);
+			List<Integer> ids = Dao.insertValuesEmptyWithRowId(newRowId, values);
 
 			String result = newRowId + ";" + StringUtils.join(ids, ";");
 			out.print(result);

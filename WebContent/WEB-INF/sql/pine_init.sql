@@ -92,7 +92,9 @@ CREATE TABLE tables (
     categoryid integer,
     parentid integer,
     classname character varying(255),
-    showusage boolean
+    showusage boolean,
+    showwarning boolean NOT NULL DEFAULT true,
+  	modifiedtime timestamp without time zone NOT NULL DEFAULT '2013-01-01 00:00:00'::timestamp without time zone
 );
 ALTER TABLE public.tables OWNER TO postgres;
 

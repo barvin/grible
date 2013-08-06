@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -31,8 +33,7 @@ public class InitDB extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -62,6 +63,7 @@ public class InitDB extends HttpServlet {
 				if (!Dao.columnExist("users", "tooltiponclick")) {
 					Dao.executeUpdate("ALTER TABLE users ADD COLUMN tooltiponclick boolean NOT NULL DEFAULT false;");
 				}
+				updateValuesLength();
 			}
 			out.print("Done.");
 		} catch (Exception e) {
@@ -75,6 +77,20 @@ public class InitDB extends HttpServlet {
 		} finally {
 			out.flush();
 			out.close();
+		}
+	}
+
+	private void updateValuesLength() throws SQLException {
+		int newValuesLength = 5000;
+		ResultSet rs = Dao
+				.executeSelect("SELECT atttypmod FROM pg_attribute WHERE attrelid = 'values'::regclass AND attname = 'value';");
+		int actualValuesLength = 0;
+		if (rs.next()) {
+			actualValuesLength = rs.getInt("atttypmod");
+		}
+		if ((actualValuesLength - 4) != newValuesLength) {
+			Dao.executeUpdate("UPDATE pg_attribute SET atttypmod = " + newValuesLength
+					+ " + 4 WHERE attrelid = 'values'::regclass AND attname = 'value';");
 		}
 	}
 

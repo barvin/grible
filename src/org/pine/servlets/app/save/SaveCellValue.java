@@ -42,15 +42,13 @@ public class SaveCellValue extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
-
 			String strId = request.getParameter("id");
 			String strValue = request.getParameter("value");
 			int id = Integer.parseInt(strId);
@@ -64,8 +62,8 @@ public class SaveCellValue extends HttpServlet {
 				int refStorageId = Dao.getRefStorageId(value.getKeyId());
 				for (int i = 0; i < strRows.length; i++) {
 					if (!StringUtils.isNumeric(strRows[i])) {
-						out.print("<br>ERROR: Indexes is not numeric. Row: "
-								+ Dao.getRow(value.getRowId()).getOrder() + ".<br>If you want to set no index, set '0'.");
+						out.print("<br>ERROR: Indexes is not numeric. Row: " + Dao.getRow(value.getRowId()).getOrder()
+								+ ".<br>If you want to set no index, set '0'.");
 						out.flush();
 						out.close();
 						return;
@@ -100,11 +98,12 @@ public class SaveCellValue extends HttpServlet {
 			Dao.updateValue(value);
 			out.print("success");
 
-			out.flush();
-			out.close();
 		} catch (Exception e) {
+			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		out.flush();
+		out.close();
 	}
 
 	private boolean isValueOfEnumeration(Value value) throws SQLException {
@@ -112,8 +111,7 @@ public class SaveCellValue extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

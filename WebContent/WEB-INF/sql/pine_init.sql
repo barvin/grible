@@ -169,7 +169,7 @@ CREATE TABLE "values" (
     id integer NOT NULL,
     rowid integer NOT NULL,
     keyid integer NOT NULL,
-    value character varying(2000) NOT NULL,
+    value character varying(5000) NOT NULL,
     isstorage boolean DEFAULT false NOT NULL,
     storagerows integer[]
 );

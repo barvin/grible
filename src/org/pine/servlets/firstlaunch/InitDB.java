@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -82,11 +81,11 @@ public class InitDB extends HttpServlet {
 
 	private void updateValuesLength() throws SQLException {
 		int newValuesLength = 5000;
-		ResultSet rs = Dao
+		String strLength = Dao
 				.executeSelect("SELECT atttypmod FROM pg_attribute WHERE attrelid = 'values'::regclass AND attname = 'value';");
 		int actualValuesLength = 0;
-		if (rs.next()) {
-			actualValuesLength = rs.getInt("atttypmod");
+		if (strLength != null) {
+			actualValuesLength = Integer.parseInt(strLength);
 		}
 		if ((actualValuesLength - 4) != newValuesLength) {
 			Dao.executeUpdate("UPDATE pg_attribute SET atttypmod = " + newValuesLength

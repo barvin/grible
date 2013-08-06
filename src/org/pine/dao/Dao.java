@@ -898,7 +898,8 @@ public class Dao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values) throws SQLException {
+	public static List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values)
+			throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1296,14 +1297,17 @@ public class Dao {
 		stmt.close();
 	}
 
-	public static ResultSet executeSelect(String query) throws SQLException {
+	public static String executeSelect(String query) throws SQLException {
 		ResultSet rs = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
+		String result = null;
 		rs = stmt.executeQuery(query);
-
+		if (rs.next()) {
+			result = rs.getString(1);
+		}
 		stmt.close();
-		return rs;
+		return result;
 	}
 
 	public static boolean deleteProduct(int productId) throws SQLException {

@@ -786,8 +786,9 @@ h3.category-item:hover {
 	width: 360px;
 	height: 40px;
 	position: absolute;
-	top: 90%;
+	bottom: 10%;
 	right: 0px;
+	display: none;
 }
 
 #video-tutorial-msg .msg-text {

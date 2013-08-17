@@ -16,6 +16,9 @@ $(window)
 
 					$(".dialog-error-message").fadeIn(400);
 
+					$("#video-tutorial-msg").css("bottom", $("#footer").height() + 25);
+					$("#video-tutorial-msg").slideDown(600);
+					
 					$("#btn-add-product")
 							.click(
 									function() {

@@ -1175,6 +1175,9 @@ function initKeysAndIndexes() {
 		var $rowOrder = parseInt($(el).text());
 		var $row = $(el).parent();
 		if (action == "add") {
+			if ($(".index-cell.ui-cell").length == 1) {
+				$("#rowMenu").enableContextMenuItems("#delete");
+			}
 			$("#waiting-bg").addClass("loading");
 			$.post("../InsertRow", {
 				rowid : $rowId
@@ -1208,6 +1211,9 @@ function initKeysAndIndexes() {
 				}
 			});
 		} else if (action == "copy") {
+			if ($(".index-cell.ui-cell").length == 1) {
+				$("#rowMenu").enableContextMenuItems("#delete");
+			}
 			$("#waiting-bg").addClass("loading");
 			$.post("../CopyRow", {
 				rowid : $rowId
@@ -1238,6 +1244,9 @@ function initKeysAndIndexes() {
 				}
 			});
 		} else if (action == "delete") {
+			if ($(".index-cell.ui-cell").length == 2) {
+				$("#rowMenu").disableContextMenuItems("#delete");
+			}
 			$("#waiting-bg").addClass("loading");
 			$.post("../DeleteRow", {
 				rowid : $rowId
@@ -1272,6 +1281,10 @@ function initKeysAndIndexes() {
 
 	$("#rowMenu").enableContextMenuItems("#add,#copy,#delete");
 
+	if ($(".index-cell.ui-cell").length == 1) {
+		$("#rowMenu").disableContextMenuItems("#delete");
+	}
+
 	enableKeyContextMenu(jQuery);
 }
 
@@ -1285,6 +1298,9 @@ function enableKeyContextMenu() {
 				var $keyOrder = $(el).attr("key-order");
 				var $column = $("div[keyid='" + $keyId + "']");
 				if (action == "add") {
+					if ($(".key-cell.ui-cell").length == 1) {
+						$("#keyMenu").enableContextMenuItems("#delete");
+					}
 					$.post("../InsertKey", {
 						keyid : $keyId
 					}, function(data) {
@@ -1320,6 +1336,9 @@ function enableKeyContextMenu() {
 						}
 					});
 				} else if (action == "copy") {
+					if ($(".key-cell.ui-cell").length == 1) {
+						$("#keyMenu").enableContextMenuItems("#delete");
+					}
 					$.post("../CopyKey", {
 						keyid : $keyId,
 					}, function(data) {
@@ -1351,6 +1370,9 @@ function enableKeyContextMenu() {
 						}
 					});
 				} else if (action == "delete") {
+					if ($(".key-cell.ui-cell").length == 2) {
+						$("#keyMenu").disableContextMenuItems("#delete");
+					}
 					$.post("../DeleteKey", {
 						keyid : $keyId,
 					}, function(data) {
@@ -1402,6 +1424,10 @@ function enableKeyContextMenu() {
 	} else {
 		$("#keyMenu").enableContextMenuItems("#add,#copy,#delete");
 		$("#keyMenu").disableContextMenuItems("#fill");
+	}
+	
+	if ($(".key-cell.ui-cell").length == 1) {
+		$("#keyMenu").disableContextMenuItems("#delete");
 	}
 }
 

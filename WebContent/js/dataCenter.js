@@ -860,6 +860,23 @@ function initTopPanel() {
 			initGeneratedClassDialog(jQuery);
 		});
 	});
+
+	$("#btn-export-data-item").click(function() {
+		$("#waiting-bg").addClass("loading");
+		$.post("../ExportToExcel", {
+			id : tableId
+		}, function(data) {
+			$("#waiting-bg").removeClass("loading");
+			if (data == "success") {
+				document.location.href = "../export/" + $(".data-item-selected").text().trim() + ".xls";
+			} else {
+				noty({
+					type : "error",
+					text : data
+				});
+			}
+		});
+	});
 }
 
 function setRowsUsage(usage) {
@@ -1425,7 +1442,7 @@ function enableKeyContextMenu() {
 		$("#keyMenu").enableContextMenuItems("#add,#copy,#delete");
 		$("#keyMenu").disableContextMenuItems("#fill");
 	}
-	
+
 	if ($(".key-cell.ui-cell").length == 1) {
 		$("#keyMenu").disableContextMenuItems("#delete");
 	}

@@ -98,6 +98,10 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<img src=\"../img/brackets.png\">");
 				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
 
+				responseHtml.append("<div id=\"btn-export-data-item\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/export-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Export to Excel</span></div>");
+
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");
@@ -207,6 +211,9 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" />");
 				responseHtml.append("<span class=\"icon-button-text\">Enable columns moving</span></div>");
 				responseHtml.append(showWarning);
+				responseHtml.append("<div id=\"btn-export-data-item\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/export-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Export to Excel</span></div>");
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");

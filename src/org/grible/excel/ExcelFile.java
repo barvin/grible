@@ -10,22 +10,39 @@
  ******************************************************************************/
 package org.grible.excel;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.pine.dao.Dao;
+import org.pine.model.Key;
+import org.pine.model.Table;
+import org.pine.model.Value;
 
 public class ExcelFile {
 
 	private Workbook workbook;
 	private List<String> generalKeys;
+
+	public ExcelFile() {
+		try {
+			this.workbook = new HSSFWorkbook();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public ExcelFile(InputStream input, boolean isXlsx) {
 		try {
@@ -37,6 +54,48 @@ public class ExcelFile {
 			setKeys();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public String saveToFile(Table table, String filePath) {
+		try {
+			FileOutputStream fileOut = new FileOutputStream(filePath);
+			Sheet worksheet = workbook.createSheet(table.getName());
+
+			Row row1 = worksheet.createRow(0);
+			
+			Font keyFont = workbook.createFont();
+			keyFont.setColor(HSSFColor.WHITE.index);
+			keyFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+			
+			CellStyle keyCellStyle = workbook.createCellStyle();
+			keyCellStyle.setFont(keyFont);
+			keyCellStyle.setFillForegroundColor(HSSFColor.BLACK.index);
+			keyCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+			keyCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+			List<Key> keys = Dao.getKeys(table.getId());
+			for (int i = 0; i < keys.size(); i++) {
+				Cell cell = row1.createCell(i);
+				cell.setCellValue(keys.get(i).getName());
+				cell.setCellStyle(keyCellStyle);
+			}
+
+			List<org.pine.model.Row> rows = Dao.getRows(table.getId());
+			for (int i = 0; i < rows.size(); i++) {
+				Row excelRow = worksheet.createRow(i + 1);
+				List<Value> values = Dao.getValues(rows.get(i));
+				for (int j = 0; j < values.size(); j++) {
+					Cell cell = excelRow.createCell(j);
+					cell.setCellValue(values.get(j).getValue());
+				}
+			}
+
+			workbook.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+			return "success";
+		} catch (Exception e) {
+			return e.getLocalizedMessage();
 		}
 	}
 

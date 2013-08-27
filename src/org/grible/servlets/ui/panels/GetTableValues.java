@@ -49,8 +49,7 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -82,50 +81,64 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	private void writeKeys(StringBuilder responseHtml, List<Key> keys) {
-		responseHtml.append("<div class=\"table-row key-row\">");
+		responseHtml.append("{\"isIndex\":");
 		if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
-			responseHtml.append("<div class=\"table-cell ui-cell index-header-cell\">Index</div>");
+			responseHtml.append("true");
+		} else {
+			responseHtml.append("false");
 		}
+		responseHtml.append(",\"keys\":[");
 		for (Key key : keys) {
-			responseHtml.append("<div id=\"").append(key.getId()).append("\" key-order=\"").append(key.getOrder())
-					.append("\" class=\"table-cell ui-cell key-cell\">").append(key.getName()).append("</div>");
+			responseHtml.append("{\"order\":").append(key.getOrder()).append(",\"id\":").append(key.getId())
+					.append(",\"text\":\"").append(key.getName()).append("\"},");
 		}
+		responseHtml.deleteCharAt(responseHtml.length() - 1);
+		responseHtml.append("],");
 		if (showUsage) {
-			responseHtml.append("<div class=\"table-cell ui-cell info-key-cell\">Used in tables</div>");
-			responseHtml.append("<div class=\"table-cell ui-cell info-key-cell\">Used in storages</div>");
+			responseHtml.append("\"info\":{\"tables\":\"Used in tables\",\"storages\":\"Used in storages\"},");
 		}
-		responseHtml.append("</div>");
 	}
 
 	private void writeValues(StringBuilder responseHtml, ArrayList<ArrayList<Value>> values) throws SQLException {
+		responseHtml.append("\"values\":[");
 		int i = 1;
-		String storageCell = "";
-		String enumCell = "";
 		for (ArrayList<Value> valuesRow : values) {
-			responseHtml.append("<div class=\"table-row value-row\">");
+			responseHtml.append("{");
 			if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
-				responseHtml.append("<div id=\"").append(valuesRow.get(0).getRowId())
-						.append("\" class=\"table-cell ui-cell index-cell\">").append(i++).append("</div>");
+				responseHtml.append("\"index\":{\"id\":").append(valuesRow.get(0).getRowId()).append(",\"order\":")
+						.append(i++).append("},");
 			}
+			responseHtml.append("\"values\":[");
 			for (Value value : valuesRow) {
-				storageCell = (value.isStorage()) ? " storage-cell" : "";
-				enumCell = (ServletHelper.isEnumValue(value)) ? " enum-cell" : "";
-				responseHtml.append("<div id=\"").append(value.getId()).append("\" keyid=\"").append(value.getKeyId())
-						.append("\" rowid=\"").append(value.getRowId())
-						.append("\" class=\"table-cell ui-cell value-cell").append(storageCell).append(enumCell)
-						.append("\">").append(StringEscapeUtils.escapeHtml4(value.getValue())).append("</div>");
+				responseHtml.append("{\"isStorage\":");
+				if (value.isStorage()) {
+					responseHtml.append("true");
+				} else {
+					responseHtml.append("false");
+				}
+				responseHtml.append(",\"isEnum\":");
+				if (ServletHelper.isEnumValue(value)) {
+					responseHtml.append("true");
+				} else {
+					responseHtml.append("false");
+				}
+				responseHtml.append(",\"rowid\":").append(value.getRowId()).append(",\"keyid\":")
+						.append(value.getKeyId()).append(",\"id\":").append(value.getId()).append(",\"text\":\"")
+						.append(StringEscapeUtils.escapeHtml4(value.getValue())).append("\"},");
 			}
+			responseHtml.deleteCharAt(responseHtml.length() - 1);
+			responseHtml.append("]");
 			if (showUsage) {
 				if (!valuesRow.isEmpty()) {
 					List<Table> tables = Dao.getTablesUsingRow(valuesRow.get(0).getRowId());
-					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")
-							.append(getTestTableOccurences(tables)).append("</div>");
-					responseHtml.append("<div class=\"table-cell ui-cell info-cell\">")
-							.append(getDataStorageOccurences(tables)).append("</div>");
+					responseHtml.append(",\"info\":{\"tables\":\"").append(getTestTableOccurences(tables))
+							.append("\",\"storages\":\"").append(getDataStorageOccurences(tables)).append("\"}");
 				}
 			}
-			responseHtml.append("</div>");
+			responseHtml.append("},");
 		}
+		responseHtml.deleteCharAt(responseHtml.length() - 1);
+		responseHtml.append("]}");
 	}
 
 	private String getTestTableOccurences(List<Table> tables) throws SQLException {

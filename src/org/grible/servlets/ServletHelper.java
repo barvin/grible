@@ -189,6 +189,7 @@ public class ServletHelper {
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/defaultVars.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/default.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/handlebars.js\"></script>");
 		return responseHtml.toString();
 	}
 

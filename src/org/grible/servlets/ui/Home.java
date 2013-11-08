@@ -67,7 +67,6 @@ public class Home extends HttpServlet {
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-1.9.1.min.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-ui-1.10.2.custom.min.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
-			responseHtml.append("<script type=\"text/javascript\" src=\"js/footer.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/jquery.noty.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/top.js\"></script>");
@@ -109,6 +108,7 @@ public class Home extends HttpServlet {
 
 				responseHtml.append(ServletHelper.getUserPanel(user));
 				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
+				responseHtml.append("<span id=\"home-image\"><img src=\"img/grible_logo_mini.png\"></span>");
 				responseHtml.append("<a href=\".\"><span id=\"home\">Home</span></a>");
 
 				if (request.getParameter("product") != null) {
@@ -167,14 +167,14 @@ public class Home extends HttpServlet {
 					responseHtml.append("<div id=\"video-tutorial-msg\">");
 					responseHtml.append("<img src=\"img/info-icon.png\"> ");
 					responseHtml.append("<span class=\"msg-text\">New to Grible? ");
-					responseHtml.append("Watch <a href=\"http://www.grible-project.org/docs.php#video\" ");
+					responseHtml.append("Watch <a href=\"http://www.grible.org/docs.php#video\" ");
 					responseHtml.append("target=\"_blank\">video tutorial</a> ");
 					responseHtml.append("on the official website.</span>");
 					responseHtml.append("</div>");
 				}
+				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
 			}
 
-			responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath(""), "img"));
 			responseHtml.append(getContextMenus());
 			responseHtml.append("</body>");
 			responseHtml.append("</html>");

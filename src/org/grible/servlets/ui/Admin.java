@@ -66,7 +66,6 @@ public class Admin extends HttpServlet {
 				responseHtml.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/style.css\" />");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/admin.js\"></script>");
-				responseHtml.append("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/defaultVars.js\"></script>");
@@ -90,8 +89,9 @@ public class Admin extends HttpServlet {
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User currentUser = Dao.getUserByName(userName);
 				responseHtml.append(ServletHelper.getUserPanel(currentUser));
-				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">"
-						+ "<a href=\"/grible\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
+				responseHtml.append("<span id=\"home-image\"><img src=\"../img/grible_logo_mini.png\"></span>");
+				responseHtml.append("<a href=\"/grible\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 				responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 				responseHtml.append("<a href=\"/grible/admin/\"><span id=\"product-name\">Admin</span></a></div>");
 
@@ -203,7 +203,7 @@ public class Admin extends HttpServlet {
 					responseHtml.append("<span class=\"medium-header\">Grible version</span>");
 					responseHtml.append("<br /><br />");
 					responseHtml.append("Current Grible version: "
-							+ ServletHelper.getBuildNumber(getServletContext().getRealPath("")));
+							+ ServletHelper.getVersion(getServletContext().getRealPath("")));
 					responseHtml.append("<br /><br />");
 					responseHtml.append("<button id=\"check-for-updates\" class=\"ui-button\">Check for updates</button>");
 					responseHtml.append("<br /><br />");
@@ -213,7 +213,7 @@ public class Admin extends HttpServlet {
 					responseHtml.append("</div>"); // page
 
 				}
-				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath(""), "../img"));
+				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
 				responseHtml.append("</body>");
 				responseHtml.append("</html>");
 				out.print(responseHtml.toString());

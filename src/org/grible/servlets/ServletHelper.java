@@ -50,12 +50,13 @@ public class ServletHelper {
 		return null;
 	}
 
-	public static String getFooter(String realPath, String pathToImg) {
-		return "<div id=\"footer\" class=\"page-bottom\"><hr><img src=\"" + pathToImg
-				+ "/grible_logo_mini.png\"><span class=\"build\">Version: " + getBuildNumber(realPath) + "</span></div>";
+	public static String getFooter(String realPath) {
+		return "<div id=\"footer\"><span class=\"build\">Version: " + getVersion(realPath) + "</span></div>";
 	}
 
-	public static String getBuildNumber(String realPath) {
+	// <img src=\"" + pathToImg + "/grible_logo_mini.png\">
+
+	public static String getVersion(String realPath) {
 		return getContents(realPath + "/VERSION.txt");
 	}
 
@@ -156,12 +157,15 @@ public class ServletHelper {
 		return responseHtml.toString();
 	}
 
-	public static String getBreadCrumb(String sectionKey, Product product) {
+	public static String getBreadCrumb(String sectionKey, Product product, String pathToImg) {
 		StringBuilder responseHtml = new StringBuilder();
 		String productName = product.getName();
 		String sectionName = Sections.getNameByKey(sectionKey);
 
 		responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
+		responseHtml.append("<span id=\"home-image\"><img src=\"");
+		responseHtml.append(pathToImg);
+		responseHtml.append("/grible_logo_mini.png\"></span>");
 		responseHtml.append("<a class=\"confirm-needed\" ");
 		responseHtml.append("href=\"/grible\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 		responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");

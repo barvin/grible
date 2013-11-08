@@ -24,7 +24,7 @@ import org.grible.servlets.ServletHelper;
 @WebServlet("/CheckForUpdates")
 public class CheckForUpdates extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final String host = "http://www.grible-project.org";
+	private static final String host = "http://www.grible.org";
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
@@ -35,7 +35,7 @@ public class CheckForUpdates extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			String currentVersion = ServletHelper.getBuildNumber(getServletContext().getRealPath(""));
+			String currentVersion = ServletHelper.getVersion(getServletContext().getRealPath(""));
 			String latestVersion = getLatestVersion();
 			if (currentVersion.equals(latestVersion)) {
 				out.print("Current Grible version is up to date.");

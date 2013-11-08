@@ -47,7 +47,7 @@ public class FirstLaunch extends HttpServlet {
 					content.append(line).append("\n");
 				}
 				String finalContent = content.toString().replace("Version:",
-						"Version: " + ServletHelper.getBuildNumber(getServletContext().getRealPath("")));
+						"Version: " + ServletHelper.getVersion(getServletContext().getRealPath("")));
 				out.print(finalContent);
 			} else {
 				out.println("<!DOCTYPE html>");
@@ -58,7 +58,6 @@ public class FirstLaunch extends HttpServlet {
 				out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />");
 				out.println("<script type=\"text/javascript\" src=\"js/jquery-1.9.1.min.js\"></script>");
 				out.println("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
-				out.println("<script type=\"text/javascript\" src=\"js/footer.js\"></script>");
 				out.println("</head>");
 				out.println("<body>");
 				out.println("<a href=\".\"><img id=\"logo-mini\" src=\"img/grible_logo_mini.png\"></a>");
@@ -66,7 +65,7 @@ public class FirstLaunch extends HttpServlet {
 						+ "<br>Your database information is stored in config.xml file and seems to be valid."
 						+ "<br>If you really need to reset your database information and/or Grible administrator credentials"
 						+ ", delete config.xml file on the server.</div>");
-				out.println(ServletHelper.getFooter(getServletContext().getRealPath(""), "img"));
+				out.println(ServletHelper.getFooter(getServletContext().getRealPath("")));
 				out.println("</body>");
 				out.println("</html>");
 			}

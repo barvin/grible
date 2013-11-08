@@ -66,7 +66,6 @@ public class Settings extends HttpServlet {
 				responseHtml.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/style.css\" />");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/settings.js\"></script>");
-				responseHtml.append("<script type=\"text/javascript\" src=\"../js/footer.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/defaultVars.js\"></script>");
@@ -77,10 +76,12 @@ public class Settings extends HttpServlet {
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				User currentUser = Dao.getUserByName(userName);
 				responseHtml.append(ServletHelper.getUserPanel(currentUser));
-				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">"
-						+ "<a href=\"/grible\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
+				responseHtml.append("<span id=\"home-image\"><img src=\"../img/grible_logo_mini.png\"></span>");
+				responseHtml.append("<a href=\"/grible\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 				responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-				responseHtml.append("<a href=\"/grible/settings/\"><span id=\"product-name\">Settings</span></a></div>");
+				responseHtml
+						.append("<a href=\"/grible/settings/\"><span id=\"product-name\">Settings</span></a></div>");
 
 				responseHtml.append("<br /><br />");
 				responseHtml.append("<div id=\"settings-page\" class=\"table\">");
@@ -95,7 +96,8 @@ public class Settings extends HttpServlet {
 				}
 				responseHtml.append("<input id=\"cbx-tooltiponclick\" type=\"checkbox\" ").append(tooltipOnClick)
 						.append(" />");
-				responseHtml.append("<span id=\"option-tooltiponclick\" class=\"label-option\"> Show storage cell info on click</span>");
+				responseHtml
+						.append("<span id=\"option-tooltiponclick\" class=\"label-option\"> Show storage cell info on click</span>");
 
 				responseHtml.append("<br><br><button id=\"btn-save-settings\" class=\"ui-button\">Save</button>");
 
@@ -103,7 +105,7 @@ public class Settings extends HttpServlet {
 				responseHtml.append("</div>"); // row
 				responseHtml.append("</div>"); // page
 
-				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath(""), "../img"));
+				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
 				responseHtml.append("</body>");
 				responseHtml.append("</html>");
 				out.print(responseHtml.toString());

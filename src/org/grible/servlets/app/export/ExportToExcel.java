@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.pine.servlets.app.export;
+package org.grible.servlets.app.export;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.pine.dao.Dao;
-import org.pine.excel.ExcelFile;
-import org.pine.model.Table;
+import org.grible.dao.Dao;
+import org.grible.excel.ExcelFile;
+import org.grible.model.Table;
 
 /**
  * Servlet implementation class GetStorageValues

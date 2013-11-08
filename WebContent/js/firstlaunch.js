@@ -44,12 +44,12 @@ $(window).on(
 							writeToConsole("<br>ERROR: 'Database user password' is empty.");
 							formvalid = false;
 						}
-						if ($("input[name='pinelogin']").val() == "") {
-							writeToConsole("<br>ERROR: 'Pine administrator name' is empty.");
+						if ($("input[name='griblelogin']").val() == "") {
+							writeToConsole("<br>ERROR: 'Grible administrator name' is empty.");
 							formvalid = false;
 						}
-						if ($("input[name='pinepswd']").val() == "") {
-							writeToConsole("<br>ERROR: 'Pine administrator password' is empty.");
+						if ($("input[name='griblepswd']").val() == "") {
+							writeToConsole("<br>ERROR: 'Grible administrator password' is empty.");
 							formvalid = false;
 						}
 
@@ -82,11 +82,11 @@ $(window).on(
 										writeToConsole(data);
 
 										if (data == "Done.") {
-											// create Pine administrator
-											writeToConsole("<br>Creating Pine administrator... ");
+											// create Grible administrator
+											writeToConsole("<br>Creating Grible administrator... ");
 											$.post("CreateAdmin", {
-												pinelogin : $("input[name='pinelogin']").val(),
-												pinepswd : $("input[name='pinepswd']").val()
+												griblelogin : $("input[name='griblelogin']").val(),
+												griblepswd : $("input[name='griblepswd']").val()
 											}, function(data) {
 
 												writeToConsole(data);
@@ -100,7 +100,7 @@ $(window).on(
 															$("#success").html(
 																	"<img src='img/success-icon.png'> "
 																			+ "Database is successfully initialized. "
-																			+ "<a href='../pine'>Start the Pine</a>.");
+																			+ "<a href='../grible'>Start the Grible</a>.");
 														}
 													});
 												}

@@ -96,7 +96,7 @@ function initLeftPanel() {
 		history.pushState({
 			product : productId
 		}, "", "?product=" + productId);
-		document.title = $("#section-name").text() + " - Pine";
+		document.title = $("#section-name").text() + " - Grible";
 	}
 
 	$(".category-item").mousedown(function(event) {
@@ -152,17 +152,17 @@ function initLeftPanel() {
 		}, "", "?id=" + tableId);
 
 		var name = thisDataItem.find("span.tree-item-text").text().trim();
-		document.title = name + " - " + $("#section-name").text() + " - Pine";
+		document.title = name + " - " + $("#section-name").text() + " - Grible";
 		$("#section-name").addClass("link-infront");
 
 		var $breadcrumb = $("#breadcrumb");
 		if ($("#" + tableType + "-name").length > 0) {
 			var $tableName = $("#" + tableType + "-name");
-			$tableName.parent().attr("href", "/pine/" + tableType + "s/?id=" + tableId);
+			$tableName.parent().attr("href", "/grible/" + tableType + "s/?id=" + tableId);
 			$tableName.text(name);
 		} else {
 			$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-			$breadcrumb.append("<a href='/pine/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
+			$breadcrumb.append("<a href='/grible/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
 		}
 
 		$("#table-container").show();
@@ -327,7 +327,7 @@ function initLeftPanel() {
 		$("#waiting-bg").addClass("loading");
 
 		var name = $(".data-item-selected").find("span.tree-item-text").text().trim();
-		document.title = name + " - " + $("#section-name").text() + " - Pine";
+		document.title = name + " - " + $("#section-name").text() + " - Grible";
 		$("#section-name").addClass("link-infront");
 
 		var $breadcrumb = $("#breadcrumb");
@@ -765,7 +765,7 @@ function initTopPanel() {
 									$("#breadcrumb>a").last().remove();
 									$("#section-name").removeClass("link-infront");
 								}
-								document.title = $("#section-name").text() + " - Pine";
+								document.title = $("#section-name").text() + " - Grible";
 								history.pushState({
 									product : productId
 								}, "", "?product=" + productId);

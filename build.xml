@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project basedir="." default="compile" name="pine">
+<project basedir="." default="compile" name="grible">
 
 	<!-- Configure the directory into which the web application is built -->
 	<property name="build" value="${basedir}/build/classes" />
 
 	<!-- Configure the context path for this application -->
-	<property name="path" value="/pine" />
+	<property name="path" value="/grible" />
 	<property name="tomcat.manager.url" value="http://localhost:7070/manager/text" />
 
-	<path id="pine.classpath">
+	<path id="grible.classpath">
 		<fileset dir="${basedir}/WebContent/WEB-INF/lib">
 			<include name="*.jar" />
 		</fileset>
@@ -22,7 +22,7 @@
 	<target name="compile" depends="clean" description="Compile web application">
 		<javac debug="true" destdir="${build}" includeantruntime="false">
 			<src path="src" />
-			<classpath refid="pine.classpath" />
+			<classpath refid="grible.classpath" />
 		</javac>
 	</target>
 

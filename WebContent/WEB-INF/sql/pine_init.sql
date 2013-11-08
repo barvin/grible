@@ -1,5 +1,5 @@
--- Pine database dump
--- Pine version 0.8
+-- Grible database dump
+-- Grible version 0.8
 
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';

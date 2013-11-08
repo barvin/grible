@@ -205,7 +205,7 @@ function initLeftPanel() {
 			$tableName.parent().attr("href", "/grible/" + tableType + "s/?id=" + tableId);			$tableName.text(name);
 		} else {
 			$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-			$breadcrumb.append("<a href='/grible/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");		}
+			$breadcrumb.append("<a href='/grible/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");}
 
 		$("#table-container").show();
 		loadTableValues(tableId);

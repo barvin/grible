@@ -1,6 +1,14 @@
+# Java binaries #
 *.class
+
+# IDE files #
+/.settings
+.project
+.classpath
+.buildpath
 
 # Package Files #
 *.war
 *.ear
 /build
+/bin

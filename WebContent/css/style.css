@@ -517,10 +517,6 @@ h3.category-item:hover {
 	font-size: 14px;
 }
 
-#login-logo {
-	margin-bottom: 20px;
-}
-
 .ui-dialog {
 	background-color: #F0F0F0;
 	border: 1px solid #888888;
@@ -620,7 +616,7 @@ h3.category-item:hover {
 
 .dialog-error-message {
 	display: none;
-	font-size: 16px;
+	font-size: 12px;
 	color: #C03300;
 }
 
@@ -768,14 +764,31 @@ h3.category-item:hover {
 	font-size: 14px;
 }
 
+#login-grible-logo {
+	float: left;
+	padding: 15px 15px 14px 15px;
+	border-left: 1px solid rgb(221, 221, 221);
+	border-top: 1px solid rgb(221, 221, 221);
+	border-bottom: 1px solid rgb(221, 221, 221);
+	background-color: #FFFFFF;
+}
+
+#outer-credentials {
+	float: left;
+	border: 1px solid rgb(221, 221, 221);
+}
+
+#outer-dialog-error-message {
+	width: 250px;
+}
+
 #credentials {
-	background-color: #CCCCCC;
 	padding: 10px;
 	width: 280px;
 }
 
 .login-dialog-buttons {
-	background-color: #C0C0C0;
+	border-top: 1px solid #DDDDDD;
 	padding: 10px;
 }
 

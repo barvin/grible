@@ -44,7 +44,8 @@ public class Home extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -76,8 +77,12 @@ public class Home extends HttpServlet {
 			responseHtml.append("<body>");
 
 			if (request.getSession(false).getAttribute("userName") == null) {
-				responseHtml.append("<div id=\"login-form\">");
-				responseHtml.append("<img id=\"login-logo\" src=\"img/grible_logo.png\"><br>");
+				responseHtml.append("<div id=\"login-form\" class=\"table\">");
+				responseHtml.append("<div class=\"table-row\">");
+				responseHtml.append("<div id=\"login-grible-logo\" class=\"table-cell\">");
+				responseHtml.append("<img id=\"login-logo\" src=\"img/grible_logo.png\">");
+				responseHtml.append("</div>");
+				responseHtml.append("<div id=\"outer-credentials\" class=\"table-cell\">");
 				responseHtml.append("<form method=\"post\" action=\"Login\">");
 				responseHtml.append("<div id=\"credentials\" class=\"table\">");
 				responseHtml.append("<div class=\"table-row\">");
@@ -95,12 +100,22 @@ public class Home extends HttpServlet {
 					responseHtml.append("<input type=\"hidden\" name=\"url\" value=\"" + request.getParameter("url")
 							+ "\">");
 				}
-				responseHtml
-						.append("<div class=\"login-dialog-buttons right\"><input type=\"submit\" value=\"Log in\" class=\"ui-button\"></div></form>");
+				responseHtml.append("<div class=\"login-dialog-buttons table\">");
+				responseHtml.append("<div class=\"table-row\">");
+				responseHtml.append("<div id=\"outer-dialog-error-message\" class=\"table-cell\">");
 				if (request.getSession(false).getAttribute("loginFailed") != null) {
 					String message = (String) request.getSession(false).getAttribute("loginFailed");
-					responseHtml.append("<br><span class=\"dialog-error-message\">" + message + "</span>");
+					responseHtml.append("<span class=\"dialog-error-message\">" + message + "</span>");
 				}
+				responseHtml.append("</div>");
+				responseHtml.append("<div class=\"table-cell\">");
+				responseHtml.append("<input type=\"submit\" value=\"Log in\" class=\"ui-button\">");
+				responseHtml.append("</div>");
+				responseHtml.append("</div>");
+				responseHtml.append("</div>");
+				responseHtml.append("</form>");
+				responseHtml.append("</div>");
+				responseHtml.append("</div>");
 				responseHtml.append("</div>");
 			} else {
 				String userName = (String) request.getSession(false).getAttribute("userName");
@@ -189,7 +204,8 @@ public class Home extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

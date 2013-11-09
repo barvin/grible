@@ -29,13 +29,23 @@ body {
 	padding: 8px 8px 8px 5px;
 }
 
+#title {
+	font-family: "Arial", sans-serif;
+	font-size: 80px;
+	font-weight: bold;
+	left: 5px;
+	position: relative;
+	top: -15px;
+	color: #367F86;
+}
+
 #footer {
 	margin-top: 25px;
 }
 
 .build {
 	color: #777777;
-	float: right;
+	font-size: 12px;
 }
 
 .dialog-buttons {

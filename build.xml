@@ -5,7 +5,7 @@
 	<property name="build" value="${basedir}/build/classes" />
 
 	<!-- Configure the context path for this application -->
-	<property name="path" value="/grible" />
+	<property name="path" value="/" />
 	<property name="tomcat.manager.url" value="http://localhost:7070/manager/text" />
 
 	<path id="grible.classpath">

@@ -217,7 +217,7 @@ INSERT INTO tabletypes VALUES (1, 'storage');
 INSERT INTO tabletypes VALUES (2, 'table');
 INSERT INTO tabletypes VALUES (3, 'precondition');
 INSERT INTO tabletypes VALUES (4, 'postcondition');
-INSERT INTO tabletypes VALUES (5, 'enumearion');
+INSERT INTO tabletypes VALUES (5, 'enumeration');
 
 
 ALTER TABLE ONLY categories

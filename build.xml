@@ -4,10 +4,6 @@
 	<!-- Configure the directory into which the web application is built -->
 	<property name="build" value="${basedir}/build/classes" />
 
-	<!-- Configure the context path for this application -->
-	<property name="path" value="/grible" />
-	<property name="tomcat.manager.url" value="http://localhost:7070/manager/text" />
-
 	<path id="grible.classpath">
 		<fileset dir="${basedir}/WebContent/WEB-INF/lib">
 			<include name="*.jar" />
@@ -35,17 +31,5 @@
 			<classes dir="${build}" />
 		</war>
 	</target>
-
-	<taskdef name="catalina-deploy" classname="org.apache.catalina.ant.DeployTask" />
-	<taskdef name="catalina-undeploy" classname="org.apache.catalina.ant.UndeployTask" />
-
-	<target name="undeploy">
-		<catalina-undeploy url="${tomcat.manager.url}" username="${tomcat.username}" password="${tomcat.password}" path="${path}" failonerror="false" />
-	</target>
-
-	<target name="deploy" depends="war">
-		<catalina-deploy url="${tomcat.manager.url}" username="${tomcat.username}" password="${tomcat.password}" path="${path}" war="file:${build}${path}.war" />
-	</target>
-
 
 </project>

@@ -23,7 +23,7 @@
 	</target>
 
 	<target name="war" depends="compile">
-		<war destfile="${build}${path}.war" webxml="${basedir}/WebContent/WEB-INF/web.xml">
+		<war destfile="${build}/grible.war" webxml="${basedir}/WebContent/WEB-INF/web.xml">
 			<fileset dir="${basedir}/WebContent">
 				<exclude name="**/*config.xml" />
 			</fileset>

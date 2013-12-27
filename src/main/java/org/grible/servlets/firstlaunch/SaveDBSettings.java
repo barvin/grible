@@ -68,7 +68,11 @@ public class SaveDBSettings extends HttpServlet {
 			Document doc = new Document(root);
 			String result = doc.toXML();
 
-			File file = new File(getServletContext().getRealPath("") + "/WEB-INF/config.xml");
+			File dir = new File(getServletContext().getRealPath("") + File.separator + ".." + File.separator + "config");
+			if (!dir.exists()) {
+				dir.mkdir();
+			}
+			File file = new File(getServletContext().getRealPath("") + File.separator + ".." + File.separator + "config" + File.separator + "config.xml");
 			if (!file.exists()) {
 				file.createNewFile();
 			}

@@ -201,9 +201,17 @@ $().ready(
 				}
 			});
 
-			$("#check-for-updates").click(function() {
-				$.post("../CheckForUpdates", function(data) {
-					$("#update-result").html(data);
+			$("#btn-apply-updates").click(function() {
+				$("#update-result").html("<img src='../img/ajax-loader-small.gif'> Downloading...");
+				$.post("../ApplyUpdates", function(data) {
+					if (data == "success") {
+						$("#update-result").html("<img src='../img/ajax-loader-small.gif'> Installing...");
+						setTimeout(function () {
+							location.reload(true);
+					    }, 5000);
+					} else {
+						$("#update-result").html(data);
+					}
 				});
 			});
 		});

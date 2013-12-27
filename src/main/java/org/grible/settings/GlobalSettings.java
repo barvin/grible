@@ -30,7 +30,7 @@ public class GlobalSettings {
 
 	public boolean init(String localRootPath) throws Exception {
 		if (this.configFile == null) {
-			this.configFile = new File(localRootPath + File.separator + "WEB-INF" + File.separator + "config.xml");
+			this.configFile = new File(localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "config.xml");
 		}
 		if (!configFile.exists()) {
 			return false;

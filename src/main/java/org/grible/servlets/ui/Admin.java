@@ -10,8 +10,15 @@
  ******************************************************************************/
 package org.grible.servlets.ui;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -32,6 +39,9 @@ import org.grible.settings.GlobalSettings;
 @WebServlet("/admin/")
 public class Admin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final String host = "http://www.grible.org";
+	private static boolean isNewVersionExist = false;
+	private static String updateVersionText = "";
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -96,8 +106,10 @@ public class Admin extends HttpServlet {
 				responseHtml.append("<a href=\"/admin/\"><span id=\"product-name\">Admin</span></a></div>");
 
 				if (!currentUser.isAdmin()) {
-					responseHtml.append("<span class=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
-					responseHtml.append("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
+					responseHtml
+							.append("<span class=\"extends-symbol\" style=\"color: rgba(255,255,255,0);\">&nbsp;&gt;&nbsp;</span>");
+					responseHtml
+							.append("<br/><br/><div class=\"error-message\">You do not have permissions to access this page.</div>");
 				} else {
 					responseHtml.append("<br /><br />");
 					responseHtml.append("<div id=\"admin-page\" class=\"table\">");
@@ -119,10 +131,12 @@ public class Admin extends HttpServlet {
 						responseHtml.append("<div class=\"table-cell users-cell\" userid=\"" + user.getId() + "\">"
 								+ user.getName() + "</div>");
 						responseHtml.append("<div class=\"table-cell users-cell\">" + user.isAdmin() + "</div>");
-						responseHtml.append("<div class=\"table-cell users-cell\">" + user.getProductsString() + "</div>");
-						responseHtml.append("<div class=\"table-cell users-cell\">" + "<button userid=\"" + user.getId()
-								+ "\" class=\"ui-button btn-edit-user\">Edit</button> " + "<button userid=\""
-								+ user.getId() + "\" class=\"ui-button btn-delete-user\">Delete</button></div>");
+						responseHtml.append("<div class=\"table-cell users-cell\">" + user.getProductsString()
+								+ "</div>");
+						responseHtml.append("<div class=\"table-cell users-cell\">" + "<button userid=\""
+								+ user.getId() + "\" class=\"ui-button btn-edit-user\">Edit</button> "
+								+ "<button userid=\"" + user.getId()
+								+ "\" class=\"ui-button btn-delete-user\">Delete</button></div>");
 						responseHtml.append("</div>");
 					}
 					responseHtml.append("</div>");
@@ -133,27 +147,31 @@ public class Admin extends HttpServlet {
 					responseHtml.append("<div class=\"table add-user-table\">");
 					responseHtml.append("<div class=\"table-row\">");
 					responseHtml.append("<div class=\"table-cell add-user-table-cell\">User Name:</div>");
-					responseHtml.append("<div class=\"table-cell add-user-table-cell\"><input class=\"username\"></div>");
+					responseHtml
+							.append("<div class=\"table-cell add-user-table-cell\"><input class=\"username\"></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row\">");
 					responseHtml.append("<div class=\"table-cell add-user-table-cell\">Password:</div>");
-					responseHtml.append("<div class=\"table-cell add-user-table-cell\"><input class=\"pass\" type=\"password\" ></div>");
+					responseHtml
+							.append("<div class=\"table-cell add-user-table-cell\"><input class=\"pass\" type=\"password\" ></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row\">");
 					responseHtml.append("<div class=\"table-cell add-user-table-cell\">Retype it:</div>");
-					responseHtml.append("<div class=\"table-cell add-user-table-cell\"><input class=\"retype-pass\" type=\"password\" ></div>");
+					responseHtml
+							.append("<div class=\"table-cell add-user-table-cell\"><input class=\"retype-pass\" type=\"password\" ></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row\">");
 					responseHtml.append("<div class=\"table-cell add-user-table-cell\">Is Admin:</div>");
-					responseHtml.append("<div class=\"table-cell add-user-table-cell\"><input class=\"isadmin\" type=\"checkbox\" ></div>");
+					responseHtml
+							.append("<div class=\"table-cell add-user-table-cell\"><input class=\"isadmin\" type=\"checkbox\" ></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row\">");
 					responseHtml.append("<div class=\"table-cell add-user-table-cell\">Products:</div>");
 					responseHtml.append("<div class=\"table-cell add-user-table-cell\">");
 
 					for (Product product : products) {
-						responseHtml.append("<input id=\"" + product.getId() + "\" class=\"access-product\" type=\"checkbox\" > "
-								+ product.getName() + "<br>");
+						responseHtml.append("<input id=\"" + product.getId()
+								+ "\" class=\"access-product\" type=\"checkbox\" > " + product.getName() + "<br>");
 					}
 
 					responseHtml.append("</div>");
@@ -172,28 +190,33 @@ public class Admin extends HttpServlet {
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row users-row\">");
 					responseHtml.append("<div class=\"table-cell users-cell\">Database host:</div>");
-					responseHtml.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbhost\" value=\""
-							+ GlobalSettings.getInstance().getDbHost() + "\"></div>");
+					responseHtml
+							.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbhost\" value=\""
+									+ GlobalSettings.getInstance().getDbHost() + "\"></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row users-row\">");
 					responseHtml.append("<div class=\"table-cell users-cell\">Database port:</div>");
-					responseHtml.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbport\" value=\""
-							+ GlobalSettings.getInstance().getDbPort() + "\"></div>");
+					responseHtml
+							.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbport\" value=\""
+									+ GlobalSettings.getInstance().getDbPort() + "\"></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row users-row\">");
 					responseHtml.append("<div class=\"table-cell users-cell\">Database name:</div>");
-					responseHtml.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbname\" value=\""
-							+ GlobalSettings.getInstance().getDbName() + "\"></div>");
+					responseHtml
+							.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dbname\" value=\""
+									+ GlobalSettings.getInstance().getDbName() + "\"></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row users-row\">");
 					responseHtml.append("<div class=\"table-cell users-cell\">Database login:</div>");
-					responseHtml.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dblogin\" value=\""
-							+ GlobalSettings.getInstance().getDbLogin() + "\"></div>");
+					responseHtml
+							.append("<div class=\"table-cell users-cell\"><input class=\"dialog-edit\" name=\"dblogin\" value=\""
+									+ GlobalSettings.getInstance().getDbLogin() + "\"></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table-row users-row\">");
 					responseHtml.append("<div class=\"table-cell users-cell\">Database password:</div>");
-					responseHtml.append("<div class=\"table-cell users-cell\"><input type=\"password\" class=\"dialog-edit\" name=\"dbpswd\" value=\""
-							+ GlobalSettings.getInstance().getDbPswd() + "\"></div>");
+					responseHtml
+							.append("<div class=\"table-cell users-cell\"><input type=\"password\" class=\"dialog-edit\" name=\"dbpswd\" value=\""
+									+ GlobalSettings.getInstance().getDbPswd() + "\"></div>");
 					responseHtml.append("</div>");
 					responseHtml.append("</div>");
 					responseHtml.append("<br><button id=\"savedbsettings\" class=\"ui-button\">Save</button>");
@@ -204,10 +227,21 @@ public class Admin extends HttpServlet {
 					responseHtml.append("<br /><br />");
 					responseHtml.append("Current Grible version: "
 							+ ServletHelper.getVersion(getServletContext().getRealPath("")));
-					responseHtml.append("<br /><br />");
-					responseHtml.append("<button id=\"check-for-updates\" class=\"ui-button\">Check for updates</button>");
-					responseHtml.append("<br /><br />");
-					responseHtml.append("<div id=\"update-result\"></div>");
+
+					if (ServletHelper.isWindows()) {
+						checkForLatestVersionText();
+						responseHtml.append("<br /><br />");
+						responseHtml.append("<div id=\"checking-for-update-result\">");
+						responseHtml.append(updateVersionText);
+						responseHtml.append("</div>");
+						if (isNewVersionExist) {
+							responseHtml.append("<br />");
+							responseHtml.append("<button id=\"btn-apply-updates\" class=\"ui-button\">Apply updates</button>");
+							responseHtml.append("<br /><br />");
+							responseHtml.append("<div id=\"update-result\"></div>");
+						}
+					}
+
 					responseHtml.append("</div>"); // cell
 					responseHtml.append("</div>"); // row
 					responseHtml.append("</div>"); // page
@@ -224,6 +258,53 @@ public class Admin extends HttpServlet {
 		}
 		out.flush();
 		out.close();
+	}
+
+	private void checkForLatestVersionText() throws ServletException, IOException {
+		try {
+			String currentVersion = ServletHelper.getVersion(getServletContext().getRealPath(""));
+			String latestVersion = getLatestVersionForWindows();
+			if (currentVersion.equals(latestVersion)) {
+				updateVersionText = "Current Grible version is up to date.";
+			} else {
+				updateVersionText = "New version (" + latestVersion + ") is available.";
+				isNewVersionExist = true;
+			}
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			updateVersionText = "ERROR: Cannot connect to host " + host + ". Please, check your internet connection.";
+		} catch (Exception e) {
+			e.printStackTrace();
+			updateVersionText = "ERROR: " + e.getLocalizedMessage();
+		}
+	}
+
+	private String getLatestVersionForWindows() throws Exception {
+		String url = host + "/updates/latestversion.php?platform=Windows";
+		String charset = "UTF-8";
+		String result = "";
+
+		URLConnection connection = new URL(url).openConnection();
+		connection.setDoOutput(true); // Triggers POST.
+		connection.setRequestProperty("Accept-Charset", charset);
+		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=" + charset);
+		OutputStream output = null;
+		try {
+			output = connection.getOutputStream();
+		} finally {
+			if (output != null)
+				try {
+					output.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+		InputStream response = connection.getInputStream();
+		BufferedReader reader = null;
+		reader = new BufferedReader(new InputStreamReader(response, charset));
+		result = reader.readLine();
+
+		return result;
 	}
 
 	/**

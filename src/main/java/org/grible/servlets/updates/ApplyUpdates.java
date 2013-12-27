@@ -54,7 +54,7 @@ public class ApplyUpdates extends HttpServlet {
 
 	private FileOutputStream downloadWarFile() throws MalformedURLException, IOException, FileNotFoundException {
 		FileOutputStream fos;
-		URL website = new URL(host + "/binaries/latest/windows/grible.war");
+		URL website = new URL(host + "/binaries/latest/grible.war");
 		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 		fos = new FileOutputStream(getServletContext().getRealPath("") + File.separator + ".." + File.separator
 				+ "grible_new.war");

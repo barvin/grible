@@ -207,8 +207,8 @@ $().ready(
 					if (data == "success") {
 						$("#update-result").html("<img src='../img/ajax-loader-small.gif'> Installing...");
 						setTimeout(function () {
-							location.reload(true);
-					    }, 5000);
+							window.location = "/../";
+					    }, 10000);
 					} else {
 						$("#update-result").html(data);
 					}

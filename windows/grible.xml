@@ -1,0 +1,9 @@
+<service>
+  <id>Grible</id>
+  <name>Grible</name>
+  <description>This service runs Grible web application.</description>
+  <env name="GRIBLE_HOME" value="%BASE%"/>
+  <executable>%BASE%\jdk\bin\java.exe</executable>
+  <arguments>-Xrs -Xmx256m -jar "%BASE%\grible.war"</arguments>
+  <logmode>rotate</logmode>
+</service>

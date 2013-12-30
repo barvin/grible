@@ -19,8 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.User;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -42,9 +43,12 @@ public class DeleteUser extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 
 			String userId = request.getParameter("userid");
 			User currUser = Dao.getUserById(Integer.parseInt(userId));
@@ -69,10 +73,12 @@ public class DeleteUser extends HttpServlet {
 					out.print("ERROR: User was not deleted. See server logs for details.");
 				}
 			}
-			out.flush();
-			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
+		} finally {
+			out.flush();
+			out.close();
 		}
 	}
 }

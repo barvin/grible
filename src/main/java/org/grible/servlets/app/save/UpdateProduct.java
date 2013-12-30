@@ -19,8 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Product;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -42,12 +43,13 @@ public class UpdateProduct extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/plain");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/plain");
-			PrintWriter out = response.getWriter();
-			
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 			String name = request.getParameter("name");
-
 			if ("".equals(name)) {
 				out.print("ERROR: Product name cannot be empty.");
 			} else {
@@ -58,11 +60,12 @@ public class UpdateProduct extends HttpServlet {
 				Dao.updateProduct(product);
 				out.print("success");
 			}
-
-			out.flush();
-			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
+		} finally {
+			out.flush();
+			out.close();
 		}
 	}
 }

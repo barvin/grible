@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.User;
 
 

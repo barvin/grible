@@ -22,11 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.Value;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -45,15 +46,18 @@ public class GetGeneratedClassDialog extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-
-		int id = Integer.parseInt(request.getParameter("id"));
 		try {
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
+			int id = Integer.parseInt(request.getParameter("id"));
 			table = Dao.getTable(id);
 		} catch (Exception e) {
 			e.printStackTrace(out);

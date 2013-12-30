@@ -24,12 +24,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.Value;
+import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 
 /**
@@ -56,6 +57,9 @@ public class GetTableValues extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 			StringBuilder responseHtml = new StringBuilder();
 			int tableId = Integer.parseInt(request.getParameter("id"));
 			Table table = Dao.getTable(tableId);

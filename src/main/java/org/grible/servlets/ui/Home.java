@@ -21,10 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Product;
 import org.grible.model.User;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
 import org.grible.uimodel.Section;
 import org.grible.uimodel.Sections;
@@ -76,7 +77,7 @@ public class Home extends HttpServlet {
 			responseHtml.append("</head>");
 			responseHtml.append("<body>");
 
-			if (request.getSession(false).getAttribute("userName") == null) {
+			if (isMultipleUsers() && request.getSession(false).getAttribute("userName") == null) {
 				responseHtml.append("<div id=\"login-form\" class=\"table\">");
 				responseHtml.append("<div class=\"table-row\">");
 				responseHtml.append("<div id=\"login-grible-logo\" class=\"table-cell\">");
@@ -118,10 +119,15 @@ public class Home extends HttpServlet {
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");
 			} else {
-				String userName = (String) request.getSession(false).getAttribute("userName");
-				User user = Dao.getUserByName(userName);
+				User user = null;
+				if (isMultipleUsers()) {
+					String userName = (String) request.getSession(false).getAttribute("userName");
+					user = Dao.getUserByName(userName);
+					responseHtml.append(ServletHelper.getUserPanel(user));
+				} else {
+					responseHtml.append(ServletHelper.getUserPanel());
+				}
 
-				responseHtml.append(ServletHelper.getUserPanel(user));
 				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
 				responseHtml.append("<span id=\"home-image\"><img src=\"img/grible_logo_mini.png\"></span>");
 				responseHtml.append("<a href=\".\"><span id=\"home\">Home</span></a>");
@@ -139,7 +145,7 @@ public class Home extends HttpServlet {
 							responseHtml.append(product.getName());
 							responseHtml.append("</span></a></div>");
 
-							if (!user.hasAccessToProduct(product.getId())) {
+							if (isMultipleUsers() && (!user.hasAccessToProduct(product.getId()))) {
 								responseHtml.append("<br/><br/>");
 								responseHtml.append("<div class=\"error-message\">");
 								responseHtml.append("You do not have permissions to access this page.</div>");
@@ -159,7 +165,7 @@ public class Home extends HttpServlet {
 
 					List<Product> products = Dao.getProducts();
 					for (Product product : products) {
-						if (user.hasAccessToProduct(product.getId())) {
+						if ((isMultipleUsers() && user.hasAccessToProduct(product.getId())) || (!isMultipleUsers())) {
 							responseHtml.append("<div class=\"table-row\">");
 							responseHtml.append("<div class=\"table-cell section-cell\">");
 							responseHtml.append("<a href=\"?product=" + product.getId() + "\"><span id=\""
@@ -171,7 +177,7 @@ public class Home extends HttpServlet {
 					}
 					responseHtml.append("</div>");
 
-					if (user.isAdmin()) {
+					if ((isMultipleUsers() && user.isAdmin()) || (!isMultipleUsers())) {
 						responseHtml.append("<div class=\"under-sections\">");
 						responseHtml.append("<div class=\"icon-button button-enabled\" id=\"btn-add-product\">");
 						responseHtml.append("<img src=\"img/add-icon.png\" class=\"icon-enabled\">");
@@ -209,6 +215,10 @@ public class Home extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
+	}
+
+	private boolean isMultipleUsers() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL;
 	}
 
 	private void includeSections(StringBuilder responseHtml, Product product) {

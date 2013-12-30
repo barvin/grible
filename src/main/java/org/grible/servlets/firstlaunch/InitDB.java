@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.settings.GlobalSettings;
 
 /**

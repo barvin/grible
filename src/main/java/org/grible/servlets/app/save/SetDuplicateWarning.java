@@ -19,8 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Table;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -45,6 +46,9 @@ public class SetDuplicateWarning extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 			int id = Integer.parseInt(request.getParameter("id"));
 			Table table = Dao.getTable(id);
 			boolean show = false;

@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.grible.dao;
+package org.grible.data;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -34,7 +34,7 @@ import org.grible.settings.GlobalSettings;
 /**
  * @author Maksym Barvinskyi
  */
-public class Dao {
+public class JsonDao {
 
 	private static Connection connection;
 
@@ -160,17 +160,9 @@ public class Dao {
 		return result;
 	}
 
-	public static List<Product> getProducts() throws SQLException {
+	public static List<Product> getProducts() {
 		List<Product> result = new ArrayList<Product>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM products ORDER BY name");
-		while (rs.next()) {
-			result.add(initProduct(rs));
-		}
-
-		rs.close();
-		stmt.close();
+		
 		return result;
 	}
 
@@ -910,7 +902,7 @@ public class Dao {
 			if (value.isStorage()) {
 				value.setValue("0");
 			} else {
-				Key key = Dao.getKey(value.getKeyId());
+				Key key = JsonDao.getKey(value.getKeyId());
 				if (key.getReferenceTableId() == 0) {
 					value.setValue("");
 				}
@@ -1447,7 +1439,7 @@ public class Dao {
 	}
 
 	public static List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws SQLException {
-		int enumId = Dao.getTable(Dao.getKey(enumValue.getKeyId()).getTableId()).getId();
+		int enumId = JsonDao.getTable(JsonDao.getKey(enumValue.getKeyId()).getTableId()).getId();
 		List<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();

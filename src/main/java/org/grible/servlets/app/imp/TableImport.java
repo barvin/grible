@@ -24,10 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 
 /**
@@ -51,6 +52,9 @@ public class TableImport extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 			Part filePart = request.getPart("file");
 			String fileName = ServletHelper.getFilename(filePart);
 			String tableName = fileName.substring(0, fileName.lastIndexOf(".xls"));

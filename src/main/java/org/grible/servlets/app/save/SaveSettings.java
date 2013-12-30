@@ -19,8 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.User;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -45,6 +46,9 @@ public class SaveSettings extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {			
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 			String userName = (String) request.getSession(false).getAttribute("userName");
 			User user = Dao.getUserByName(userName);
 			boolean isTooltipOnClick = Boolean.parseBoolean(request.getParameter("tooltiponclick"));

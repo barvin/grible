@@ -22,7 +22,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Key;
 import org.grible.model.Product;
@@ -79,6 +79,17 @@ public class ServletHelper {
 	public static String getLoadingGif() {
 		return "<span id=\"waiting-bg\" class=\"loading\">"
 				+ "<img class=\"waiting-gif\" src=\"../img/ajax-loader.gif\" /></span>";
+	}
+
+	public static String getUserPanel() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<div id=\"user-panel\"><span id=\"lnk-admin-page\">");
+		builder.append("<a class=\"confirm-needed\" href=\"/admin/\">Admin page</a>");
+		builder.append("</span><span id=\"lnk-settings\"> | <a class=\"confirm-needed\" ");
+		builder.append("href=\"/settings/\">Settings</a></span>");
+		builder.append("<span id=\"lnk-logout\"> | <a class=\"confirm-needed\" ");
+		builder.append("href=\"/logout\">Log out</a></span></div>");
+		return builder.toString();
 	}
 
 	public static String getUserPanel(User user) {

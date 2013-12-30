@@ -20,10 +20,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -46,6 +47,9 @@ public class GetAddTableDialog extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
 		try {
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 
 			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
 			Category category = Dao.getCategory(categoryId);

@@ -19,9 +19,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -46,6 +47,9 @@ public class GetTopPanel extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 			StringBuilder responseHtml = new StringBuilder();
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			if (tableType == TableType.STORAGE) {

@@ -12,13 +12,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.settings.AppTypes;
-import org.grible.settings.GlobalSettings;
-
-import com.google.gson.Gson;
-
 import nu.xom.Document;
 import nu.xom.Element;
+
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class SaveDBSettings

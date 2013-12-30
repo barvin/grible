@@ -22,10 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Value;
+import org.grible.security.Security;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -47,9 +48,12 @@ public class GetStorageTooltip extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
 		try {
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 
 			String content = request.getParameter("content");
 
@@ -73,10 +77,12 @@ public class GetStorageTooltip extends HttpServlet {
 			} else {
 				out.print(content);
 			}
-			out.flush();
-			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.print(e.getLocalizedMessage());
+		} finally {
+			out.flush();
+			out.close();
 		}
 	}
 

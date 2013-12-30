@@ -19,10 +19,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.Dao;
+import org.grible.data.Dao;
 import org.grible.model.User;
+import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
-import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -47,67 +47,62 @@ public class Storages extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			if (!GlobalSettings.getInstance().init(getServletContext().getRealPath(""))) {
-				response.sendRedirect("/firstlaunch");
+			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			StringBuilder responseHtml = new StringBuilder();
 
-			if (request.getSession(false) == null) {
-				response.sendRedirect("/?url=" + request.getRequestURI() + "?" + request.getQueryString());
-			} else if (request.getSession(false).getAttribute("userName") == null) {
-				response.sendRedirect("/?url=" + request.getRequestURI() + "?" + request.getQueryString());
-			} else if ((request.getParameter("product") == null) && (request.getParameter("id") == null)) {
+			if ((request.getParameter("product") == null) && (request.getParameter("id") == null)) {
 				response.sendRedirect("/");
-			} else {
-
-				responseHtml.append("<!DOCTYPE html>");
-				responseHtml.append("<html>");
-				responseHtml.append("<head>");
-				responseHtml.append("<title>Data Storages - Grible</title>");
-				responseHtml.append(ServletHelper.getIncludes());
-
-				String userName = (String) request.getSession(false).getAttribute("userName");
-				User user = Dao.getUserByName(userName);
-
-				int productId;
-				int tableId;
-				if (request.getParameter("id") != null) {
-					tableId = Integer.parseInt(request.getParameter("id"));
-					productId = Dao.getProductIdByPrimaryTableId(tableId);
-				} else {
-					productId = Integer.parseInt(request.getParameter("product"));
-					tableId = 0;
-				}
-
-				if (!user.hasAccessToProduct(productId)) {
-					responseHtml.append("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
-					responseHtml.append("<br/><br/>"
-							+ "<div class=\"error-message\">You do not have permissions to access this page.</div>");
-				} else {
-					responseHtml.append("<script type=\"text/javascript\">");
-					responseHtml.append("var productId = \"").append(productId).append("\";");
-					responseHtml.append("var tableId = \"").append(tableId).append("\";");
-					responseHtml.append("var tableType = \"storage\";");
-					responseHtml.append("var isTooltipOnClick = ").append(user.isTooltipOnClick()).append(";");
-					responseHtml.append("</script>");
-					responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
-					ServletHelper.showImportResult(request, responseHtml, tableId);
-					ServletHelper.showAdvancedImportDialog(request, responseHtml);
-
-					responseHtml.append("</head>");
-					responseHtml.append("<body>");
-					responseHtml.append(ServletHelper.getUserPanel(user));
-					responseHtml.append(ServletHelper.getBreadCrumb("storages", Dao.getProduct(productId), "../img"));
-					responseHtml.append(ServletHelper.getMain());
-					responseHtml.append(ServletHelper.getContextMenus("storage"));
-					responseHtml.append(ServletHelper.getLoadingGif());
-				}
-				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
-				responseHtml.append("</body>");
-				responseHtml.append("</html>");
-				out.print(responseHtml.toString());
+				return;
 			}
+
+			StringBuilder responseHtml = new StringBuilder();
+			responseHtml.append("<!DOCTYPE html>");
+			responseHtml.append("<html>");
+			responseHtml.append("<head>");
+			responseHtml.append("<title>Data Storages - Grible</title>");
+			responseHtml.append(ServletHelper.getIncludes());
+
+			String userName = (String) request.getSession(false).getAttribute("userName");
+			User user = Dao.getUserByName(userName);
+
+			int productId;
+			int tableId;
+			if (request.getParameter("id") != null) {
+				tableId = Integer.parseInt(request.getParameter("id"));
+				productId = Dao.getProductIdByPrimaryTableId(tableId);
+			} else {
+				productId = Integer.parseInt(request.getParameter("product"));
+				tableId = 0;
+			}
+
+			if (!user.hasAccessToProduct(productId)) {
+				responseHtml.append("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
+				responseHtml.append("<br/><br/>"
+						+ "<div class=\"error-message\">You do not have permissions to access this page.</div>");
+			} else {
+				responseHtml.append("<script type=\"text/javascript\">");
+				responseHtml.append("var productId = \"").append(productId).append("\";");
+				responseHtml.append("var tableId = \"").append(tableId).append("\";");
+				responseHtml.append("var tableType = \"storage\";");
+				responseHtml.append("var isTooltipOnClick = ").append(user.isTooltipOnClick()).append(";");
+				responseHtml.append("</script>");
+				responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
+				ServletHelper.showImportResult(request, responseHtml, tableId);
+				ServletHelper.showAdvancedImportDialog(request, responseHtml);
+
+				responseHtml.append("</head>");
+				responseHtml.append("<body>");
+				responseHtml.append(ServletHelper.getUserPanel(user));
+				responseHtml.append(ServletHelper.getBreadCrumb("storages", Dao.getProduct(productId), "../img"));
+				responseHtml.append(ServletHelper.getMain());
+				responseHtml.append(ServletHelper.getContextMenus("storage"));
+				responseHtml.append(ServletHelper.getLoadingGif());
+			}
+			responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
+			responseHtml.append("</body>");
+			responseHtml.append("</html>");
+			out.print(responseHtml.toString());
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();

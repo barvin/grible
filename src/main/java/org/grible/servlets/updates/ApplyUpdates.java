@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.grible.security.Security;
+
 /**
  * Servlet implementation class CheckForUpdates
  */
@@ -34,6 +36,9 @@ public class ApplyUpdates extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		FileOutputStream fos = null;
 		try {
+			if (Security.anyServletEntryCheckFailed(request, response)) {
+				return;
+			}
 			fos = downloadWarFile();
 			out.print("success");
 			runRestartBatchFile();

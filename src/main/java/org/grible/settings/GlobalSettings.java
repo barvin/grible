@@ -19,6 +19,7 @@ import nu.xom.Element;
 public class GlobalSettings {
 	private static GlobalSettings settings;
 	private File configFile;
+	private AppTypes appType;
 	private String dbhost;
 	private String dbport;
 	private String dbname;
@@ -32,10 +33,10 @@ public class GlobalSettings {
 		if (this.configFile == null) {
 			this.configFile = new File(localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "config.xml");
 		}
-		if (!configFile.exists()) {
+		if ((!configFile.exists()) || (appType == null)) {
 			return false;
 		}
-		if (hasNulls()) {
+		if ((appType == AppTypes.PostgreSQL) && hasNulls()) {
 			setDbSettingsFromFile();
 		}
 		return true;
@@ -100,6 +101,14 @@ public class GlobalSettings {
 
 	public void setDbPswd(String dbpswd) {
 		this.dbpswd = dbpswd;
+	}
+
+	public AppTypes getAppType() {
+		return appType;
+	}
+
+	public void setAppType(AppTypes appType) {
+		this.appType = appType;
 	}
 
 	private boolean hasNulls() {

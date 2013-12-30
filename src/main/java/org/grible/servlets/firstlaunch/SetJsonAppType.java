@@ -12,7 +12,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
+
+import com.google.gson.Gson;
 
 import nu.xom.Document;
 import nu.xom.Element;
@@ -20,14 +23,14 @@ import nu.xom.Element;
 /**
  * Servlet implementation class SaveDBSettings
  */
-@WebServlet("/SaveDBSettings")
-public class SaveDBSettings extends HttpServlet {
+@WebServlet("/SetJsonAppType")
+public class SetJsonAppType extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public SaveDBSettings() {
+	public SetJsonAppType() {
 		super();
 	}
 
@@ -40,34 +43,12 @@ public class SaveDBSettings extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
+			GlobalSettings.getInstance().setAppType(AppTypes.Json);
+
 			Element root = new Element("configuration");
 			Element apptype = new Element("apptype");
-			apptype.appendChild(GlobalSettings.getInstance().getAppType().toString().toLowerCase());
+			apptype.appendChild(AppTypes.Json.toString().toLowerCase());
 			root.appendChild(apptype);
-			
-			Element database = new Element("database");
-
-			Element host = new Element("dbhost");
-			host.appendChild(GlobalSettings.getInstance().getDbHost());
-
-			Element port = new Element("dbport");
-			port.appendChild(GlobalSettings.getInstance().getDbPort());
-
-			Element dbname = new Element("dbname");
-			dbname.appendChild(GlobalSettings.getInstance().getDbName());
-
-			Element login = new Element("dblogin");
-			login.appendChild(GlobalSettings.getInstance().getDbLogin());
-
-			Element password = new Element("dbpswd");
-			password.appendChild(GlobalSettings.getInstance().getDbPswd());
-
-			database.appendChild(host);
-			database.appendChild(port);
-			database.appendChild(dbname);
-			database.appendChild(login);
-			database.appendChild(password);
-			root.appendChild(database);
 
 			Document doc = new Document(root);
 			String result = doc.toXML();
@@ -76,17 +57,10 @@ public class SaveDBSettings extends HttpServlet {
 			if (!dir.exists()) {
 				dir.mkdir();
 			}
-			File file = new File(getServletContext().getRealPath("") + File.separator + ".." + File.separator + "config" + File.separator + "config.xml");
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(result);
-			bw.close();
-
-			out.print("Done.");
+			writeToFileInConfigFolder("config.xml", result);			
+			writeToFileInConfigFolder("products.json", "[]");
+			
+			out.print("success");
 
 		} catch (Exception e) {
 			out.print("ERROR: " + e.getLocalizedMessage());
@@ -95,6 +69,20 @@ public class SaveDBSettings extends HttpServlet {
 			out.flush();
 			out.close();
 		}
+	}
+
+	private File writeToFileInConfigFolder(String fileName, String text) throws IOException {
+		File file = new File(getServletContext().getRealPath("") + File.separator + ".." + File.separator
+				+ "config" + File.separator + fileName);
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+
+		FileWriter fw = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(text);
+		bw.close();
+		return file;
 	}
 
 }

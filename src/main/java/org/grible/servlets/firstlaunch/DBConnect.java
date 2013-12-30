@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
 
 /**
@@ -47,6 +48,7 @@ public class DBConnect extends HttpServlet {
 			if (con != null) {
 				out.print("Done.");
 				con.close();
+				GlobalSettings.getInstance().setAppType(AppTypes.PostgreSQL);
 				GlobalSettings.getInstance().setDbHost(dbhost);
 				GlobalSettings.getInstance().setDbPort(dbport);
 				GlobalSettings.getInstance().setDbName(dbname);

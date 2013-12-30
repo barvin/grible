@@ -99,6 +99,10 @@ body {
 	display: none;
 }
 
+.hiddensettings {
+	display: none;
+}
+
 #success {
 	margin-top: 25px;
 }
@@ -107,4 +111,8 @@ body {
 	float: left;
 	margin-top: -4px;
 	margin-right: 8px;
+}
+
+.center {
+	text-align: center;
 }

@@ -14,6 +14,25 @@ $(window).on(
 				$("#btn-createdb").val("Create database");
 			});
 
+			$("#btn-select-json").click(
+					function() {
+						$.post("SetJsonAppType", function(data) {
+							if (data == "success") {
+								$("#success").html(
+										"<img src='img/success-icon.png'> " + "Configuration has been saved successfully. "
+												+ "<a href='../'>Start the Grible</a>.");
+							} else {
+								alert(data);
+							}
+						});
+					});
+
+			$("#btn-select-postgresql").click(function() {
+				$("#type-selection").slideUp(function() {
+					$(".hiddensettings").slideDown();
+				});
+			});
+
 			var $console = $("#console");
 
 			$("#btn-createdb").click(
@@ -68,7 +87,11 @@ $(window).on(
 								writeToConsole(data);
 
 								if (data == "Done.") {
-									// create database | validate database
+									// create
+									// database
+									// |
+									// validate
+									// database
 									// structure
 									var $message = "<br>Creating database... ";
 									if ($("input[value='false']:checked").length > 0) {
@@ -82,7 +105,9 @@ $(window).on(
 										writeToConsole(data);
 
 										if (data == "Done.") {
-											// create Grible administrator
+											// create
+											// Grible
+											// administrator
 											writeToConsole("<br>Creating Grible administrator... ");
 											$.post("CreateAdmin", {
 												griblelogin : $("input[name='griblelogin']").val(),
@@ -92,7 +117,9 @@ $(window).on(
 												writeToConsole(data);
 
 												if (data == "Done.") {
-													// save database settings
+													// save
+													// database
+													// settings
 													writeToConsole("<br>Saving database settings... ");
 													$.post("SaveDBSettings", function(data) {
 														writeToConsole(data);

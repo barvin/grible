@@ -4,30 +4,68 @@
 <title>First launch - Grible</title>
 <link rel="shortcut icon" href="img/favicon.ico">
 <link rel="stylesheet" type="text/css" href="css/firstlaunch.css" />
-<script type="text/javascript"
-	src="js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="js/firstlaunch.js"></script>
 </head>
 <body>
 	<img id="login-logo" src="img/grible_logo.png">
 	<span id="title">Grible</span>
 	<p>
-		It seems like you are launching the Grible for the first time. Please, configure the
-		database. <br> <strong>Note:</strong> At the moment PostgreSQL as
-		a database is only supported. If you have not installed it, please <a
-			href="http://www.postgresql.org/download/" target="_blank">do it</a>.
+		It seems like you are launching the Grible for the first time. <br />Please,
+		choose what type of Grible you want.
 	</p>
-	<div class="setting-table">
-		<input type="radio" name="createnewdb" value="true" checked="checked">Install
-		new Grible database<span class="showninfo info"> *</span><br> <input type="radio" name="createnewdb"
-			value="false">Already have the Grible database, just
-		reinstalling the application
+	<div id="type-selection" class="setting-table">
+		<div class="table">
+			<div class="table-row">
+				<div class="table-cell">
+					<img src="img/json.jpg">
+				</div>
+				<div class="table-cell">
+					<img src="img/postgresql.jpg">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell">
+					<p>This Grible is more like a desktop application with web
+						interface. It does not have users. It uses JSON files to store
+						your test data, so you can keep these files within your automation
+						framework in your control version system.</p>
+				</div>
+				<div class="table-cell">
+					<p>This Grible is to be installed on one server and used by
+						multiple users. It uses PostgreSQL database to store your test
+						data, so it is hard to keep different data for the different
+						branches of your automation framework, but you don't need to
+						commit the changes, because tests use the data directly from the
+						database.</p>
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell center">
+					<input id="btn-select-json" type="button" value="Select JSON"
+						class="ui-button">
+				</div>
+				<div class="table-cell center">
+					<input id="btn-select-postgresql" type="button"
+						value="Select PostgreSQL" class="ui-button">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="postgres-settings" class="setting-table hiddensettings">
+		<strong>Note:</strong> If you have not installed PostgreSQL, please <a
+			href="http://www.postgresql.org/download/" target="_blank">do it</a>.
+		<br /> <input type="radio" name="createnewdb" value="true"
+			checked="checked">I have no data yet, I have just created an
+		empty database<span class="showninfo info"> *</span><br> <input
+			type="radio" name="createnewdb" value="false">I already have
+		some data in the Grible database, I am just (re)installing the
+		application
 		<div class="table">
 			<div class="table-row">
 				<div class="table-cell dialog-cell">Database host:</div>
 				<div class="table-cell dialog-cell">
-					<input class="dialog-edit" name="dbhost"
-						value="localhost">
+					<input class="dialog-edit" name="dbhost" value="localhost">
 				</div>
 			</div>
 			<div class="table-row">
@@ -45,8 +83,7 @@
 			<div class="table-row">
 				<div class="table-cell dialog-cell">Database user name:</div>
 				<div class="table-cell dialog-cell">
-					<input class="dialog-edit" name="dblogin"
-						value="postgres">
+					<input class="dialog-edit" name="dblogin" value="postgres">
 				</div>
 			</div>
 			<div class="table-row">
@@ -56,7 +93,9 @@
 				</div>
 			</div>
 			<div class="table-row">
-				<div class="table-cell dialog-cell">Grible administrator name<span class="hiddeninfo info"> * </span>:</div>
+				<div class="table-cell dialog-cell">
+					Grible administrator name<span class="hiddeninfo info"> * </span>:
+				</div>
 				<div class="table-cell dialog-cell">
 					<input class="dialog-edit" name="griblelogin" value="admin">
 				</div>
@@ -65,20 +104,20 @@
 				<div class="table-cell dialog-cell">Grible administrator
 					password:</div>
 				<div class="table-cell dialog-cell">
-					<input type="password" class="dialog-edit"
-						name="griblepswd">
+					<input type="password" class="dialog-edit" name="griblepswd">
 				</div>
 			</div>
 		</div>
-		<span class="hiddeninfo info"><br>* If the user
-						with this name already exists, the password will be updated.</span>
-		<span class="showninfo info"><br>* Note: database should be created in advance on the specified host.</span>
+		<span class="hiddeninfo info"><br>* If the user with this
+			name already exists, the password will be updated.</span> <span
+			class="showninfo info"><br>* Note: database should be
+			created in advance on the specified host.</span>
 		<div class="dialog-buttons right">
 			<input id="btn-createdb" type="button" value="Create database"
 				class="ui-button">
 		</div>
 	</div>
-	<div id="console"></div>
+	<div id="console" class="hiddensettings"></div>
 	<div id="success"></div>
 	<div id="footer" class="page-bottom">
 		<span class="build">Version:</span>

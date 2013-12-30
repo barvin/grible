@@ -12,9 +12,9 @@
 	<url>http://www.grible.org</url>
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.8.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -67,19 +67,24 @@
 			<artifactId>jetty-jsp</artifactId>
 			<version>9.1.0.M0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>grible</finalName>
 		<plugins>
 			<plugin>
-          			<groupId>org.apache.maven.plugins</groupId>
-          			<artifactId>maven-compiler-plugin</artifactId>
-          			<version>3.1</version>
-          			<configuration>
-            				<source>1.7</source>
-          				<target>1.7</target>
-          			</configuration>
-        		</plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.4</version>

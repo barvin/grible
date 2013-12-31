@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -37,7 +37,8 @@ public class AddUser extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -55,11 +56,12 @@ public class AddUser extends HttpServlet {
 				md = MessageDigest.getInstance("MD5");
 				md.update(strPass.getBytes());
 				String hashPass = new String(md.digest());
-				int userId = Dao.insertUser(userName, hashPass, isAdmin, false);
+				PostgresDao dao = new PostgresDao();
+				int userId = dao.insertUser(userName, hashPass, isAdmin, false);
 				if (userId > 0) {
 					if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
 						String[] productIds = request.getParameterValues("productIds[]");
-						Dao.insertUserPermissions(userId, productIds);
+						dao.insertUserPermissions(userId, productIds);
 					}
 					out.print("success");
 				} else {

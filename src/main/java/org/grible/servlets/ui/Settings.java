@@ -19,10 +19,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -67,9 +69,14 @@ public class Settings extends HttpServlet {
 			responseHtml.append("</head>");
 			responseHtml.append("<body>");
 
-			String userName = (String) request.getSession(false).getAttribute("userName");
-			User currentUser = Dao.getUserByName(userName);
-			responseHtml.append(ServletHelper.getUserPanel(currentUser));
+			User currentUser = null;
+			if (isMultipleUsers()) {
+				String userName = (String) request.getSession(false).getAttribute("userName");
+				currentUser = new PostgresDao().getUserByName(userName);
+				responseHtml.append(ServletHelper.getUserPanel(currentUser));
+			} else {
+				responseHtml.append(ServletHelper.getUserPanel());
+			}
 			responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
 			responseHtml.append("<span id=\"home-image\"><img src=\"../img/grible_logo_mini.png\"></span>");
 			responseHtml.append("<a href=\"/\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
@@ -84,7 +91,7 @@ public class Settings extends HttpServlet {
 			responseHtml.append("<br /><br />");
 
 			String tooltipOnClick = "";
-			if (currentUser.isTooltipOnClick()) {
+			if ((isMultipleUsers() && currentUser.isTooltipOnClick()) || (!isMultipleUsers() && isJsonTooltipOnClick())) {
 				tooltipOnClick = "checked=\"checked\"";
 			}
 			responseHtml.append("<input id=\"cbx-tooltiponclick\" type=\"checkbox\" ").append(tooltipOnClick)
@@ -111,6 +118,15 @@ public class Settings extends HttpServlet {
 		}
 		out.flush();
 		out.close();
+	}
+
+	private boolean isJsonTooltipOnClick() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private boolean isMultipleUsers() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL;
 	}
 
 	/**

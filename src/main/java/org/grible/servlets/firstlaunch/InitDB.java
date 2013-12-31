@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 import org.grible.settings.GlobalSettings;
 
 /**
@@ -32,7 +32,8 @@ public class InitDB extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -40,27 +41,27 @@ public class InitDB extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			boolean createNewDb = Boolean.parseBoolean(request.getParameter("createnew"));
-
+			PostgresDao dao = new PostgresDao();
 			if (createNewDb) {
 				String query = getSQLQuery("/WEB-INF/sql/grible_init.sql");
 				String querySetSeqVal = getSQLQuery("/WEB-INF/sql/grible_setseqval.sql");
-				Dao.executeUpdate(query);
-				Dao.executeSelect(querySetSeqVal);
+				dao.executeUpdate(query);
+				dao.executeSelect(querySetSeqVal);
 			} else {
-				Dao.executeUpdateNoFail("ALTER TABLE ONLY keys ADD CONSTRAINT keys_tableid_order_key UNIQUE (tableid, \"order\");");
-				Dao.executeUpdateNoFail("ALTER TABLE ONLY rows ADD CONSTRAINT rows_tableid_order_key UNIQUE (tableid, \"order\");");
-				Dao.executeUpdateNoFail("ALTER TABLE ONLY \"values\" ADD CONSTRAINT values_rowid_keyid_key UNIQUE (rowid, keyid);");
-				if (!Dao.isTableTypeExist("enumeration")) {
-					Dao.executeUpdate("INSERT INTO tabletypes(name) VALUES ('enumeration')");
+				dao.executeUpdateNoFail("ALTER TABLE ONLY keys ADD CONSTRAINT keys_tableid_order_key UNIQUE (tableid, \"order\");");
+				dao.executeUpdateNoFail("ALTER TABLE ONLY rows ADD CONSTRAINT rows_tableid_order_key UNIQUE (tableid, \"order\");");
+				dao.executeUpdateNoFail("ALTER TABLE ONLY \"values\" ADD CONSTRAINT values_rowid_keyid_key UNIQUE (rowid, keyid);");
+				if (!dao.isTableTypeExist("enumeration")) {
+					dao.executeUpdate("INSERT INTO tabletypes(name) VALUES ('enumeration')");
 				}
-				if (!Dao.columnExist("tables", "showwarning")) {
-					Dao.executeUpdate("ALTER TABLE tables ADD COLUMN showwarning boolean NOT NULL DEFAULT true;");
+				if (!dao.columnExist("tables", "showwarning")) {
+					dao.executeUpdate("ALTER TABLE tables ADD COLUMN showwarning boolean NOT NULL DEFAULT true;");
 				}
-				if (!Dao.columnExist("tables", "modifiedtime")) {
-					Dao.executeUpdate("ALTER TABLE tables ADD COLUMN modifiedtime timestamp without time zone NOT NULL DEFAULT '2013-01-01 00:00:00';");
+				if (!dao.columnExist("tables", "modifiedtime")) {
+					dao.executeUpdate("ALTER TABLE tables ADD COLUMN modifiedtime timestamp without time zone NOT NULL DEFAULT '2013-01-01 00:00:00';");
 				}
-				if (!Dao.columnExist("users", "tooltiponclick")) {
-					Dao.executeUpdate("ALTER TABLE users ADD COLUMN tooltiponclick boolean NOT NULL DEFAULT false;");
+				if (!dao.columnExist("users", "tooltiponclick")) {
+					dao.executeUpdate("ALTER TABLE users ADD COLUMN tooltiponclick boolean NOT NULL DEFAULT false;");
 				}
 				updateValuesLength();
 			}
@@ -81,14 +82,14 @@ public class InitDB extends HttpServlet {
 
 	private void updateValuesLength() throws SQLException {
 		int newValuesLength = 5000;
-		String strLength = Dao
+		String strLength = new PostgresDao()
 				.executeSelect("SELECT atttypmod FROM pg_attribute WHERE attrelid = 'values'::regclass AND attname = 'value';");
 		int actualValuesLength = 0;
 		if (strLength != null) {
 			actualValuesLength = Integer.parseInt(strLength);
 		}
 		if ((actualValuesLength - 4) != newValuesLength) {
-			Dao.executeUpdate("UPDATE pg_attribute SET atttypmod = " + newValuesLength
+			new PostgresDao().executeUpdate("UPDATE pg_attribute SET atttypmod = " + newValuesLength
 					+ " + 4 WHERE attrelid = 'values'::regclass AND attname = 'value';");
 		}
 	}

@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.TableType;
 import org.grible.security.Security;
 
@@ -66,12 +66,12 @@ public class AddCategory extends HttpServlet {
 			if ("".equals(name)) {
 				out.print("ERROR: Category name cannot be empty.");
 			} else {
-				Integer categoryId = Dao.getCategoryId(name, productId, tableType, parentId);
+				Integer categoryId = DataManager.getInstance().getDao().getCategoryId(name, productId, tableType, parentId);
 				if (categoryId != null) {
 					out.print("ERROR: Category with name '" + name + "' already exists.");
 				} else {
 					try {
-						Dao.insertCategory(tableType, productId, name, parentId);
+						DataManager.getInstance().getDao().insertCategory(tableType, productId, name, parentId);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

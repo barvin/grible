@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.security.Security;
@@ -56,12 +56,12 @@ public class InsertKey extends HttpServlet {
 
 			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-			Key currentKey = Dao.getKey(keyId);
+			Key currentKey = DataManager.getInstance().getDao().getKey(keyId);
 			int currentKeyNumber = currentKey.getOrder();
 			int tableId = currentKey.getTableId();
 			List<Integer> keyIds = new ArrayList<Integer>();
 			List<Integer> keyNumbers = new ArrayList<Integer>();
-			List<Key> keys = Dao.getKeys(tableId);
+			List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
 			for (int i = keys.size() - 1; i >= 0; i--) {
 				keyIds.add(keys.get(i).getId());
 				if (keys.get(i).getOrder() >= currentKeyNumber) {
@@ -70,12 +70,12 @@ public class InsertKey extends HttpServlet {
 					keyNumbers.add(i + 1);
 				}
 			}
-			Dao.updateKeys(keyIds, keyNumbers);
+			DataManager.getInstance().getDao().updateKeys(keyIds, keyNumbers);
 			currentKey.setOrder(currentKeyNumber);
-			int newKeyId = Dao.insertKey(tableId, "editme", currentKey.getOrder(), 0);
+			int newKeyId = DataManager.getInstance().getDao().insertKey(tableId, "editme", currentKey.getOrder(), 0);
 
-			List<Row> rows = Dao.getRows(tableId);
-			List<Integer> ids = Dao.insertValuesEmptyWithKeyId(newKeyId, rows);
+			List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+			List<Integer> ids = DataManager.getInstance().getDao().insertValuesEmptyWithKeyId(newKeyId, rows);
 
 			String result = newKeyId + ";" + StringUtils.join(ids, ";");
 			out.print(result);

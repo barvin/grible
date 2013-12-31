@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.security.Security;
 
 /**
@@ -62,7 +62,7 @@ public class UpdateRowsOrder extends HttpServlet {
 					oldRowNumbers.add(Integer.parseInt(strOldOrder[i]));
 					modifiedRowNumbers.add(Integer.parseInt(strNewOrder[i]));
 				}
-				Dao.updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
+				DataManager.getInstance().getDao().updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
 			}
 			out.print("success");
 

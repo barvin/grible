@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.security.Security;
 
 /**
@@ -49,7 +49,7 @@ public class SaveKeyValue extends HttpServlet {
 			}			
 			String id = request.getParameter("id");
 			String value = request.getParameter("value");
-			Dao.updateKeyValue(id, value);
+			DataManager.getInstance().getDao().updateKeyValue(id, value);
 			out.print("success");
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());

@@ -25,13 +25,19 @@ public class GlobalSettings {
 	private String dbname;
 	private String dblogin;
 	private String dbpswd;
+	private String localRootPath;
+	private String configFilePath;
+	private String productsJsonFilePath;
 
 	private GlobalSettings() throws Exception {
 	}
 
 	public boolean init(String localRootPath) throws Exception {
+		this.localRootPath = localRootPath;
 		if (this.configFile == null) {
-			this.configFile = new File(localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "config.xml");
+			this.configFilePath = localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "config.xml";
+			this.productsJsonFilePath = localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "products.json";
+			this.configFile = new File(configFilePath);
 		}
 		if ((!configFile.exists()) || (appType == null)) {
 			return false;
@@ -109,6 +115,18 @@ public class GlobalSettings {
 
 	public void setAppType(AppTypes appType) {
 		this.appType = appType;
+	}
+
+	public String getLocalRootPath() {
+		return localRootPath;
+	}
+
+	public String getConfigFilePath() {
+		return configFilePath;
+	}
+
+	public String getProductsJsonFilePath() {
+		return productsJsonFilePath;
 	}
 
 	private boolean hasNulls() {

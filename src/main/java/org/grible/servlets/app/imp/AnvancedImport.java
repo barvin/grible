@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Key;
 import org.grible.model.Row;
@@ -62,9 +62,9 @@ public class AnvancedImport extends HttpServlet {
 
 			if ("addtoend".equals(option)) {
 				ArrayList<ArrayList<String>> values = excelFile.getValues();
-				List<Integer> rowIds = Dao.addRows(currTable.getId(), Dao.getRows(currTable.getId()).size(),
+				List<Integer> rowIds = DataManager.getInstance().getDao().addRows(currTable.getId(), DataManager.getInstance().getDao().getRows(currTable.getId()).size(),
 						values.size());
-				Dao.insertValues(rowIds, getKeyIds(Dao.getKeys(currTable.getId())), values);
+				DataManager.getInstance().getDao().insertValues(rowIds, getKeyIds(DataManager.getInstance().getDao().getKeys(currTable.getId())), values);
 			} else if ("addfromrow".equals(option)) {
 				int startRow = 0;
 				if (request.getParameter("startrow") != null) {
@@ -76,7 +76,7 @@ public class AnvancedImport extends HttpServlet {
 				} else {
 					throw new Exception("ERROR: Start row is null.");
 				}
-				List<Row> rows = Dao.getRows(currTable.getId());
+				List<Row> rows = DataManager.getInstance().getDao().getRows(currTable.getId());
 				ArrayList<ArrayList<String>> newValues = excelFile.getValues();
 				int rowsCount = rows.size();
 				int newValuesCount = newValues.size();
@@ -88,17 +88,17 @@ public class AnvancedImport extends HttpServlet {
 					limit = newValuesCount;
 				}
 				for (int i = startRow - 1; i < limit; i++) {
-					List<Value> currValues = Dao.getValues(rows.get(i));
+					List<Value> currValues = DataManager.getInstance().getDao().getValues(rows.get(i));
 					for (int j = 0; j < currValues.size(); j++) {
 						Value value = currValues.get(j);
 						value.setValue(newValues.get(0).get(j));
-						Dao.updateValue(value);
+						DataManager.getInstance().getDao().updateValue(value);
 					}
 					newValues.remove(0);
 				}
 				if (newValues.size() > 0) {
-					List<Integer> rowIds = Dao.addRows(currTable.getId(), rowsCount, newValues.size());
-					Dao.insertValues(rowIds, getKeyIds(Dao.getKeys(currTable.getId())), newValues);
+					List<Integer> rowIds = DataManager.getInstance().getDao().addRows(currTable.getId(), rowsCount, newValues.size());
+					DataManager.getInstance().getDao().insertValues(rowIds, getKeyIds(DataManager.getInstance().getDao().getKeys(currTable.getId())), newValues);
 				}
 			}
 			request.getSession(false).setAttribute("importedTable", null);

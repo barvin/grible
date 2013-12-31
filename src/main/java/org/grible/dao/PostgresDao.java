@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.grible.data;
+package org.grible.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -34,11 +34,11 @@ import org.grible.settings.GlobalSettings;
 /**
  * @author Maksym Barvinskyi
  */
-public class JsonDao {
+public class PostgresDao implements Dao {
 
-	private static Connection connection;
+	private Connection connection;
 
-	private static Connection getConnection() throws SQLException {
+	private Connection getConnection() throws SQLException {
 		if (connection == null) {
 			initializeSQLDriver();
 			String sqlserver = null;
@@ -61,7 +61,7 @@ public class JsonDao {
 		return connection;
 	}
 
-	private static void initializeSQLDriver() {
+	private void initializeSQLDriver() {
 		try {
 			Class.forName("org.postgresql.Driver").newInstance();
 		} catch (Exception e) {
@@ -70,13 +70,13 @@ public class JsonDao {
 		}
 	}
 
-	private static Product initProduct(ResultSet rs) throws SQLException {
+	private Product initProduct(ResultSet rs) throws SQLException {
 		Product product = new Product(rs.getInt("id"));
 		product.setName(rs.getString("name"));
 		return product;
 	}
 
-	private static Category initCategory(ResultSet rs) throws SQLException {
+	private Category initCategory(ResultSet rs) throws SQLException {
 		Category category = new Category(rs.getInt("id"));
 		category.setName(rs.getString("name"));
 		category.setProductId(rs.getInt("productid"));
@@ -85,7 +85,7 @@ public class JsonDao {
 		return category;
 	}
 
-	private static Table initTable(ResultSet rs) throws SQLException {
+	private Table initTable(ResultSet rs) throws SQLException {
 		Table result = new Table(rs.getInt("id"));
 		result.setType(TableType.valueOf(rs.getString("type").toUpperCase()));
 		result.setName(rs.getString("name"));
@@ -102,7 +102,7 @@ public class JsonDao {
 		return result;
 	}
 
-	private static User initUser(ResultSet rs) throws SQLException {
+	private User initUser(ResultSet rs) throws SQLException {
 		User user = new User(rs.getInt("id"));
 		user.setName(rs.getString("login"));
 		user.setPassword(rs.getString("password"));
@@ -113,7 +113,7 @@ public class JsonDao {
 		return user;
 	}
 
-	private static List<UserPermission> getUserPermissions(int userId) throws SQLException {
+	private List<UserPermission> getUserPermissions(int userId) throws SQLException {
 		ArrayList<UserPermission> result = new ArrayList<UserPermission>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -130,7 +130,7 @@ public class JsonDao {
 		return result;
 	}
 
-	private static Key initKey(ResultSet rs) throws SQLException {
+	private Key initKey(ResultSet rs) throws SQLException {
 		Key result = new Key(rs.getInt("id"));
 		result.setName(rs.getString("name"));
 		result.setTableId(rs.getInt("tableid"));
@@ -139,14 +139,14 @@ public class JsonDao {
 		return result;
 	}
 
-	private static Row initRow(ResultSet rs) throws SQLException {
+	private Row initRow(ResultSet rs) throws SQLException {
 		Row result = new Row(rs.getInt("id"));
 		result.setTableId(rs.getInt("tableid"));
 		result.setOrder(rs.getInt("order"));
 		return result;
 	}
 
-	private static Value initValue(ResultSet rs) throws SQLException {
+	private Value initValue(ResultSet rs) throws SQLException {
 		Value result = new Value(rs.getInt("id"));
 		result.setKeyId(rs.getInt("keyid"));
 		result.setRowId(rs.getInt("rowid"));
@@ -160,13 +160,21 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Product> getProducts() {
+	public List<Product> getProducts() throws SQLException {
 		List<Product> result = new ArrayList<Product>();
-		
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT * FROM products ORDER BY name");
+		while (rs.next()) {
+			result.add(initProduct(rs));
+		}
+
+		rs.close();
+		stmt.close();
 		return result;
 	}
 
-	public static Product getProduct(int id) throws SQLException {
+	public Product getProduct(int id) throws SQLException {
 		Product result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -180,7 +188,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Category> getAllCategories(int productId, TableType type) throws SQLException {
+	public List<Category> getAllCategories(int productId, TableType type) throws SQLException {
 		List<Category> result = new ArrayList<Category>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -197,7 +205,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Category> getTopLevelCategories(int productId, TableType type) throws SQLException {
+	public List<Category> getTopLevelCategories(int productId, TableType type) throws SQLException {
 		List<Category> result = new ArrayList<Category>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -214,7 +222,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Category> getChildCategories(int categoryId) throws SQLException {
+	public List<Category> getChildCategories(int categoryId) throws SQLException {
 		List<Category> result = new ArrayList<Category>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -231,7 +239,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static int insertCategory(TableType type, int productId, String name, Integer parentId) throws SQLException {
+	public int insertCategory(TableType type, int productId, String name, Integer parentId) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -246,7 +254,7 @@ public class JsonDao {
 		return id;
 	}
 
-	public static int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className)
+	public int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className)
 			throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
@@ -266,7 +274,7 @@ public class JsonDao {
 		return id;
 	}
 
-	public static int insertRow(int tableId, int order) throws SQLException {
+	public int insertRow(int tableId, int order) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -280,7 +288,7 @@ public class JsonDao {
 		return id;
 	}
 
-	public static int insertKey(int tableId, String name, int order, int referenceStorageId) throws SQLException {
+	public int insertKey(int tableId, String name, int order, int referenceStorageId) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -296,7 +304,7 @@ public class JsonDao {
 		return id;
 	}
 
-	public static void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
+	public void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
 			throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -307,7 +315,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static boolean deleteUser(String userId) throws SQLException {
+	public boolean deleteUser(String userId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -323,7 +331,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static User getUserById(int id) throws SQLException {
+	public User getUserById(int id) throws SQLException {
 		User result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -336,7 +344,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static void updateUserPermissions(int userId, String[] productIds) throws SQLException {
+	public void updateUserPermissions(int userId, String[] productIds) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("DELETE FROM userpermissions WHERE userid=" + userId);
@@ -348,7 +356,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateUserName(int id, String userName) throws SQLException {
+	public void updateUserName(int id, String userName) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE users SET login='" + userName + "' WHERE id=" + id);
@@ -356,7 +364,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateUserPassword(int id, String hashPass) throws SQLException {
+	public void updateUserPassword(int id, String hashPass) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE users SET password='" + hashPass + "' WHERE id=" + id);
@@ -364,7 +372,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateUserIsAdmin(int id, boolean isAdmin) throws SQLException {
+	public void updateUserIsAdmin(int id, boolean isAdmin) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE users SET isadmin=" + isAdmin + " WHERE id=" + id);
@@ -372,7 +380,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateUserIsTooltipOnClick(int id, boolean isTooltipOnClick) throws SQLException {
+	public void updateUserIsTooltipOnClick(int id, boolean isTooltipOnClick) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE users SET tooltiponclick=" + isTooltipOnClick + " WHERE id=" + id);
@@ -380,7 +388,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static int insertUser(String userName, String hashPass, boolean isAdmin, boolean isTooltipOnClick)
+	public int insertUser(String userName, String hashPass, boolean isAdmin, boolean isTooltipOnClick)
 			throws SQLException {
 		int id = 0;
 
@@ -398,7 +406,7 @@ public class JsonDao {
 		return id;
 	}
 
-	public static List<User> getUsers() throws SQLException {
+	public List<User> getUsers() throws SQLException {
 		List<User> result = new ArrayList<User>();
 
 		Connection conn = getConnection();
@@ -415,7 +423,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static void insertUserPermissions(int userId, String[] productIds) throws SQLException {
+	public void insertUserPermissions(int userId, String[] productIds) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < productIds.length; i++) {
@@ -427,7 +435,7 @@ public class JsonDao {
 
 	}
 
-	public static User getUserByName(String userName) throws SQLException {
+	public User getUserByName(String userName) throws SQLException {
 		User result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -440,7 +448,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Table getTable(int id) throws SQLException {
+	public Table getTable(int id) throws SQLException {
 		Table result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -457,7 +465,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Table getTable(String name, Integer categoryId) throws SQLException {
+	public Table getTable(String name, Integer categoryId) throws SQLException {
 		Table result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -479,7 +487,7 @@ public class JsonDao {
 	/**
 	 * Method for 'tables' or 'storages'.
 	 */
-	public static int getProductIdByPrimaryTableId(int tableId) throws SQLException {
+	public int getProductIdByPrimaryTableId(int tableId) throws SQLException {
 		int productId = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -496,7 +504,7 @@ public class JsonDao {
 	/**
 	 * Method for 'preconditions' or 'postconditions'.
 	 */
-	public static int getProductIdBySecondaryTableId(int tableId) throws SQLException {
+	public int getProductIdBySecondaryTableId(int tableId) throws SQLException {
 		int productId = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -510,7 +518,7 @@ public class JsonDao {
 		return productId;
 	}
 
-	public static List<Table> getTablesByCategoryId(int categoryId) throws SQLException {
+	public List<Table> getTablesByCategoryId(int categoryId) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -526,7 +534,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Key> getKeys(int tableId) throws SQLException {
+	public List<Key> getKeys(int tableId) throws SQLException {
 		ArrayList<Key> result = new ArrayList<Key>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -539,7 +547,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Row> getRows(int tableId) throws SQLException {
+	public List<Row> getRows(int tableId) throws SQLException {
 		ArrayList<Row> result = new ArrayList<Row>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -552,7 +560,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static ArrayList<Value> getValues(Row row) throws SQLException {
+	public ArrayList<Value> getValues(Row row) throws SQLException {
 		ArrayList<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -567,7 +575,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Table> getTablesUsingRow(int rowId) throws SQLException {
+	public List<Table> getTablesUsingRow(int rowId) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -584,7 +592,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Integer getChildtable(int tableId, TableType childType) throws SQLException {
+	public Integer getChildtable(int tableId, TableType childType) throws SQLException {
 		Integer result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -598,7 +606,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Category getCategory(int id) throws SQLException {
+	public Category getCategory(int id) throws SQLException {
 		Category result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -612,7 +620,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Value> getValues(Key key) throws SQLException {
+	public List<Value> getValues(Key key) throws SQLException {
 		List<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -627,7 +635,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Row getRow(int id) throws SQLException {
+	public Row getRow(int id) throws SQLException {
 		Row result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -640,7 +648,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Value getValue(int id) throws SQLException {
+	public Value getValue(int id) throws SQLException {
 		Value result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -653,7 +661,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Key getKey(int id) throws SQLException {
+	public Key getKey(int id) throws SQLException {
 		Key result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -666,7 +674,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Table> getRefTablesOfProductByKeyId(int keyId, TableType type) throws SQLException {
+	public List<Table> getRefTablesOfProductByKeyId(int keyId, TableType type) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -698,7 +706,7 @@ public class JsonDao {
 
 	}
 
-	public static Integer getCategoryId(String name, int productId, TableType type, Integer parentId)
+	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId)
 			throws SQLException {
 		Integer result = null;
 		Connection conn = getConnection();
@@ -718,7 +726,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> insertKeys(int tableId, List<String> keyNames) throws SQLException {
+	public List<Integer> insertKeys(int tableId, List<String> keyNames) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -735,7 +743,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws SQLException {
+	public List<Integer> insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -752,7 +760,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
+	public void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < keyIds.size(); i++) {
@@ -765,7 +773,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static int insertKeyCopy(Key currentKey) throws SQLException {
+	public int insertKeyCopy(Key currentKey) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -782,7 +790,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesWithKeyId(int newKeyId, List<Value> values) throws SQLException {
+	public List<Integer> insertValuesWithKeyId(int newKeyId, List<Value> values) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -806,11 +814,11 @@ public class JsonDao {
 	 * @param value
 	 * @return value that is ready for DB inserting.
 	 */
-	private static String escape(String value) {
+	private String escape(String value) {
 		return value.replace("'", "''");
 	}
 
-	public static void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
+	public void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
 			throws SQLException {
 		List<Value> values = new ArrayList<Value>();
 		Connection conn = getConnection();
@@ -847,7 +855,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateRows(List<Integer> rowIds, List<Integer> rowNumbers) throws SQLException {
+	public void updateRows(List<Integer> rowIds, List<Integer> rowNumbers) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < rowIds.size(); i++) {
@@ -857,7 +865,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static int insertRowCopy(Row currentRow) throws SQLException {
+	public int insertRowCopy(Row currentRow) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -872,7 +880,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesWithRowId(int newRowId, List<Value> values) throws SQLException {
+	public List<Integer> insertValuesWithRowId(int newRowId, List<Value> values) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -890,7 +898,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values)
+	public List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values)
 			throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
@@ -902,7 +910,7 @@ public class JsonDao {
 			if (value.isStorage()) {
 				value.setValue("0");
 			} else {
-				Key key = JsonDao.getKey(value.getKeyId());
+				Key key = getKey(value.getKeyId());
 				if (key.getReferenceTableId() == 0) {
 					value.setValue("");
 				}
@@ -921,7 +929,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
+	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -956,7 +964,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static boolean deleteCategory(int categoryId) throws SQLException {
+	public boolean deleteCategory(int categoryId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("DELETE FROM categories WHERE id=" + categoryId);
@@ -971,7 +979,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Table> getTablesUsingStorage(int storageId) throws SQLException {
+	public List<Table> getTablesUsingStorage(int storageId) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -988,7 +996,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static boolean deleteTable(int tableId) throws SQLException {
+	public boolean deleteTable(int tableId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1014,7 +1022,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static boolean deleteKey(int keyId) throws SQLException {
+	public boolean deleteKey(int keyId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1030,7 +1038,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static boolean deleteRow(int rowId) throws SQLException {
+	public boolean deleteRow(int rowId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1046,7 +1054,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> insertRows(int tableId, int rowsNumber) throws SQLException {
+	public List<Integer> insertRows(int tableId, int rowsNumber) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1062,7 +1070,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Integer> addRows(int tableId, int currRowsNumber, int rowsNumberToAdd) throws SQLException {
+	public List<Integer> addRows(int tableId, int currRowsNumber, int rowsNumberToAdd) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1078,7 +1086,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static void insertValues(List<Integer> rowIds, List<Integer> keyIds, ArrayList<ArrayList<String>> values)
+	public void insertValues(List<Integer> rowIds, List<Integer> keyIds, ArrayList<ArrayList<String>> values)
 			throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1096,7 +1104,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateTable(Table table) throws SQLException {
+	public void updateTable(Table table) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		String finalName = table.getName();
@@ -1112,7 +1120,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateCategory(Category category) throws SQLException {
+	public void updateCategory(Category category) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE categories SET name='" + category.getName() + "' WHERE id=" + category.getId());
@@ -1120,7 +1128,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateKeys(String[] keyIds, String[] keyValues) throws SQLException {
+	public void updateKeys(String[] keyIds, String[] keyValues) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (int i = 0; i < keyIds.length; i++) {
@@ -1130,7 +1138,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateKeyValue(String id, String value) throws SQLException {
+	public void updateKeyValue(String id, String value) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE keys SET name='" + value.replace("'", "''") + "' " + "WHERE id=" + id);
@@ -1138,7 +1146,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static int getRefStorageId(int keyId) throws SQLException {
+	public int getRefStorageId(int keyId) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1151,7 +1159,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Row getRow(int refStorageId, int order) throws SQLException {
+	public Row getRow(int refStorageId, int order) throws SQLException {
 		Row result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1165,7 +1173,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static void updateValues(ArrayList<Value> values) throws SQLException {
+	public void updateValues(ArrayList<Value> values) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Value value : values) {
@@ -1177,7 +1185,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateKey(Key key) throws SQLException {
+	public void updateKey(Key key) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		String finalRefTableId = "null";
@@ -1190,7 +1198,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateValuesTypes(int keyId, boolean isStorage, String storageIds) throws SQLException {
+	public void updateValuesTypes(int keyId, boolean isStorage, String storageIds) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE values SET isstorage=" + isStorage + ", " + "storagerows=" + storageIds + " "
@@ -1199,7 +1207,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateValue(Value value) throws SQLException {
+	public void updateValue(Value value) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE values " + "SET rowid=" + value.getRowId() + ", keyid=" + value.getKeyId()
@@ -1209,7 +1217,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static boolean isLastAdmin(String userId) throws SQLException {
+	public boolean isLastAdmin(String userId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1229,7 +1237,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static Product getProduct(String name) throws SQLException {
+	public Product getProduct(String name) throws SQLException {
 		Product result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1243,7 +1251,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static int insertProduct(String name) throws SQLException {
+	public int insertProduct(String name, String path) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1257,7 +1265,7 @@ public class JsonDao {
 		return id;
 	}
 
-	public static int getAdminsCount() throws SQLException {
+	public int getAdminsCount() throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1270,7 +1278,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static void executeUpdate(String query) throws SQLException {
+	public void executeUpdate(String query) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(query);
@@ -1278,7 +1286,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void executeUpdateNoFail(String query) throws SQLException {
+	public void executeUpdateNoFail(String query) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		try {
@@ -1289,7 +1297,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static String executeSelect(String query) throws SQLException {
+	public String executeSelect(String query) throws SQLException {
 		ResultSet rs = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1302,7 +1310,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static boolean deleteProduct(int productId) throws SQLException {
+	public boolean deleteProduct(int productId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 
@@ -1325,7 +1333,7 @@ public class JsonDao {
 		return true;
 	}
 
-	public static void turnOffKeyReftableConstraint() throws Exception {
+	public void turnOffKeyReftableConstraint() throws Exception {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		try {
@@ -1338,7 +1346,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void turnOnKeyReftableConstraint() throws Exception {
+	public void turnOnKeyReftableConstraint() throws Exception {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		try {
@@ -1351,7 +1359,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static void updateProduct(Product product) throws SQLException {
+	public void updateProduct(Product product) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate("UPDATE products SET name='" + product.getName() + "' WHERE id=" + product.getId());
@@ -1359,7 +1367,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static List<Table> getTablesOfProduct(int productId, TableType type) throws SQLException {
+	public List<Table> getTablesOfProduct(int productId, TableType type) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1377,7 +1385,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws SQLException {
+	public boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1393,7 +1401,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
+	public List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
 		List<Key> result = new ArrayList<Key>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1409,7 +1417,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static void insertValues(int tableId, int oldTableId, List<Row> oldRows, List<Key> keys) throws SQLException {
+	public void insertValues(int tableId, int oldTableId, List<Row> oldRows, List<Key> keys) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		for (Row oldRow : oldRows) {
@@ -1426,7 +1434,7 @@ public class JsonDao {
 		stmt.close();
 	}
 
-	public static boolean isTableTypeExist(String name) throws SQLException {
+	public boolean isTableTypeExist(String name) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1438,8 +1446,8 @@ public class JsonDao {
 		return result;
 	}
 
-	public static List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws SQLException {
-		int enumId = JsonDao.getTable(JsonDao.getKey(enumValue.getKeyId()).getTableId()).getId();
+	public List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws SQLException {
+		int enumId = getTable(getKey(enumValue.getKeyId()).getTableId()).getId();
 		List<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1452,7 +1460,7 @@ public class JsonDao {
 		return result;
 	}
 
-	public static boolean columnExist(String table, String column) {
+	public boolean columnExist(String table, String column) {
 		try {
 			Connection conn = getConnection();
 			Statement stmt = conn.createStatement();

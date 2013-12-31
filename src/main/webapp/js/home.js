@@ -18,10 +18,16 @@ $(window)
 
 					$("#video-tutorial-msg").css("bottom", $("#footer").height() + 25);
 					$("#video-tutorial-msg").slideDown(600);
-					
+
 					$("#btn-add-product")
 							.click(
 									function() {
+										var productPath = "";
+										if ($("#lbl-user").length == 0) {
+											productPath = '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Path:</div><div class="table-cell dialog-cell dialog-edit">'
+													+ '<input class="product-path dialog-edit" size="50"></div></div>';
+										}
 										$("body")
 												.append(
 														'<div id="add-product-dialog" class="ui-dialog">'
@@ -30,8 +36,9 @@ $(window)
 																+ '<div class="table">'
 																+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
 																+ 'Name:</div><div class="table-cell dialog-cell dialog-edit">'
-																+ '<input class="product-name dialog-edit"></div>'
+																+ '<input class="product-name dialog-edit" size="50"></div>'
 																+ '</div>'
+																+ productPath
 																+ '</div>'
 																+ '<div class="dialog-buttons right">'
 																+ '<button id="dialog-btn-add-product" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
@@ -39,91 +46,60 @@ $(window)
 										initAddProductDialog(jQuery);
 									});
 
-					$(".product-item")
-							.contextMenu(
-									{
-										menu : 'productMenu'
-									},
-									function(action, el, pos) {
-										var $id = $(el).attr("id");
-										if (action == "edit") {
-											$("body")
-													.append(
-															'<div id="edit-product-dialog" class="ui-dialog">'
-																	+ '<div class="ui-dialog-title">Edit product</div>'
-																	+ '<div class="ui-dialog-content">'
-																	+ '<div class="table">'
-																	+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-																	+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="product-name dialog-edit" value="'
-																	+ $(el)
-																			.text()
-																	+ '"></div>'
-																	+ '</div>'
-																	+ '</div>'
-																	+ '<div class="dialog-buttons right">'
-																	+ '<button id="dialog-btn-edit-product" product-id="'
-																	+ $id
-																	+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
-																	+ '</div></div></div>');
-											initEditProductDialog(jQuery);
-										} else if (action == "delete") {
-											noty({
-												type : "confirm",
-												text : "Are you sure you want to delete this product?",
-												buttons : [
-														{
-															addClass : 'btn btn-primary ui-button',
-															text : 'Delete',
-															onClick : function(
-																	$noty) {
-																$noty.close();
-																$
-																		.post(
-																				"DeleteProduct",
-																				{
-																					id : $id
-																				},
-																				function(
-																						data) {
-																					if (data == "success") {
-																						noty({
-																							type : "success",
-																							text : "The product was deleted.",
-																							timeout : 5000
-																						});
-																						$(
-																								el)
-																								.parents(
-																										".table-row")
-																								.remove();
-																					} else {
-																						noty({
-																							type : "error",
-																							text : data
-																						});
-																					}
-																				});
-															}
-														},
-														{
-															addClass : 'btn btn-danger ui-button',
-															text : 'Cancel',
-															onClick : function(
-																	$noty) {
-																$noty.close();
-															}
-														} ]
-											});
-										}
-									});
-
-					$(".section").each(
-							function(i) {
-								if ($(this).width() < 250) {
-									$(this).css("padding-right",
-											(250 - $(this).width()) + "px");
-								}
+					$(".product-item").contextMenu({
+						menu : 'productMenu'
+					}, function(action, el, pos) {
+						var $id = $(el).attr("id");
+						if (action == "edit") {
+							$.post("GetEditProductDialog", {
+								id : $id
+							}, function(data) {
+								$("body").append(data);
+								initEditProductDialog(jQuery);
 							});
+						} else if (action == "delete") {
+							noty({
+								type : "confirm",
+								text : "Are you sure you want to delete this product?",
+								buttons : [ {
+									addClass : 'btn btn-primary ui-button',
+									text : 'Delete',
+									onClick : function($noty) {
+										$noty.close();
+										$.post("DeleteProduct", {
+											id : $id
+										}, function(data) {
+											if (data == "success") {
+												noty({
+													type : "success",
+													text : "The product was deleted.",
+													timeout : 5000
+												});
+												$(el).parents(".table-row").remove();
+											} else {
+												noty({
+													type : "error",
+													text : data
+												});
+											}
+										});
+									}
+								}, {
+									addClass : 'btn btn-danger ui-button',
+									text : 'Cancel',
+									onClick : function($noty) {
+										$noty.close();
+									}
+								} ]
+							});
+						}
+					});
+
+					$(".section").each(function(i) {
+						if ($(this).width() < 250) {
+							$(this).css("padding-right", (250 - $(this).width()) + "px");
+						}
+					});
 
 					function initAddProductDialog() {
 						initDialog();
@@ -139,10 +115,27 @@ $(window)
 							submitAddProduct();
 						});
 
+						if ($("#lbl-user").length == 0) {
+							$("input.product-path").keypress(function(event) {
+								if (event.which === 13) {
+									submitAddProduct();
+								}
+							});
+						}
+
 						function submitAddProduct() {
-							$.post("AddProduct", {
-								name : $("input.product-name").val()
-							}, function(data) {
+							var args;
+							if ($("#lbl-user").length == 0) {
+								args = {
+									name : $("input.product-name").val(),
+									path : $("input.product-path").val()
+								};
+							} else {
+								args = {
+									name : $("input.product-name").val()
+								};
+							}
+							$.post("AddProduct", args, function(data) {
 								if (data == "success") {
 									$("#add-product-dialog").remove();
 									location.reload(true);
@@ -186,13 +179,30 @@ $(window)
 							submitEditProduct();
 						});
 
+						if ($("#lbl-user").length == 0) {
+							$("input.product-path").keypress(function(event) {
+								if (event.which === 13) {
+									submitEditProduct();
+								}
+							});
+						}
+
 						function submitEditProduct() {
-							var $id = $("#dialog-btn-edit-product").attr(
-									"product-id");
-							$.post("UpdateProduct", {
-								id : $id,
-								name : $("input.product-name").val()
-							}, function(data) {
+							var $id = $("#dialog-btn-edit-product").attr("product-id");
+							var args;
+							if ($("#lbl-user").length == 0) {
+								args = {
+									id : $id,
+									name : $("input.product-name").val(),
+									path : $("input.product-path").val()
+								};
+							} else {
+								args = {
+									id : $id,
+									name : $("input.product-name").val()
+								};
+							}
+							$.post("UpdateProduct", args, function(data) {
 								if (data == "success") {
 									$("#edit-product-dialog").remove();
 									location.reload(true);

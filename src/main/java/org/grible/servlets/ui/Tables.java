@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.model.User;
 import org.grible.security.Security;
@@ -65,25 +66,25 @@ public class Tables extends HttpServlet {
 			responseHtml.append(ServletHelper.getIncludes());
 
 			String userName = (String) request.getSession(false).getAttribute("userName");
-			User user = Dao.getUserByName(userName);
+			User user = new PostgresDao().getUserByName(userName);
 
 			int productId = 0;
 			int tableId = 0;
 			String tableType = "table";
 			if (request.getParameter("id") != null) {
 				tableId = Integer.parseInt(request.getParameter("id"));
-				Table table = Dao.getTable(tableId);
+				Table table = DataManager.getInstance().getDao().getTable(tableId);
 				switch (table.getType()) {
 				case TABLE:
-					productId = Dao.getProductIdByPrimaryTableId(tableId);
+					productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
 					break;
 
 				case PRECONDITION:
-					productId = Dao.getProductIdBySecondaryTableId(tableId);
+					productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
 					break;
 
 				case POSTCONDITION:
-					productId = Dao.getProductIdBySecondaryTableId(tableId);
+					productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
 					break;
 
 				default:
@@ -113,7 +114,7 @@ public class Tables extends HttpServlet {
 				responseHtml.append("</head>");
 				responseHtml.append("<body>");
 				responseHtml.append(ServletHelper.getUserPanel(user));
-				responseHtml.append(ServletHelper.getBreadCrumb("tables", Dao.getProduct(productId), "../img"));
+				responseHtml.append(ServletHelper.getBreadCrumb("tables", DataManager.getInstance().getDao().getProduct(productId), "../img"));
 				responseHtml.append(ServletHelper.getMain());
 				responseHtml.append(ServletHelper.getContextMenus("table"));
 				responseHtml.append(ServletHelper.getLoadingGif());

@@ -26,7 +26,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.Value;
@@ -73,17 +73,17 @@ public class ExcelFile {
 			keyCellStyle.setFillForegroundColor(HSSFColor.BLACK.index);
 			keyCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
 			keyCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
-			List<Key> keys = Dao.getKeys(table.getId());
+			List<Key> keys = DataManager.getInstance().getDao().getKeys(table.getId());
 			for (int i = 0; i < keys.size(); i++) {
 				Cell cell = row1.createCell(i);
 				cell.setCellValue(keys.get(i).getName());
 				cell.setCellStyle(keyCellStyle);
 			}
 
-			List<org.grible.model.Row> rows = Dao.getRows(table.getId());
+			List<org.grible.model.Row> rows = DataManager.getInstance().getDao().getRows(table.getId());
 			for (int i = 0; i < rows.size(); i++) {
 				Row excelRow = worksheet.createRow(i + 1);
-				List<Value> values = Dao.getValues(rows.get(i));
+				List<Value> values = DataManager.getInstance().getDao().getValues(rows.get(i));
 				for (int j = 0; j < values.size(); j++) {
 					Cell cell = excelRow.createCell(j);
 					cell.setCellValue(values.get(j).getValue());

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -52,7 +52,7 @@ public class GetAddTableDialog extends HttpServlet {
 			}
 
 			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
-			Category category = Dao.getCategory(categoryId);
+			Category category = DataManager.getInstance().getDao().getCategory(categoryId);
 			if ((category.getType() == TableType.TABLE) || (category.getType() == TableType.STORAGE)
 					|| (category.getType() == TableType.ENUMERATION)) {
 				response.setContentType("text/html");
@@ -91,7 +91,7 @@ public class GetAddTableDialog extends HttpServlet {
 				responseHtml.append("<div class=\"table-cell dialog-cell\">");
 				responseHtml.append("<select class=\"tables-list dialog-edit\" disabled=\"disabled\"\">");
 
-				List<Table> tables = Dao.getTablesOfProduct(category.getProductId(), category.getType());
+				List<Table> tables = DataManager.getInstance().getDao().getTablesOfProduct(category.getProductId(), category.getType());
 				for (Table table : tables) {
 					responseHtml.append("<option value=\"");
 					responseHtml.append(table.getId());

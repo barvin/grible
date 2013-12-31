@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Key;
 import org.grible.model.Product;
@@ -208,13 +207,13 @@ public class ServletHelper {
 		return responseHtml.toString();
 	}
 
-	public static String deleteTable(int tableId) throws SQLException {
-		Table currentTable = Dao.getTable(tableId);
+	public static String deleteTable(int tableId) throws Exception {
+		Table currentTable = DataManager.getInstance().getDao().getTable(tableId);
 
 		boolean isUsedByTables = false;
 		String error = "";
 		if ((currentTable.getType() == TableType.STORAGE) || (currentTable.getType() == TableType.ENUMERATION)) {
-			List<Table> tablesUsingThisStorage = Dao.getTablesUsingStorage(tableId);
+			List<Table> tablesUsingThisStorage = DataManager.getInstance().getDao().getTablesUsingStorage(tableId);
 			if (!tablesUsingThisStorage.isEmpty()) {
 				isUsedByTables = true;
 				error = "ERROR: " + StringUtils.capitalize(currentTable.getType().toString().toLowerCase()) + " '"
@@ -227,7 +226,7 @@ public class ServletHelper {
 		if (isUsedByTables) {
 			return error;
 		}
-		boolean deleted = Dao.deleteTable(tableId);
+		boolean deleted = DataManager.getInstance().getDao().deleteTable(tableId);
 		if (deleted) {
 			switch (currentTable.getType()) {
 			case TABLE:
@@ -248,22 +247,22 @@ public class ServletHelper {
 	}
 
 	public static void showImportResult(HttpServletRequest request, StringBuilder responseHtml, int tableId)
-			throws SQLException {
+			throws Exception {
 		if (request.getSession(false).getAttribute("importResult") != null) {
 			String importResult = (String) request.getSession(false).getAttribute("importResult");
 
 			String applyPart = "var keyIds=new Array(); var refIds=new Array(); var types=new Array(); ";
-			List<Key> keys = Dao.getKeys(tableId);
+			List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
 			int i = 0;
 			for (Key key : keys) {
 				if (key.getReferenceTableId() != 0) {
-					String type = Dao.getTable(key.getReferenceTableId()).getType().toString().toLowerCase();
+					String type = DataManager.getInstance().getDao().getTable(key.getReferenceTableId()).getType().toString().toLowerCase();
 					applyPart += "keyIds[" + i + "]=" + key.getId() + "; refIds[" + i + "]="
 							+ key.getReferenceTableId() + "; types[" + i + "]='" + type + "'; ";
 					i++;
 					key.setReferenceTableId(0);
-					Dao.updateKey(key);
-					Dao.updateValuesTypes(key.getId(), false, "NULL");
+					DataManager.getInstance().getDao().updateKey(key);
+					DataManager.getInstance().getDao().updateValuesTypes(key.getId(), false, "NULL");
 				}
 			}
 			if (i > 0) {
@@ -280,22 +279,22 @@ public class ServletHelper {
 	}
 
 	public static void showAdvancedImportDialog(HttpServletRequest request, StringBuilder responseHtml)
-			throws SQLException {
+			throws Exception {
 		if (request.getSession(false).getAttribute("importedTable") != null) {
 			Table currTable = (Table) request.getSession(false).getAttribute("importedTable");
 			ExcelFile excelFile = (ExcelFile) request.getSession(false).getAttribute("importedFile");
 			responseHtml.append("<script type=\"text/javascript\">");
 			responseHtml.append("$(window).on('load', function() { showAdvancedImportDialog("
-					+ Dao.getRows(currTable.getId()).size() + ", " + excelFile.getValues().size() + "); });");
+					+ DataManager.getInstance().getDao().getRows(currTable.getId()).size() + ", " + excelFile.getValues().size() + "); });");
 			responseHtml.append("</script>");
 		}
 	}
 
-	public static boolean isEnumValue(Value value) throws SQLException {
+	public static boolean isEnumValue(Value value) throws Exception {
 		boolean result = false;
-		Key key = Dao.getKey(value.getKeyId());
+		Key key = DataManager.getInstance().getDao().getKey(value.getKeyId());
 		if (key.getReferenceTableId() != 0) {
-			Table refTable = Dao.getTable(key.getReferenceTableId());
+			Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
 			if (refTable.getType() == TableType.ENUMERATION) {
 				result = true;
 			}

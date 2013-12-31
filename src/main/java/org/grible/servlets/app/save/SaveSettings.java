@@ -19,9 +19,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -49,10 +51,15 @@ public class SaveSettings extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			String userName = (String) request.getSession(false).getAttribute("userName");
-			User user = Dao.getUserByName(userName);
 			boolean isTooltipOnClick = Boolean.parseBoolean(request.getParameter("tooltiponclick"));
-			Dao.updateUserIsTooltipOnClick(user.getId(), isTooltipOnClick);
+			if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+				String userName = (String) request.getSession(false).getAttribute("userName");
+				PostgresDao dao = new PostgresDao();
+				User user = dao.getUserByName(userName);
+				dao.updateUserIsTooltipOnClick(user.getId(), isTooltipOnClick);
+			} else {
+				// TODO: add implementation for JSON
+			}
 			out.print("success");
 
 		} catch (Exception e) {

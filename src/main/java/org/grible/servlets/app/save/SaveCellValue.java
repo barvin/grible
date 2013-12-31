@@ -12,7 +12,6 @@ package org.grible.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -23,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.TableType;
 import org.grible.model.Value;
 import org.grible.security.Security;
@@ -57,25 +56,25 @@ public class SaveCellValue extends HttpServlet {
 			String strValue = request.getParameter("value");
 			int id = Integer.parseInt(strId);
 
-			Value value = Dao.getValue(id);
+			Value value = DataManager.getInstance().getDao().getValue(id);
 			String oldValue = value.getValue();
 			value.setValue(StringEscapeUtils.unescapeHtml(strValue));
 
 			if (value.isStorage()) {
 				String[] strRows = value.getValue().split(";");
-				int refStorageId = Dao.getRefStorageId(value.getKeyId());
+				int refStorageId = DataManager.getInstance().getDao().getRefStorageId(value.getKeyId());
 				for (int i = 0; i < strRows.length; i++) {
 					if (!StringUtils.isNumeric(strRows[i])) {
-						out.print("<br>ERROR: Indexes is not numeric. Row: " + Dao.getRow(value.getRowId()).getOrder()
+						out.print("<br>ERROR: Indexes is not numeric. Row: " + DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
 								+ ".<br>If you want to set no index, set '0'.");
 						out.flush();
 						out.close();
 						return;
 					} else if ((!strRows[i].equals("0"))
-							&& (Dao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
-						out.print("<br>ERROR: Data storage '" + Dao.getTable(refStorageId).getName()
+							&& (DataManager.getInstance().getDao().getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
+						out.print("<br>ERROR: Data storage '" + DataManager.getInstance().getDao().getTable(refStorageId).getName()
 								+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
-								+ Dao.getRow(value.getRowId()).getOrder()
+								+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
 								+ ".<br>You must first create this row in specified data storage.");
 						out.flush();
 						out.close();
@@ -87,19 +86,19 @@ public class SaveCellValue extends HttpServlet {
 				} else {
 					Integer[] intRows = new Integer[strRows.length];
 					for (int i = 0; i < strRows.length; i++) {
-						intRows[i] = Dao.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
+						intRows[i] = DataManager.getInstance().getDao().getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
 					}
 					value.setStorageIds(intRows);
 				}
 				value.setIsStorage(true);
 			} else if (isValueOfEnumeration(value)) {
-				List<Value> dependedValues = Dao.getValuesByEnumValue(value, oldValue);
+				List<Value> dependedValues = DataManager.getInstance().getDao().getValuesByEnumValue(value, oldValue);
 				for (Value dependedValue : dependedValues) {
 					dependedValue.setValue(value.getValue());
-					Dao.updateValue(dependedValue);
+					DataManager.getInstance().getDao().updateValue(dependedValue);
 				}
 			}
-			Dao.updateValue(value);
+			DataManager.getInstance().getDao().updateValue(value);
 			out.print("success");
 
 		} catch (Exception e) {
@@ -110,8 +109,8 @@ public class SaveCellValue extends HttpServlet {
 		out.close();
 	}
 
-	private boolean isValueOfEnumeration(Value value) throws SQLException {
-		return TableType.ENUMERATION == Dao.getTable(Dao.getKey(value.getKeyId()).getTableId()).getType();
+	private boolean isValueOfEnumeration(Value value) throws Exception {
+		return TableType.ENUMERATION == DataManager.getInstance().getDao().getTable(DataManager.getInstance().getDao().getKey(value.getKeyId()).getTableId()).getType();
 	}
 
 	/**

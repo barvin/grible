@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.settings.GlobalSettings;
 
@@ -40,14 +40,13 @@ public class CreateAdmin extends HttpServlet {
 			String gribleLogin = request.getParameter("griblelogin");
 			String griblePswd = request.getParameter("griblepswd");
 
-			
-
-			User user = Dao.getUserByName(gribleLogin);
+			PostgresDao dao = new PostgresDao();
+			User user = dao.getUserByName(gribleLogin);
 			if (user == null) {
 				MessageDigest md = MessageDigest.getInstance("MD5");
 				md.update(griblePswd.getBytes());
 				String hashPass = new String(md.digest());
-				int userId = Dao.insertUser(gribleLogin, hashPass, true, false);
+				int userId = dao.insertUser(gribleLogin, hashPass, true, false);
 				if (userId > 0) {
 					out.print("Done.");
 				} else {
@@ -58,8 +57,8 @@ public class CreateAdmin extends HttpServlet {
 					MessageDigest md = MessageDigest.getInstance("MD5");
 					md.update(griblePswd.getBytes());
 					String hashPass = new String(md.digest());
-					Dao.updateUserPassword(user.getId(), hashPass);
-					Dao.updateUserIsAdmin(user.getId(), true);
+					dao.updateUserPassword(user.getId(), hashPass);
+					dao.updateUserIsAdmin(user.getId(), true);
 					out.print("Done.");
 				} else {
 					out.print("ERROR: Password for Grible administrator cannot be empty.");

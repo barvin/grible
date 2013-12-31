@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Value;
 import org.grible.security.Security;
@@ -50,12 +50,12 @@ public class GetEnumValues extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			Key key = Dao.getKey(Integer.parseInt(request.getParameter("keyid")));
+			Key key = DataManager.getInstance().getDao().getKey(Integer.parseInt(request.getParameter("keyid")));
 			String content = request.getParameter("content");
 
 			out.println("<select class=\"enum-values\">");
-			Key enumKey = Dao.getKeys(Dao.getTable(key.getReferenceTableId()).getId()).get(0);
-			List<Value> enumValues = Dao.getValues(enumKey);
+			Key enumKey = DataManager.getInstance().getDao().getKeys(DataManager.getInstance().getDao().getTable(key.getReferenceTableId()).getId()).get(0);
+			List<Value> enumValues = DataManager.getInstance().getDao().getValues(enumKey);
 			for (Value enumeValue : enumValues) {
 				String selected = "";
 				if (enumeValue.getValue().equals(content)) {

@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Product;
 import org.grible.security.Security;
 
@@ -49,18 +49,22 @@ public class AddProduct extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			
+
 			String name = request.getParameter("name");
+			String path = request.getParameter("path");
 
 			if ("".equals(name)) {
 				out.print("ERROR: Product name cannot be empty.");
+			} else if ("".equals(path)) {
+				out.print("ERROR: Product path cannot be empty.");
 			} else {
-				Product product = Dao.getProduct(name);
+				Product product = DataManager.getInstance().getDao().getProduct(name);
 				if (product != null) {
-					out.print("ERROR: Category with name '" + name + "' already exists.");
+					out.print("ERROR: Product with name '" + name + "' already exists.");
 				} else {
 					try {
-						Dao.insertProduct(name);
+						path = (path == null) ? "" : path;
+						DataManager.getInstance().getDao().insertProduct(name, path);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

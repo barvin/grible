@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Table;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
@@ -53,7 +53,7 @@ public class DeleteCategory extends HttpServlet {
 			}
 
 			int categoryId = Integer.parseInt(request.getParameter("id"));
-			List<Table> tables = Dao.getTablesByCategoryId(categoryId);
+			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategoryId(categoryId);
 
 			StringBuilder error = new StringBuilder();
 			for (Table table : tables) {
@@ -66,7 +66,7 @@ public class DeleteCategory extends HttpServlet {
 			if (error.length() > 0) {
 				out.print(error.toString());
 			} else {
-				boolean deleted = Dao.deleteCategory(categoryId);
+				boolean deleted = DataManager.getInstance().getDao().deleteCategory(categoryId);
 				if (deleted) {
 					out.print("success");
 				} else {

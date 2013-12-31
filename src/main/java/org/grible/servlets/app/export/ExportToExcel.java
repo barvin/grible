@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Table;
 import org.grible.security.Security;
@@ -52,7 +52,7 @@ public class ExportToExcel extends HttpServlet {
 				return;
 			}
 			int tableId = Integer.parseInt(request.getParameter("id"));
-			Table table = Dao.getTable(tableId);
+			Table table = DataManager.getInstance().getDao().getTable(tableId);
 			ExcelFile excelFile = new ExcelFile();
 			File exportDir = new File(getServletContext().getRealPath("") + "/export");
 			if (!exportDir.exists()) {

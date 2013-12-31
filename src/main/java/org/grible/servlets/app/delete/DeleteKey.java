@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.security.Security;
 
@@ -53,16 +53,16 @@ public class DeleteKey extends HttpServlet {
 			}
 			int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-			int tableId = Dao.getKey(keyId).getTableId();
-			if (Dao.deleteKey(keyId)) {
+			int tableId = DataManager.getInstance().getDao().getKey(keyId).getTableId();
+			if (DataManager.getInstance().getDao().deleteKey(keyId)) {
 				List<Integer> keyIds = new ArrayList<Integer>();
 				List<Integer> keyNumbers = new ArrayList<Integer>();
-				List<Key> keys = Dao.getKeys(tableId);
+				List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
 				for (int i = 0; i < keys.size(); i++) {
 					keyIds.add(keys.get(i).getId());
 					keyNumbers.add(i + 1);
 				}
-				Dao.updateKeys(keyIds, keyNumbers);
+				DataManager.getInstance().getDao().updateKeys(keyIds, keyNumbers);
 				out.print("success");
 			} else {
 				out.print("Could not delete the column. See server log for detail.");

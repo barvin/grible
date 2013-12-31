@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -54,14 +54,14 @@ public class DeleteRow extends HttpServlet {
 				return;
 			}
 			int rowId = Integer.parseInt(request.getParameter("rowid"));
-			Row row = Dao.getRow(rowId);
+			Row row = DataManager.getInstance().getDao().getRow(rowId);
 			int tableId = row.getTableId();
-			Table currentTable = Dao.getTable(tableId);
+			Table currentTable = DataManager.getInstance().getDao().getTable(tableId);
 
 			boolean isUsedByTables = false;
 			String error = "";
 			if (currentTable.getType() == TableType.STORAGE) {
-				List<Table> tablesUsingRow = Dao.getTablesUsingRow(rowId);
+				List<Table> tablesUsingRow = DataManager.getInstance().getDao().getTablesUsingRow(rowId);
 				if (!tablesUsingRow.isEmpty()) {
 					isUsedByTables = true;
 					error = "ERROR: This row is used by:";
@@ -79,17 +79,17 @@ public class DeleteRow extends HttpServlet {
 			if (isUsedByTables) {
 				out.print(error);
 			} else {
-				if (Dao.deleteRow(rowId)) {
+				if (DataManager.getInstance().getDao().deleteRow(rowId)) {
 					List<Integer> rowIds = new ArrayList<Integer>();
 					List<Integer> oldRowNumbers = new ArrayList<Integer>();
 					List<Integer> rowNumbers = new ArrayList<Integer>();
-					List<Row> rows = Dao.getRows(tableId);
+					List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
 					for (int i = 0; i < rows.size(); i++) {
 						rowIds.add(rows.get(i).getId());
 						oldRowNumbers.add(rows.get(i).getOrder());
 						rowNumbers.add(i + 1);
 					}
-					Dao.updateRows(rowIds, oldRowNumbers, rowNumbers);
+					DataManager.getInstance().getDao().updateRows(rowIds, oldRowNumbers, rowNumbers);
 					out.print("success");
 				} else {
 					out.print("Could not delete the row. See server log for details.");

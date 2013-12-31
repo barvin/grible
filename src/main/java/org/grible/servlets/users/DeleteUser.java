@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.security.Security;
 
@@ -51,18 +51,19 @@ public class DeleteUser extends HttpServlet {
 			}
 
 			String userId = request.getParameter("userid");
-			User currUser = Dao.getUserById(Integer.parseInt(userId));
+			PostgresDao dao = new PostgresDao();
+			User currUser = dao.getUserById(Integer.parseInt(userId));
 
 			boolean deletingSelf = false;
 			if (request.getSession(false).getAttribute("userName").equals(currUser.getName())) {
 				deletingSelf = true;
 			}
 			
-			boolean isLastAdmin = Dao.getAdminsCount() == 1;
+			boolean isLastAdmin = dao.getAdminsCount() == 1;
 			if (deletingSelf && isLastAdmin) {
 				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
 			} else {
-				boolean deleted = Dao.deleteUser(userId);
+				boolean deleted = dao.deleteUser(userId);
 				if (deleted) {
 					if (deletingSelf) {
 						out.print("gohome");	

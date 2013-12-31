@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Table;
 import org.grible.security.Security;
 
@@ -50,7 +50,7 @@ public class EditTable extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = Dao.getTable(id);
+			Table table = DataManager.getInstance().getDao().getTable(id);
 			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
 			String name = request.getParameter("name");
 			String className = request.getParameter("classname");
@@ -61,7 +61,7 @@ public class EditTable extends HttpServlet {
 				table.setCategoryId(categoryId);
 				table.setName(name);
 				table.setClassName(className);
-				Dao.updateTable(table);
+				DataManager.getInstance().getDao().updateTable(table);
 				out.print("success");
 			}
 

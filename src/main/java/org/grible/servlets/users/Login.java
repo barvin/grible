@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 
 
@@ -50,8 +50,7 @@ public class Login extends HttpServlet {
 
 		User user = null;
 		try {
-			
-			user = Dao.getUserByName(userName);
+			user = new PostgresDao().getUserByName(userName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -58,7 +58,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			table = Dao.getTable(id);
+			table = DataManager.getInstance().getDao().getTable(id);
 		} catch (Exception e) {
 			e.printStackTrace(out);
 		}
@@ -121,8 +121,8 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 			StringBuilder fields = new StringBuilder("<br>");
 
-			Key key = Dao.getKeys(table.getId()).get(0);
-			List<Value> values = Dao.getValues(key);
+			Key key = DataManager.getInstance().getDao().getKeys(table.getId()).get(0);
+			List<Value> values = DataManager.getInstance().getDao().getValues(key);
 			List<String> strValues = getStringValues(values);
 			fields.append(StringUtils.join(strValues, ", "));
 			fields.append(";<br>}");
@@ -152,8 +152,8 @@ public class GetGeneratedClassDialog extends HttpServlet {
 
 			StringBuilder fields = new StringBuilder("<br>");
 
-			Key key = Dao.getKeys(table.getId()).get(0);
-			List<Value> values = Dao.getValues(key);
+			Key key = DataManager.getInstance().getDao().getKeys(table.getId()).get(0);
+			List<Value> values = DataManager.getInstance().getDao().getValues(key);
 			List<String> strValues = getStringValues(values);
 			fields.append(StringUtils.join(strValues, ", "));
 			fields.append("<br>}");
@@ -189,21 +189,21 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append("(HashMap&lt;String, String&gt; data) {");
 			constructor.append("<br>super(data);");
 
-			List<Key> keys = Dao.getKeys(table.getId());
+			List<Key> keys = DataManager.getInstance().getDao().getKeys(table.getId());
 			for (Key key : keys) {
 				String keyName = key.getName();
 				String fieldName = StringUtils.uncapitalize(keyName).replace(" ", "");
 				String type = "String";
 				String method = "getString(\"" + keyName + "\");";
 
-				List<Value> values = Dao.getValues(key);
+				List<Value> values = DataManager.getInstance().getDao().getValues(key);
 				if (key.getReferenceTableId() == 0) {
 					if (isBoolean(values)) {
 						type = "boolean";
 						method = "getBoolean(\"" + keyName + "\");";
 					}
 				} else {
-					Table refTable = Dao.getTable(key.getReferenceTableId());
+					Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
 					if (refTable.getType() == TableType.STORAGE) {
 						isDataHelperIncluded = true;
 						String refClassName = refTable.getClassName();
@@ -284,22 +284,22 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append(className);
 			constructor.append("(Dictionary&lt;string, string&gt; data) : base(data)<br>{");
 
-			List<Key> keys = Dao.getKeys(table.getId());
+			List<Key> keys = DataManager.getInstance().getDao().getKeys(table.getId());
 			for (Key key : keys) {
 				String keyName = key.getName().replace(" ", "");
 				String type = "string";
 				String method = "GetString(\"" + keyName + "\");";
 
-				List<Value> values = Dao.getValues(key);
+				List<Value> values = DataManager.getInstance().getDao().getValues(key);
 				if (key.getReferenceTableId() == 0) {
 					if (isBoolean(values)) {
 						type = "bool";
 						method = "GetBoolean(\"" + keyName + "\");";
 					}
 				} else {
-					Table refTable = Dao.getTable(key.getReferenceTableId());
+					Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
 					if (refTable.getType() == TableType.STORAGE) {
-						String refClassName = Dao.getTable(key.getReferenceTableId()).getClassName();
+						String refClassName = DataManager.getInstance().getDao().getTable(key.getReferenceTableId()).getClassName();
 						if (semicolumnExists(values)) {
 							type = "List&lt;" + refClassName + "&gt;";
 							method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\"" + keyName

@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Table;
 import org.grible.security.Security;
 
@@ -50,14 +50,14 @@ public class SetDuplicateWarning extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = Dao.getTable(id);
+			Table table = DataManager.getInstance().getDao().getTable(id);
 			boolean show = false;
 			if (request.getParameter("show") != null) {
 				show = Boolean.parseBoolean(request.getParameter("show"));
 			}
 
 			table.setShowWarning(show);
-			Dao.updateTable(table);
+			DataManager.getInstance().getDao().updateTable(table);
 			out.print("success");
 
 		} catch (Exception e) {

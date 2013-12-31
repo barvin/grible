@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -62,10 +62,10 @@ public class TableImport extends HttpServlet {
 			InputStream filecontent = filePart.getInputStream();
 			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
 
-			if (Dao.isTableInProductExist(tableName, TableType.TABLE, categoryId)) {
-				Table table = Dao.getTable(tableName, categoryId);
+			if (DataManager.getInstance().getDao().isTableInProductExist(tableName, TableType.TABLE, categoryId)) {
+				Table table = DataManager.getInstance().getDao().getTable(tableName, categoryId);
 
-				int currentKeysCount = Dao.getKeys(table.getId()).size();
+				int currentKeysCount = DataManager.getInstance().getDao().getKeys(table.getId()).size();
 				int importedKeysCount = excelFile.getKeys().size();
 				if (currentKeysCount != importedKeysCount) {
 					throw new Exception("Parameters number is different.<br>In the current table: " + currentKeysCount
@@ -77,28 +77,28 @@ public class TableImport extends HttpServlet {
 				String destination = "/tables/?id=" + table.getId();
 				response.sendRedirect(destination);
 			} else {
-				int tableId = Dao.insertTable(tableName, TableType.TABLE, categoryId, null, null);
-				List<Integer> keyIds = Dao.insertKeys(tableId, excelFile.getKeys());
+				int tableId = DataManager.getInstance().getDao().insertTable(tableName, TableType.TABLE, categoryId, null, null);
+				List<Integer> keyIds = DataManager.getInstance().getDao().insertKeys(tableId, excelFile.getKeys());
 				ArrayList<ArrayList<String>> values = excelFile.getValues();
-				List<Integer> rowIds = Dao.insertRows(tableId, values.size());
-				Dao.insertValues(rowIds, keyIds, values);
+				List<Integer> rowIds = DataManager.getInstance().getDao().insertRows(tableId, values.size());
+				DataManager.getInstance().getDao().insertValues(rowIds, keyIds, values);
 
 				if (excelFile.hasPreconditions()) {
 					List<String> precondKeyNames = getKeyNames(excelFile.getPrecondition());
 					ArrayList<ArrayList<String>> precondValues = getValues(excelFile.getPrecondition());
-					int precondTableId = Dao.insertTable(null, TableType.PRECONDITION, null, tableId, null);
-					List<Integer> precondKeyIds = Dao.insertKeys(precondTableId, precondKeyNames);
-					List<Integer> precondRowIds = Dao.insertRows(precondTableId, 1);
-					Dao.insertValues(precondRowIds, precondKeyIds, precondValues);
+					int precondTableId = DataManager.getInstance().getDao().insertTable(null, TableType.PRECONDITION, null, tableId, null);
+					List<Integer> precondKeyIds = DataManager.getInstance().getDao().insertKeys(precondTableId, precondKeyNames);
+					List<Integer> precondRowIds = DataManager.getInstance().getDao().insertRows(precondTableId, 1);
+					DataManager.getInstance().getDao().insertValues(precondRowIds, precondKeyIds, precondValues);
 				}
 
 				if (excelFile.hasPostconditions()) {
 					List<String> postcondKeyNames = getKeyNames(excelFile.getPostcondition());
 					ArrayList<ArrayList<String>> postcondValues = getValues(excelFile.getPostcondition());
-					int postcondTableId = Dao.insertTable(null, TableType.POSTCONDITION, null, tableId, null);
-					List<Integer> postcondKeyIds = Dao.insertKeys(postcondTableId, postcondKeyNames);
-					List<Integer> postcondRowIds = Dao.insertRows(postcondTableId, 1);
-					Dao.insertValues(postcondRowIds, postcondKeyIds, postcondValues);
+					int postcondTableId = DataManager.getInstance().getDao().insertTable(null, TableType.POSTCONDITION, null, tableId, null);
+					List<Integer> postcondKeyIds = DataManager.getInstance().getDao().insertKeys(postcondTableId, postcondKeyNames);
+					List<Integer> postcondRowIds = DataManager.getInstance().getDao().insertRows(postcondTableId, 1);
+					DataManager.getInstance().getDao().insertValues(postcondRowIds, postcondKeyIds, postcondValues);
 				}
 
 				String message = "'" + tableName + "' storage was successfully imported.";

@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.security.Security;
 
 /**
@@ -59,7 +59,7 @@ public class UpdateKeysOrder extends HttpServlet {
 					keyIds.add(Integer.parseInt(strKeyIds[i]));
 					keyNumbers.add(Integer.parseInt(strKeyNumbers[i]));
 				}
-				Dao.updateKeys(keyIds, keyNumbers);
+				DataManager.getInstance().getDao().updateKeys(keyIds, keyNumbers);
 			}
 			out.print("success");
 

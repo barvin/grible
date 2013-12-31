@@ -12,7 +12,6 @@ package org.grible.servlets.ui.panels;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -21,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -61,9 +60,9 @@ public class GetCategories extends HttpServlet {
 			TableType tableType = TableType.valueOf(strTableType.toUpperCase());
 			if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
 				tableType = TableType.TABLE;
-				tableId = Dao.getTable(tableId).getParentId();
+				tableId = DataManager.getInstance().getDao().getTable(tableId).getParentId();
 			}
-			List<Category> categories = Dao.getTopLevelCategories(productId, tableType);
+			List<Category> categories = DataManager.getInstance().getDao().getTopLevelCategories(productId, tableType);
 			StringBuilder responseHtml = new StringBuilder();
 			for (Category category : categories) {
 				appendCategory(tableId, responseHtml, category);
@@ -77,7 +76,7 @@ public class GetCategories extends HttpServlet {
 		out.close();
 	}
 
-	private void appendCategory(int tableId, StringBuilder responseHtml, Category category) throws SQLException {
+	private void appendCategory(int tableId, StringBuilder responseHtml, Category category) throws Exception {
 		String categorySelectedClass = "";
 		if (tableId > 0) {
 			if (isOneOfParentCategoriesForTable(tableId, category.getId())) {
@@ -91,7 +90,7 @@ public class GetCategories extends HttpServlet {
 		responseHtml.append(category.getName()).append("</span></h3>");
 		responseHtml.append("<div class=\"category-content-holder\">");
 
-		List<Category> childCategories = Dao.getChildCategories(category.getId());
+		List<Category> childCategories = DataManager.getInstance().getDao().getChildCategories(category.getId());
 		if (!childCategories.isEmpty()) {
 			responseHtml.append("<div class=\"categories\">");
 			for (Category childCategory : childCategories) {
@@ -100,7 +99,7 @@ public class GetCategories extends HttpServlet {
 			responseHtml.append("</div>");
 		}
 
-		List<Table> tables = Dao.getTablesByCategoryId(category.getId());
+		List<Table> tables = DataManager.getInstance().getDao().getTablesByCategoryId(category.getId());
 		for (Table table : tables) {
 			String selected = (table.getId() == tableId) ? " data-item-selected" : "";
 			responseHtml.append("<div id=\"").append(table.getId()).append("\" class=\"data-item");
@@ -111,18 +110,18 @@ public class GetCategories extends HttpServlet {
 		responseHtml.append("</div>");
 	}
 
-	private boolean isOneOfParentCategoriesForTable(int tableId, int categoryId) throws SQLException {
-		int parentCategoryId = Dao.getTable(tableId).getCategoryId();
+	private boolean isOneOfParentCategoriesForTable(int tableId, int categoryId) throws Exception {
+		int parentCategoryId = DataManager.getInstance().getDao().getTable(tableId).getCategoryId();
 		if (parentCategoryId == categoryId) {
 			return true;
 		} else {
-			Category currentCategory = Dao.getCategory(parentCategoryId);
+			Category currentCategory = DataManager.getInstance().getDao().getCategory(parentCategoryId);
 			while (currentCategory.getParentId() > 0) {
 				parentCategoryId = currentCategory.getParentId();
 				if (parentCategoryId == categoryId) {
 					return true;
 				}
-				currentCategory = Dao.getCategory(parentCategoryId);
+				currentCategory = DataManager.getInstance().getDao().getCategory(parentCategoryId);
 			}
 		}
 		return false;

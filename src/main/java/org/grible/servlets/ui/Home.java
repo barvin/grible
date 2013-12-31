@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Product;
 import org.grible.model.User;
 import org.grible.servlets.ServletHelper;
@@ -122,7 +123,7 @@ public class Home extends HttpServlet {
 				User user = null;
 				if (isMultipleUsers()) {
 					String userName = (String) request.getSession(false).getAttribute("userName");
-					user = Dao.getUserByName(userName);
+					user = new PostgresDao().getUserByName(userName);
 					responseHtml.append(ServletHelper.getUserPanel(user));
 				} else {
 					responseHtml.append(ServletHelper.getUserPanel());
@@ -136,7 +137,7 @@ public class Home extends HttpServlet {
 					if (StringUtils.isNumeric(request.getParameter("product"))) {
 
 						int id = Integer.parseInt(request.getParameter("product"));
-						Product product = Dao.getProduct(id);
+						Product product = DataManager.getInstance().getDao().getProduct(id);
 						if (product != null) {
 							responseHtml.replace(responseHtml.indexOf(">Home"), responseHtml.indexOf(">Home") + 1,
 									" class=\"link-infront\">");
@@ -163,7 +164,7 @@ public class Home extends HttpServlet {
 					responseHtml.append("</div>");
 					responseHtml.append("<div class=\"table\">");
 
-					List<Product> products = Dao.getProducts();
+					List<Product> products = DataManager.getInstance().getDao().getProducts();
 					for (Product product : products) {
 						if ((isMultipleUsers() && user.hasAccessToProduct(product.getId())) || (!isMultipleUsers())) {
 							responseHtml.append("<div class=\"table-row\">");

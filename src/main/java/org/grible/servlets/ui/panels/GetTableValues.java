@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
@@ -62,17 +62,17 @@ public class GetTableValues extends HttpServlet {
 			}
 			StringBuilder responseHtml = new StringBuilder();
 			int tableId = Integer.parseInt(request.getParameter("id"));
-			Table table = Dao.getTable(tableId);
+			Table table = DataManager.getInstance().getDao().getTable(tableId);
 			tableType = table.getType();
 			showUsage = table.isShowUsage();
 
-			List<Key> keys = Dao.getKeys(tableId);
+			List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
 			writeKeys(responseHtml, keys);
 
-			List<Row> rows = Dao.getRows(tableId);
+			List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
 			ArrayList<ArrayList<Value>> values = new ArrayList<ArrayList<Value>>();
 			for (Row row : rows) {
-				values.add(Dao.getValues(row));
+				values.add(DataManager.getInstance().getDao().getValues(row));
 			}
 			writeValues(responseHtml, values);
 			out.print(responseHtml.toString());
@@ -103,7 +103,7 @@ public class GetTableValues extends HttpServlet {
 		}
 	}
 
-	private void writeValues(StringBuilder responseHtml, ArrayList<ArrayList<Value>> values) throws SQLException {
+	private void writeValues(StringBuilder responseHtml, ArrayList<ArrayList<Value>> values) throws Exception {
 		responseHtml.append("\"values\":[");
 		int i = 1;
 		for (ArrayList<Value> valuesRow : values) {
@@ -134,7 +134,7 @@ public class GetTableValues extends HttpServlet {
 			responseHtml.append("]");
 			if (showUsage) {
 				if (!valuesRow.isEmpty()) {
-					List<Table> tables = Dao.getTablesUsingRow(valuesRow.get(0).getRowId());
+					List<Table> tables = DataManager.getInstance().getDao().getTablesUsingRow(valuesRow.get(0).getRowId());
 					responseHtml.append(",\"info\":{\"tables\":\"").append(getTestTableOccurences(tables))
 							.append("\",\"storages\":\"").append(getDataStorageOccurences(tables)).append("\"}");
 				}
@@ -145,7 +145,7 @@ public class GetTableValues extends HttpServlet {
 		responseHtml.append("]}");
 	}
 
-	private String getTestTableOccurences(List<Table> tables) throws SQLException {
+	private String getTestTableOccurences(List<Table> tables) throws Exception {
 		List<String> tableNames = new ArrayList<String>();
 		for (int i = 0; i < tables.size(); i++) {
 			if (TableType.TABLE == tables.get(i).getType()) {
@@ -154,7 +154,7 @@ public class GetTableValues extends HttpServlet {
 				}
 			} else if (TableType.PRECONDITION == tables.get(i).getType()
 					|| TableType.POSTCONDITION == tables.get(i).getType()) {
-				String tableName = Dao.getTable(tables.get(i).getParentId()).getName();
+				String tableName = DataManager.getInstance().getDao().getTable(tables.get(i).getParentId()).getName();
 				if (!tableNames.contains(tableName)) {
 					tableNames.add(tableName);
 				}

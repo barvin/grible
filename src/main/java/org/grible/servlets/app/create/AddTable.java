@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
@@ -66,7 +66,7 @@ public class AddTable extends HttpServlet {
 				if (currType == TableType.TABLE) {
 					parentId = Integer.parseInt(request.getParameter("parentid"));
 				} else {
-					Table sibling = Dao.getTable(Integer.parseInt(request.getParameter("parentid")));
+					Table sibling = DataManager.getInstance().getDao().getTable(Integer.parseInt(request.getParameter("parentid")));
 					parentId = sibling.getParentId();
 				}
 			}
@@ -76,13 +76,13 @@ public class AddTable extends HttpServlet {
 				throw new Exception("ERROR: Name cannot be empty.");
 			}
 			TableType type = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
-			if (Dao.isTableInProductExist(name, type, categoryId)) {
+			if (DataManager.getInstance().getDao().isTableInProductExist(name, type, categoryId)) {
 				throw new Exception("ERROR: " + type.toString().toLowerCase() + " with name '" + name
 						+ "' already exists.");
 			}
 			String className = request.getParameter("classname");
 
-			int tableId = Dao.insertTable(name, type, categoryId, parentId, className);
+			int tableId = DataManager.getInstance().getDao().insertTable(name, type, categoryId, parentId, className);
 			boolean isCopy = Boolean.parseBoolean(request.getParameter("iscopy"));
 			if (isCopy) {
 				int copyTableId = Integer.parseInt(request.getParameter("copytableid"));
@@ -91,17 +91,17 @@ public class AddTable extends HttpServlet {
 				if (type == TableType.ENUMERATION) {
 					List<String> keyName = new ArrayList<String>();
 					keyName.add(name);
-					Dao.insertKeys(tableId, keyName);
-					keys = Dao.getKeys(tableId);
+					DataManager.getInstance().getDao().insertKeys(tableId, keyName);
+					keys = DataManager.getInstance().getDao().getKeys(tableId);
 				} else {
-					keys = Dao.insertKeysFromOneTableToAnother(copyTableId, tableId);
+					keys = DataManager.getInstance().getDao().insertKeysFromOneTableToAnother(copyTableId, tableId);
 				}
 				if (isOnlyColumns) {
-					int rowId = Dao.insertRow(tableId, 1);
-					Dao.insertValuesEmptyWithRowId(rowId, keys);
+					int rowId = DataManager.getInstance().getDao().insertRow(tableId, 1);
+					DataManager.getInstance().getDao().insertValuesEmptyWithRowId(rowId, keys);
 				} else {
-					List<Row> oldRows = Dao.getRows(copyTableId);
-					Dao.insertValues(tableId, copyTableId, oldRows, keys);
+					List<Row> oldRows = DataManager.getInstance().getDao().getRows(copyTableId);
+					DataManager.getInstance().getDao().insertValues(tableId, copyTableId, oldRows, keys);
 				}
 			} else {
 				List<String> keys = new ArrayList<String>();
@@ -110,10 +110,10 @@ public class AddTable extends HttpServlet {
 				} else {
 					keys.add("editme");
 				}
-				int keyId = Dao.insertKeys(tableId, keys).get(0);
-				Dao.insertRow(tableId, 1);
-				List<Row> rows = Dao.getRows(tableId);
-				Dao.insertValuesEmptyWithKeyId(keyId, rows);
+				int keyId = DataManager.getInstance().getDao().insertKeys(tableId, keys).get(0);
+				DataManager.getInstance().getDao().insertRow(tableId, 1);
+				List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+				DataManager.getInstance().getDao().insertValuesEmptyWithKeyId(keyId, rows);
 			}
 			out.print(tableId);
 		} catch (Exception e) {

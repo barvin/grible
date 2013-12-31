@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Category;
 import org.grible.security.Security;
 
@@ -55,9 +55,9 @@ public class UpdateCategory extends HttpServlet {
 			} else {
 				int categoryId = Integer.parseInt(request.getParameter("id"));
 				Category category;
-				category = Dao.getCategory(categoryId);
+				category = DataManager.getInstance().getDao().getCategory(categoryId);
 				category.setName(name);
-				Dao.updateCategory(category);
+				DataManager.getInstance().getDao().updateCategory(category);
 				out.print("success");
 			}
 		} catch (Exception e) {

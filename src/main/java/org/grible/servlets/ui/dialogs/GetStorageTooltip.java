@@ -12,7 +12,6 @@ package org.grible.servlets.ui.dialogs;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -22,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Value;
@@ -71,7 +70,7 @@ public class GetStorageTooltip extends HttpServlet {
 			}
 
 			if (correctFormat) {
-				Value value = Dao.getValue(Integer.parseInt(request.getParameter("id")));
+				Value value = DataManager.getInstance().getDao().getValue(Integer.parseInt(request.getParameter("id")));
 				Integer[] storageIds = value.getStorageIds();
 				out.print(content + getStorageTooltip(storageIds));
 			} else {
@@ -86,13 +85,13 @@ public class GetStorageTooltip extends HttpServlet {
 		}
 	}
 
-	private String getStorageTooltip(Integer[] integers) throws SQLException {
+	private String getStorageTooltip(Integer[] integers) throws Exception {
 		if (integers != null) {
 			StringBuilder result = new StringBuilder(
 					"<div class=\"tooltip\"><div style=\"width: auto;\" class=\"table\">");
-			int tableId = Dao.getRow(integers[0]).getTableId();
+			int tableId = DataManager.getInstance().getDao().getRow(integers[0]).getTableId();
 
-			List<Key> keys = Dao.getKeys(tableId);
+			List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
 			result.append("<div class=\"table-row key-row\">");
 			result.append("<div class=\"table-cell ui-cell-mini index-header-cell\">Index</div>");
 			for (Key key : keys) {
@@ -103,8 +102,8 @@ public class GetStorageTooltip extends HttpServlet {
 			result.append("</div>");
 
 			for (int i = 0; i < integers.length; i++) {
-				Row row = Dao.getRow(integers[i]);
-				List<Value> values = Dao.getValues(row);
+				Row row = DataManager.getInstance().getDao().getRow(integers[i]);
+				List<Value> values = DataManager.getInstance().getDao().getValues(row);
 				result.append("<div class=\"table-row value-row\">");
 				result.append("<div id=\"").append(row.getId());
 				result.append("\" class=\"table-cell ui-cell-mini index-cell\">");

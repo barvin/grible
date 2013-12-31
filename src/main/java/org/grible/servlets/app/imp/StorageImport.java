@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -65,10 +65,10 @@ public class StorageImport extends HttpServlet {
 			InputStream filecontent = filePart.getInputStream();
 			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
 
-			if (Dao.isTableInProductExist(storageName, TableType.STORAGE, categoryId)) {
-				Table table = Dao.getTable(storageName, categoryId);
+			if (DataManager.getInstance().getDao().isTableInProductExist(storageName, TableType.STORAGE, categoryId)) {
+				Table table = DataManager.getInstance().getDao().getTable(storageName, categoryId);
 
-				int currentKeysCount = Dao.getKeys(table.getId()).size();
+				int currentKeysCount = DataManager.getInstance().getDao().getKeys(table.getId()).size();
 				int importedKeysCount = excelFile.getKeys().size();
 				if (currentKeysCount != importedKeysCount) {
 					throw new Exception("Parameters number is different.<br>In the current storage: " + currentKeysCount
@@ -80,12 +80,12 @@ public class StorageImport extends HttpServlet {
 				String destination = "/storages/?id=" + table.getId();
 				response.sendRedirect(destination);
 			} else {
-				storageId = Dao.insertTable(storageName, TableType.STORAGE, categoryId, null, className);
+				storageId = DataManager.getInstance().getDao().insertTable(storageName, TableType.STORAGE, categoryId, null, className);
 
-				List<Integer> keyIds = Dao.insertKeys(storageId, excelFile.getKeys());
+				List<Integer> keyIds = DataManager.getInstance().getDao().insertKeys(storageId, excelFile.getKeys());
 				ArrayList<ArrayList<String>> values = excelFile.getValues();
-				List<Integer> rowIds = Dao.insertRows(storageId, values.size());
-				Dao.insertValues(rowIds, keyIds, values);
+				List<Integer> rowIds = DataManager.getInstance().getDao().insertRows(storageId, values.size());
+				DataManager.getInstance().getDao().insertValues(rowIds, keyIds, values);
 
 				if (className.equals("")) {
 					message = "'" + storageName + "' storage was successfully imported. WARNING: Class name is empty.";

@@ -12,7 +12,6 @@ package org.grible.servlets.app.delete;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -21,11 +20,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -42,7 +44,8 @@ public class DeleteProduct extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -54,42 +57,51 @@ public class DeleteProduct extends HttpServlet {
 			}
 			int productId = Integer.parseInt(request.getParameter("id"));
 
-			Dao.turnOffKeyReftableConstraint();
-			deleteCategories(out, productId, TableType.TABLE);
-			deleteCategories(out, productId, TableType.STORAGE);
-			deleteCategories(out, productId, TableType.ENUMERATION);
+			if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+				new PostgresDao().turnOffKeyReftableConstraint();
+				deleteCategories(out, productId, TableType.TABLE);
+				deleteCategories(out, productId, TableType.STORAGE);
+				deleteCategories(out, productId, TableType.ENUMERATION);
+			}
 
-			boolean deleted = Dao.deleteProduct(productId);
+			boolean deleted = DataManager.getInstance().getDao().deleteProduct(productId);
 			if (deleted) {
 				out.print("success");
 			} else {
 				out.print("ERROR: Product was not deleted. See server logs for details.");
 			}
 
-			Dao.turnOnKeyReftableConstraint();
-
+			if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+				new PostgresDao().turnOnKeyReftableConstraint();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print(e.getLocalizedMessage());
 			try {
-				Dao.turnOnKeyReftableConstraint();
+				if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+					try {
+						new PostgresDao().turnOnKeyReftableConstraint();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						out.print(e1.getLocalizedMessage());
+					}
+				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				out.print(e1.getLocalizedMessage());
 			}
 		}
 		out.flush();
 		out.close();
 	}
 
-	public void deleteCategories(PrintWriter out, int productId, TableType tableType) throws SQLException {
-		List<Category> categories = Dao.getAllCategories(productId, tableType);
+	public void deleteCategories(PrintWriter out, int productId, TableType tableType) throws Exception {
+		List<Category> categories = DataManager.getInstance().getDao().getAllCategories(productId, tableType);
 		for (Category category : categories) {
-			List<Table> tables = Dao.getTablesByCategoryId(category.getId());
+			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategoryId(category.getId());
 
 			StringBuilder error = new StringBuilder();
 			for (Table table : tables) {
-				boolean deleted = Dao.deleteTable(table.getId());
+				boolean deleted = DataManager.getInstance().getDao().deleteTable(table.getId());
 				if (!deleted) {
 					out.print("ERROR: Table was not deleted. See server logs for details.");
 				}
@@ -98,7 +110,7 @@ public class DeleteProduct extends HttpServlet {
 			if (error.length() > 0) {
 				out.print(error.toString());
 			} else {
-				boolean deleted = Dao.deleteCategory(category.getId());
+				boolean deleted = DataManager.getInstance().getDao().deleteCategory(category.getId());
 				if (!deleted) {
 					out.print("ERROR: Category was not deleted. See server logs for details.");
 				}

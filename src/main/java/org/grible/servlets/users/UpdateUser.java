@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 
 /**
@@ -54,12 +54,12 @@ public class UpdateUser extends HttpServlet {
 			boolean isAdmin = Boolean.parseBoolean(request.getParameter("isadmin"));
 
 			boolean noErrors = true;
-
+			PostgresDao dao = new PostgresDao();
 			User user;
-			user = Dao.getUserById(Integer.parseInt(userId));
+			user = dao.getUserById(Integer.parseInt(userId));
 
 			if (!user.getName().equals(userName)) {
-				Dao.updateUserName(user.getId(), userName);
+				dao.updateUserName(user.getId(), userName);
 			}
 
 			if (!strPass.equals("")) {
@@ -69,7 +69,7 @@ public class UpdateUser extends HttpServlet {
 						md = MessageDigest.getInstance("MD5");
 						md.update(strPass.getBytes());
 						String hashPass = new String(md.digest());
-						Dao.updateUserPassword(user.getId(), hashPass);
+						dao.updateUserPassword(user.getId(), hashPass);
 					} catch (NoSuchAlgorithmException e) {
 						out.print("ERROR: " + e.getMessage());
 						noErrors = false;
@@ -82,12 +82,12 @@ public class UpdateUser extends HttpServlet {
 			}
 
 			if (user.isAdmin() != isAdmin) {
-				Dao.updateUserIsAdmin(user.getId(), isAdmin);
+				dao.updateUserIsAdmin(user.getId(), isAdmin);
 			}
 
 			if ((request.getParameterValues("productIds[]") != null) && (!isAdmin)) {
 				String[] productIds = request.getParameterValues("productIds[]");
-				Dao.updateUserPermissions(user.getId(), productIds);
+				dao.updateUserPermissions(user.getId(), productIds);
 			}
 			if (noErrors) {
 				out.print("success");

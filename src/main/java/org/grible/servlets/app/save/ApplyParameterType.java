@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Value;
 import org.grible.security.Security;
@@ -60,34 +60,34 @@ public class ApplyParameterType extends HttpServlet {
 			}
 			// "text", "storage", "enumeration"
 			String type = request.getParameter("type");
-			Key key = Dao.getKey(keyId);
+			Key key = DataManager.getInstance().getDao().getKey(keyId);
 			if (((key.getReferenceTableId() == 0) && ("text".equals(type)))
 					|| ((key.getReferenceTableId() == refTableId) && ("storage".equals(type) || "enumeration"
 							.equals(type)))) {
 				out.print("not-changed");
 			} else if ("text".equals(type)) {
 				key.setReferenceTableId(0);
-				Dao.updateKey(key);
-				Dao.updateValuesTypes(keyId, false, "NULL");
+				DataManager.getInstance().getDao().updateKey(key);
+				DataManager.getInstance().getDao().updateValuesTypes(keyId, false, "NULL");
 				out.print("success");
 			} else if ("storage".equals(type)) {
 				key.setReferenceTableId(refTableId);
-				List<Value> values = Dao.getValues(key);
+				List<Value> values = DataManager.getInstance().getDao().getValues(key);
 				for (Value value : values) {
 					String[] strRows = value.getValue().split(";");
 					for (int i = 0; i < strRows.length; i++) {
 						if (!StringUtils.isNumeric(strRows[i])) {
 							out.print("ERROR: One of indexes is not numeric. Row: "
-									+ Dao.getRow(value.getRowId()).getOrder()
+									+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
 									+ ".<br>If you want to set no index, set '0'.");
 							out.flush();
 							out.close();
 							return;
 						} else if ((!strRows[i].equals("0"))
-								&& (Dao.getRow(refTableId, Integer.parseInt(strRows[i]))) == null) {
-							out.print("ERROR: Data storage '" + Dao.getTable(refTableId).getName()
+								&& (DataManager.getInstance().getDao().getRow(refTableId, Integer.parseInt(strRows[i]))) == null) {
+							out.print("ERROR: Data storage '" + DataManager.getInstance().getDao().getTable(refTableId).getName()
 									+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
-									+ Dao.getRow(value.getRowId()).getOrder()
+									+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
 									+ ".<br>You must first create this row in specified data storage.");
 							out.flush();
 							out.close();
@@ -102,20 +102,20 @@ public class ApplyParameterType extends HttpServlet {
 						String[] strRows = value.getValue().split(";");
 						Integer[] intRows = new Integer[strRows.length];
 						for (int i = 0; i < strRows.length; i++) {
-							intRows[i] = Dao.getRow(refTableId, Integer.parseInt(strRows[i])).getId();
+							intRows[i] = DataManager.getInstance().getDao().getRow(refTableId, Integer.parseInt(strRows[i])).getId();
 						}
 						value.setStorageIds(intRows);
 					}
 					value.setIsStorage(true);
-					Dao.updateValue(value);
+					DataManager.getInstance().getDao().updateValue(value);
 				}
-				Dao.updateKey(key);
+				DataManager.getInstance().getDao().updateKey(key);
 				out.print("success|" + keyId + "|storage");
 			} else {
 				key.setReferenceTableId(refTableId);
-				Key enumKey = Dao.getKeys(refTableId).get(0);
-				List<Value> enumValues = Dao.getValues(enumKey);
-				List<Value> values = Dao.getValues(key);
+				Key enumKey = DataManager.getInstance().getDao().getKeys(refTableId).get(0);
+				List<Value> enumValues = DataManager.getInstance().getDao().getValues(enumKey);
+				List<Value> values = DataManager.getInstance().getDao().getValues(key);
 				for (Value value : values) {
 					boolean valid = false;
 					for (Value enumValue : enumValues) {
@@ -126,13 +126,13 @@ public class ApplyParameterType extends HttpServlet {
 					}
 					if (!valid) {
 						out.print("ERROR: One of values is not from the enumeration. Row: "
-								+ Dao.getRow(value.getRowId()).getOrder() + ".");
+								+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder() + ".");
 						out.flush();
 						out.close();
 						return;
 					}
 				}
-				Dao.updateKey(key);
+				DataManager.getInstance().getDao().updateKey(key);
 				out.print("success|" + keyId + "|enum");
 			}
 		} catch (Exception e) {

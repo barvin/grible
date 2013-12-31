@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -56,7 +56,7 @@ public class GetEditTableDialog extends HttpServlet {
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
 
-			Table table = Dao.getTable(id);
+			Table table = DataManager.getInstance().getDao().getTable(id);
 			if ((table.getType() == TableType.TABLE) || (table.getType() == TableType.STORAGE)
 					|| (table.getType() == TableType.ENUMERATION)) {
 				String name = table.getName();
@@ -86,7 +86,7 @@ public class GetEditTableDialog extends HttpServlet {
 				out.println("<div class=\"table-cell dialog-cell\">");
 				out.println("<select class=\"categories dialog-edit\" \">");
 
-				List<Category> categories = Dao.getAllCategories(Dao.getCategory(categoryId).getProductId(),
+				List<Category> categories = DataManager.getInstance().getDao().getAllCategories(DataManager.getInstance().getDao().getCategory(categoryId).getProductId(),
 						table.getType());
 				for (Category category : categories) {
 					category.setName(addParents(category));
@@ -122,7 +122,7 @@ public class GetEditTableDialog extends HttpServlet {
 		Category currCategory = category;
 		String fullPath = category.getName();
 		while (currCategory.getParentId() != 0) {
-			currCategory = Dao.getCategory(currCategory.getParentId());
+			currCategory = DataManager.getInstance().getDao().getCategory(currCategory.getParentId());
 			fullPath = StringUtils.join(new Object[] { currCategory.getName(), "/", fullPath });
 		}
 		return fullPath;

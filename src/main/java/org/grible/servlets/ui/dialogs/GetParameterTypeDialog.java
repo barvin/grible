@@ -12,7 +12,6 @@ package org.grible.servlets.ui.dialogs;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -21,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -53,8 +52,8 @@ public class GetParameterTypeDialog extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			Key key = Dao.getKey(Integer.parseInt(request.getParameter("keyid")));
-			if (Dao.getTable(key.getTableId()).getType() != TableType.ENUMERATION) {
+			Key key = DataManager.getInstance().getDao().getKey(Integer.parseInt(request.getParameter("keyid")));
+			if (DataManager.getInstance().getDao().getTable(key.getTableId()).getType() != TableType.ENUMERATION) {
 				getDialog(out, key);
 			}
 		} catch (Exception e) {
@@ -65,7 +64,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.close();
 	}
 
-	private void getDialog(PrintWriter out, Key key) throws SQLException {
+	private void getDialog(PrintWriter out, Key key) throws Exception {
 		String textChecked = "";
 		String storageChecked = "";
 		String storageDisabled = "";
@@ -78,7 +77,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 			storageSelectDisabled = "disabled=\"disabled\" ";
 			enumSelectDisabled = "disabled=\"disabled\" ";
 		} else {
-			Table refTable = Dao.getTable(key.getReferenceTableId());
+			Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
 			if (refTable.getType() == TableType.STORAGE) {
 				storageChecked = " checked=\"checked\" ";
 				enumSelectDisabled = "disabled=\"disabled\" ";
@@ -88,12 +87,12 @@ public class GetParameterTypeDialog extends HttpServlet {
 			}
 		}
 
-		List<Table> dataSotages = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.STORAGE);
+		List<Table> dataSotages = DataManager.getInstance().getDao().getRefTablesOfProductByKeyId(key.getId(), TableType.STORAGE);
 		if (dataSotages.isEmpty()) {
 			storageDisabled = " disabled=\"disabled\" ";
 		}
 
-		List<Table> enums = Dao.getRefTablesOfProductByKeyId(key.getId(), TableType.ENUMERATION);
+		List<Table> enums = DataManager.getInstance().getDao().getRefTablesOfProductByKeyId(key.getId(), TableType.ENUMERATION);
 		if (enums.isEmpty()) {
 			enumDisabled = " disabled=\"disabled\" ";
 		}

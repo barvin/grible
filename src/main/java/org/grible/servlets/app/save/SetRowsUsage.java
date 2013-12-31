@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Table;
 import org.grible.security.Security;
 
@@ -50,13 +50,13 @@ public class SetRowsUsage extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = Dao.getTable(id);
+			Table table = DataManager.getInstance().getDao().getTable(id);
 			boolean usage = false;
 			if (request.getParameter("usage") != null) {
 				usage = Boolean.parseBoolean(request.getParameter("usage"));
 			}
 			table.setShowUsage(usage);
-			Dao.updateTable(table);
+			DataManager.getInstance().getDao().updateTable(table);
 			out.print("success");
 		} catch (Exception e) {
 			e.printStackTrace();

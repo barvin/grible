@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
@@ -54,7 +54,7 @@ public class GetTopPanel extends HttpServlet {
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 			if (tableType == TableType.STORAGE) {
 				int tableId = Integer.parseInt(request.getParameter("tableid"));
-				Table table = Dao.getTable(tableId);
+				Table table = DataManager.getInstance().getDao().getTable(tableId);
 				responseHtml.append("<div id=\"manage-buttons\">");
 
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
@@ -156,12 +156,12 @@ public class GetTopPanel extends HttpServlet {
 				switch (tableType) {
 				case TABLE:
 					tableId = Integer.parseInt(request.getParameter("tableid"));
-					preId = Dao.getChildtable(tableId, TableType.PRECONDITION);
-					postId = Dao.getChildtable(tableId, TableType.POSTCONDITION);
+					preId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.PRECONDITION);
+					postId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.POSTCONDITION);
 					generalSelected = " sheet-tab-selected";
 
 					String warning = "";
-					if (Dao.getTable(tableId).isShowWarning()) {
+					if (DataManager.getInstance().getDao().getTable(tableId).isShowWarning()) {
 						warning = "checked=\"checked\"";
 					}
 					showWarning += "<div id=\"btn-show-warning\" class=\"checkbox-option\">";
@@ -171,16 +171,16 @@ public class GetTopPanel extends HttpServlet {
 
 				case PRECONDITION:
 					preId = Integer.parseInt(request.getParameter("tableid"));
-					tableId = Dao.getTable(preId).getParentId();
-					postId = Dao.getChildtable(tableId, TableType.POSTCONDITION);
+					tableId = DataManager.getInstance().getDao().getTable(preId).getParentId();
+					postId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.POSTCONDITION);
 					preSelected = " sheet-tab-selected";
 					editButtonEnable = "button-disabled";
 					break;
 
 				case POSTCONDITION:
 					postId = Integer.parseInt(request.getParameter("tableid"));
-					tableId = Dao.getTable(postId).getParentId();
-					preId = Dao.getChildtable(tableId, TableType.PRECONDITION);
+					tableId = DataManager.getInstance().getDao().getTable(postId).getParentId();
+					preId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.PRECONDITION);
 					postSelected = " sheet-tab-selected";
 					editButtonEnable = "button-disabled";
 					break;

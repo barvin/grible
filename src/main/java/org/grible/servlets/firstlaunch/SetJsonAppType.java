@@ -55,8 +55,8 @@ public class SetJsonAppType extends HttpServlet {
 			if (!dir.exists()) {
 				dir.mkdir();
 			}
-			writeToFileInConfigFolder("config.xml", result);			
-			writeToFileInConfigFolder("products.json", "[]");
+			writeToFileInConfigFolder(GlobalSettings.getInstance().getConfigFilePath(), result);			
+			writeToFileInConfigFolder(GlobalSettings.getInstance().getProductsJsonFilePath(), "[]");
 			
 			out.print("success");
 
@@ -69,9 +69,8 @@ public class SetJsonAppType extends HttpServlet {
 		}
 	}
 
-	private File writeToFileInConfigFolder(String fileName, String text) throws IOException {
-		File file = new File(getServletContext().getRealPath("") + File.separator + ".." + File.separator
-				+ "config" + File.separator + fileName);
+	private File writeToFileInConfigFolder(String filePath, String text) throws IOException {
+		File file = new File(filePath);
 		if (!file.exists()) {
 			file.createNewFile();
 		}

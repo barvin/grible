@@ -12,7 +12,6 @@ package org.grible.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -56,14 +55,14 @@ public class PingModifiedTime extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = Dao.getTable(id);
+			Table table = DataManager.getInstance().getDao().getTable(id);
 
 			String message = "";
 
 			if (table.getType() == TableType.TABLE || table.getType() == TableType.STORAGE) {
 				if (table.isShowWarning()) {
 					List<String> strValues = new ArrayList<String>();
-					List<Row> rows = Dao.getRows(id);
+					List<Row> rows = DataManager.getInstance().getDao().getRows(id);
 					for (Row row : rows) {
 						strValues.add(getCombinedValues(row));
 					}
@@ -89,9 +88,9 @@ public class PingModifiedTime extends HttpServlet {
 		out.close();
 	}
 
-	private String getCombinedValues(Row row) throws SQLException {
+	private String getCombinedValues(Row row) throws Exception {
 		StringBuilder builder = new StringBuilder();
-		List<Value> values = Dao.getValues(row);
+		List<Value> values = DataManager.getInstance().getDao().getValues(row);
 		for (Value value : values) {
 			builder.append(value.getValue());
 		}

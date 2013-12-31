@@ -13,6 +13,7 @@ package org.grible.model;
 public class Product {
 	private int id;
 	private String name;
+	private String path;
 
 	public Product(int id) {
 		this.id = id;
@@ -28,5 +29,13 @@ public class Product {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 }

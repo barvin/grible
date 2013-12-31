@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.data.Dao;
+import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
@@ -64,13 +65,13 @@ public class Storages extends HttpServlet {
 			responseHtml.append(ServletHelper.getIncludes());
 
 			String userName = (String) request.getSession(false).getAttribute("userName");
-			User user = Dao.getUserByName(userName);
+			User user = new PostgresDao().getUserByName(userName);
 
 			int productId;
 			int tableId;
 			if (request.getParameter("id") != null) {
 				tableId = Integer.parseInt(request.getParameter("id"));
-				productId = Dao.getProductIdByPrimaryTableId(tableId);
+				productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
 			} else {
 				productId = Integer.parseInt(request.getParameter("product"));
 				tableId = 0;
@@ -94,7 +95,7 @@ public class Storages extends HttpServlet {
 				responseHtml.append("</head>");
 				responseHtml.append("<body>");
 				responseHtml.append(ServletHelper.getUserPanel(user));
-				responseHtml.append(ServletHelper.getBreadCrumb("storages", Dao.getProduct(productId), "../img"));
+				responseHtml.append(ServletHelper.getBreadCrumb("storages", DataManager.getInstance().getDao().getProduct(productId), "../img"));
 				responseHtml.append(ServletHelper.getMain());
 				responseHtml.append(ServletHelper.getContextMenus("storage"));
 				responseHtml.append(ServletHelper.getLoadingGif());

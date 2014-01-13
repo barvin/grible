@@ -120,13 +120,12 @@ public class Settings extends HttpServlet {
 		out.close();
 	}
 
-	private boolean isJsonTooltipOnClick() {
-		// TODO Auto-generated method stub
-		return false;
+	private boolean isJsonTooltipOnClick() throws Exception {
+		return GlobalSettings.getInstance().getConfigJson().read().isTooltipOnClick();
 	}
 
 	private boolean isMultipleUsers() throws Exception {
-		return GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL;
+		return GlobalSettings.getInstance().getAppType() == AppTypes.POSTGRESQL;
 	}
 
 	/**

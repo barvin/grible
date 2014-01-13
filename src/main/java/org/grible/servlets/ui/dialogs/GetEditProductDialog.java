@@ -88,6 +88,6 @@ public class GetEditProductDialog extends HttpServlet {
 	}
 
 	private boolean isPathPresent() throws Exception {
-		return GlobalSettings.getInstance().getAppType() == AppTypes.Json;
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 }

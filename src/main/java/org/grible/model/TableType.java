@@ -10,16 +10,27 @@
  ******************************************************************************/
 package org.grible.model;
 
+import org.grible.uimodel.Section;
+import org.grible.uimodel.Sections;
+
 public enum TableType {
-	STORAGE(1), TABLE(2), PRECONDITION(3), POSTCONDITION(4), ENUMERATION(5);
+	STORAGE(1, Sections.getSections().get(1)), TABLE(2, Sections.getSections().get(0)), PRECONDITION(3, Sections
+			.getSections().get(0)), POSTCONDITION(4, Sections.getSections().get(0)), ENUMERATION(5, Sections
+			.getSections().get(2));
 
 	private int id;
+	private Section section;
 
-	private TableType(int id) {
+	private TableType(int id, Section section) {
 		this.id = id;
+		this.section = section;
 	}
 
 	public int getId() {
 		return this.id;
+	}
+
+	public Section getSection() {
+		return this.section;
 	}
 }

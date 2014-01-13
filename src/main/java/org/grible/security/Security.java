@@ -13,7 +13,7 @@ public class Security {
 			response.sendRedirect("/firstlaunch");
 			return true;
 		}
-		if (GlobalSettings.getInstance().getAppType() == AppTypes.Json) {
+		if (GlobalSettings.getInstance().getAppType() == AppTypes.JSON) {
 			return false;
 		}
 		if (request.getSession(false) == null) {

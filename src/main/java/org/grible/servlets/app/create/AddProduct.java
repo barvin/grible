@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.grible.servlets.app.create;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -22,6 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.grible.dao.DataManager;
 import org.grible.model.Product;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
+import org.grible.uimodel.Section;
+import org.grible.uimodel.Sections;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -57,6 +62,8 @@ public class AddProduct extends HttpServlet {
 				out.print("ERROR: Product name cannot be empty.");
 			} else if ("".equals(path)) {
 				out.print("ERROR: Product path cannot be empty.");
+			} else if (!exists(path)) {
+				out.print("ERROR: Directory '" + path + "' does not exist. Please, create this folder first.");
 			} else {
 				Product product = DataManager.getInstance().getDao().getProduct(name);
 				if (product != null) {
@@ -64,7 +71,28 @@ public class AddProduct extends HttpServlet {
 				} else {
 					try {
 						path = (path == null) ? "" : path;
-						DataManager.getInstance().getDao().insertProduct(name, path);
+						int id = DataManager.getInstance().getDao().insertProduct(name, path);
+						if (isJson()) {
+							Product thisProduct = DataManager.getInstance().getDao().getProduct(id);
+							File gribleJsonFile = new File(thisProduct.getGribleJson().getFilePath());
+							if (gribleJsonFile.exists()) {
+								for (Section section : Sections.getSections()) {
+									File dir = new File(path + File.separator + section.getDirName());
+									if (!dir.exists()) {
+										dir.mkdir();
+									}
+								}
+							} else {
+								thisProduct.getGribleJson().save();
+								for (Section section : Sections.getSections()) {
+									File dir = new File(path + File.separator + section.getDirName());
+									if (dir.exists()) {
+										dir.delete();
+									}
+									dir.mkdir();
+								}
+							}
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -78,5 +106,13 @@ public class AddProduct extends HttpServlet {
 			out.flush();
 			out.close();
 		}
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
+	}
+
+	private boolean exists(String path) {
+		return new File(path).exists();
 	}
 }

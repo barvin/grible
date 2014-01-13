@@ -18,11 +18,11 @@ public class DataManager {
 
 	private DataManager() throws Exception {
 		switch (GlobalSettings.getInstance().getAppType()) {
-		case PostgreSQL:
+		case POSTGRESQL:
 			dao = new PostgresDao();
 			break;
 
-		case Json:
+		case JSON:
 			dao = new JsonDao();
 			break;
 

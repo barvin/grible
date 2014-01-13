@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import nu.xom.Document;
 import nu.xom.Element;
 
+import org.grible.json.ConfigJson;
+import org.grible.model.Product;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
 
@@ -41,11 +44,12 @@ public class SetJsonAppType extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			GlobalSettings.getInstance().setAppType(AppTypes.Json);
+			GlobalSettings.getInstance().setAppType(AppTypes.JSON);
 
 			Element root = new Element("configuration");
+			
 			Element apptype = new Element("apptype");
-			apptype.appendChild(AppTypes.Json.toString().toLowerCase());
+			apptype.appendChild(AppTypes.JSON.toString());						
 			root.appendChild(apptype);
 
 			Document doc = new Document(root);
@@ -55,8 +59,13 @@ public class SetJsonAppType extends HttpServlet {
 			if (!dir.exists()) {
 				dir.mkdir();
 			}
-			writeToFileInConfigFolder(GlobalSettings.getInstance().getConfigFilePath(), result);			
-			writeToFileInConfigFolder(GlobalSettings.getInstance().getProductsJsonFilePath(), "[]");
+			writeToFileInConfigFolder(GlobalSettings.getInstance().getConfigFilePath(), result);
+			
+			ConfigJson configJson = new ConfigJson();
+			configJson.setProducts(new ArrayList<Product>());
+			configJson.setTooltipOnClick(false);
+			GlobalSettings.getInstance().setConfigJson(configJson);
+			GlobalSettings.getInstance().getConfigJson().save();
 			
 			out.print("success");
 

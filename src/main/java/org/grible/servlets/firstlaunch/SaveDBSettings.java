@@ -42,7 +42,7 @@ public class SaveDBSettings extends HttpServlet {
 		try {
 			Element root = new Element("configuration");
 			Element apptype = new Element("apptype");
-			apptype.appendChild(GlobalSettings.getInstance().getAppType().toString().toLowerCase());
+			apptype.appendChild(GlobalSettings.getInstance().getAppType().toString());
 			root.appendChild(apptype);
 			
 			Element database = new Element("database");

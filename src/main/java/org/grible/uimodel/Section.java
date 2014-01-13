@@ -14,11 +14,13 @@ public class Section {
 	private String key;
 	private String name;
 	private String description;
+	private String dirName;
 	
-	public Section(String key, String name, String description) {
+	public Section(String key, String name, String description, String dirName) {
 		this.key = key;
 		this.name = name;
 		this.description = description;
+		this.dirName = dirName;
 	}
 
 	public String getKey() {
@@ -31,5 +33,9 @@ public class Section {
 
 	public String getDescription() {
 		return description;
+	}
+
+	public String getDirName() {
+		return dirName;
 	}
 }

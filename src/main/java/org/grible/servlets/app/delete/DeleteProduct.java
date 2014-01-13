@@ -57,7 +57,7 @@ public class DeleteProduct extends HttpServlet {
 			}
 			int productId = Integer.parseInt(request.getParameter("id"));
 
-			if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+			if (GlobalSettings.getInstance().getAppType() == AppTypes.POSTGRESQL) {
 				new PostgresDao().turnOffKeyReftableConstraint();
 				deleteCategories(out, productId, TableType.TABLE);
 				deleteCategories(out, productId, TableType.STORAGE);
@@ -71,14 +71,14 @@ public class DeleteProduct extends HttpServlet {
 				out.print("ERROR: Product was not deleted. See server logs for details.");
 			}
 
-			if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+			if (GlobalSettings.getInstance().getAppType() == AppTypes.POSTGRESQL) {
 				new PostgresDao().turnOnKeyReftableConstraint();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print(e.getLocalizedMessage());
 			try {
-				if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+				if (GlobalSettings.getInstance().getAppType() == AppTypes.POSTGRESQL) {
 					try {
 						new PostgresDao().turnOnKeyReftableConstraint();
 					} catch (Exception e1) {

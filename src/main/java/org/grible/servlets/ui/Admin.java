@@ -318,7 +318,7 @@ public class Admin extends HttpServlet {
 	}
 
 	private boolean isMultipleUsers() throws Exception {
-		return GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL;
+		return GlobalSettings.getInstance().getAppType() == AppTypes.POSTGRESQL;
 	}
 
 	/**

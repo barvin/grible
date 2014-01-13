@@ -12,6 +12,8 @@ package org.grible.settings;
 
 import java.io.File;
 
+import org.grible.json.ConfigJson;
+
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -27,7 +29,8 @@ public class GlobalSettings {
 	private String dbpswd;
 	private String localRootPath;
 	private String configFilePath;
-	private String productsJsonFilePath;
+	private String configJsonFilePath;
+	private ConfigJson configJson;
 
 	private GlobalSettings() throws Exception {
 	}
@@ -36,13 +39,14 @@ public class GlobalSettings {
 		this.localRootPath = localRootPath;
 		if (this.configFile == null) {
 			this.configFilePath = localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "config.xml";
-			this.productsJsonFilePath = localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "products.json";
+			this.configJsonFilePath = localRootPath + File.separator + ".." + File.separator + "config" + File.separator + "config.json";
 			this.configFile = new File(configFilePath);
 		}
-		if ((!configFile.exists()) || (appType == null)) {
+		if ((!configFile.exists())) {
 			return false;
 		}
-		if ((appType == AppTypes.PostgreSQL) && hasNulls()) {
+		setAppTypeFromFile();
+		if ((appType == AppTypes.POSTGRESQL) && hasNulls()) {
 			setDbSettingsFromFile();
 		}
 		return true;
@@ -59,6 +63,16 @@ public class GlobalSettings {
 			this.dbname = database.getFirstChildElement("dbname").getValue();
 			this.dblogin = database.getFirstChildElement("dblogin").getValue();
 			this.dbpswd = database.getFirstChildElement("dbpswd").getValue();
+		}
+	}
+
+	private void setAppTypeFromFile() throws Exception {
+		Builder parser = new Builder();
+		Document doc = null;
+		doc = parser.build(configFile);
+		if (doc != null) {
+			Element apptype = doc.getRootElement().getFirstChildElement("apptype");
+			this.appType = AppTypes.valueOf(apptype.getValue());
 		}
 	}
 
@@ -125,8 +139,19 @@ public class GlobalSettings {
 		return configFilePath;
 	}
 
-	public String getProductsJsonFilePath() {
-		return productsJsonFilePath;
+	public String getConfigJsonFilePath() {
+		return configJsonFilePath;
+	}
+
+	public ConfigJson getConfigJson() throws Exception {
+		if (configJson == null) {
+			configJson = new ConfigJson().read();
+		}
+		return configJson;
+	}
+
+	public void setConfigJson(ConfigJson json) {
+		this.configJson = json;
 	}
 
 	private boolean hasNulls() {

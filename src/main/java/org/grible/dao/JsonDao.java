@@ -10,10 +10,7 @@
  ******************************************************************************/
 package org.grible.dao;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +23,6 @@ import org.grible.model.TableType;
 import org.grible.model.Value;
 import org.grible.settings.GlobalSettings;
 
-import com.google.gson.Gson;
-
 /**
  * @author Maksym Barvinskyi
  */
@@ -35,15 +30,7 @@ public class JsonDao implements Dao {
 
 	@Override
 	public List<Product> getProducts() throws Exception {
-		FileReader fr = new FileReader(GlobalSettings.getInstance().getProductsJsonFilePath());
-		BufferedReader br = new BufferedReader(fr);
-		Gson gson = new Gson();
-		Product[] productArray = gson.fromJson(br, Product[].class);
-		br.close();
-		List<Product> productList = new ArrayList<>();
-		for (Product product : productArray) {
-			productList.add(product);
-		}
+		List<Product> productList = GlobalSettings.getInstance().getConfigJson().read().getProducts();
 		return productList;
 	}
 
@@ -66,8 +53,16 @@ public class JsonDao implements Dao {
 
 	@Override
 	public List<Category> getTopLevelCategories(int productId, TableType type) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		List<Category> result = new ArrayList<>();
+		Product product = getProduct(productId);
+		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
+		File[] subdirs = dir.listFiles();
+		for (File subdir : subdirs) {
+			if (subdir.isDirectory()){
+				result.add(new Category(subdir.getName(), type, productId));
+			}
+		}
+		return result;
 	}
 
 	@Override
@@ -408,18 +403,26 @@ public class JsonDao implements Dao {
 		product.setName(name);
 		product.setPath(path);
 		productList.add(product);
-		
-		FileWriter fw = new FileWriter(GlobalSettings.getInstance().getProductsJsonFilePath());
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(new Gson().toJson(productList));
-		bw.close();
+
+		GlobalSettings.getInstance().getConfigJson().setProducts(productList);
+		GlobalSettings.getInstance().getConfigJson().save();
 		return id;
 	}
 
 	@Override
 	public boolean deleteProduct(int productId) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+		List<Product> productList = getProducts();
+		int prNumberToDelete = -1;
+		for (int i = 0; i < productList.size(); i++) {
+			if (productList.get(i).getId() == productId) {
+				prNumberToDelete = i;
+				break;
+			}
+		}
+		productList.remove(prNumberToDelete);
+		GlobalSettings.getInstance().getConfigJson().setProducts(productList);
+		GlobalSettings.getInstance().getConfigJson().save();
+		return true;
 	}
 
 	@Override
@@ -432,10 +435,8 @@ public class JsonDao implements Dao {
 				break;
 			}
 		}
-		FileWriter fw = new FileWriter(GlobalSettings.getInstance().getProductsJsonFilePath());
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(new Gson().toJson(productList));
-		bw.close();
+		GlobalSettings.getInstance().getConfigJson().setProducts(productList);
+		GlobalSettings.getInstance().getConfigJson().save();
 	}
 
 	@Override

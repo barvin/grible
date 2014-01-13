@@ -22,6 +22,12 @@ public class Category implements Comparable<Category> {
 		setParentId(null);
 	}
 
+	public Category(String name, TableType type, int productId) {
+		this.name = name;
+		this.type = type;
+		this.productId = productId;
+	}
+
 	public int getId() {
 		return id;
 	}

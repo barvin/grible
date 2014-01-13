@@ -52,13 +52,14 @@ public class SaveSettings extends HttpServlet {
 				return;
 			}
 			boolean isTooltipOnClick = Boolean.parseBoolean(request.getParameter("tooltiponclick"));
-			if (GlobalSettings.getInstance().getAppType() == AppTypes.PostgreSQL) {
+			if (GlobalSettings.getInstance().getAppType() == AppTypes.POSTGRESQL) {
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				PostgresDao dao = new PostgresDao();
 				User user = dao.getUserByName(userName);
 				dao.updateUserIsTooltipOnClick(user.getId(), isTooltipOnClick);
 			} else {
-				// TODO: add implementation for JSON
+				GlobalSettings.getInstance().getConfigJson().setTooltipOnClick(isTooltipOnClick);
+				GlobalSettings.getInstance().getConfigJson().save();
 			}
 			out.print("success");
 

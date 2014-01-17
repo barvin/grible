@@ -34,7 +34,7 @@ public interface Dao {
 
 	public List<Category> getTopLevelCategories(int productId, TableType type) throws Exception;
 
-	public List<Category> getChildCategories(int categoryId) throws Exception;
+	public List<Category> getChildCategories(Category category) throws Exception;
 
 	public int insertCategory(TableType type, int productId, String name, Integer parentId) throws Exception;
 

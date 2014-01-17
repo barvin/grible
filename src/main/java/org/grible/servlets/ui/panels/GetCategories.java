@@ -90,7 +90,7 @@ public class GetCategories extends HttpServlet {
 		responseHtml.append(category.getName()).append("</span></h3>");
 		responseHtml.append("<div class=\"category-content-holder\">");
 
-		List<Category> childCategories = DataManager.getInstance().getDao().getChildCategories(category.getId());
+		List<Category> childCategories = DataManager.getInstance().getDao().getChildCategories(category);
 		if (!childCategories.isEmpty()) {
 			responseHtml.append("<div class=\"categories\">");
 			for (Category childCategory : childCategories) {

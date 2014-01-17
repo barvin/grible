@@ -222,12 +222,12 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Category> getChildCategories(int categoryId) throws SQLException {
+	public List<Category> getChildCategories(Category category) throws SQLException {
 		List<Category> result = new ArrayList<Category>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT c.id, c.name, c.productid, c.parentid, tt.name as type "
-				+ " FROM categories as c JOIN tabletypes as tt ON c.type=tt.id AND c.parentid=" + categoryId
+				+ " FROM categories as c JOIN tabletypes as tt ON c.type=tt.id AND c.parentid=" + category.getId()
 				+ " ORDER BY c.name");
 
 		while (rs.next()) {

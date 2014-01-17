@@ -10,20 +10,26 @@
  ******************************************************************************/
 package org.grible.model;
 
+import java.io.File;
+
+import org.apache.commons.lang.StringUtils;
+
 public class Category implements Comparable<Category> {
 	private int id;
 	private TableType type;
 	private String name;
 	private int productId;
 	private Integer parentId;
+	private String path;
 
 	public Category(int id) {
 		this.id = id;
 		setParentId(null);
 	}
 
-	public Category(String name, TableType type, int productId) {
-		this.name = name;
+	public Category(String path, TableType type, int productId) {
+		this.path = path;
+		this.name = StringUtils.substringAfterLast(path, File.separator);
 		this.type = type;
 		this.productId = productId;
 	}
@@ -66,6 +72,14 @@ public class Category implements Comparable<Category> {
 
 	public int compareTo(Category compareCategory) {
 		return this.name.compareTo(compareCategory.getName());
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 	
 }

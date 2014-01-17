@@ -11,7 +11,9 @@
 package org.grible.dao;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.grible.model.Category;
@@ -47,8 +49,29 @@ public class JsonDao implements Dao {
 
 	@Override
 	public List<Category> getAllCategories(int productId, TableType type) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		Product product = getProduct(productId);
+		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
+		return getSubCategoriesRecursively(dir, "", type, productId);
+	}
+	
+	private List<Category> getSubCategoriesRecursively(File dir, String initPath, TableType type, int productId) {
+		List<Category> categories = new ArrayList<>();
+	    List<File> subdirs = Arrays.asList(dir.listFiles(new FileFilter() {
+	        public boolean accept(File f) {
+	            return f.isDirectory();
+	        }
+	    }));
+	    subdirs = new ArrayList<File>(subdirs);
+	    for(File subdir : subdirs) {
+	        categories.add(new Category(initPath + subdir.getName(), type, productId)); 
+	    }
+
+	    List<Category> deepSubcategories = new ArrayList<Category>();
+	    for(File subdir : subdirs) {
+	        deepSubcategories.addAll(getSubCategoriesRecursively(subdir, initPath + subdir.getName() + File.separator, type, productId)); 
+	    }
+	    categories.addAll(deepSubcategories);
+	    return categories;
 	}
 
 	@Override
@@ -66,9 +89,17 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public List<Category> getChildCategories(int categoryId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Category> getChildCategories(Category category) throws Exception {
+		List<Category> result = new ArrayList<>();
+		Product product = getProduct(category.getProductId());
+		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName() + File.separator + category.getPath());
+		File[] subdirs = dir.listFiles();
+		for (File subdir : subdirs) {
+			if (subdir.isDirectory()){
+				result.add(new Category(category.getPath() + File.separator + subdir.getName(), category.getType(), category.getProductId()));
+			}
+		}
+		return result;
 	}
 
 	@Override

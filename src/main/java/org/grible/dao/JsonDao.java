@@ -53,25 +53,26 @@ public class JsonDao implements Dao {
 		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
 		return getSubCategoriesRecursively(dir, "", type, productId);
 	}
-	
+
 	private List<Category> getSubCategoriesRecursively(File dir, String initPath, TableType type, int productId) {
 		List<Category> categories = new ArrayList<>();
-	    List<File> subdirs = Arrays.asList(dir.listFiles(new FileFilter() {
-	        public boolean accept(File f) {
-	            return f.isDirectory();
-	        }
-	    }));
-	    subdirs = new ArrayList<File>(subdirs);
-	    for(File subdir : subdirs) {
-	        categories.add(new Category(initPath + subdir.getName(), type, productId)); 
-	    }
+		List<File> subdirs = Arrays.asList(dir.listFiles(new FileFilter() {
+			public boolean accept(File f) {
+				return f.isDirectory();
+			}
+		}));
+		subdirs = new ArrayList<File>(subdirs);
+		for (File subdir : subdirs) {
+			categories.add(new Category(initPath + subdir.getName(), type, productId));
+		}
 
-	    List<Category> deepSubcategories = new ArrayList<Category>();
-	    for(File subdir : subdirs) {
-	        deepSubcategories.addAll(getSubCategoriesRecursively(subdir, initPath + subdir.getName() + File.separator, type, productId)); 
-	    }
-	    categories.addAll(deepSubcategories);
-	    return categories;
+		List<Category> deepSubcategories = new ArrayList<Category>();
+		for (File subdir : subdirs) {
+			deepSubcategories.addAll(getSubCategoriesRecursively(subdir, initPath + subdir.getName() + File.separator,
+					type, productId));
+		}
+		categories.addAll(deepSubcategories);
+		return categories;
 	}
 
 	@Override
@@ -81,7 +82,7 @@ public class JsonDao implements Dao {
 		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
 		File[] subdirs = dir.listFiles();
 		for (File subdir : subdirs) {
-			if (subdir.isDirectory()){
+			if (subdir.isDirectory()) {
 				result.add(new Category(subdir.getName(), type, productId));
 			}
 		}
@@ -92,19 +93,25 @@ public class JsonDao implements Dao {
 	public List<Category> getChildCategories(Category category) throws Exception {
 		List<Category> result = new ArrayList<>();
 		Product product = getProduct(category.getProductId());
-		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName() + File.separator + category.getPath());
+		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
+				+ File.separator + category.getPath());
 		File[] subdirs = dir.listFiles();
 		for (File subdir : subdirs) {
-			if (subdir.isDirectory()){
-				result.add(new Category(category.getPath() + File.separator + subdir.getName(), category.getType(), category.getProductId()));
+			if (subdir.isDirectory()) {
+				result.add(new Category(category.getPath() + File.separator + subdir.getName(), category.getType(),
+						category.getProductId()));
 			}
 		}
 		return result;
 	}
 
 	@Override
-	public int insertCategory(TableType type, int productId, String name, Integer parentId) throws Exception {
-		// TODO Auto-generated method stub
+	public int insertCategory(TableType type, int productId, String name, Integer parentId, String parentPath)
+			throws Exception {
+		Product product = getProduct(productId);
+		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName() + File.separator
+				+ parentPath + name);
+		dir.mkdir();
 		return 0;
 	}
 
@@ -159,9 +166,13 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public List<Table> getTablesByCategoryId(int categoryId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Table> getTablesByCategory(Category category) throws Exception {
+		List<Table> result = new ArrayList<>();
+		Product product = new Product(category.getProductId());
+		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName() + File.separator
+				+ category.getPath());
+		//File[] files = 
+		return result;
 	}
 
 	@Override
@@ -231,8 +242,14 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId) throws Exception {
-		// TODO Auto-generated method stub
+	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId, String parentPath)
+			throws Exception {
+		Product product = getProduct(productId);
+		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName() + File.separator
+				+ parentPath + File.separator + name);
+		if (dir.exists()) {
+			return 1;
+		}
 		return null;
 	}
 

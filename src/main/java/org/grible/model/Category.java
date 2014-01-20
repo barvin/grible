@@ -29,9 +29,16 @@ public class Category implements Comparable<Category> {
 
 	public Category(String path, TableType type, int productId) {
 		this.path = path;
-		this.name = StringUtils.substringAfterLast(path, File.separator);
+		this.name = getNameFromPath();
 		this.type = type;
 		this.productId = productId;
+	}
+
+	private String getNameFromPath() {
+		if (path.contains(File.separator)) {
+			return StringUtils.substringAfterLast(path, File.separator);
+		}
+		return path;
 	}
 
 	public int getId() {

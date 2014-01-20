@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.grible.model;
 
+import java.io.File;
 import java.util.Date;
 
 public class Table {
 	private int id;
 	private TableType type;
 	private Integer categoryId;
+	private Category category;
+	private File file;
 	private Integer parentId;
 	private String name;
 	private String className;
@@ -27,6 +30,22 @@ public class Table {
 		this.id = id;
 		setCategoryId(null);
 		setParentId(null);
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 
 	public int getId() {
@@ -96,5 +115,5 @@ public class Table {
 	public void setModifiedTime(Date dateTime) {
 		this.modifiedTime = dateTime;
 	}
-	
+
 }

@@ -202,10 +202,16 @@ function initLeftPanel() {
 		var $breadcrumb = $("#breadcrumb");
 		if ($("#" + tableType + "-name").length > 0) {
 			var $tableName = $("#" + tableType + "-name");
-			$tableName.parent().attr("href", "/" + tableType + "s/?id=" + tableId);			$tableName.text(name);
+			$tableName.parent().attr("href",
+					"/" + tableType + "s/?id=" + tableId);
+			$tableName.text(name);
 		} else {
-			$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-			$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");}
+			$breadcrumb
+					.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
+			$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId
+					+ "'><span id='" + tableType + "-name'>" + name
+					+ "</span></a>");
+		}
 
 		$("#table-container").show();
 		loadTableValues(tableId);
@@ -284,6 +290,8 @@ function initLeftPanel() {
 													+ '<div class="dialog-buttons right">'
 													+ '<button id="dialog-btn-add-category" parentid="'
 													+ $id
+													+ '" parent-path="'
+													+ getCategoryPath($(el))
 													+ '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
 													+ '</div></div></div>');
 							initAddCategoryDialog(jQuery);
@@ -407,6 +415,14 @@ function initLeftPanel() {
 	} else {
 		$("#table-container").hide();
 	}
+}
+
+function getCategoryPath(el) {
+	var parentsText = ";" + el.text().trim();
+	el.parents(".category-content-holder").each(function(){
+		parentsText += ";" + $(this).parent().children("h3").text().trim();
+	});
+	return parentsText;
 }
 
 function initImportDialog() {
@@ -606,16 +622,19 @@ function initAddCategoryDialog() {
 	});
 
 	function submitAddCategory() {
-		var $args = {
-			tabletype : tableType,
-			product : productId,
-			name : $("input.category-name").val()
-		};
+		var $args;
 		if (isNumber($("#dialog-btn-add-category").attr("parentid"))) {
 			$args = {
 				tabletype : tableType,
 				product : productId,
 				parent : $("#dialog-btn-add-category").attr("parentid"),
+				parentpath : $("#dialog-btn-add-category").attr("parent-path"),
+				name : $("input.category-name").val()
+			};
+		} else {
+			$args = {
+				tabletype : tableType,
+				product : productId,
 				name : $("input.category-name").val()
 			};
 		}
@@ -865,8 +884,14 @@ function initTopPanel() {
 																					.removeClass(
 																							"link-infront");
 																		}
-								document.title = $("#section-name").text() + " - Grible";
-								history.pushState({																							product : productId
+																		document.title = $(
+																				"#section-name")
+																				.text()
+																				+ " - Grible";
+																		history
+																				.pushState(
+																						{
+																							product : productId
 																						},
 																						"",
 																						"?product="
@@ -945,7 +970,7 @@ function initTopPanel() {
 																							var message = data
 																									.split("|");
 																							if (message[0] == "true") {
-																								for ( var i = 1; i < message.length; i++) {
+																								for (var i = 1; i < message.length; i++) {
 																									noty({
 																										type : "warning",
 																										text : message[i]
@@ -999,12 +1024,12 @@ function initTopPanel() {
 																						})
 																				.get();
 																		var usedNames = new Array();
-																		for ( var i = 0; i < keyNames.length - 1; i++) {
+																		for (var i = 0; i < keyNames.length - 1; i++) {
 																			if ($
 																					.inArray(
 																							keyNames[i],
 																							usedNames) == -1) {
-																				for ( var j = i + 1; j < keyNames.length; j++) {
+																				for (var j = i + 1; j < keyNames.length; j++) {
 																					if (keyNames[i] === keyNames[j]) {
 																						usedNames
 																								.push(keyNames[i]);
@@ -1361,7 +1386,7 @@ function initTableValues() {
 											},
 											function(data) {
 												if (data == "success") {
-													for ( var j = 0; j < rowIds.length; j++) {
+													for (var j = 0; j < rowIds.length; j++) {
 														var modifiedIndexCell = $(".ui-cell.index-cell[id='"
 																+ rowIds[j]
 																+ "']");
@@ -2097,7 +2122,7 @@ function modifyValueCell() {
 		var start = parseInt($newContent.substring(0, $newContent.indexOf("-")));
 		var end = parseInt($newContent.substring($newContent.indexOf("-") + 1));
 		$newContent = start;
-		for ( var i = start + 1; i < end + 1; i++) {
+		for (var i = start + 1; i < end + 1; i++) {
 			$newContent += ";" + i;
 		}
 	}
@@ -2208,7 +2233,7 @@ function initAdvancedImportDialog() {
 }
 
 function applyParameterTypesAfterImport(keyIds, refIds, types) {
-	for ( var i = 0; i < keyIds.length; i++) {
+	for (var i = 0; i < keyIds.length; i++) {
 		var $id = keyIds[i];
 		var $type = types[i];
 		var $refId = refIds[i];
@@ -2273,4 +2298,8 @@ function confirmLeavingUnsavedTable(url) {
 
 function isChrome() {
 	return /chrome/.test(navigator.userAgent.toLowerCase());
+}
+
+function isJson() {
+	return appType == "json";
 }

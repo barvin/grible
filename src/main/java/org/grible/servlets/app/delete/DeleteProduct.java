@@ -97,7 +97,7 @@ public class DeleteProduct extends HttpServlet {
 	public void deleteCategories(PrintWriter out, int productId, TableType tableType) throws Exception {
 		List<Category> categories = DataManager.getInstance().getDao().getAllCategories(productId, tableType);
 		for (Category category : categories) {
-			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategoryId(category.getId());
+			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategory(category);
 
 			StringBuilder error = new StringBuilder();
 			for (Table table : tables) {

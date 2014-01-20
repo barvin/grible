@@ -36,7 +36,7 @@ public interface Dao {
 
 	public List<Category> getChildCategories(Category category) throws Exception;
 
-	public int insertCategory(TableType type, int productId, String name, Integer parentId) throws Exception;
+	public int insertCategory(TableType type, int productId, String name, Integer parentId, String parentPath) throws Exception;
 
 	public int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className) throws Exception;
 
@@ -61,7 +61,7 @@ public interface Dao {
 	 */
 	public int getProductIdBySecondaryTableId(int tableId) throws Exception;
 
-	public List<Table> getTablesByCategoryId(int categoryId) throws Exception;
+	public List<Table> getTablesByCategory(Category category) throws Exception;
 
 	public List<Key> getKeys(int tableId) throws Exception;
 
@@ -85,7 +85,7 @@ public interface Dao {
 
 	public List<Table> getRefTablesOfProductByKeyId(int keyId, TableType type) throws Exception;
 
-	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId)
+	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId, String parentPath)
 			throws Exception;
 
 	public List<Integer> insertKeys(int tableId, List<String> keyNames) throws Exception;

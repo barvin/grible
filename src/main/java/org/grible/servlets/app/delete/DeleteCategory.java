@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
@@ -53,7 +54,7 @@ public class DeleteCategory extends HttpServlet {
 			}
 
 			int categoryId = Integer.parseInt(request.getParameter("id"));
-			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategoryId(categoryId);
+			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategory(new Category(categoryId));
 
 			StringBuilder error = new StringBuilder();
 			for (Table table : tables) {

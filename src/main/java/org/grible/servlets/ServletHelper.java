@@ -248,7 +248,7 @@ public class ServletHelper {
 
 	public static void showImportResult(HttpServletRequest request, StringBuilder responseHtml, int tableId)
 			throws Exception {
-		if (request.getSession(false).getAttribute("importResult") != null) {
+		if ((request.getSession(false) != null) && (request.getSession(false).getAttribute("importResult") != null)) {
 			String importResult = (String) request.getSession(false).getAttribute("importResult");
 
 			String applyPart = "var keyIds=new Array(); var refIds=new Array(); var types=new Array(); ";
@@ -280,7 +280,7 @@ public class ServletHelper {
 
 	public static void showAdvancedImportDialog(HttpServletRequest request, StringBuilder responseHtml)
 			throws Exception {
-		if (request.getSession(false).getAttribute("importedTable") != null) {
+		if ((request.getSession(false) != null) && (request.getSession(false).getAttribute("importedTable") != null)) {
 			Table currTable = (Table) request.getSession(false).getAttribute("importedTable");
 			ExcelFile excelFile = (ExcelFile) request.getSession(false).getAttribute("importedFile");
 			responseHtml.append("<script type=\"text/javascript\">");

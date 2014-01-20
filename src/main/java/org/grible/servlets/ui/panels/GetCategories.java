@@ -99,7 +99,7 @@ public class GetCategories extends HttpServlet {
 			responseHtml.append("</div>");
 		}
 
-		List<Table> tables = DataManager.getInstance().getDao().getTablesByCategoryId(category.getId());
+		List<Table> tables = DataManager.getInstance().getDao().getTablesByCategory(category);
 		for (Table table : tables) {
 			String selected = (table.getId() == tableId) ? " data-item-selected" : "";
 			responseHtml.append("<div id=\"").append(table.getId()).append("\" class=\"data-item");

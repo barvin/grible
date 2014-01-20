@@ -239,7 +239,8 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public int insertCategory(TableType type, int productId, String name, Integer parentId) throws SQLException {
+	public int insertCategory(TableType type, int productId, String name, Integer parentId, String parentPath)
+			throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -518,14 +519,14 @@ public class PostgresDao implements Dao {
 		return productId;
 	}
 
-	public List<Table> getTablesByCategoryId(int categoryId) throws SQLException {
+	public List<Table> getTablesByCategory(Category category) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
 						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
-						+ "ON t.type=tt.id AND t.categoryid=" + categoryId + " ORDER BY t.name");
+						+ "ON t.type=tt.id AND t.categoryid=" + category.getId() + " ORDER BY t.name");
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}
@@ -706,7 +707,7 @@ public class PostgresDao implements Dao {
 
 	}
 
-	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId)
+	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId, String parentPath)
 			throws SQLException {
 		Integer result = null;
 		Connection conn = getConnection();
@@ -809,7 +810,8 @@ public class PostgresDao implements Dao {
 	}
 
 	/**
-	 * Adds escaping symbols to the value, so that it could be properly inserted to the database.
+	 * Adds escaping symbols to the value, so that it could be properly inserted
+	 * to the database.
 	 * 
 	 * @param value
 	 * @return value that is ready for DB inserting.
@@ -898,8 +900,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values)
-			throws SQLException {
+	public List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values) throws SQLException {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();

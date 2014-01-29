@@ -1,78 +1,49 @@
-$(window).on(
-		"load",
-		function() {
-			var docHeight = $(window).height() - 95;
-			var docWidth = $(window).width() - 45;
-			var breadcrumbHeight = $("#breadcrumb").height();
-			var footerHeight = $("#footer").outerHeight();
-			var mainHeight = docHeight - breadcrumbHeight - footerHeight - 27;
-			$("#table-container").width(
-					docWidth - $("#delimiter").width()
-							- $(".left-panel").width() - 10);
+$(window).on("load", function() {
+	var docHeight = $(window).height() - 95;
+	var docWidth = $(window).width() - 45;
+	var breadcrumbHeight = $("#breadcrumb").height();
+	var footerHeight = $("#footer").outerHeight();
+	var mainHeight = docHeight - breadcrumbHeight - footerHeight - 27;
+	$("#table-container").width(docWidth - $("#delimiter").width() - $(".left-panel").width() - 10);
 
-			if (isChrome()) {
-				$("#main .table-cell").addClass("floatleft");
-			}
+	if (isChrome()) {
+		$("#main .table-cell").addClass("floatleft");
+	}
 
-			$("#main").height(mainHeight);
-			$("#table-container").height(mainHeight);
-			$(".left-panel").height(mainHeight);
-			$("#entities-list").height(mainHeight);
-		});
+	$("#main").height(mainHeight);
+	$("#table-container").height(mainHeight);
+	$(".left-panel").height(mainHeight);
+	$("#entities-list").height(mainHeight);
+});
 
 $().ready(initialize());
 
-var source = '<div class="table-row key-row">'
-		+ '{{#if isIndex}}'
-		+ '<div class="table-cell ui-cell index-header-cell">Index</div>'
-		+ '{{/if}}'
-		+ '{{#each keys}}'
-		+ '<div class="table-cell ui-cell key-cell" key-order="{{order}}" id="{{id}}">{{text}}</div>'
-		+ '{{/each}}'
-		+ '{{#if info}}'
-		+ '<div class="table-cell ui-cell info-key-cell">{{tables}}</div>'
-		+ '<div class="table-cell ui-cell info-key-cell">{{storages}}</div>'
-		+ '{{/if}}'
-		+ '</div>'
-		+ '{{#each values}}'
-		+ '<div class="table-row value-row">'
-		+ '{{#if index}}'
-		+ '{{#with index}}'
-		+ '<div class="table-cell ui-cell index-cell" id="{{id}}">{{order}}</div>'
-		+ '{{/with}}'
-		+ '{{/if}}'
-		+ '{{#each values}}'
-		+ '<div class="table-cell ui-cell value-cell'
+var source = '<div class="table-row key-row">' + '{{#if isIndex}}'
+		+ '<div class="table-cell ui-cell index-header-cell">Index</div>' + '{{/if}}' + '{{#each keys}}'
+		+ '<div class="table-cell ui-cell key-cell" key-order="{{order}}" id="{{id}}">{{text}}</div>' + '{{/each}}'
+		+ '{{#if info}}' + '<div class="table-cell ui-cell info-key-cell">{{tables}}</div>'
+		+ '<div class="table-cell ui-cell info-key-cell">{{storages}}</div>' + '{{/if}}' + '</div>'
+		+ '{{#each values}}' + '<div class="table-row value-row">' + '{{#if index}}' + '{{#with index}}'
+		+ '<div class="table-cell ui-cell index-cell" id="{{id}}">{{order}}</div>' + '{{/with}}' + '{{/if}}'
+		+ '{{#each values}}' + '<div class="table-cell ui-cell value-cell'
 		+ '{{#if isStorage}} storage-cell {{/if}} {{#if isEnum}} enum-cell {{/if}}"'
-		+ 'rowid="{{rowid}}" keyid="{{keyid}}" id="{{id}}">{{text}}</div>'
-		+ '{{/each}}' + '{{#if info}}'
+		+ 'rowid="{{rowid}}" keyid="{{keyid}}" id="{{id}}">{{text}}</div>' + '{{/each}}' + '{{#if info}}'
 		+ '<div class="table-cell ui-cell info-cell">{{tables}}</div>'
-		+ '<div class="table-cell ui-cell info-cell">{{storages}}</div>'
-		+ '{{/if}}' + '</div>' + '{{/each}}';
+		+ '<div class="table-cell ui-cell info-cell">{{storages}}</div>' + '{{/if}}' + '</div>' + '{{/each}}';
 var template = Handlebars.compile(source);
 
 function initialize() {
 
-	$(document)
-			.ajaxError(
-					function(e, xhr, settings, exception) {
-						var exrrorText = xhr.responseText
-								.substring(xhr.responseText.indexOf("<h1>"));
-						$("body")
-								.append(
-										'<div id="error-dialog" class="ui-dialog">'
-												+ '<div class="ui-dialog-title">Error</div>'
-												+ '<div class="ui-dialog-content">'
-												+ 'Location: '
-												+ settings.url
-												+ '<br><br>'
-												+ exrrorText
-												+ '<br><br>'
-												+ '<div class="right">'
-												+ '<button class="ui-button btn-cancel">OK</button>'
-												+ '</div></div></div>');
-						initOneButtonDialog(jQuery);
-					});
+	$(document).ajaxError(
+			function(e, xhr, settings, exception) {
+				var exrrorText = xhr.responseText.substring(xhr.responseText.indexOf("<h1>"));
+				$("body").append(
+						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>'
+								+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url + '<br><br>'
+								+ exrrorText + '<br><br>' + '<div class="right">'
+								+ '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
+				initOneButtonDialog(jQuery);
+			});
 
 	$.post("../GetCategories", {
 		productId : productId,
@@ -202,15 +173,12 @@ function initLeftPanel() {
 		var $breadcrumb = $("#breadcrumb");
 		if ($("#" + tableType + "-name").length > 0) {
 			var $tableName = $("#" + tableType + "-name");
-			$tableName.parent().attr("href",
-					"/" + tableType + "s/?id=" + tableId);
+			$tableName.parent().attr("href", "/" + tableType + "s/?id=" + tableId);
 			$tableName.text(name);
 		} else {
-			$breadcrumb
-					.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-			$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId
-					+ "'><span id='" + tableType + "-name'>" + name
-					+ "</span></a>");
+			$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
+			$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>"
+					+ name + "</span></a>");
 		}
 
 		$("#table-container").show();
@@ -229,9 +197,19 @@ function initLeftPanel() {
 					function(action, el, pos) {
 						var $id = $(el).attr("id");
 						if (action == "add") {
-							$.post("../GetAddTableDialog", {
-								categoryid : $id
-							}, function(data) {
+							var $args;
+							if (isJson()) {
+								$args = {
+									product : productId,
+									tabletype : tableType,
+									path : getCategoryPath($(el))
+								};
+							} else {
+								$args = {
+										categoryid : $id
+								};
+							}
+							$.post("../GetAddTableDialog", $args, function(data) {
 								$("body").append(data);
 								initAddDataItemDialog(jQuery);
 							});
@@ -311,6 +289,8 @@ function initLeftPanel() {
 													+ '<div class="dialog-buttons right">'
 													+ '<button id="dialog-btn-edit-category" category-id="'
 													+ $id
+													+ '" path="'
+													+ getCategoryPath($(el))
 													+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
 													+ '</div></div></div>');
 							initEditCategoryDialog(jQuery);
@@ -318,51 +298,49 @@ function initLeftPanel() {
 							noty({
 								type : "confirm",
 								text : "Are you sure you want to delete this category?",
-								buttons : [
-										{
-											addClass : 'btn btn-primary ui-button',
-											text : 'Delete',
-											onClick : function($noty) {
-												$noty.close();
-												$
-														.post(
-																"../DeleteCategory",
-																{
-																	id : $id
-																},
-																function(data) {
-																	if (data == "success") {
-																		noty({
-																			type : "success",
-																			text : "The category was deleted.",
-																			timeout : 5000
-																		});
-																		$(el)
-																				.remove();
-																		history
-																				.pushState(
-																						{
-																							product : productId
-																						},
-																						"",
-																						"?product="
-																								+ productId);
-																	} else {
-																		noty({
-																			type : "error",
-																			text : data
-																		});
-																	}
-																});
+								buttons : [ {
+									addClass : 'btn btn-primary ui-button',
+									text : 'Delete',
+									onClick : function($noty) {
+										$noty.close();
+										var $args;
+										if (isJson()) {
+											$args = {
+												product : productId,
+												tabletype : tableType,
+												path : getCategoryPath($(el))
+											};
+										} else {
+											$args = {
+												id : $id
+											};
+										}
+										$.post("../DeleteCategory", $args, function(data) {
+											if (data == "success") {
+												noty({
+													type : "success",
+													text : "The category was deleted.",
+													timeout : 5000
+												});
+												$(el).remove();
+												history.pushState({
+													product : productId
+												}, "", "?product=" + productId);
+											} else {
+												noty({
+													type : "error",
+													text : data
+												});
 											}
-										},
-										{
-											addClass : 'btn btn-danger ui-button',
-											text : 'Cancel',
-											onClick : function($noty) {
-												$noty.close();
-											}
-										} ]
+										});
+									}
+								}, {
+									addClass : 'btn btn-danger ui-button',
+									text : 'Cancel',
+									onClick : function($noty) {
+										$noty.close();
+									}
+								} ]
 							});
 						}
 					});
@@ -396,16 +374,14 @@ function initLeftPanel() {
 	if (tableId > 0) {
 		$("#waiting-bg").addClass("loading");
 
-		var name = $(".data-item-selected").find("span.tree-item-text").text()
-				.trim();
+		var name = $(".data-item-selected").find("span.tree-item-text").text().trim();
 		document.title = name + " - " + $("#section-name").text() + " - Grible";
 		$("#section-name").addClass("link-infront");
 
 		var $breadcrumb = $("#breadcrumb");
-		$breadcrumb
-				.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-		$breadcrumb.append("<a href='" + window.location + "'><span id='"
-				+ tableType + "-name'>" + name + "</span></a>");
+		$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
+		$breadcrumb.append("<a href='" + window.location + "'><span id='" + tableType + "-name'>" + name
+				+ "</span></a>");
 
 		loadTableValues(tableId);
 		loadTopPanel({
@@ -419,7 +395,7 @@ function initLeftPanel() {
 
 function getCategoryPath(el) {
 	var parentsText = ";" + el.text().trim();
-	el.parents(".category-content-holder").each(function(){
+	el.parents(".category-content-holder").each(function() {
 		parentsText += ";" + $(this).parent().children("h3").text().trim();
 	});
 	return parentsText;
@@ -519,39 +495,72 @@ function initAddDataItemDialog() {
 	});
 
 	function submitAddDataItem() {
-		var $id = $("#dialog-btn-add-data-item").attr("category-id");
 		var $args;
-		if (tableType == "storage") {
-			$args = {
-				tabletype : tableType,
-				categoryid : $id,
-				name : $("input.data-item-name").val(),
-				classname : $("input.data-storage-class-name").val(),
-				iscopy : $("input.copy-existing").is(':checked'),
-				copytableid : $("select.tables-list").find("option:selected")
-						.val(),
-				isonlycolumns : $("input.only-columns").is(':checked')
-			};
-		} else if (tableType == "enumeration") {
-			$args = {
-				tabletype : tableType,
-				categoryid : $id,
-				name : $("input.data-item-name").val(),
-				iscopy : $("input.copy-existing").is(':checked'),
-				copytableid : $("select.tables-list").find("option:selected")
-						.val(),
-				isonlycolumns : $("input.only-columns").is(':checked')
-			};
+		if (isJson()) {
+			var $path = $("#dialog-btn-add-data-item").attr("category-path");
+			if (tableType == "storage") {
+				$args = {
+					tabletype : tableType,
+					product : productId,
+					categorypath : $path,
+					name : $("input.data-item-name").val(),
+					classname : $("input.data-storage-class-name").val(),
+					iscopy : $("input.copy-existing").is(':checked'),
+					copytableid : $("select.tables-list").find("option:selected").val(),
+					isonlycolumns : $("input.only-columns").is(':checked')
+				};
+			} else if (tableType == "enumeration") {
+				$args = {
+					tabletype : tableType,
+					product : productId,
+					categorypath : $path,
+					name : $("input.data-item-name").val(),
+					iscopy : $("input.copy-existing").is(':checked'),
+					copytableid : $("select.tables-list").find("option:selected").val(),
+					isonlycolumns : $("input.only-columns").is(':checked')
+				};
+			} else {
+				$args = {
+					tabletype : "table",
+					product : productId,
+					categorypath : $path,
+					name : $("input.data-item-name").val(),
+					iscopy : $("input.copy-existing").is(':checked'),
+					copytableid : $("select.tables-list").find("option:selected").val(),
+					isonlycolumns : $("input.only-columns").is(':checked')
+				};
+			}
 		} else {
-			$args = {
-				tabletype : "table",
-				categoryid : $id,
-				name : $("input.data-item-name").val(),
-				iscopy : $("input.copy-existing").is(':checked'),
-				copytableid : $("select.tables-list").find("option:selected")
-						.val(),
-				isonlycolumns : $("input.only-columns").is(':checked')
-			};
+			var $id = $("#dialog-btn-add-data-item").attr("category-id");
+			if (tableType == "storage") {
+				$args = {
+					tabletype : tableType,
+					categoryid : $id,
+					name : $("input.data-item-name").val(),
+					classname : $("input.data-storage-class-name").val(),
+					iscopy : $("input.copy-existing").is(':checked'),
+					copytableid : $("select.tables-list").find("option:selected").val(),
+					isonlycolumns : $("input.only-columns").is(':checked')
+				};
+			} else if (tableType == "enumeration") {
+				$args = {
+					tabletype : tableType,
+					categoryid : $id,
+					name : $("input.data-item-name").val(),
+					iscopy : $("input.copy-existing").is(':checked'),
+					copytableid : $("select.tables-list").find("option:selected").val(),
+					isonlycolumns : $("input.only-columns").is(':checked')
+				};
+			} else {
+				$args = {
+					tabletype : "table",
+					categoryid : $id,
+					name : $("input.data-item-name").val(),
+					iscopy : $("input.copy-existing").is(':checked'),
+					copytableid : $("select.tables-list").find("option:selected").val(),
+					isonlycolumns : $("input.only-columns").is(':checked')
+				};
+			}
 		}
 		$.post("../AddTable", $args, function(newTableId) {
 			if (isNaN(newTableId)) {
@@ -671,11 +680,21 @@ function initEditCategoryDialog() {
 	});
 
 	function submitEditCategory() {
-		var $id = $("#dialog-btn-edit-category").attr("category-id");
-		$.post("../UpdateCategory", {
-			id : $id,
-			name : $("input.category-name").val()
-		}, function(data) {
+		var $args;
+		if (isJson()) {
+			$args = {
+				product : productId,
+				tabletype : tableType,
+				name : $("input.category-name").val(),
+				path : $("#dialog-btn-edit-category").attr("path")
+			};
+		} else {
+			$args = {
+				id : $("#dialog-btn-edit-category").attr("category-id"),
+				name : $("input.category-name").val()
+			};
+		}
+		$.post("../UpdateCategory", $args, function(data) {
 			if (data == "success") {
 				$("#edit-category-dialog").remove();
 				location.reload(true);
@@ -709,8 +728,7 @@ function loadTopPanel(args) {
 
 function initTopPanel() {
 
-	if ((tableType == "table") || (tableType == "precondition")
-			|| (tableType == "postcondition")) {
+	if ((tableType == "table") || (tableType == "precondition") || (tableType == "postcondition")) {
 		$(".sheet-tab-container").click(function() {
 			if ($(this).find(".sheet-tab").length > 0) {
 				var $tab = $(this).find(".sheet-tab");
@@ -812,17 +830,13 @@ function initTopPanel() {
 		});
 	});
 
-	$("#btn-more").mouseenter(
-			function() {
-				var optionsTop = Math.floor($("#btn-more").offset().top)
-						+ $("#btn-more").height() + 11;
-				var optionsLeft = $("#btn-more").offset().left
-						+ $("#btn-more").width()
-						- $("#data-item-options").width() + 15;
-				$("#data-item-options").css("top", optionsTop + "px");
-				$("#data-item-options").css("left", optionsLeft + "px");
-				$("#data-item-options").slideDown(150);
-			}).mouseleave(function() {
+	$("#btn-more").mouseenter(function() {
+		var optionsTop = Math.floor($("#btn-more").offset().top) + $("#btn-more").height() + 11;
+		var optionsLeft = $("#btn-more").offset().left + $("#btn-more").width() - $("#data-item-options").width() + 15;
+		$("#data-item-options").css("top", optionsTop + "px");
+		$("#data-item-options").css("left", optionsLeft + "px");
+		$("#data-item-options").slideDown(150);
+	}).mouseleave(function() {
 		$("#data-item-options").slideUp(150);
 	});
 
@@ -830,224 +844,147 @@ function initTopPanel() {
 		$(this).css("display", "block");
 	});
 
-	$("#btn-delete-data-item")
-			.click(
-					function() {
-						if ($(this).hasClass("button-enabled")) {
-							noty({
-								type : "confirm",
-								text : "Are you sure you want to delete this "
-										+ tableType + "?",
-								buttons : [
-										{
-											addClass : 'btn btn-primary ui-button',
-											text : 'Delete',
-											onClick : function($noty) {
-												$noty.close();
-												$
-														.post(
-																"../DeleteTable",
-																{
-																	id : tableId
-																},
-																function(data) {
-																	if (data == "success") {
-																		noty({
-																			type : "success",
-																			text : "The "
-																					+ tableType
-																					+ " was deleted.",
-																			timeout : 5000
-																		});
-																		$(
-																				".data-item-selected")
-																				.remove();
-																		$(
-																				".top-panel")
-																				.find(
-																						"div")
-																				.hide();
-																		$(
-																				"#table-container")
-																				.hide();
-																		if ($("#breadcrumb>a").length > 3) {
-																			$(
-																					".extends-symbol")
-																					.last()
-																					.remove();
-																			$(
-																					"#breadcrumb>a")
-																					.last()
-																					.remove();
-																			$(
-																					"#section-name")
-																					.removeClass(
-																							"link-infront");
-																		}
-																		document.title = $(
-																				"#section-name")
-																				.text()
-																				+ " - Grible";
-																		history
-																				.pushState(
-																						{
-																							product : productId
-																						},
-																						"",
-																						"?product="
-																								+ productId);
-																	} else if (isNumber(data)) {
-																		window.location = "?id="
-																				+ data;
-																	} else {
-																		noty({
-																			type : "error",
-																			text : data
-																		});
-																	}
-																});
-											}
-										},
-										{
-											addClass : 'btn btn-danger ui-button',
-											text : 'Cancel',
-											onClick : function($noty) {
-												$noty.close();
-											}
-										} ]
-							});
-						}
-					});
+	$("#btn-delete-data-item").click(function() {
+		if ($(this).hasClass("button-enabled")) {
+			noty({
+				type : "confirm",
+				text : "Are you sure you want to delete this " + tableType + "?",
+				buttons : [ {
+					addClass : 'btn btn-primary ui-button',
+					text : 'Delete',
+					onClick : function($noty) {
+						$noty.close();
+						$.post("../DeleteTable", {
+							id : tableId
+						}, function(data) {
+							if (data == "success") {
+								noty({
+									type : "success",
+									text : "The " + tableType + " was deleted.",
+									timeout : 5000
+								});
+								$(".data-item-selected").remove();
+								$(".top-panel").find("div").hide();
+								$("#table-container").hide();
+								if ($("#breadcrumb>a").length > 3) {
+									$(".extends-symbol").last().remove();
+									$("#breadcrumb>a").last().remove();
+									$("#section-name").removeClass("link-infront");
+								}
+								document.title = $("#section-name").text() + " - Grible";
+								history.pushState({
+									product : productId
+								}, "", "?product=" + productId);
+							} else if (isNumber(data)) {
+								window.location = "?id=" + data;
+							} else {
+								noty({
+									type : "error",
+									text : data
+								});
+							}
+						});
+					}
+				}, {
+					addClass : 'btn btn-danger ui-button',
+					text : 'Cancel',
+					onClick : function($noty) {
+						$noty.close();
+					}
+				} ]
+			});
+		}
+	});
 
-	$("#btn-save-data-item")
-			.click(
-					function() {
-						if ($(this).hasClass("button-enabled")) {
-							$(".data-item-selected > .changed-sign").remove();
-							$(this).removeClass("button-enabled");
-							$(this).addClass("button-disabled");
-							var valuesWaiting = $(".modified-value-cell").length;
-							$(".modified-value-cell")
-									.each(
-											function(i) {
-												var $cell = $(this);
-												if ($cell.has("span")) {
-													$cell.find("span").remove();
-												}
-												if ($cell.has("div.tooltip")) {
-													$cell.find("div.tooltip")
-															.remove();
-												}
-												$
-														.post(
-																"../SaveCellValue",
-																{
-																	id : $cell
-																			.attr('id'),
-																	value : $cell
-																			.text()
-																},
-																function(data) {
-																	if (data == "success") {
-																		$cell
-																				.removeClass("modified-value-cell");
-																	} else {
-																		noty({
-																			type : "error",
-																			text : data
-																		});
-																	}
-																	valuesWaiting--;
-																	if (valuesWaiting == 0) {
-																		$
-																				.post(
-																						"../CheckForDuplicatedRows",
-																						{
-																							id : tableId
-																						},
-																						function(
-																								data) {
-																							var message = data
-																									.split("|");
-																							if (message[0] == "true") {
-																								for (var i = 1; i < message.length; i++) {
-																									noty({
-																										type : "warning",
-																										text : message[i]
-																									});
-																								}
-																							}
-																						});
-																	}
-																});
-											});
-							var keysWaiting = $(".modified-key-cell").length;
-							$(".modified-key-cell")
-									.each(
-											function(i) {
-												var $key = $(this);
-												if ($key.has("span")) {
-													$key.find("span").remove();
-												}
-												if ($key.has("div.tooltip")) {
-													$key.find("div.tooltip")
-															.remove();
-												}
-												$
-														.post(
-																"../SaveKeyValue",
-																{
-																	id : $key
-																			.attr('id'),
-																	value : $key
-																			.text()
-																},
-																function(data) {
-																	if (data == "success") {
-																		$key
-																				.removeClass("modified-key-cell");
-																	} else {
-																		noty({
-																			type : "error",
-																			text : data
-																		});
-																	}
-																	keysWaiting--;
-																	if (keysWaiting == 0) {
-																		var keyNames = $(
-																				".key-cell.ui-cell")
-																				.map(
-																						function() {
-																							return $(
-																									this)
-																									.text();
-																						})
-																				.get();
-																		var usedNames = new Array();
-																		for (var i = 0; i < keyNames.length - 1; i++) {
-																			if ($
-																					.inArray(
-																							keyNames[i],
-																							usedNames) == -1) {
-																				for (var j = i + 1; j < keyNames.length; j++) {
-																					if (keyNames[i] === keyNames[j]) {
-																						usedNames
-																								.push(keyNames[i]);
-																						noty({
-																							type : "warning",
-																							text : "More than one parameter name '"
-																									+ keyNames[i]
-																									+ "'."
-																						});
-																					}
-																				}
-																			}
-																		}
-																	}
-																});
-											});
+	$("#btn-save-data-item").click(function() {
+		if ($(this).hasClass("button-enabled")) {
+			$(".data-item-selected > .changed-sign").remove();
+			$(this).removeClass("button-enabled");
+			$(this).addClass("button-disabled");
+			var valuesWaiting = $(".modified-value-cell").length;
+			$(".modified-value-cell").each(function(i) {
+				var $cell = $(this);
+				if ($cell.has("span")) {
+					$cell.find("span").remove();
+				}
+				if ($cell.has("div.tooltip")) {
+					$cell.find("div.tooltip").remove();
+				}
+				$.post("../SaveCellValue", {
+					id : $cell.attr('id'),
+					value : $cell.text()
+				}, function(data) {
+					if (data == "success") {
+						$cell.removeClass("modified-value-cell");
+					} else {
+						noty({
+							type : "error",
+							text : data
+						});
+					}
+					valuesWaiting--;
+					if (valuesWaiting == 0) {
+						$.post("../CheckForDuplicatedRows", {
+							id : tableId
+						}, function(data) {
+							var message = data.split("|");
+							if (message[0] == "true") {
+								for (var i = 1; i < message.length; i++) {
+									noty({
+										type : "warning",
+										text : message[i]
+									});
+								}
+							}
+						});
+					}
+				});
+			});
+			var keysWaiting = $(".modified-key-cell").length;
+			$(".modified-key-cell").each(function(i) {
+				var $key = $(this);
+				if ($key.has("span")) {
+					$key.find("span").remove();
+				}
+				if ($key.has("div.tooltip")) {
+					$key.find("div.tooltip").remove();
+				}
+				$.post("../SaveKeyValue", {
+					id : $key.attr('id'),
+					value : $key.text()
+				}, function(data) {
+					if (data == "success") {
+						$key.removeClass("modified-key-cell");
+					} else {
+						noty({
+							type : "error",
+							text : data
+						});
+					}
+					keysWaiting--;
+					if (keysWaiting == 0) {
+						var keyNames = $(".key-cell.ui-cell").map(function() {
+							return $(this).text();
+						}).get();
+						var usedNames = new Array();
+						for (var i = 0; i < keyNames.length - 1; i++) {
+							if ($.inArray(keyNames[i], usedNames) == -1) {
+								for (var j = i + 1; j < keyNames.length; j++) {
+									if (keyNames[i] === keyNames[j]) {
+										usedNames.push(keyNames[i]);
+										noty({
+											type : "warning",
+											text : "More than one parameter name '" + keyNames[i] + "'."
+										});
+									}
+								}
+							}
 						}
-					});
+					}
+				});
+			});
+		}
+	});
 
 	$("#btn-edit-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
@@ -1069,25 +1006,22 @@ function initTopPanel() {
 		});
 	});
 
-	$("#btn-export-data-item").click(
-			function() {
-				$("#waiting-bg").addClass("loading");
-				$.post("../ExportToExcel", {
-					id : tableId
-				}, function(data) {
-					$("#waiting-bg").removeClass("loading");
-					if (data == "success") {
-						document.location.href = "../export/"
-								+ $(".data-item-selected").text().trim()
-								+ ".xls";
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
+	$("#btn-export-data-item").click(function() {
+		$("#waiting-bg").addClass("loading");
+		$.post("../ExportToExcel", {
+			id : tableId
+		}, function(data) {
+			$("#waiting-bg").removeClass("loading");
+			if (data == "success") {
+				document.location.href = "../export/" + $(".data-item-selected").text().trim() + ".xls";
+			} else {
+				noty({
+					type : "error",
+					text : data
 				});
-			});
+			}
+		});
+	});
 }
 
 function setRowsUsage(usage) {
@@ -1129,118 +1063,61 @@ function setDuplicateWarning(show) {
 
 function enableCoulumnsMoving() {
 	$(".key-cell").destroyContextMenu();
-	$(".key-row")
-			.sortable(
-					{
-						cursor : "move",
-						delay : 50,
-						items : "> .key-cell",
-						forcePlaceholderSize : false,
-						containment : "parent",
-						axis : "x",
-						update : function(event, ui) {
-							$('#cbx-sort-keys').attr("checked", false);
-							var keyIds = [];
-							var newOrder = [];
-							var oldOrder = [];
-							var modifiedStart = -1;
-							$(".ui-cell.key-cell")
-									.each(
-											function(i) {
-												if ($(this).attr('key-order') != (i + 1)) {
-													if (modifiedStart == -1) {
-														modifiedStart = i;
-													}
-													keyIds[i - modifiedStart] = $(
-															this).attr('id');
-													newOrder[i - modifiedStart] = i + 1;
-													oldOrder[i - modifiedStart] = $(
-															this).attr(
-															'key-order');
-												}
-											});
-							$
-									.post(
-											"../UpdateKeysOrder",
-											{
-												modkeyids : keyIds,
-												modkeynumbers : newOrder
-											},
-											function(data) {
-												if (data == "success") {
-													$(".key-cell")
-															.each(
-																	function(i) {
-																		$(this)
-																				.attr(
-																						"key-order",
-																						(i + 1));
-																	});
-													$(".value-row")
-															.each(
-																	function(i) {
-																		var sortedCells = $(
-																				this)
-																				.find(
-																						".ui-cell.value-cell")
-																				.sort(
-																						function(
-																								a,
-																								b) {
-																							var contentA = parseInt($(
-																									".key-cell[id='"
-																											+ $(
-																													a)
-																													.attr(
-																															'keyid')
-																											+ "']")
-																									.attr(
-																											'key-order'));
-																							var contentB = parseInt($(
-																									".key-cell[id='"
-																											+ $(
-																													b)
-																													.attr(
-																															'keyid')
-																											+ "']")
-																									.attr(
-																											'key-order'));
-																							return (contentA < contentB) ? -1
-																									: (contentA > contentB) ? 1
-																											: 0;
-																						});
-																		$(this)
-																				.find(
-																						".value-cell")
-																				.remove();
-																		if ($(
-																				this)
-																				.find(
-																						".info-cell").length > 0) {
-																			sortedCells
-																					.insertBefore($(
-																							this)
-																							.find(
-																									".info-cell")
-																							.first());
-																		} else {
-																			$(
-																					this)
-																					.append(
-																							sortedCells);
-																		}
-																	});
-													initTableValues(jQuery);
-												} else {
-													noty({
-														type : "error",
-														text : data
-													});
-												}
-												enableKeyContextMenu(jQuery);
-											});
+	$(".key-row").sortable({
+		cursor : "move",
+		delay : 50,
+		items : "> .key-cell",
+		forcePlaceholderSize : false,
+		containment : "parent",
+		axis : "x",
+		update : function(event, ui) {
+			$('#cbx-sort-keys').attr("checked", false);
+			var keyIds = [];
+			var newOrder = [];
+			var oldOrder = [];
+			var modifiedStart = -1;
+			$(".ui-cell.key-cell").each(function(i) {
+				if ($(this).attr('key-order') != (i + 1)) {
+					if (modifiedStart == -1) {
+						modifiedStart = i;
+					}
+					keyIds[i - modifiedStart] = $(this).attr('id');
+					newOrder[i - modifiedStart] = i + 1;
+					oldOrder[i - modifiedStart] = $(this).attr('key-order');
+				}
+			});
+			$.post("../UpdateKeysOrder", {
+				modkeyids : keyIds,
+				modkeynumbers : newOrder
+			}, function(data) {
+				if (data == "success") {
+					$(".key-cell").each(function(i) {
+						$(this).attr("key-order", (i + 1));
+					});
+					$(".value-row").each(function(i) {
+						var sortedCells = $(this).find(".ui-cell.value-cell").sort(function(a, b) {
+							var contentA = parseInt($(".key-cell[id='" + $(a).attr('keyid') + "']").attr('key-order'));
+							var contentB = parseInt($(".key-cell[id='" + $(b).attr('keyid') + "']").attr('key-order'));
+							return (contentA < contentB) ? -1 : (contentA > contentB) ? 1 : 0;
+						});
+						$(this).find(".value-cell").remove();
+						if ($(this).find(".info-cell").length > 0) {
+							sortedCells.insertBefore($(this).find(".info-cell").first());
+						} else {
+							$(this).append(sortedCells);
 						}
 					});
+					initTableValues(jQuery);
+				} else {
+					noty({
+						type : "error",
+						text : data
+					});
+				}
+				enableKeyContextMenu(jQuery);
+			});
+		}
+	});
 }
 
 function initEditDataItemDialog() {
@@ -1350,61 +1227,46 @@ function initTableValues() {
 		}
 	});
 
-	$(".entities-values")
-			.sortable(
-					{
-						cursor : "move",
-						delay : 50,
-						items : "> .value-row",
-						forcePlaceholderSize : true,
-						update : function(event, ui) {
-							var rowIds = [];
-							var oldOrder = [];
-							var newOrder = [];
-							var modifiedStart = -1;
-							$(".ui-cell.index-cell")
-									.each(
-											function(i) {
-												if ($(this).text() != (i + 1)) {
-													if (modifiedStart == -1) {
-														modifiedStart = i;
-													}
-													rowIds[i - modifiedStart] = $(
-															this).attr('id');
-													oldOrder[i - modifiedStart] = $(
-															this).text();
-													newOrder[i - modifiedStart] = i + 1;
-												}
-											});
-							$
-									.post(
-											"../UpdateRowsOrder",
-											{
-												rowids : rowIds,
-												oldorder : oldOrder,
-												neworder : newOrder
-											},
-											function(data) {
-												if (data == "success") {
-													for (var j = 0; j < rowIds.length; j++) {
-														var modifiedIndexCell = $(".ui-cell.index-cell[id='"
-																+ rowIds[j]
-																+ "']");
-														highlight(modifiedIndexCell);
-														modifiedIndexCell
-																.text(j
-																		+ modifiedStart
-																		+ 1);
-													}
-												} else {
-													noty({
-														type : "error",
-														text : data
-													});
-												}
-											});
-						}
+	$(".entities-values").sortable({
+		cursor : "move",
+		delay : 50,
+		items : "> .value-row",
+		forcePlaceholderSize : true,
+		update : function(event, ui) {
+			var rowIds = [];
+			var oldOrder = [];
+			var newOrder = [];
+			var modifiedStart = -1;
+			$(".ui-cell.index-cell").each(function(i) {
+				if ($(this).text() != (i + 1)) {
+					if (modifiedStart == -1) {
+						modifiedStart = i;
+					}
+					rowIds[i - modifiedStart] = $(this).attr('id');
+					oldOrder[i - modifiedStart] = $(this).text();
+					newOrder[i - modifiedStart] = i + 1;
+				}
+			});
+			$.post("../UpdateRowsOrder", {
+				rowids : rowIds,
+				oldorder : oldOrder,
+				neworder : newOrder
+			}, function(data) {
+				if (data == "success") {
+					for (var j = 0; j < rowIds.length; j++) {
+						var modifiedIndexCell = $(".ui-cell.index-cell[id='" + rowIds[j] + "']");
+						highlight(modifiedIndexCell);
+						modifiedIndexCell.text(j + modifiedStart + 1);
+					}
+				} else {
+					noty({
+						type : "error",
+						text : data
 					});
+				}
+			});
+		}
+	});
 
 	initValueCells($(".value-cell:not(:has(> input.changed-value))"));
 	initTooltipCells($(".storage-cell"));
@@ -1440,8 +1302,7 @@ function initValueCells(cells) {
 		var $content = $cell.text().replace(/'/g, "&#39;");
 		var $width = $cell.width();
 		$cell.html("<input class='changed-value' value='" + $content
-				+ "' /><span class='old-value' style='display: none;'>"
-				+ $content + "</span>");
+				+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
 		$cell.find("input.changed-value").css("width", $width + "px");
 		$cell.find("input.changed-value").focus();
 		$cell.find("input.changed-value").select();
@@ -1455,142 +1316,127 @@ function isNumber(n) {
 
 function initKeysAndIndexes() {
 	if (tableType != "enumeration") {
-		$(".key-cell")
-				.dblclick(
-						function() {
-							var $key = $(this);
-							if ($key.has("span")) {
-								$key.find("span").remove();
-							}
-							var $content = $key.text().replace(/'/g, "&#39;");
-							var $width = $key.width();
-							$key
-									.html("<input class='changed-value' value='"
-											+ $content
-											+ "' /><span class='old-value' style='display: none;'>"
-											+ $content + "</span>");
-							$key.find("input.changed-value").css("width",
-									$width + "px");
-							$key.find("input.changed-value").focus();
-							$key.find("input.changed-value").select();
-							initEditableKeyCell(jQuery);
-						});
+		$(".key-cell").dblclick(
+				function() {
+					var $key = $(this);
+					if ($key.has("span")) {
+						$key.find("span").remove();
+					}
+					var $content = $key.text().replace(/'/g, "&#39;");
+					var $width = $key.width();
+					$key.html("<input class='changed-value' value='" + $content
+							+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
+					$key.find("input.changed-value").css("width", $width + "px");
+					$key.find("input.changed-value").focus();
+					$key.find("input.changed-value").select();
+					initEditableKeyCell(jQuery);
+				});
 	}
 
-	$(".ui-cell.index-cell").contextMenu(
-			{
-				menu : "rowMenu"
-			},
-			function(action, el, pos) {
-				var $rowId = $(el).attr("id");
-				var $rowOrder = parseInt($(el).text());
-				var $row = $(el).parent();
-				if (action == "add") {
-					if ($(".index-cell.ui-cell").length == 1) {
-						$("#rowMenu").enableContextMenuItems("#delete");
-					}
-					$("#waiting-bg").addClass("loading");
-					$.post("../InsertRow", {
-						rowid : $rowId
-					}, function(data) {
-						$("#waiting-bg").removeClass("loading");
-						var newIds = data.split(";");
-						if (newIds.length > 1) {
-							$newRow = $row.clone(true);
-							$newRow.find(".ui-cell.selected-cell").removeClass(
-									"selected-cell");
-							$newRow.find(".ui-cell.index-cell").attr("id",
-									newIds[0]);
-							$newRow.find(".ui-cell.modified-value-cell")
-									.removeClass("modified-value-cell");
-							$newRow.find(".ui-cell.value-cell:not(.enum-cell)")
-									.text("");
-							$newRow.find(".ui-cell.storage-cell").text("0");
-							$newRow.find(".ui-cell.value-cell").each(
-									function(i) {
-										$(this).attr("rowid", newIds[0]);
-										$(this).attr("id", newIds[i + 1]);
-									});
-							$newRow.insertBefore($row);
-							highlight($newRow);
-							$(".ui-cell.index-cell").each(function(i) {
-								if ((i + 1) >= $rowOrder) {
-									$(this).text(i + 1);
-								}
-							});
-
-						} else {
-							noty({
-								type : "error",
-								text : data
-							});
+	$(".ui-cell.index-cell").contextMenu({
+		menu : "rowMenu"
+	}, function(action, el, pos) {
+		var $rowId = $(el).attr("id");
+		var $rowOrder = parseInt($(el).text());
+		var $row = $(el).parent();
+		if (action == "add") {
+			if ($(".index-cell.ui-cell").length == 1) {
+				$("#rowMenu").enableContextMenuItems("#delete");
+			}
+			$("#waiting-bg").addClass("loading");
+			$.post("../InsertRow", {
+				rowid : $rowId
+			}, function(data) {
+				$("#waiting-bg").removeClass("loading");
+				var newIds = data.split(";");
+				if (newIds.length > 1) {
+					$newRow = $row.clone(true);
+					$newRow.find(".ui-cell.selected-cell").removeClass("selected-cell");
+					$newRow.find(".ui-cell.index-cell").attr("id", newIds[0]);
+					$newRow.find(".ui-cell.modified-value-cell").removeClass("modified-value-cell");
+					$newRow.find(".ui-cell.value-cell:not(.enum-cell)").text("");
+					$newRow.find(".ui-cell.storage-cell").text("0");
+					$newRow.find(".ui-cell.value-cell").each(function(i) {
+						$(this).attr("rowid", newIds[0]);
+						$(this).attr("id", newIds[i + 1]);
+					});
+					$newRow.insertBefore($row);
+					highlight($newRow);
+					$(".ui-cell.index-cell").each(function(i) {
+						if ((i + 1) >= $rowOrder) {
+							$(this).text(i + 1);
 						}
 					});
-				} else if (action == "copy") {
-					if ($(".index-cell.ui-cell").length == 1) {
-						$("#rowMenu").enableContextMenuItems("#delete");
-					}
-					$("#waiting-bg").addClass("loading");
-					$.post("../CopyRow", {
-						rowid : $rowId
-					}, function(data) {
-						$("#waiting-bg").removeClass("loading");
-						var newIds = data.split(";");
-						if (newIds.length > 1) {
-							$newRow = $row.clone(true);
-							$newRow.find(".ui-cell.index-cell").attr("id",
-									newIds[0]);
-							$newRow.find(".ui-cell.value-cell").each(
-									function(i) {
-										$(this).attr("rowid", newIds[0]);
-										$(this).attr("id", newIds[i + 1]);
-									});
-							$newRow.find(".ui-cell.value-cell").removeClass(
-									"selected-cell");
-							$newRow.insertAfter($row);
-							highlight($newRow);
-							$(".ui-cell.index-cell").each(function(i) {
-								if ((i + 1) > $rowOrder) {
-									$(this).text(i + 1);
-								}
-							});
 
-						} else {
-							noty({
-								type : "error",
-								text : data
-							});
-						}
-					});
-				} else if (action == "delete") {
-					if ($(".index-cell.ui-cell").length == 2) {
-						$("#rowMenu").disableContextMenuItems("#delete");
-					}
-					$("#waiting-bg").addClass("loading");
-					$.post("../DeleteRow", {
-						rowid : $rowId
-					}, function(data) {
-						$("#waiting-bg").removeClass("loading");
-						if (data == "success") {
-							$row.hide(400, function() {
-								$row.remove();
-								$(".ui-cell.index-cell").each(function(i) {
-									if ((i + 1) >= $rowOrder) {
-										highlight($(this));
-										$(this).text(i + 1);
-									}
-								});
-
-							});
-						} else {
-							noty({
-								type : "error",
-								text : data
-							});
-						}
+				} else {
+					noty({
+						type : "error",
+						text : data
 					});
 				}
 			});
+		} else if (action == "copy") {
+			if ($(".index-cell.ui-cell").length == 1) {
+				$("#rowMenu").enableContextMenuItems("#delete");
+			}
+			$("#waiting-bg").addClass("loading");
+			$.post("../CopyRow", {
+				rowid : $rowId
+			}, function(data) {
+				$("#waiting-bg").removeClass("loading");
+				var newIds = data.split(";");
+				if (newIds.length > 1) {
+					$newRow = $row.clone(true);
+					$newRow.find(".ui-cell.index-cell").attr("id", newIds[0]);
+					$newRow.find(".ui-cell.value-cell").each(function(i) {
+						$(this).attr("rowid", newIds[0]);
+						$(this).attr("id", newIds[i + 1]);
+					});
+					$newRow.find(".ui-cell.value-cell").removeClass("selected-cell");
+					$newRow.insertAfter($row);
+					highlight($newRow);
+					$(".ui-cell.index-cell").each(function(i) {
+						if ((i + 1) > $rowOrder) {
+							$(this).text(i + 1);
+						}
+					});
+
+				} else {
+					noty({
+						type : "error",
+						text : data
+					});
+				}
+			});
+		} else if (action == "delete") {
+			if ($(".index-cell.ui-cell").length == 2) {
+				$("#rowMenu").disableContextMenuItems("#delete");
+			}
+			$("#waiting-bg").addClass("loading");
+			$.post("../DeleteRow", {
+				rowid : $rowId
+			}, function(data) {
+				$("#waiting-bg").removeClass("loading");
+				if (data == "success") {
+					$row.hide(400, function() {
+						$row.remove();
+						$(".ui-cell.index-cell").each(function(i) {
+							if ((i + 1) >= $rowOrder) {
+								highlight($(this));
+								$(this).text(i + 1);
+							}
+						});
+
+					});
+				} else {
+					noty({
+						type : "error",
+						text : data
+					});
+				}
+			});
+		}
+	});
 
 	$(".ui-cell.index-cell").mousedown(function(event) {
 		if (event.which === 3) {
@@ -1621,66 +1467,40 @@ function enableKeyContextMenu() {
 							if ($(".key-cell.ui-cell").length == 1) {
 								$("#keyMenu").enableContextMenuItems("#delete");
 							}
-							$
-									.post(
-											"../InsertKey",
-											{
-												keyid : $keyId
-											},
-											function(data) {
-												var newIds = data.split(";");
-												if (newIds.length > 1) {
-													$newKey = $(el).clone(true);
-													$newKey.attr("id",
-															newIds[0]);
-													$newKey.text("editme");
-													$newKey.insertBefore($(el));
-													highlight($newKey);
+							$.post("../InsertKey", {
+								keyid : $keyId
+							}, function(data) {
+								var newIds = data.split(";");
+								if (newIds.length > 1) {
+									$newKey = $(el).clone(true);
+									$newKey.attr("id", newIds[0]);
+									$newKey.text("editme");
+									$newKey.insertBefore($(el));
+									highlight($newKey);
 
-													$column
-															.each(function(i) {
-																$newCell = $(
-																		this)
-																		.clone(
-																				true);
-																$newCell
-																		.removeClass("modified-value-cell");
-																$newCell
-																		.removeClass("storage-cell");
-																$newCell
-																		.removeClass("selected-cell");
-																$newCell
-																		.text("");
-																$newCell
-																		.attr(
-																				"keyid",
-																				newIds[0]);
-																$newCell
-																		.attr(
-																				"id",
-																				newIds[i + 1]);
-																$newCell
-																		.insertBefore($(this));
-																highlight($newCell);
-															});
-													$(".ui-cell.key-cell")
-															.each(
-																	function(i) {
-																		if ((i + 1) >= $keyOrder) {
-																			$(
-																					this)
-																					.attr(
-																							"key-order",
-																							(i + 1));
-																		}
-																	});
-												} else {
-													noty({
-														type : "error",
-														text : data
-													});
-												}
-											});
+									$column.each(function(i) {
+										$newCell = $(this).clone(true);
+										$newCell.removeClass("modified-value-cell");
+										$newCell.removeClass("storage-cell");
+										$newCell.removeClass("selected-cell");
+										$newCell.text("");
+										$newCell.attr("keyid", newIds[0]);
+										$newCell.attr("id", newIds[i + 1]);
+										$newCell.insertBefore($(this));
+										highlight($newCell);
+									});
+									$(".ui-cell.key-cell").each(function(i) {
+										if ((i + 1) >= $keyOrder) {
+											$(this).attr("key-order", (i + 1));
+										}
+									});
+								} else {
+									noty({
+										type : "error",
+										text : data
+									});
+								}
+							});
 						} else if (action == "copy") {
 							if ($(".key-cell.ui-cell").length == 1) {
 								$("#keyMenu").enableContextMenuItems("#delete");
@@ -1717,8 +1537,7 @@ function enableKeyContextMenu() {
 							});
 						} else if (action == "delete") {
 							if ($(".key-cell.ui-cell").length == 2) {
-								$("#keyMenu")
-										.disableContextMenuItems("#delete");
+								$("#keyMenu").disableContextMenuItems("#delete");
 							}
 							$.post("../DeleteKey", {
 								keyid : $keyId,
@@ -1728,14 +1547,11 @@ function enableKeyContextMenu() {
 									$column.hide(400, function() {
 										$(el).remove();
 										$column.remove();
-										$(".ui-cell.key-cell").each(
-												function(i) {
-													if ((i + 1) >= $keyOrder) {
-														$(this).attr(
-																"key-order",
-																(i + 1));
-													}
-												});
+										$(".ui-cell.key-cell").each(function(i) {
+											if ((i + 1) >= $keyOrder) {
+												$(this).attr("key-order", (i + 1));
+											}
+										});
 									});
 								} else {
 									noty({
@@ -1804,8 +1620,7 @@ function initTooltipCells(elements) {
 
 	function initTooltipCellsOnClick(value) {
 		var $value = value;
-		if (($value.has("span.old-value").length == 0)
-				&& ($value.text() != "0") && ($value.text() != "")
+		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "")
 				&& (!$value.hasClass("modified-value-cell"))) {
 			if ($value.has("div.tooltip").length == 0) {
 				var $content = $value.text();
@@ -1827,10 +1642,8 @@ function initTooltipCells(elements) {
 
 	function initTooltipCellsOnHover(value) {
 		var $value = value;
-		if (($value.has("span.old-value").length == 0)
-				&& ($value.text() != "0") && ($value.text() != "")
-				&& (!$value.hasClass("modified-value-cell"))
-				&& ($value.has("div.tooltip").length == 0)) {
+		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "")
+				&& (!$value.hasClass("modified-value-cell")) && ($value.has("div.tooltip").length == 0)) {
 			var $content = $value.text();
 			var $args = {
 				id : $value.attr('id'),
@@ -1849,24 +1662,20 @@ function initTooltipCells(elements) {
 			event.stopPropagation();
 		});
 
-		var $widthRight = $("#table-container").width()
-				- $value.position().left - 17;
+		var $widthRight = $("#table-container").width() - $value.position().left - 17;
 		var $tooltipWidth = $tooltip.width();
 		if ($widthRight < $tooltipWidth) {
 			if ($tooltipWidth > $("#table-container").width()) {
-				$tooltip.css("max-width", ($("#table-container").width() - 20)
-						+ "px");
+				$tooltip.css("max-width", ($("#table-container").width() - 20) + "px");
 				$tooltip.css("left", "0px");
 			} else {
-				$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight)
-						+ "px");
+				$tooltip.css("margin-left", "-" + ($tooltipWidth - $widthRight) + "px");
 			}
 		}
 
 		var $heightToBorder;
 		if ($value.position().top < $("#table-container").height() * 0.7) {
-			$heightToBorder = $("#table-container").height()
-					- $value.position().top - 17;
+			$heightToBorder = $("#table-container").height() - $value.position().top - 17;
 			$tooltip.addClass("down");
 		} else {
 			$heightToBorder = $value.position().top;
@@ -1882,8 +1691,7 @@ function initTooltipCells(elements) {
 			$tooltip.css("padding-right", "15px");
 		} else {
 			if ($tooltip.hasClass("up")) {
-				$tooltip.css("margin-top", "-" + ($tooltip.height() + 35)
-						+ "px");
+				$tooltip.css("margin-top", "-" + ($tooltip.height() + 35) + "px");
 			}
 		}
 	}
@@ -2186,13 +1994,8 @@ function showAdvancedImportDialog(currentRowsCount, importedRowsCount) {
 							+ ':</div><div class="table-cell dialog-cell">'
 							+ currentRowsCount
 							+ '</div></div><div class="table-row"><div class="table-cell dialog-cell dialog-label">Rows in the file being imported:</div>'
-							+ '<div class="table-cell dialog-cell">'
-							+ importedRowsCount
-							+ '</div></div></div>'
-							+ '<br/><br/>How would you like to apply changes?'
-							+ options
-							+ '<br /><br />'
-							+ noteText
+							+ '<div class="table-cell dialog-cell">' + importedRowsCount + '</div></div></div>'
+							+ '<br/><br/>How would you like to apply changes?' + options + '<br /><br />' + noteText
 							+ '<div class="dialog-buttons right"><button class="ui-button btn-apply">Apply</button> '
 							+ '<button class="ui-button btn-cancel">Cancel</button></div></div></div>');
 	initAdvancedImportDialog(jQuery);

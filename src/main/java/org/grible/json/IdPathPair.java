@@ -3,6 +3,11 @@ package org.grible.json;
 public class IdPathPair {
 	private int id;
 	private String path;
+	
+	public IdPathPair(int id, String path) {
+		setId(id);
+		setPath(path);
+	}
 
 	public int getId() {
 		return id;

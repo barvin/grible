@@ -26,6 +26,7 @@ import javax.servlet.http.Part;
 
 import org.grible.dao.DataManager;
 import org.grible.excel.ExcelFile;
+import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
@@ -59,10 +60,11 @@ public class TableImport extends HttpServlet {
 			String fileName = ServletHelper.getFilename(filePart);
 			String tableName = fileName.substring(0, fileName.lastIndexOf(".xls"));
 			int categoryId = Integer.parseInt(request.getParameter("category"));
+			Category category = new Category(categoryId);
 			InputStream filecontent = filePart.getInputStream();
 			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
 
-			if (DataManager.getInstance().getDao().isTableInProductExist(tableName, TableType.TABLE, categoryId)) {
+			if (DataManager.getInstance().getDao().isTableInProductExist(tableName, TableType.TABLE, category)) {
 				Table table = DataManager.getInstance().getDao().getTable(tableName, categoryId);
 
 				int currentKeysCount = DataManager.getInstance().getDao().getKeys(table.getId()).size();
@@ -77,7 +79,7 @@ public class TableImport extends HttpServlet {
 				String destination = "/tables/?id=" + table.getId();
 				response.sendRedirect(destination);
 			} else {
-				int tableId = DataManager.getInstance().getDao().insertTable(tableName, TableType.TABLE, categoryId, null, null);
+				int tableId = DataManager.getInstance().getDao().insertTable(tableName, TableType.TABLE, category, null, null);
 				List<Integer> keyIds = DataManager.getInstance().getDao().insertKeys(tableId, excelFile.getKeys());
 				ArrayList<ArrayList<String>> values = excelFile.getValues();
 				List<Integer> rowIds = DataManager.getInstance().getDao().insertRows(tableId, values.size());

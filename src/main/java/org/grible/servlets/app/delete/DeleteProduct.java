@@ -110,7 +110,7 @@ public class DeleteProduct extends HttpServlet {
 			if (error.length() > 0) {
 				out.print(error.toString());
 			} else {
-				boolean deleted = DataManager.getInstance().getDao().deleteCategory(category.getId());
+				boolean deleted = DataManager.getInstance().getDao().deleteCategory(category);
 				if (!deleted) {
 					out.print("ERROR: Category was not deleted. See server logs for details.");
 				}

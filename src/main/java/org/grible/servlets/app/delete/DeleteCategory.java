@@ -21,10 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Table;
+import org.grible.model.TableType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -53,8 +57,21 @@ public class DeleteCategory extends HttpServlet {
 				return;
 			}
 
-			int categoryId = Integer.parseInt(request.getParameter("id"));
-			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategory(new Category(categoryId));
+			Category category = null;
+			if (isJson()) {
+				Integer productId = Integer.parseInt(request.getParameter("product"));
+				TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
+				if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
+					tableType = TableType.TABLE;
+				}
+				String path = StringHelper.getFolderPathWithoutLastSeparator(request.getParameter("path"));
+				category = new Category(path, tableType, productId);
+			} else {
+				int categoryId = Integer.parseInt(request.getParameter("id"));
+				category = DataManager.getInstance().getDao().getCategory(categoryId);
+			}
+
+			List<Table> tables = DataManager.getInstance().getDao().getTablesByCategory(category);
 
 			StringBuilder error = new StringBuilder();
 			for (Table table : tables) {
@@ -67,7 +84,7 @@ public class DeleteCategory extends HttpServlet {
 			if (error.length() > 0) {
 				out.print(error.toString());
 			} else {
-				boolean deleted = DataManager.getInstance().getDao().deleteCategory(categoryId);
+				boolean deleted = DataManager.getInstance().getDao().deleteCategory(category);
 				if (deleted) {
 					out.print("success");
 				} else {
@@ -81,5 +98,9 @@ public class DeleteCategory extends HttpServlet {
 		}
 		out.flush();
 		out.close();
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 }

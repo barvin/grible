@@ -10,15 +10,24 @@
  ******************************************************************************/
 package org.grible.model;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+import org.grible.model.json.TableJson;
+
+import com.google.gson.Gson;
 
 public class Table {
 	private int id;
 	private TableType type;
 	private Integer categoryId;
-	private Category category;
 	private File file;
+	private TableJson tableJson;
 	private Integer parentId;
 	private String name;
 	private String className;
@@ -31,13 +40,16 @@ public class Table {
 		setCategoryId(null);
 		setParentId(null);
 	}
-
-	public Category getCategory() {
-		return category;
+	
+	public Table(File file, TableType type) throws Exception {
+		setFile(file);
+		setName(StringUtils.substringBefore(file.getName(), ".json"));
+		setType(type);
+		this.tableJson = new TableJson();
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
+	public TableJson getTableJson() {
+		return tableJson;
 	}
 
 	public File getFile() {
@@ -116,4 +128,21 @@ public class Table {
 		this.modifiedTime = dateTime;
 	}
 
+	public void save() throws Exception {
+		FileWriter fw = new FileWriter(file);
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(new Gson().toJson(tableJson));
+		bw.close();
+	}
+
+	public void setTableJson() throws Exception {
+		FileReader fr = new FileReader(file);
+		BufferedReader br = new BufferedReader(fr);
+		TableJson tableJson = new Gson().fromJson(br, TableJson.class);
+		br.close();
+		setClassName(tableJson.getClassName());
+		setShowUsage(tableJson.isShowUsage());
+		setShowWarning(tableJson.isShowWarning());
+		this.tableJson = tableJson;
+	}
 }

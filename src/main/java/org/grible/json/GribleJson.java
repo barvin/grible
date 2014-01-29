@@ -31,6 +31,26 @@ public class GribleJson {
 		}
 		this.pairs = pairArray;
 	}
+	
+	public int addPath(String path) {
+		int maxId = getMaxId();
+		List<IdPathPair> pairs = getIdPathPairs();
+		int newId = maxId + 1;
+		pairs.add(new IdPathPair(newId, path));
+		setIdPathPairs(pairs);
+		return newId;
+	}
+	
+	private int getMaxId() {
+		List<IdPathPair> pairs = getIdPathPairs();
+		int maxId = 0;
+		for (IdPathPair pair : pairs) {
+			if (maxId < pair.getId()) {
+				maxId = pair.getId();
+			}
+		}
+		return maxId;
+	}
 
 	public void setFilePath(String path) {
 		this.filePath = path + File.separator + "grible.json";

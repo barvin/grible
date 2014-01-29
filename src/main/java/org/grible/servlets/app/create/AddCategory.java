@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.grible.servlets.app.create;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -20,9 +19,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.helpers.StringHelper;
 import org.grible.model.TableType;
 import org.grible.security.Security;
 
@@ -62,7 +60,7 @@ public class AddCategory extends HttpServlet {
 
 			String parentPath = "";
 			if (request.getParameter("parentpath") != null) {
-				parentPath = getFolderPath(request.getParameter("parentpath"));
+				parentPath = StringHelper.getFolderPath(request.getParameter("parentpath"));
 			}
 
 			String name = request.getParameter("name");
@@ -93,11 +91,5 @@ public class AddCategory extends HttpServlet {
 			out.flush();
 			out.close();
 		}
-	}
-
-	private String getFolderPath(String pathWithSemicolon) {
-		String[] folders = pathWithSemicolon.split(";");
-		ArrayUtils.reverse(folders);
-		return StringUtils.join(folders, File.separator);
 	}
 }

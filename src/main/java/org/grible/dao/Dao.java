@@ -38,7 +38,7 @@ public interface Dao {
 
 	public int insertCategory(TableType type, int productId, String name, Integer parentId, String parentPath) throws Exception;
 
-	public int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className) throws Exception;
+	public int insertTable(String name, TableType type, Category category, Integer parentId, String className) throws Exception;
 
 	public int insertRow(int tableId, int order) throws Exception;
 
@@ -112,7 +112,7 @@ public interface Dao {
 
 	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws Exception;
 
-	public boolean deleteCategory(int categoryId) throws Exception;
+	public boolean deleteCategory(Category category) throws Exception;
 
 	public List<Table> getTablesUsingStorage(int storageId) throws Exception;
 
@@ -159,7 +159,7 @@ public interface Dao {
 
 	public List<Table> getTablesOfProduct(int productId, TableType type) throws Exception;
 
-	public boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws Exception;
+	public boolean isTableInProductExist(String name, TableType type, Category category) throws Exception;
 
 	public List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws Exception;
 

@@ -20,8 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
+import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -48,14 +52,24 @@ public class UpdateCategory extends HttpServlet {
 		try {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
-			}			
+			}
 			String name = request.getParameter("name");
 			if ("".equals(name)) {
 				out.print("ERROR: Category name cannot be empty.");
 			} else {
-				int categoryId = Integer.parseInt(request.getParameter("id"));
-				Category category;
-				category = DataManager.getInstance().getDao().getCategory(categoryId);
+				Category category = null;
+				if (isJson()) {
+					Integer productId = Integer.parseInt(request.getParameter("product"));
+					TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
+					if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
+						tableType = TableType.TABLE;
+					}
+					String path = StringHelper.getFolderPathWithoutLastSeparator(request.getParameter("path"));
+					category = new Category(path, tableType, productId);
+				} else {
+					int categoryId = Integer.parseInt(request.getParameter("id"));
+					category = DataManager.getInstance().getDao().getCategory(categoryId);
+				}
 				category.setName(name);
 				DataManager.getInstance().getDao().updateCategory(category);
 				out.print("success");
@@ -67,5 +81,9 @@ public class UpdateCategory extends HttpServlet {
 			out.flush();
 			out.close();
 		}
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 }

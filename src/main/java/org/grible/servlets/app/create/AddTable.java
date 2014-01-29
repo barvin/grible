@@ -22,11 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.model.Category;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -54,10 +57,19 @@ public class AddTable extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			
-			Integer categoryId = null;
-			if (request.getParameter("categoryid") != null) {
-				categoryId = Integer.parseInt(request.getParameter("categoryid"));
+
+			Category category = null;
+			if (isJson()) {
+				Integer productId = Integer.parseInt(request.getParameter("product"));
+				TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
+				if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
+					tableType = TableType.TABLE;
+				}
+				String path = request.getParameter("categorypath");
+				category = new Category(path, tableType, productId);
+			} else if (request.getParameter("categoryid") != null) {
+				int categoryId = Integer.parseInt(request.getParameter("categoryid"));
+				category = DataManager.getInstance().getDao().getCategory(categoryId);
 			}
 
 			Integer parentId = null;
@@ -66,7 +78,8 @@ public class AddTable extends HttpServlet {
 				if (currType == TableType.TABLE) {
 					parentId = Integer.parseInt(request.getParameter("parentid"));
 				} else {
-					Table sibling = DataManager.getInstance().getDao().getTable(Integer.parseInt(request.getParameter("parentid")));
+					Table sibling = DataManager.getInstance().getDao()
+							.getTable(Integer.parseInt(request.getParameter("parentid")));
 					parentId = sibling.getParentId();
 				}
 			}
@@ -76,13 +89,14 @@ public class AddTable extends HttpServlet {
 				throw new Exception("ERROR: Name cannot be empty.");
 			}
 			TableType type = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
-			if (DataManager.getInstance().getDao().isTableInProductExist(name, type, categoryId)) {
+
+			if (DataManager.getInstance().getDao().isTableInProductExist(name, type, category)) {
 				throw new Exception("ERROR: " + type.toString().toLowerCase() + " with name '" + name
 						+ "' already exists.");
 			}
 			String className = request.getParameter("classname");
 
-			int tableId = DataManager.getInstance().getDao().insertTable(name, type, categoryId, parentId, className);
+			int tableId = DataManager.getInstance().getDao().insertTable(name, type, category, parentId, className);
 			boolean isCopy = Boolean.parseBoolean(request.getParameter("iscopy"));
 			if (isCopy) {
 				int copyTableId = Integer.parseInt(request.getParameter("copytableid"));
@@ -104,16 +118,29 @@ public class AddTable extends HttpServlet {
 					DataManager.getInstance().getDao().insertValues(tableId, copyTableId, oldRows, keys);
 				}
 			} else {
-				List<String> keys = new ArrayList<String>();
-				if (type == TableType.ENUMERATION) {
-					keys.add(name);
+				if (isJson()) {
+//					List<String> keys = new ArrayList<String>();
+//					if (type == TableType.ENUMERATION) {
+//						keys.add(name);
+//					} else {
+//						keys.add("editme");
+//					}
+//					int keyId = DataManager.getInstance().getDao().insertKeys(tableId, keys).get(0);
+//					DataManager.getInstance().getDao().insertRow(tableId, 1);
+//					List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+//					DataManager.getInstance().getDao().insertValuesEmptyWithKeyId(keyId, rows);
 				} else {
-					keys.add("editme");
+					List<String> keys = new ArrayList<String>();
+					if (type == TableType.ENUMERATION) {
+						keys.add(name);
+					} else {
+						keys.add("editme");
+					}
+					int keyId = DataManager.getInstance().getDao().insertKeys(tableId, keys).get(0);
+					DataManager.getInstance().getDao().insertRow(tableId, 1);
+					List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+					DataManager.getInstance().getDao().insertValuesEmptyWithKeyId(keyId, rows);
 				}
-				int keyId = DataManager.getInstance().getDao().insertKeys(tableId, keys).get(0);
-				DataManager.getInstance().getDao().insertRow(tableId, 1);
-				List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
-				DataManager.getInstance().getDao().insertValuesEmptyWithKeyId(keyId, rows);
 			}
 			out.print(tableId);
 		} catch (Exception e) {
@@ -124,5 +151,9 @@ public class AddTable extends HttpServlet {
 		}
 		out.flush();
 		out.close();
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 }

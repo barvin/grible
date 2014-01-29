@@ -255,7 +255,7 @@ public class PostgresDao implements Dao {
 		return id;
 	}
 
-	public int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className)
+	public int insertTable(String name, TableType type, Category category, Integer parentId, String className)
 			throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
@@ -265,7 +265,7 @@ public class PostgresDao implements Dao {
 			finalClassName = "'" + className + "'";
 		}
 		stmt.executeUpdate("INSERT INTO tables(name, type, categoryid, parentid, classname) VALUES ('" + name + "', "
-				+ type.getId() + ", " + categoryId + ", " + parentId + ", " + finalClassName + ")");
+				+ type.getId() + ", " + category.getId() + ", " + parentId + ", " + finalClassName + ")");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM tables ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {
 			id = rs.getInt("id");
@@ -965,12 +965,12 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public boolean deleteCategory(int categoryId) throws SQLException {
+	public boolean deleteCategory(Category category) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("DELETE FROM categories WHERE id=" + categoryId);
+		stmt.executeUpdate("DELETE FROM categories WHERE id=" + category.getId());
 		boolean result = false;
-		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE id=" + categoryId);
+		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE id=" + category.getId());
 		if (!rs.next()) {
 			result = true;
 		}
@@ -1315,12 +1315,12 @@ public class PostgresDao implements Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 
-		ResultSet rs = stmt.executeQuery("SELECT id FROM categories WHERE productid=" + productId);
+		ResultSet rs = stmt.executeQuery("SELECT c.id, c.name, c.productid, c.parentid, tt.name as type "
+				+ " FROM categories as c JOIN tabletypes as tt ON c.type=tt.id AND c.productid=" + productId);
 
 		while (rs.next()) {
-
-			if (!deleteCategory(rs.getInt("id"))) {
-
+			Category category = initCategory(rs);
+			if (!deleteCategory(category)) {
 				rs.close();
 				stmt.close();
 				return false;
@@ -1386,12 +1386,15 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws SQLException {
+	public boolean isTableInProductExist(String name, TableType type, Category category) throws SQLException {
+		if (category == null) {
+			return false;
+		}
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE categoryid IN "
-				+ "(SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id=" + categoryId
+				+ "(SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id=" + category.getId()
 				+ ")) AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
 				+ "') AND name='" + name + "'");
 		if (rs.next()) {

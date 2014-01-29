@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.grible.helpers.IOHelper;
 import org.grible.model.Category;
 import org.grible.model.Key;
 import org.grible.model.Product;
@@ -116,10 +118,24 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public int insertTable(String name, TableType type, Integer categoryId, Integer parentId, String className)
+	public int insertTable(String name, TableType type, Category category, Integer parentId, String className)
 			throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
+		Product product = getProduct(category.getProductId());
+		File file = new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
+				+ File.separator + category.getPath() + File.separator + name + ".json");
+		Table table = new Table(file, type);
+		table.getTableJson().setClassName(className);
+		table.getTableJson().setShowUsage(false);
+		table.getTableJson().setShowWarning(true);
+		// table.getTableJson().setKeys(new KeyJson[]{new KeyJson()});
+		table.save();
+		table.setTableJson();
+
+		int id = product.getGribleJson().addPath(
+				category.getType().getSection().getDirName() + File.separator + category.getPath() + File.separator
+						+ name + ".json");
+		product.getGribleJson().save();
+		return id;
 	}
 
 	@Override
@@ -169,9 +185,21 @@ public class JsonDao implements Dao {
 	public List<Table> getTablesByCategory(Category category) throws Exception {
 		List<Table> result = new ArrayList<>();
 		Product product = new Product(category.getProductId());
-		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName() + File.separator
-				+ category.getPath());
-		//File[] files = 
+		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
+				+ File.separator + category.getPath());
+		File[] files = dir.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				return (file.isFile() && file.getName().contains(".json"));
+			}
+		});
+		if (files != null) {
+			for (File file : files) {
+				Table table = new Table(file, category.getType());
+				table.setTableJson();
+				result.add(table);
+			}
+		}
 		return result;
 	}
 
@@ -321,9 +349,12 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public boolean deleteCategory(int categoryId) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean deleteCategory(Category category) throws Exception {
+		Product product = getProduct(category.getProductId());
+		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
+				+ File.separator + category.getPath());
+		dir.delete();
+		return !dir.exists();
 	}
 
 	@Override
@@ -377,8 +408,13 @@ public class JsonDao implements Dao {
 
 	@Override
 	public void updateCategory(Category category) throws Exception {
-		// TODO Auto-generated method stub
-
+		Product product = getProduct(category.getProductId());
+		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
+				+ File.separator + category.getPath());
+		String newFullPath = StringUtils.substringBeforeLast(category.getPath(), File.separator) + File.separator
+				+ category.getName();
+		dir.renameTo(new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
+				+ File.separator + newFullPath));
 	}
 
 	@Override
@@ -490,13 +526,18 @@ public class JsonDao implements Dao {
 	@Override
 	public List<Table> getTablesOfProduct(int productId, TableType type) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<Table>();
 	}
 
 	@Override
-	public boolean isTableInProductExist(String name, TableType type, Integer categoryId) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isTableInProductExist(String name, TableType type, Category category) throws Exception {
+		if (category == null) {
+			return false;
+		}
+		Product product = getProduct(category.getProductId());
+		File dir = new File(product.getPath());
+		File file = IOHelper.searchForFile(dir, name + ".json");
+		return file != null;
 	}
 
 	@Override

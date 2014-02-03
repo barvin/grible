@@ -75,7 +75,7 @@ public class DeleteCategory extends HttpServlet {
 
 			StringBuilder error = new StringBuilder();
 			for (Table table : tables) {
-				String result = ServletHelper.deleteTable(table.getId());
+				String result = ServletHelper.deleteTable(table.getId(), Integer.parseInt(request.getParameter("product")));
 				if (!result.equals("success")) {
 					error.append(result).append("<br>");
 				}

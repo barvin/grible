@@ -19,10 +19,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -52,9 +55,18 @@ public class GetTopPanel extends HttpServlet {
 			}
 			StringBuilder responseHtml = new StringBuilder();
 			TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
+			int productId = 0;
+			if (isJson()) {
+				productId = Integer.parseInt(request.getParameter("product"));
+			}
 			if (tableType == TableType.STORAGE) {
 				int tableId = Integer.parseInt(request.getParameter("tableid"));
-				Table table = DataManager.getInstance().getDao().getTable(tableId);
+				Table table = null;
+				if (isJson()) {
+					table = new JsonDao().getTable(tableId, productId);
+				} else {
+					table = new PostgresDao().getTable(tableId);
+				}
 				responseHtml.append("<div id=\"manage-buttons\">");
 
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
@@ -143,7 +155,6 @@ public class GetTopPanel extends HttpServlet {
 
 				responseHtml.append("</div>");
 			} else {
-
 				Integer tableId = null;
 				Integer preId = null;
 				Integer postId = null;
@@ -156,12 +167,22 @@ public class GetTopPanel extends HttpServlet {
 				switch (tableType) {
 				case TABLE:
 					tableId = Integer.parseInt(request.getParameter("tableid"));
-					preId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.PRECONDITION);
-					postId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.POSTCONDITION);
+					Table table = null;
+					if (isJson()) {
+						JsonDao dao = new JsonDao();
+						table = dao.getTable(tableId, productId);
+						preId = dao.getChildTableId(tableId, productId, TableType.PRECONDITION);
+						postId = dao.getChildTableId(tableId, productId, TableType.POSTCONDITION);
+					} else {
+						PostgresDao dao = new PostgresDao();
+						table = dao.getTable(tableId);
+						preId = dao.getChildTableId(tableId, TableType.PRECONDITION);
+						postId = dao.getChildTableId(tableId, TableType.POSTCONDITION);
+					}
 					generalSelected = " sheet-tab-selected";
 
 					String warning = "";
-					if (DataManager.getInstance().getDao().getTable(tableId).isShowWarning()) {
+					if (table.isShowWarning()) {
 						warning = "checked=\"checked\"";
 					}
 					showWarning += "<div id=\"btn-show-warning\" class=\"checkbox-option\">";
@@ -171,16 +192,33 @@ public class GetTopPanel extends HttpServlet {
 
 				case PRECONDITION:
 					preId = Integer.parseInt(request.getParameter("tableid"));
-					tableId = DataManager.getInstance().getDao().getTable(preId).getParentId();
-					postId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.POSTCONDITION);
+					if (isJson()) {
+						JsonDao dao = new JsonDao();
+						tableId = dao.getParentTableId(preId, productId, TableType.PRECONDITION);
+						postId = dao.getChildTableId(tableId, productId, TableType.POSTCONDITION);
+					} else {
+						PostgresDao dao = new PostgresDao();
+						Table preTable = dao.getTable(preId);
+						tableId = preTable.getParentId();
+						postId = dao.getChildTableId(tableId, TableType.POSTCONDITION);
+					}
 					preSelected = " sheet-tab-selected";
 					editButtonEnable = "button-disabled";
 					break;
 
 				case POSTCONDITION:
 					postId = Integer.parseInt(request.getParameter("tableid"));
-					tableId = DataManager.getInstance().getDao().getTable(postId).getParentId();
-					preId = DataManager.getInstance().getDao().getChildtable(tableId, TableType.PRECONDITION);
+					Table postTable = null;
+					if (isJson()) {
+						JsonDao dao = new JsonDao();
+						tableId = dao.getParentTableId(postId, productId, TableType.POSTCONDITION);
+						preId = dao.getChildTableId(tableId, productId, TableType.PRECONDITION);
+					} else {
+						PostgresDao dao = new PostgresDao();
+						postTable = dao.getTable(postId);
+						tableId = postTable.getParentId();
+						preId = dao.getChildTableId(tableId, TableType.PRECONDITION);
+					}
 					postSelected = " sheet-tab-selected";
 					editButtonEnable = "button-disabled";
 					break;
@@ -269,4 +307,9 @@ public class GetTopPanel extends HttpServlet {
 		out.flush();
 		out.close();
 	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
+	}
+
 }

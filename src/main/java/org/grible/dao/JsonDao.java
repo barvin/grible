@@ -121,19 +121,25 @@ public class JsonDao implements Dao {
 	public int insertTable(String name, TableType type, Category category, Integer parentId, String className)
 			throws Exception {
 		Product product = getProduct(category.getProductId());
+		if (parentId != null) {
+			name = getTable(parentId, category.getProductId()).getName() + "_" + type.toString();
+		}
 		File file = new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
 				+ File.separator + category.getPath() + File.separator + name + ".json");
-		Table table = new Table(file, type);
+		Table table = new Table(file);
+		table.getTableJson().setType(type);
 		table.getTableJson().setClassName(className);
 		table.getTableJson().setShowUsage(false);
 		table.getTableJson().setShowWarning(true);
-		// table.getTableJson().setKeys(new KeyJson[]{new KeyJson()});
 		table.save();
 		table.setTableJson();
 
-		int id = product.getGribleJson().addPath(
-				category.getType().getSection().getDirName() + File.separator + category.getPath() + File.separator
-						+ name + ".json");
+		int id = product
+				.getGribleJson()
+				.read()
+				.addPath(
+						category.getType().getSection().getDirName() + File.separator + category.getPath()
+								+ File.separator + name + ".json");
 		product.getGribleJson().save();
 		return id;
 	}
@@ -157,10 +163,18 @@ public class JsonDao implements Dao {
 
 	}
 
-	@Override
-	public Table getTable(int id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Table getTable(int id, int productId) throws Exception {
+		Product product = getProduct(productId);
+		String path = product.getGribleJson().read().getPathById(id);
+		if (path == null) {
+			throw new Exception("Entry with id = " + id + " not found in '" + product.getGribleJson().getFilePath()
+					+ "'.");
+		}
+		File file = new File(product.getPath() + File.separator + path);
+		Table table = new Table(file);
+		table.setTableJson();
+		table.setId(id);
+		return table;
 	}
 
 	@Override
@@ -184,19 +198,27 @@ public class JsonDao implements Dao {
 	@Override
 	public List<Table> getTablesByCategory(Category category) throws Exception {
 		List<Table> result = new ArrayList<>();
-		Product product = new Product(category.getProductId());
+		Product product = getProduct(category.getProductId());
 		File dir = new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
 				+ File.separator + category.getPath());
 		File[] files = dir.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				return (file.isFile() && file.getName().contains(".json"));
+				return (file.isFile() && file.getName().contains(".json")
+						&& !file.getName().contains("_PRECONDITION.json") && !file.getName().contains(
+						"_POSTCONDITION.json"));
 			}
 		});
 		if (files != null) {
 			for (File file : files) {
-				Table table = new Table(file, category.getType());
+				Table table = new Table(file);
 				table.setTableJson();
+				table.setId(product
+						.getGribleJson()
+						.read()
+						.getIdByPath(
+								category.getType().getSection().getDirName() + File.separator + category.getPath()
+										+ File.separator + file.getName()));
 				result.add(table);
 			}
 		}
@@ -227,10 +249,19 @@ public class JsonDao implements Dao {
 		return null;
 	}
 
-	@Override
-	public Integer getChildtable(int tableId, TableType childType) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer getChildTableId(int tableId, int productId, TableType childType) throws Exception {
+		Product product = getProduct(productId);
+		String parentPath = product.getGribleJson().read().getPathById(tableId);
+		String childPath = StringUtils.replace(parentPath, ".json", "_" + childType.toString() + ".json");
+		int result = product.getGribleJson().getIdByPath(childPath);
+		return (result == 0) ? null : result;
+	}
+
+	public Integer getParentTableId(int tableId, int productId, TableType childType) throws Exception {
+		Product product = getProduct(productId);
+		String childPath = product.getGribleJson().read().getPathById(tableId);
+		String parentPath = StringUtils.replace(childPath, "_" + childType.toString() + ".json", ".json");
+		return product.getGribleJson().getIdByPath(parentPath);
 	}
 
 	@Override
@@ -358,15 +389,30 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public List<Table> getTablesUsingStorage(int storageId) throws Exception {
+	public List<Table> getTablesUsingStorage(Table table) throws Exception {
+		List<Table> result = new ArrayList<Table>();
 		// TODO Auto-generated method stub
-		return null;
+		return result;
 	}
 
 	@Override
-	public boolean deleteTable(int tableId) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean deleteTable(Table table, int productId) throws Exception {
+		if (table.getType() == TableType.TABLE) {
+			Integer preId = getChildTableId(table.getId(), productId, TableType.PRECONDITION);
+			if (preId != null) {
+				deleteTable(getTable(preId, productId), productId);
+			}
+			Integer ppstId = getChildTableId(table.getId(), productId, TableType.POSTCONDITION);
+			if (ppstId != null) {
+				deleteTable(getTable(ppstId, productId), productId);
+			}
+		}
+		Product product = getProduct(productId);
+		product.getGribleJson().read().deleteId(table.getId());
+		product.getGribleJson().save();
+		File file = table.getFile();
+		file.delete();
+		return !file.exists();
 	}
 
 	@Override
@@ -400,10 +446,11 @@ public class JsonDao implements Dao {
 
 	}
 
-	@Override
 	public void updateTable(Table table) throws Exception {
-		// TODO Auto-generated method stub
-
+		table.getTableJson().setClassName(table.getClassName());
+		table.getTableJson().setShowUsage(table.isShowUsage());
+		table.getTableJson().setShowWarning(table.isShowWarning());
+		table.save();
 	}
 
 	@Override
@@ -562,6 +609,28 @@ public class JsonDao implements Dao {
 	public List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void moveTableFile(Table table, Integer productId, String newCategoryPath, String newName) throws Exception {
+		if (table.getType() == TableType.TABLE) {
+			Integer preId = getChildTableId(table.getId(), productId, TableType.PRECONDITION);
+			if (preId != null) {
+				moveTableFile(getTable(preId, productId), productId, newCategoryPath, newName);
+			}
+			Integer ppstId = getChildTableId(table.getId(), productId, TableType.POSTCONDITION);
+			if (ppstId != null) {
+				moveTableFile(getTable(ppstId, productId), productId, newCategoryPath, newName);
+			}
+		} else if (table.getType() == TableType.PRECONDITION || table.getType() == TableType.POSTCONDITION) {
+			newName = newName + "_" + table.getType(); 
+		}
+		Product product = getProduct(productId);
+		String pathAfterProduct = table.getType().getSection().getDirName() + File.separator + newCategoryPath
+				+ File.separator + newName + ".json";
+		product.getGribleJson().read().updatePath(table.getId(), pathAfterProduct);
+		product.getGribleJson().save();
+		File file = table.getFile();
+		file.renameTo(new File(product.getPath() + File.separator + pathAfterProduct));
 	}
 
 }

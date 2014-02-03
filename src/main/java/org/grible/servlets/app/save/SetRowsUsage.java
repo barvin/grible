@@ -20,8 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -50,7 +54,13 @@ public class SetRowsUsage extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = DataManager.getInstance().getDao().getTable(id);
+			int productId = Integer.parseInt(request.getParameter("product"));
+			Table table = null;
+			if (isJson()) {
+				table = new JsonDao().getTable(id, productId);
+			} else {
+				table = new PostgresDao().getTable(id);
+			}
 			boolean usage = false;
 			if (request.getParameter("usage") != null) {
 				usage = Boolean.parseBoolean(request.getParameter("usage"));
@@ -65,5 +75,9 @@ public class SetRowsUsage extends HttpServlet {
 			out.flush();
 			out.close();
 		}
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 }

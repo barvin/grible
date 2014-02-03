@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -53,7 +54,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 				return;
 			}
 			Key key = DataManager.getInstance().getDao().getKey(Integer.parseInt(request.getParameter("keyid")));
-			if (DataManager.getInstance().getDao().getTable(key.getTableId()).getType() != TableType.ENUMERATION) {
+			if (new PostgresDao().getTable(key.getTableId()).getType() != TableType.ENUMERATION) {
 				getDialog(out, key);
 			}
 		} catch (Exception e) {
@@ -77,7 +78,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 			storageSelectDisabled = "disabled=\"disabled\" ";
 			enumSelectDisabled = "disabled=\"disabled\" ";
 		} else {
-			Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
+			Table refTable = new PostgresDao().getTable(key.getReferenceTableId());
 			if (refTable.getType() == TableType.STORAGE) {
 				storageChecked = " checked=\"checked\" ";
 				enumSelectDisabled = "disabled=\"disabled\" ";

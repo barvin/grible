@@ -22,6 +22,8 @@ import javax.servlet.http.Part;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Key;
 import org.grible.model.Product;
@@ -29,6 +31,8 @@ import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.User;
 import org.grible.model.Value;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 import org.grible.uimodel.Sections;
 
 public class ServletHelper {
@@ -207,13 +211,23 @@ public class ServletHelper {
 		return responseHtml.toString();
 	}
 
-	public static String deleteTable(int tableId) throws Exception {
-		Table currentTable = DataManager.getInstance().getDao().getTable(tableId);
+	public static String deleteTable(int tableId, int productId) throws Exception {
+		Table currentTable = null;
+		String parentId = null;
+		if (isJson()) {
+			JsonDao dao = new JsonDao();
+			currentTable = dao.getTable(tableId, productId);
+			if (currentTable.getType() == TableType.PRECONDITION || currentTable.getType() == TableType.POSTCONDITION) {
+				parentId = String.valueOf(dao.getParentTableId(tableId, productId, currentTable.getType()));
+			}
+		} else {
+			currentTable = new PostgresDao().getTable(tableId);
+		}
 
 		boolean isUsedByTables = false;
 		String error = "";
 		if ((currentTable.getType() == TableType.STORAGE) || (currentTable.getType() == TableType.ENUMERATION)) {
-			List<Table> tablesUsingThisStorage = DataManager.getInstance().getDao().getTablesUsingStorage(tableId);
+			List<Table> tablesUsingThisStorage = DataManager.getInstance().getDao().getTablesUsingStorage(currentTable);
 			if (!tablesUsingThisStorage.isEmpty()) {
 				isUsedByTables = true;
 				error = "ERROR: " + StringUtils.capitalize(currentTable.getType().toString().toLowerCase()) + " '"
@@ -226,7 +240,7 @@ public class ServletHelper {
 		if (isUsedByTables) {
 			return error;
 		}
-		boolean deleted = DataManager.getInstance().getDao().deleteTable(tableId);
+		boolean deleted = DataManager.getInstance().getDao().deleteTable(currentTable, productId);
 		if (deleted) {
 			switch (currentTable.getType()) {
 			case TABLE:
@@ -235,6 +249,9 @@ public class ServletHelper {
 
 			case PRECONDITION:
 			case POSTCONDITION:
+				if (isJson()) {
+					return parentId;
+				}
 				return String.valueOf(currentTable.getParentId());
 
 			default:
@@ -244,6 +261,10 @@ public class ServletHelper {
 
 		return "ERROR: " + currentTable.getType().toString().toLowerCase()
 				+ " was not deleted. See server logs for details.";
+	}
+
+	public static boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 
 	public static void showImportResult(HttpServletRequest request, StringBuilder responseHtml, int tableId)
@@ -256,7 +277,8 @@ public class ServletHelper {
 			int i = 0;
 			for (Key key : keys) {
 				if (key.getReferenceTableId() != 0) {
-					String type = DataManager.getInstance().getDao().getTable(key.getReferenceTableId()).getType().toString().toLowerCase();
+					String type = new PostgresDao().getTable(key.getReferenceTableId()).getType().toString()
+							.toLowerCase();
 					applyPart += "keyIds[" + i + "]=" + key.getId() + "; refIds[" + i + "]="
 							+ key.getReferenceTableId() + "; types[" + i + "]='" + type + "'; ";
 					i++;
@@ -285,7 +307,8 @@ public class ServletHelper {
 			ExcelFile excelFile = (ExcelFile) request.getSession(false).getAttribute("importedFile");
 			responseHtml.append("<script type=\"text/javascript\">");
 			responseHtml.append("$(window).on('load', function() { showAdvancedImportDialog("
-					+ DataManager.getInstance().getDao().getRows(currTable.getId()).size() + ", " + excelFile.getValues().size() + "); });");
+					+ DataManager.getInstance().getDao().getRows(currTable.getId()).size() + ", "
+					+ excelFile.getValues().size() + "); });");
 			responseHtml.append("</script>");
 		}
 	}
@@ -294,7 +317,7 @@ public class ServletHelper {
 		boolean result = false;
 		Key key = DataManager.getInstance().getDao().getKey(value.getKeyId());
 		if (key.getReferenceTableId() != 0) {
-			Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
+			Table refTable = new PostgresDao().getTable(key.getReferenceTableId());
 			if (refTable.getType() == TableType.ENUMERATION) {
 				result = true;
 			}

@@ -25,13 +25,28 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
+import org.grible.json.ui.UiIndex;
+import org.grible.json.ui.UiInfo;
+import org.grible.json.ui.UiKey;
+import org.grible.json.ui.UiRow;
+import org.grible.json.ui.UiTable;
+import org.grible.json.ui.UiValue;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.Value;
+import org.grible.model.json.KeyJson;
+import org.grible.model.json.KeyType;
+import org.grible.model.json.TableJson;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
+
+import com.google.gson.Gson;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -50,7 +65,8 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -60,22 +76,33 @@ public class GetTableValues extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			StringBuilder responseHtml = new StringBuilder();
 			int tableId = Integer.parseInt(request.getParameter("id"));
-			Table table = DataManager.getInstance().getDao().getTable(tableId);
+			Table table = null;
+			if (isJson()) {
+				int productId = Integer.parseInt(request.getParameter("product"));
+				table = new JsonDao().getTable(tableId, productId);
+			} else {
+				table = new PostgresDao().getTable(tableId);
+			}
+
 			tableType = table.getType();
 			showUsage = table.isShowUsage();
 
-			List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
-			writeKeys(responseHtml, keys);
+			UiTable uiTable = new UiTable();
+			if (isJson()) {
+				transformTableToUiTable(table.getTableJson(), uiTable);
+			} else {
+				List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
+				writeKeys(uiTable, keys);
 
-			List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
-			ArrayList<ArrayList<Value>> values = new ArrayList<ArrayList<Value>>();
-			for (Row row : rows) {
-				values.add(DataManager.getInstance().getDao().getValues(row));
+				List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+				ArrayList<ArrayList<Value>> values = new ArrayList<ArrayList<Value>>();
+				for (Row row : rows) {
+					values.add(DataManager.getInstance().getDao().getValues(row));
+				}
+				writeValues(uiTable, values);
 			}
-			writeValues(responseHtml, values);
-			out.print(responseHtml.toString());
+			out.print(new Gson().toJson(uiTable));
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();
@@ -84,65 +111,121 @@ public class GetTableValues extends HttpServlet {
 		out.close();
 	}
 
-	private void writeKeys(StringBuilder responseHtml, List<Key> keys) {
-		responseHtml.append("{\"isIndex\":");
+	private void transformTableToUiTable(TableJson table, UiTable uiTable) {
 		if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
-			responseHtml.append("true");
+			uiTable.setIndex(true);
 		} else {
-			responseHtml.append("false");
+			uiTable.setIndex(false);
 		}
-		responseHtml.append(",\"keys\":[");
-		for (Key key : keys) {
-			responseHtml.append("{\"order\":").append(key.getOrder()).append(",\"id\":").append(key.getId())
-					.append(",\"text\":\"").append(key.getName()).append("\"},");
+		KeyJson[] keys = table.getKeys();
+		UiKey[] uiKeys = new UiKey[keys.length];
+		for (int i = 0; i < keys.length; i++) {
+			uiKeys[i] = new UiKey();
+			uiKeys[i].setOrder(0);
+			uiKeys[i].setId(0);
+			uiKeys[i].setText(keys[i].getName());
 		}
-		responseHtml.deleteCharAt(responseHtml.length() - 1);
-		responseHtml.append("],");
+		uiTable.setKeys(uiKeys);
 		if (showUsage) {
-			responseHtml.append("\"info\":{\"tables\":\"Used in tables\",\"storages\":\"Used in storages\"},");
+			UiInfo uiInfo = new UiInfo();
+			uiInfo.setTables("Used in tables");
+			uiInfo.setTables("Used in storages");
+			uiTable.setInfo(uiInfo);
+		}
+		String[][] values = table.getValues();
+		UiRow[] uiRows = new UiRow[values.length];
+		for (int i = 0; i < values.length; i++) {
+			uiRows[i] = new UiRow();
+			if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
+				UiIndex uiIndex = new UiIndex();
+				uiIndex.setId(0);
+				uiIndex.setOrder(i + 1);
+				uiRows[i].setIndex(uiIndex);
+			}
+			UiValue[] uiValues = new UiValue[values[i].length];
+			for (int j = 0; j < values[i].length; j++) {
+				uiValues[j] = new UiValue();
+				uiValues[j].setStorage(keys[j].getType() == KeyType.STORAGE);
+				uiValues[j].setEnum(keys[j].getType() == KeyType.ENUMERATION);
+				uiValues[j].setRowid(0);
+				uiValues[j].setKeyid(0);
+				uiValues[j].setId(0);
+				uiValues[j].setText(StringEscapeUtils.escapeHtml(values[i][j]));
+			}
+			uiRows[i].setValues(uiValues);
+			if (showUsage) {
+				if (values[i].length > 0) {
+					// List<Table> tables = DataManager.getInstance().getDao()
+					// .getTablesUsingRow(values.get(i).get(0).getRowId());
+					UiInfo uiInfo = new UiInfo();
+					uiInfo.setTables("");
+					uiInfo.setStorages("");
+					uiRows[i].setInfo(uiInfo);
+				}
+			}
+		}
+		uiTable.setValues(uiRows);
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
+	}
+
+	private void writeKeys(UiTable uiTable, List<Key> keys) {
+		if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
+			uiTable.setIndex(true);
+		} else {
+			uiTable.setIndex(false);
+		}
+		UiKey[] uiKeys = new UiKey[keys.size()];
+		for (int i = 0; i < keys.size(); i++) {
+			uiKeys[i] = new UiKey();
+			uiKeys[i].setOrder(keys.get(i).getOrder());
+			uiKeys[i].setId(keys.get(i).getId());
+			uiKeys[i].setText(keys.get(i).getName());
+		}
+		uiTable.setKeys(uiKeys);
+		if (showUsage) {
+			UiInfo uiInfo = new UiInfo();
+			uiInfo.setTables("Used in tables");
+			uiInfo.setTables("Used in storages");
+			uiTable.setInfo(uiInfo);
 		}
 	}
 
-	private void writeValues(StringBuilder responseHtml, ArrayList<ArrayList<Value>> values) throws Exception {
-		responseHtml.append("\"values\":[");
-		int i = 1;
-		for (ArrayList<Value> valuesRow : values) {
-			responseHtml.append("{");
+	private void writeValues(UiTable uiTable, ArrayList<ArrayList<Value>> values) throws Exception {
+		UiRow[] uiRows = new UiRow[values.size()];
+		for (int i = 0; i < values.size(); i++) {
+			uiRows[i] = new UiRow();
 			if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
-				responseHtml.append("\"index\":{\"id\":").append(valuesRow.get(0).getRowId()).append(",\"order\":")
-						.append(i++).append("},");
+				UiIndex uiIndex = new UiIndex();
+				uiIndex.setId(values.get(i).get(0).getRowId());
+				uiIndex.setOrder(i + 1);
+				uiRows[i].setIndex(uiIndex);
 			}
-			responseHtml.append("\"values\":[");
-			for (Value value : valuesRow) {
-				responseHtml.append("{\"isStorage\":");
-				if (value.isStorage()) {
-					responseHtml.append("true");
-				} else {
-					responseHtml.append("false");
-				}
-				responseHtml.append(",\"isEnum\":");
-				if (ServletHelper.isEnumValue(value)) {
-					responseHtml.append("true");
-				} else {
-					responseHtml.append("false");
-				}
-				responseHtml.append(",\"rowid\":").append(value.getRowId()).append(",\"keyid\":")
-						.append(value.getKeyId()).append(",\"id\":").append(value.getId()).append(",\"text\":\"")
-						.append(StringEscapeUtils.escapeHtml(value.getValue())).append("\"},");
+			UiValue[] uiValues = new UiValue[values.get(i).size()];
+			for (int j = 0; j < values.get(i).size(); j++) {
+				uiValues[j] = new UiValue();
+				uiValues[j].setStorage(values.get(i).get(j).isStorage());
+				uiValues[j].setEnum(ServletHelper.isEnumValue(values.get(i).get(j)));
+				uiValues[j].setRowid(values.get(i).get(j).getRowId());
+				uiValues[j].setKeyid(values.get(i).get(j).getKeyId());
+				uiValues[j].setId(values.get(i).get(j).getId());
+				uiValues[j].setText(StringEscapeUtils.escapeHtml(values.get(i).get(j).getValue()));
 			}
-			responseHtml.deleteCharAt(responseHtml.length() - 1);
-			responseHtml.append("]");
+			uiRows[i].setValues(uiValues);
 			if (showUsage) {
-				if (!valuesRow.isEmpty()) {
-					List<Table> tables = DataManager.getInstance().getDao().getTablesUsingRow(valuesRow.get(0).getRowId());
-					responseHtml.append(",\"info\":{\"tables\":\"").append(getTestTableOccurences(tables))
-							.append("\",\"storages\":\"").append(getDataStorageOccurences(tables)).append("\"}");
+				if (!values.get(i).isEmpty()) {
+					List<Table> tables = DataManager.getInstance().getDao()
+							.getTablesUsingRow(values.get(i).get(0).getRowId());
+					UiInfo uiInfo = new UiInfo();
+					uiInfo.setTables(getTestTableOccurences(tables));
+					uiInfo.setStorages(getDataStorageOccurences(tables));
+					uiRows[i].setInfo(uiInfo);
 				}
 			}
-			responseHtml.append("},");
 		}
-		responseHtml.deleteCharAt(responseHtml.length() - 1);
-		responseHtml.append("]}");
+		uiTable.setValues(uiRows);
 	}
 
 	private String getTestTableOccurences(List<Table> tables) throws Exception {
@@ -154,7 +237,7 @@ public class GetTableValues extends HttpServlet {
 				}
 			} else if (TableType.PRECONDITION == tables.get(i).getType()
 					|| TableType.POSTCONDITION == tables.get(i).getType()) {
-				String tableName = DataManager.getInstance().getDao().getTable(tables.get(i).getParentId()).getName();
+				String tableName = new PostgresDao().getTable(tables.get(i).getParentId()).getName();
 				if (!tableNames.contains(tableName)) {
 					tableNames.add(tableName);
 				}

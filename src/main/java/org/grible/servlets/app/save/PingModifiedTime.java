@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -55,7 +56,7 @@ public class PingModifiedTime extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = DataManager.getInstance().getDao().getTable(id);
+			Table table = new PostgresDao().getTable(id);
 
 			String message = "";
 

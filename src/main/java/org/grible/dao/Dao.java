@@ -47,8 +47,6 @@ public interface Dao {
 	public void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
 			throws Exception;
 
-	public Table getTable(int id) throws Exception;
-
 	public Table getTable(String name, Integer categoryId) throws Exception;
 
 	/**
@@ -70,8 +68,6 @@ public interface Dao {
 	public ArrayList<Value> getValues(Row row) throws Exception;
 
 	public List<Table> getTablesUsingRow(int rowId) throws Exception;
-
-	public Integer getChildtable(int tableId, TableType childType) throws Exception;
 
 	public Category getCategory(int id) throws Exception;
 
@@ -114,9 +110,9 @@ public interface Dao {
 
 	public boolean deleteCategory(Category category) throws Exception;
 
-	public List<Table> getTablesUsingStorage(int storageId) throws Exception;
+	public List<Table> getTablesUsingStorage(Table storage) throws Exception;
 
-	public boolean deleteTable(int tableId) throws Exception;
+	public boolean deleteTable(Table table, int productId) throws Exception;
 
 	public boolean deleteKey(int keyId) throws Exception;
 
@@ -128,8 +124,6 @@ public interface Dao {
 
 	public void insertValues(List<Integer> rowIds, List<Integer> keyIds, ArrayList<ArrayList<String>> values)
 			throws Exception;
-
-	public void updateTable(Table table) throws Exception;
 
 	public void updateCategory(Category category) throws Exception;
 
@@ -168,4 +162,6 @@ public interface Dao {
 	public boolean isTableTypeExist(String name) throws Exception;
 
 	public List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws Exception;
+
+	public void updateTable(Table table) throws Exception;
 }

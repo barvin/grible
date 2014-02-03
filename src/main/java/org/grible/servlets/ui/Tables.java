@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.model.User;
@@ -72,22 +73,29 @@ public class Tables extends HttpServlet {
 			String tableType = "table";
 			if (request.getParameter("id") != null) {
 				tableId = Integer.parseInt(request.getParameter("id"));
-				Table table = DataManager.getInstance().getDao().getTable(tableId);
-				switch (table.getType()) {
-				case TABLE:
-					productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
-					break;
+				Table table = null;
+				
+				if (isMultipleUsers()) {
+					table = new PostgresDao().getTable(tableId);
+					switch (table.getType()) {
+					case TABLE:
+						productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
+						break;
 
-				case PRECONDITION:
-					productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
-					break;
+					case PRECONDITION:
+						productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
+						break;
 
-				case POSTCONDITION:
-					productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
-					break;
+					case POSTCONDITION:
+						productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
+						break;
 
-				default:
-					break;
+					default:
+						break;
+					}
+				} else {
+					productId = Integer.parseInt(request.getParameter("product"));
+					table = new JsonDao().getTable(tableId, productId);
 				}
 				tableType = table.getType().toString().toLowerCase();
 			} else {

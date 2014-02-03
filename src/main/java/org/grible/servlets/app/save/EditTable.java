@@ -19,9 +19,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
+import org.grible.helpers.StringHelper;
 import org.grible.model.Table;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -45,31 +49,59 @@ public class EditTable extends HttpServlet {
 			IOException {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
-		try {			
+		try {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = DataManager.getInstance().getDao().getTable(id);
-			int categoryId = Integer.parseInt(request.getParameter("categoryid"));
-			String name = request.getParameter("name");
+			String newName = request.getParameter("name");
 			String className = request.getParameter("classname");
 
-			if ("".equals(name)) {
+			if ("".equals(newName)) {
 				out.print("ERROR: Name cannot be empty.");
+			} else if ("".equals(className)) {
+				out.print("ERROR: Class name cannot be empty.");
 			} else {
-				table.setCategoryId(categoryId);
-				table.setName(name);
-				table.setClassName(className);
-				DataManager.getInstance().getDao().updateTable(table);
+				int id = Integer.parseInt(request.getParameter("id"));
+				Integer productId = null;
+
+				Table table = null;
+				if (isJson()) {
+					productId = Integer.parseInt(request.getParameter("product"));
+					JsonDao dao = new JsonDao();
+					table = dao.getTable(id, productId);
+					table.setClassName(className);
+					dao.updateTable(table);
+
+					String newCategoryPath = request.getParameter("categorypath");
+					String categoryPath = StringHelper.getCategoryPathFromTable(table, productId, table.getType());
+					String name = table.getName();
+
+					if (!categoryPath.equals(newCategoryPath) || !name.equals(newName)) {
+						dao.moveTableFile(table, productId, newCategoryPath, newName);
+					}
+
+				} else {
+					PostgresDao dao = new PostgresDao();
+					table = dao.getTable(id);
+					int categoryId = Integer.parseInt(request.getParameter("categoryid"));
+					table.setCategoryId(categoryId);
+					table.setName(newName);
+					table.setClassName(className);
+					dao.updateTable(table);
+				}
+
 				out.print("success");
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print(e.getLocalizedMessage());
+		} finally {
+			out.flush();
+			out.close();
 		}
-		out.flush();
-		out.close();
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 }

@@ -65,7 +65,11 @@ public class Enumerations extends HttpServlet {
 			int tableId;
 			if (request.getParameter("id") != null) {
 				tableId = Integer.parseInt(request.getParameter("id"));
-				productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
+				if (isMultipleUsers()) {
+					productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
+				} else {
+					productId = Integer.parseInt(request.getParameter("product"));
+				}
 			} else {
 				productId = Integer.parseInt(request.getParameter("product"));
 				tableId = 0;

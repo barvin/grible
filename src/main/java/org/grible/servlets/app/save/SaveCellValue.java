@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.TableType;
 import org.grible.model.Value;
 import org.grible.security.Security;
@@ -42,7 +43,8 @@ public class SaveCellValue extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -65,14 +67,15 @@ public class SaveCellValue extends HttpServlet {
 				int refStorageId = DataManager.getInstance().getDao().getRefStorageId(value.getKeyId());
 				for (int i = 0; i < strRows.length; i++) {
 					if (!StringUtils.isNumeric(strRows[i])) {
-						out.print("<br>ERROR: Indexes is not numeric. Row: " + DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
+						out.print("<br>ERROR: Indexes is not numeric. Row: "
+								+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
 								+ ".<br>If you want to set no index, set '0'.");
 						out.flush();
 						out.close();
 						return;
 					} else if ((!strRows[i].equals("0"))
 							&& (DataManager.getInstance().getDao().getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
-						out.print("<br>ERROR: Data storage '" + DataManager.getInstance().getDao().getTable(refStorageId).getName()
+						out.print("<br>ERROR: Data storage '" + new PostgresDao().getTable(refStorageId).getName()
 								+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
 								+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
 								+ ".<br>You must first create this row in specified data storage.");
@@ -86,7 +89,8 @@ public class SaveCellValue extends HttpServlet {
 				} else {
 					Integer[] intRows = new Integer[strRows.length];
 					for (int i = 0; i < strRows.length; i++) {
-						intRows[i] = DataManager.getInstance().getDao().getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
+						intRows[i] = DataManager.getInstance().getDao()
+								.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
 					}
 					value.setStorageIds(intRows);
 				}
@@ -110,11 +114,13 @@ public class SaveCellValue extends HttpServlet {
 	}
 
 	private boolean isValueOfEnumeration(Value value) throws Exception {
-		return TableType.ENUMERATION == DataManager.getInstance().getDao().getTable(DataManager.getInstance().getDao().getKey(value.getKeyId()).getTableId()).getType();
+		return TableType.ENUMERATION == new PostgresDao().getTable(
+				DataManager.getInstance().getDao().getKey(value.getKeyId()).getTableId()).getType();
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);

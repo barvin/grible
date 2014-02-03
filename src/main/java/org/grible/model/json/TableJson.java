@@ -1,11 +1,22 @@
 package org.grible.model.json;
 
+import org.grible.model.TableType;
+
 public class TableJson {
+	private TableType type;
 	private String className;
 	private boolean showUsage;
 	private boolean showWarning;
 	private KeyJson[] keys;
 	private String[][] values;
+
+	public TableType getType() {
+		return type;
+	}
+
+	public void setType(TableType type) {
+		this.type = type;
+	}
 
 	public String getClassName() {
 		return className;

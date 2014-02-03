@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.grible.model;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.grible.json.GribleJson;
@@ -45,10 +46,10 @@ public class Product {
 		this.path = path;
 		this.gribleJson = new GribleJson();
 		gribleJson.setIdPathPairs(new ArrayList<IdPathPair>());
-		gribleJson.setFilePath(path);
+		gribleJson.setFilePath(path + File.separator + "grible.json");
 	}
-	
-	public GribleJson getGribleJson() {
+
+	public GribleJson getGribleJson() throws Exception {
 		return gribleJson;
 	}
 }

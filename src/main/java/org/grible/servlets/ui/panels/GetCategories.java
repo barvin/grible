@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.grible.servlets.ui.panels;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -20,11 +21,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Category;
+import org.grible.model.Product;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -32,6 +39,7 @@ import org.grible.security.Security;
 @WebServlet("/GetCategories")
 public class GetCategories extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private int productId;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -52,15 +60,19 @@ public class GetCategories extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			
-			int productId = Integer.parseInt(request.getParameter("productId"));
+
+			productId = Integer.parseInt(request.getParameter("productId"));
 			int tableId = Integer.parseInt(request.getParameter("tableId"));
 			String strTableType = request.getParameter("tableType");
 
 			TableType tableType = TableType.valueOf(strTableType.toUpperCase());
 			if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
 				tableType = TableType.TABLE;
-				tableId = DataManager.getInstance().getDao().getTable(tableId).getParentId();
+				if (isJson()) {
+					tableId = new JsonDao().getParentTableId(tableId, productId, tableType);
+				} else {
+					tableId = new PostgresDao().getTable(tableId).getParentId();
+				}
 			}
 			List<Category> categories = DataManager.getInstance().getDao().getTopLevelCategories(productId, tableType);
 			StringBuilder responseHtml = new StringBuilder();
@@ -79,7 +91,7 @@ public class GetCategories extends HttpServlet {
 	private void appendCategory(int tableId, StringBuilder responseHtml, Category category) throws Exception {
 		String categorySelectedClass = "";
 		if (tableId > 0) {
-			if (isOneOfParentCategoriesForTable(tableId, category.getId())) {
+			if (isOneOfParentCategoriesForTable(tableId, category)) {
 				categorySelectedClass = " category-item-selected";
 			}
 		}
@@ -110,20 +122,31 @@ public class GetCategories extends HttpServlet {
 		responseHtml.append("</div>");
 	}
 
-	private boolean isOneOfParentCategoriesForTable(int tableId, int categoryId) throws Exception {
-		int parentCategoryId = DataManager.getInstance().getDao().getTable(tableId).getCategoryId();
-		if (parentCategoryId == categoryId) {
+	private boolean isOneOfParentCategoriesForTable(int tableId, Category category) throws Exception {
+		if (isJson()) {
+			Table table = new JsonDao().getTable(tableId, productId);
+			Product product = DataManager.getInstance().getDao().getProduct(productId);
+			String tableFilePath = StringUtils.substringAfter(table.getFile().getAbsolutePath(), product.getPath()
+					+ File.separator + category.getType().getSection().getDirName() + File.separator);
+			return tableFilePath.startsWith(category.getPath());
+		}
+		int parentCategoryId = new PostgresDao().getTable(tableId).getCategoryId();
+		if (parentCategoryId == category.getId()) {
 			return true;
 		} else {
 			Category currentCategory = DataManager.getInstance().getDao().getCategory(parentCategoryId);
 			while (currentCategory.getParentId() > 0) {
 				parentCategoryId = currentCategory.getParentId();
-				if (parentCategoryId == categoryId) {
+				if (parentCategoryId == category.getId()) {
 					return true;
 				}
 				currentCategory = DataManager.getInstance().getDao().getCategory(parentCategoryId);
 			}
 		}
 		return false;
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 }

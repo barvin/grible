@@ -162,9 +162,16 @@ function initLeftPanel() {
 		if ((tableType == "precondition") || (tableType == "postcondition")) {
 			tableType = "table";
 		}
-		history.pushState({
-			id : tableId
-		}, "", "?id=" + tableId);
+		if (isJson()) {
+			history.pushState({
+				product : productId,
+				id : tableId
+			}, "", "?product=" + productId + "&id=" + tableId);
+		} else {
+			history.pushState({
+				id : tableId
+			}, "", "?id=" + tableId);
+		}
 
 		var name = thisDataItem.find("span.tree-item-text").text().trim();
 		document.title = name + " - " + $("#section-name").text() + " - Grible";
@@ -173,19 +180,32 @@ function initLeftPanel() {
 		var $breadcrumb = $("#breadcrumb");
 		if ($("#" + tableType + "-name").length > 0) {
 			var $tableName = $("#" + tableType + "-name");
-			$tableName.parent().attr("href", "/" + tableType + "s/?id=" + tableId);
+			if (isJson()) {
+				$tableName.parent().attr("href", "/" + tableType + "s/?product=" + productId + "&id=" + tableId);
+			} else {
+				$tableName.parent().attr("href", "/" + tableType + "s/?id=" + tableId);
+			}
 			$tableName.text(name);
 		} else {
 			$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-			$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>"
-					+ name + "</span></a>");
+			if (isJson()) {
+				$breadcrumb.append("<a href='/" + tableType + "s/?product=" + productId + "&id=" + tableId
+						+ "'><span id='" + tableType + "-name'>" + name + "</span></a>");
+			} else {
+				$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType
+						+ "-name'>" + name + "</span></a>");
+			}
 		}
 
 		$("#table-container").show();
-		loadTableValues(tableId);
+		loadTableValues({
+			id : tableId,
+			product : productId
+		});
 		loadTopPanel({
 			tabletype : tableType,
-			tableid : tableId
+			tableid : tableId,
+			product : productId
 		});
 	}
 
@@ -206,7 +226,7 @@ function initLeftPanel() {
 								};
 							} else {
 								$args = {
-										categoryid : $id
+									categoryid : $id
 								};
 							}
 							$.post("../GetAddTableDialog", $args, function(data) {
@@ -383,10 +403,14 @@ function initLeftPanel() {
 		$breadcrumb.append("<a href='" + window.location + "'><span id='" + tableType + "-name'>" + name
 				+ "</span></a>");
 
-		loadTableValues(tableId);
+		loadTableValues({
+			id : tableId,
+			product : productId
+		});
 		loadTopPanel({
 			tabletype : tableType,
-			tableid : tableId
+			tableid : tableId,
+			product : productId
 		});
 	} else {
 		$("#table-container").hide();
@@ -396,7 +420,7 @@ function initLeftPanel() {
 function getCategoryPath(el) {
 	var parentsText = ";" + el.text().trim();
 	el.parents(".category-content-holder").each(function() {
-		parentsText += ";" + $(this).parent().children("h3").text().trim();
+		parentsText += ";" + $(this).prev("h3").text().trim();
 	});
 	return parentsText;
 }
@@ -570,7 +594,11 @@ function initAddDataItemDialog() {
 				});
 			} else {
 				$("#add-category-dialog").remove();
-				window.location = "?id=" + newTableId;
+				if (isJson()) {
+					window.location = "?product=" + productId + "&id=" + newTableId;
+				} else {
+					window.location = "?id=" + newTableId;
+				}
 			}
 		});
 	}
@@ -737,13 +765,26 @@ function initTopPanel() {
 				$tab.addClass("sheet-tab-selected");
 				tableId = $tab.attr('id');
 				tableType = $tab.attr('label');
-				history.pushState({
-					id : tableId
-				}, "", "?id=" + tableId);
-				loadTableValues(tableId);
+
+				if (isJson()) {
+					history.pushState({
+						product : productId,
+						id : tableId
+					}, "", "?product=" + productId + "&id=" + tableId);
+				} else {
+					history.pushState({
+						id : tableId
+					}, "", "?id=" + tableId);
+				}
+
+				loadTableValues({
+					id : tableId,
+					product : productId
+				});
 				loadTopPanel({
 					tabletype : tableType,
-					tableid : tableId
+					tableid : tableId,
+					product : productId
 				});
 			}
 		});
@@ -814,9 +855,14 @@ function initTopPanel() {
 		$.post("../AddTable", {
 			parentid : tableId,
 			currTabletype : tableType,
-			tabletype : "precondition"
+			tabletype : "precondition",
+			product : productId
 		}, function(newTableId) {
-			window.location = "?id=" + newTableId;
+			if (isJson()) {
+				window.location = "?product=" + productId + "&id=" + newTableId;
+			} else {
+				window.location = "?id=" + newTableId;
+			}
 		});
 	});
 
@@ -824,9 +870,14 @@ function initTopPanel() {
 		$.post("../AddTable", {
 			parentid : tableId,
 			currTabletype : tableType,
-			tabletype : "postcondition"
+			tabletype : "postcondition",
+			product : productId
 		}, function(newTableId) {
-			window.location = "?id=" + newTableId;
+			if (isJson()) {
+				window.location = "?product=" + productId + "&id=" + newTableId;
+			} else {
+				window.location = "?id=" + newTableId;
+			}
 		});
 	});
 
@@ -855,7 +906,8 @@ function initTopPanel() {
 					onClick : function($noty) {
 						$noty.close();
 						$.post("../DeleteTable", {
-							id : tableId
+							id : tableId,
+							product : productId
 						}, function(data) {
 							if (data == "success") {
 								noty({
@@ -876,7 +928,11 @@ function initTopPanel() {
 									product : productId
 								}, "", "?product=" + productId);
 							} else if (isNumber(data)) {
-								window.location = "?id=" + data;
+								if (isJson()) {
+									window.location = "?product=" + productId + "&id=" + data;
+								} else {
+									window.location = "?id=" + data;
+								}
 							} else {
 								noty({
 									type : "error",
@@ -989,7 +1045,8 @@ function initTopPanel() {
 	$("#btn-edit-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
 			$.post("../GetEditTableDialog", {
-				id : tableId
+				id : tableId,
+				product : productId
 			}, function(data) {
 				$("body").append(data);
 				initEditDataItemDialog(jQuery);
@@ -1033,11 +1090,15 @@ function setRowsUsage(usage) {
 	});
 	$.post("../SetRowsUsage", {
 		id : tableId,
+		product : productId,
 		usage : usage
 	}, function(data) {
 		$("#waiting-bg").removeClass("loading");
 		if (data == "success") {
-			loadTableValues(tableId);
+			loadTableValues({
+				id : tableId,
+				product : productId
+			});
 		} else {
 			noty({
 				type : "error",
@@ -1050,6 +1111,7 @@ function setRowsUsage(usage) {
 function setDuplicateWarning(show) {
 	$.post("../SetDuplicateWarning", {
 		id : tableId,
+		product : productId,
 		show : show
 	}, function(data) {
 		if (data != "success") {
@@ -1143,20 +1205,38 @@ function initEditDataItemDialog() {
 	function submitDataItem() {
 		var $categoryid = $("select.categories").find("option:selected").val();
 		var $args;
-		if (tableType == "storage") {
-			$args = {
-				id : tableId,
-				categoryid : $categoryid,
-				usage : $("input.usage").is("input:checked"),
-				name : $("input.data-item-name").val(),
-				classname : $("input.data-storage-class-name").val()
-			};
+		if (isJson()) {
+			if (tableType == "storage") {
+				$args = {
+					id : tableId,
+					categorypath : $("select.categories").find("option:selected").text(),
+					name : $("input.data-item-name").val(),
+					classname : $("input.data-storage-class-name").val(),
+					product : productId
+				};
+			} else {
+				$args = {
+					id : tableId,
+					categorypath : $("select.categories").find("option:selected").text(),
+					name : $("input.data-item-name").val(),
+					product : productId
+				};
+			}
 		} else {
-			$args = {
-				id : tableId,
-				categoryid : $categoryid,
-				name : $("input.data-item-name").val()
-			};
+			if (tableType == "storage") {
+				$args = {
+					id : tableId,
+					categoryid : $categoryid,
+					name : $("input.data-item-name").val(),
+					classname : $("input.data-storage-class-name").val(),
+				};
+			} else {
+				$args = {
+					id : tableId,
+					categoryid : $categoryid,
+					name : $("input.data-item-name").val(),
+				};
+			}
 		}
 		$.post("../EditTable", $args, function(data) {
 			if (data == "success") {
@@ -1204,10 +1284,8 @@ function highlight(element) {
 	}, 600);
 }
 
-function loadTableValues(id) {
-	$.post("../GetTableValues", {
-		id : id
-	}, function(data) {
+function loadTableValues(args) {
+	$.post("../GetTableValues", args, function(data) {
 		$(".entities-values").html(template(jQuery.parseJSON(data)));
 		initTableValues(jQuery);
 		initKeysAndIndexes(jQuery);

@@ -101,7 +101,7 @@ public class DeleteProduct extends HttpServlet {
 
 			StringBuilder error = new StringBuilder();
 			for (Table table : tables) {
-				boolean deleted = DataManager.getInstance().getDao().deleteTable(table.getId());
+				boolean deleted = DataManager.getInstance().getDao().deleteTable(table, productId);
 				if (!deleted) {
 					out.print("ERROR: Table was not deleted. See server logs for details.");
 				}

@@ -593,7 +593,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public Integer getChildtable(int tableId, TableType childType) throws SQLException {
+	public Integer getChildTableId(Integer tableId, TableType childType) throws SQLException {
 		Integer result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -930,7 +930,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws SQLException {
+	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws Exception {
 		List<Integer> result = new ArrayList<Integer>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -980,14 +980,14 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Table> getTablesUsingStorage(int storageId) throws SQLException {
+	public List<Table> getTablesUsingStorage(Table table) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
 						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
-						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + storageId
+						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + table.getId()
 						+ ") ORDER BY t.id");
 		while (rs.next()) {
 			result.add(initTable(rs));
@@ -997,23 +997,24 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public boolean deleteTable(int tableId) throws SQLException {
+	public boolean deleteTable(Table table, int productId) throws SQLException {
 		boolean result = false;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 
-		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE parentid=" + tableId);
+		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE parentid=" + table.getId());
 		while (rs.next()) {
-			deleteTable(rs.getInt("id"));
+			deleteTable(new Table(rs.getInt("id")), productId);
 		}
 		rs.close();
 
-		stmt.executeUpdate("DELETE FROM values WHERE rowid IN (SELECT id FROM rows WHERE tableid=" + tableId + ")");
-		stmt.executeUpdate("DELETE FROM keys WHERE tableid=" + tableId);
-		stmt.executeUpdate("DELETE FROM rows WHERE tableid=" + tableId);
-		stmt.executeUpdate("DELETE FROM tables WHERE id=" + tableId);
+		stmt.executeUpdate("DELETE FROM values WHERE rowid IN (SELECT id FROM rows WHERE tableid=" + table.getId()
+				+ ")");
+		stmt.executeUpdate("DELETE FROM keys WHERE tableid=" + table.getId());
+		stmt.executeUpdate("DELETE FROM rows WHERE tableid=" + table.getId());
+		stmt.executeUpdate("DELETE FROM tables WHERE id=" + table.getId());
 
-		ResultSet rs2 = stmt.executeQuery("SELECT id FROM tables WHERE id=" + tableId);
+		ResultSet rs2 = stmt.executeQuery("SELECT id FROM tables WHERE id=" + table.getId());
 		if (!rs2.next()) {
 			result = true;
 		}
@@ -1105,7 +1106,7 @@ public class PostgresDao implements Dao {
 		stmt.close();
 	}
 
-	public void updateTable(Table table) throws SQLException {
+	public void updateTable(Table table) throws Exception {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		String finalName = table.getName();
@@ -1394,9 +1395,9 @@ public class PostgresDao implements Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT id FROM tables WHERE categoryid IN "
-				+ "(SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id=" + category.getId()
-				+ ")) AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
-				+ "') AND name='" + name + "'");
+				+ "(SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id="
+				+ category.getId() + ")) AND type=(SELECT id FROM tabletypes WHERE name='"
+				+ type.toString().toLowerCase() + "') AND name='" + name + "'");
 		if (rs.next()) {
 			result = true;
 		}
@@ -1450,7 +1451,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws SQLException {
+	public List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws Exception {
 		int enumId = getTable(getKey(enumValue.getKeyId()).getTableId()).getId();
 		List<Value> result = new ArrayList<Value>();
 		Connection conn = getConnection();

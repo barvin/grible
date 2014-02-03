@@ -40,11 +40,10 @@ public class Table {
 		setCategoryId(null);
 		setParentId(null);
 	}
-	
-	public Table(File file, TableType type) throws Exception {
+
+	public Table(File file) throws Exception {
 		setFile(file);
 		setName(StringUtils.substringBefore(file.getName(), ".json"));
-		setType(type);
 		this.tableJson = new TableJson();
 	}
 
@@ -62,6 +61,10 @@ public class Table {
 
 	public int getId() {
 		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -140,6 +143,7 @@ public class Table {
 		BufferedReader br = new BufferedReader(fr);
 		TableJson tableJson = new Gson().fromJson(br, TableJson.class);
 		br.close();
+		setType(tableJson.getType());
 		setClassName(tableJson.getClassName());
 		setShowUsage(tableJson.isShowUsage());
 		setShowWarning(tableJson.isShowWarning());

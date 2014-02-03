@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -56,7 +57,7 @@ public class DeleteRow extends HttpServlet {
 			int rowId = Integer.parseInt(request.getParameter("rowid"));
 			Row row = DataManager.getInstance().getDao().getRow(rowId);
 			int tableId = row.getTableId();
-			Table currentTable = DataManager.getInstance().getDao().getTable(tableId);
+			Table currentTable = new PostgresDao().getTable(tableId);
 
 			boolean isUsedByTables = false;
 			String error = "";

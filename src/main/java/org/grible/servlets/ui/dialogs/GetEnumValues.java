@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Value;
 import org.grible.security.Security;
@@ -54,7 +55,7 @@ public class GetEnumValues extends HttpServlet {
 			String content = request.getParameter("content");
 
 			out.println("<select class=\"enum-values\">");
-			Key enumKey = DataManager.getInstance().getDao().getKeys(DataManager.getInstance().getDao().getTable(key.getReferenceTableId()).getId()).get(0);
+			Key enumKey = DataManager.getInstance().getDao().getKeys(new PostgresDao().getTable(key.getReferenceTableId()).getId()).get(0);
 			List<Value> enumValues = DataManager.getInstance().getDao().getValues(enumKey);
 			for (Value enumeValue : enumValues) {
 				String selected = "";

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -58,7 +59,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			table = DataManager.getInstance().getDao().getTable(id);
+			table = new PostgresDao().getTable(id);
 		} catch (Exception e) {
 			e.printStackTrace(out);
 		}
@@ -203,7 +204,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						method = "getBoolean(\"" + keyName + "\");";
 					}
 				} else {
-					Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
+					Table refTable = new PostgresDao().getTable(key.getReferenceTableId());
 					if (refTable.getType() == TableType.STORAGE) {
 						isDataHelperIncluded = true;
 						String refClassName = refTable.getClassName();
@@ -297,9 +298,10 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						method = "GetBoolean(\"" + keyName + "\");";
 					}
 				} else {
-					Table refTable = DataManager.getInstance().getDao().getTable(key.getReferenceTableId());
+					PostgresDao dao = new PostgresDao();
+					Table refTable = dao.getTable(key.getReferenceTableId());
 					if (refTable.getType() == TableType.STORAGE) {
-						String refClassName = DataManager.getInstance().getDao().getTable(key.getReferenceTableId()).getClassName();
+						String refClassName = dao.getTable(key.getReferenceTableId()).getClassName();
 						if (semicolumnExists(values)) {
 							type = "List&lt;" + refClassName + "&gt;";
 							method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\"" + keyName

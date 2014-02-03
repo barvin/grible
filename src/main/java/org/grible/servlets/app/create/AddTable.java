@@ -22,11 +22,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
+import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.model.json.KeyJson;
+import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
@@ -59,27 +64,38 @@ public class AddTable extends HttpServlet {
 			}
 
 			Category category = null;
+			Integer productId = 0;
+			Integer parentId = null;
 			if (isJson()) {
-				Integer productId = Integer.parseInt(request.getParameter("product"));
+				productId = Integer.parseInt(request.getParameter("product"));
 				TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
-				if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
-					tableType = TableType.TABLE;
+				if (request.getParameter("categorypath") != null) {
+					String path = request.getParameter("categorypath");
+					category = new Category(path, tableType, productId);
+				} else {
+					TableType currType = TableType.valueOf(request.getParameter("currTabletype").toUpperCase());
+					JsonDao dao = new JsonDao();
+					if (currType == TableType.TABLE) {
+						parentId = Integer.parseInt(request.getParameter("parentid"));
+					} else {
+						parentId = dao.getParentTableId(Integer.parseInt(request.getParameter("parentid")), productId,
+								currType);
+					}
+					String categoryPathFromTable = StringHelper.getCategoryPathFromTable(
+							dao.getTable(parentId, productId), productId, tableType);
+					category = new Category(categoryPathFromTable, tableType, productId);
 				}
-				String path = request.getParameter("categorypath");
-				category = new Category(path, tableType, productId);
 			} else if (request.getParameter("categoryid") != null) {
 				int categoryId = Integer.parseInt(request.getParameter("categoryid"));
 				category = DataManager.getInstance().getDao().getCategory(categoryId);
 			}
 
-			Integer parentId = null;
-			if (request.getParameter("parentid") != null) {
+			if ((!isJson()) && (request.getParameter("parentid") != null)) {
 				TableType currType = TableType.valueOf(request.getParameter("currTabletype").toUpperCase());
 				if (currType == TableType.TABLE) {
 					parentId = Integer.parseInt(request.getParameter("parentid"));
 				} else {
-					Table sibling = DataManager.getInstance().getDao()
-							.getTable(Integer.parseInt(request.getParameter("parentid")));
+					Table sibling = new PostgresDao().getTable(Integer.parseInt(request.getParameter("parentid")));
 					parentId = sibling.getParentId();
 				}
 			}
@@ -119,16 +135,10 @@ public class AddTable extends HttpServlet {
 				}
 			} else {
 				if (isJson()) {
-//					List<String> keys = new ArrayList<String>();
-//					if (type == TableType.ENUMERATION) {
-//						keys.add(name);
-//					} else {
-//						keys.add("editme");
-//					}
-//					int keyId = DataManager.getInstance().getDao().insertKeys(tableId, keys).get(0);
-//					DataManager.getInstance().getDao().insertRow(tableId, 1);
-//					List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
-//					DataManager.getInstance().getDao().insertValuesEmptyWithKeyId(keyId, rows);
+					Table table = new JsonDao().getTable(tableId, productId);
+					table.getTableJson().setKeys(new KeyJson[] { new KeyJson("editme", KeyType.TEXT, 0) });
+					table.getTableJson().setValues(new String[][] { { "" } });
+					table.save();
 				} else {
 					List<String> keys = new ArrayList<String>();
 					if (type == TableType.ENUMERATION) {
@@ -145,7 +155,7 @@ public class AddTable extends HttpServlet {
 			out.print(tableId);
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
-			if (!e.getLocalizedMessage().startsWith("ERROR")) {
+			if ((e.getLocalizedMessage() != null) && (!e.getLocalizedMessage().startsWith("ERROR"))) {
 				e.printStackTrace();
 			}
 		}

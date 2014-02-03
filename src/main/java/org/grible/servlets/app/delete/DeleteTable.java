@@ -48,7 +48,8 @@ public class DeleteTable extends HttpServlet {
 				return;
 			}
 			int tableId = Integer.parseInt(request.getParameter("id"));
-			out.print(ServletHelper.deleteTable(tableId));
+			int productId = Integer.parseInt(request.getParameter("product"));
+			out.print(ServletHelper.deleteTable(tableId, productId));
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();

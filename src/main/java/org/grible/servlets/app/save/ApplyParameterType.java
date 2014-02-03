@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Value;
 import org.grible.security.Security;
@@ -85,7 +86,7 @@ public class ApplyParameterType extends HttpServlet {
 							return;
 						} else if ((!strRows[i].equals("0"))
 								&& (DataManager.getInstance().getDao().getRow(refTableId, Integer.parseInt(strRows[i]))) == null) {
-							out.print("ERROR: Data storage '" + DataManager.getInstance().getDao().getTable(refTableId).getName()
+							out.print("ERROR: Data storage '" + new PostgresDao().getTable(refTableId).getName()
 									+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
 									+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
 									+ ".<br>You must first create this row in specified data storage.");

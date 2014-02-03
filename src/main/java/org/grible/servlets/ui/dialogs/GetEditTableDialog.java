@@ -23,10 +23,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
+import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.settings.AppTypes;
+import org.grible.settings.GlobalSettings;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -55,12 +60,17 @@ public class GetEditTableDialog extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
+			int productId = Integer.parseInt(request.getParameter("product"));
 
-			Table table = DataManager.getInstance().getDao().getTable(id);
+			Table table = null;
+			if (isJson()) {
+				table = new JsonDao().getTable(id, productId);
+			} else {
+				table = new PostgresDao().getTable(id);
+			}
 			if ((table.getType() == TableType.TABLE) || (table.getType() == TableType.STORAGE)
 					|| (table.getType() == TableType.ENUMERATION)) {
 				String name = table.getName();
-				int categoryId = table.getCategoryId();
 
 				out.println("<div id=\"edit-table-dialog\" class=\"ui-dialog\">");
 				out.println("<div class=\"ui-dialog-title\">Edit " + table.getType().toString().toLowerCase()
@@ -86,16 +96,29 @@ public class GetEditTableDialog extends HttpServlet {
 				out.println("<div class=\"table-cell dialog-cell\">");
 				out.println("<select class=\"categories dialog-edit\" \">");
 
-				List<Category> categories = DataManager.getInstance().getDao().getAllCategories(DataManager.getInstance().getDao().getCategory(categoryId).getProductId(),
-						table.getType());
+				List<Category> categories = DataManager.getInstance().getDao()
+						.getAllCategories(productId, table.getType());
 				for (Category category : categories) {
-					category.setName(addParents(category));
+					if (isJson()) {
+						category.setName(category.getPath());
+					} else {
+						category.setName(addParents(category));
+					}
 				}
 				Collections.sort(categories);
+
 				for (Category category : categories) {
 					String selected = "";
-					if (categoryId == category.getId()) {
-						selected = "selected=\"selected\" ";
+					if (isJson()) {
+						String categoryPathFromTable = StringHelper.getCategoryPathFromTable(table, productId,
+								category.getType());
+						if (categoryPathFromTable.equals(category.getPath())) {
+							selected = "selected=\"selected\" ";
+						}
+					} else {
+						if (table.getCategoryId() == category.getId()) {
+							selected = "selected=\"selected\" ";
+						}
 					}
 					out.print("<option value=\"" + category.getId() + "\" " + selected + ">" + category.getName()
 							+ "</option>");
@@ -116,6 +139,10 @@ public class GetEditTableDialog extends HttpServlet {
 		}
 		out.flush();
 		out.close();
+	}
+
+	private boolean isJson() throws Exception {
+		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 
 	private String addParents(Category category) throws Exception {

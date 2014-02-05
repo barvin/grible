@@ -12,7 +12,7 @@ package org.grible.model;
 
 import java.io.File;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class Category implements Comparable<Category> {
 	private int id;

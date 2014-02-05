@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
-import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.Value;
@@ -35,14 +34,14 @@ import org.grible.servlets.ServletHelper;
 /**
  * Servlet implementation class GetStorageValues
  */
-@WebServlet("/ApplyParameterType")
-public class ApplyParameterType extends HttpServlet {
+@WebServlet("/CorrectValuesForParameterType")
+public class CorrectValuesForParameterType extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public ApplyParameterType() {
+	public CorrectValuesForParameterType() {
 		super();
 	}
 
@@ -69,7 +68,6 @@ public class ApplyParameterType extends HttpServlet {
 			Table table = null;
 			int productId = 0;
 			KeyJson keyJson = null;
-			int currentRefId = 0;
 			int keyOrder = 0;
 			if (ServletHelper.isJson()) {
 				int tableId = Integer.parseInt(request.getParameter("tableid"));
@@ -77,66 +75,31 @@ public class ApplyParameterType extends HttpServlet {
 				keyOrder = Integer.parseInt(request.getParameter("keyorder")) - 1;
 				table = new JsonDao().getTable(tableId, productId);
 				keyJson = table.getTableJson().getKeys()[keyOrder];
-				currentRefId = keyJson.getRefid();
 			} else {
 				int keyId = Integer.parseInt(request.getParameter("keyId"));
 				key = DataManager.getInstance().getDao().getKey(keyId);
-				currentRefId = key.getReferenceTableId();
 			}
 
-			if (((currentRefId == 0) && (type == KeyType.TEXT))
-					|| ((currentRefId == refTableId) && (type == KeyType.STORAGE || type == KeyType.ENUMERATION))) {
-				out.print("not-changed");
-			} else if (type == KeyType.TEXT) {
-				if (ServletHelper.isJson()) {
-					keyJson.setRefid(0);
-					keyJson.setType(type);
-					table.getTableJson().getKeys()[keyOrder] = keyJson;
-					table.save();
-				} else {
-					key.setReferenceTableId(0);
-					DataManager.getInstance().getDao().updateKey(key);
-					DataManager.getInstance().getDao().updateValuesTypes(key.getId(), false, "NULL");
-				}
-				out.print("success");
-			} else if (type == KeyType.STORAGE) {
+			if (type == KeyType.STORAGE) {
 				if (ServletHelper.isJson()) {
 					keyJson.setRefid(refTableId);
 					keyJson.setType(type);
 
 					JsonDao dao = new JsonDao();
-					List<String> values = dao.getValuesByKeyOrder(table, keyOrder);
+					List<String> columnValues = dao.getValuesByKeyOrder(table, keyOrder);
+					String[][] values = table.getTableJson().getValues();
 
-					for (int row = 0; row < values.size(); row++) {
-						String[] strRows = values.get(row).split(";");
-						for (String strRow : strRows) {
-							if ((StringUtils.isNumeric(strRow)) && (!"0".equals(strRow))) {
-								Table refTable = dao.getTable(refTableId, productId);
-								String[][] refRows = refTable.getTableJson().getValues();
-								if (refRows.length < Integer.parseInt(strRow)) {
-									out.print("ERROR: Data storage '" + refTable.getName()
-											+ "' does not contain row number " + strRow
-											+ ".<br>You specified it in row: " + (row + 1)
-											+ ".<br>You must first create this row in specified data storage.");
-									out.flush();
-									out.close();
-									return;
-								}
-							}
-						}
-					}
-					for (int row = 0; row < values.size(); row++) {
-						String[] strRows = values.get(row).split(";");
+					for (int row = 0; row < columnValues.size(); row++) {
+						String[] strRows = columnValues.get(row).split(";");
 						for (String strRow : strRows) {
 							if (!StringUtils.isNumeric(strRow)) {
-								out.print("need-correction");
-								out.flush();
-								out.close();
-								return;
+								values[row][keyOrder] = "0";
+								break;
 							}
 						}
 					}
 
+					table.getTableJson().setValues(values);
 					table.getTableJson().getKeys()[keyOrder] = keyJson;
 					table.save();
 					out.print("success");
@@ -146,27 +109,9 @@ public class ApplyParameterType extends HttpServlet {
 					for (Value value : values) {
 						String[] strRows = value.getValue().split(";");
 						for (String strRow : strRows) {
-							if ((StringUtils.isNumeric(strRow))
-									&& (!strRow.equals("0"))
-									&& (DataManager.getInstance().getDao().getRow(refTableId, Integer.parseInt(strRow))) == null) {
-								out.print("ERROR: Data storage '" + new PostgresDao().getTable(refTableId).getName()
-										+ "' does not contain row number " + strRow + ".<br>You specified it in row: "
-										+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
-										+ ".<br>You must first create this row in specified data storage.");
-								out.flush();
-								out.close();
-								return;
-							}
-						}
-					}
-					for (Value value : values) {
-						String[] strRows = value.getValue().split(";");
-						for (String strRow : strRows) {
 							if (!StringUtils.isNumeric(strRow)) {
-								out.print("need-correction");
-								out.flush();
-								out.close();
-								return;
+								value.setValue("0");
+								break;
 							}
 						}
 					}
@@ -194,25 +139,24 @@ public class ApplyParameterType extends HttpServlet {
 					keyJson.setType(type);
 
 					JsonDao dao = new JsonDao();
-					List<String> values = dao.getValuesByKeyOrder(table, keyOrder);
+					List<String> columnValues = dao.getValuesByKeyOrder(table, keyOrder);
 					Table refTable = dao.getTable(refTableId, productId);
 					List<String> enumValues = dao.getValuesByKeyOrder(refTable, 0);
-					for (int row = 0; row < values.size(); row++) {
+					String[][] values = table.getTableJson().getValues();
+					for (int row = 0; row < columnValues.size(); row++) {
 						boolean isValid = false;
 						for (String enumValue : enumValues) {
-							if (values.get(row).equals(enumValue)) {
+							if (columnValues.get(row).equals(enumValue)) {
 								isValid = true;
 								break;
 							}
 						}
 						if (!isValid) {
-							out.print("need-correction");
-							out.flush();
-							out.close();
-							return;
+							values[row][keyOrder] = enumValues.get(0);
 						}
 					}
 
+					table.getTableJson().setValues(values);
 					table.getTableJson().getKeys()[keyOrder] = keyJson;
 					table.save();
 					out.print("success");
@@ -230,10 +174,7 @@ public class ApplyParameterType extends HttpServlet {
 							}
 						}
 						if (!isValid) {
-							out.print("need-correction");
-							out.flush();
-							out.close();
-							return;
+							value.setValue(enumValues.get(0).getValue());
 						}
 					}
 					DataManager.getInstance().getDao().updateKey(key);

@@ -79,8 +79,6 @@ public interface Dao {
 
 	public Key getKey(int id) throws Exception;
 
-	public List<Table> getRefTablesOfProductByKeyId(int keyId, TableType type) throws Exception;
-
 	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId, String parentPath)
 			throws Exception;
 

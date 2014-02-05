@@ -16,8 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.helpers.IOHelper;
+import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Key;
 import org.grible.model.Product;
@@ -25,6 +26,7 @@ import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.Value;
+import org.grible.model.json.KeyJson;
 import org.grible.settings.GlobalSettings;
 
 /**
@@ -290,12 +292,6 @@ public class JsonDao implements Dao {
 
 	@Override
 	public Key getKey(int id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Table> getRefTablesOfProductByKeyId(int keyId, TableType type) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -572,8 +568,26 @@ public class JsonDao implements Dao {
 
 	@Override
 	public List<Table> getTablesOfProduct(int productId, TableType type) throws Exception {
-		// TODO Auto-generated method stub
-		return new ArrayList<Table>();
+		List<Table> result = new ArrayList<Table>();
+		Product product = getProduct(productId);
+		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
+		List<File> files = new ArrayList<>();
+		IOHelper.searchAllFiles(files, dir, ".json");
+		for (File file : files) {
+			Table table = new Table(file);
+			table.setTableJson();
+			if (table.getType() == type) {
+				table.setId(product
+						.getGribleJson()
+						.read()
+						.getIdByPath(
+								type.getSection().getDirName() + File.separator
+										+ StringHelper.getCategoryPathFromTable(table, productId, type)
+										+ File.separator + file.getName()));
+				result.add(table);
+			}
+		}
+		return result;
 	}
 
 	@Override
@@ -583,7 +597,7 @@ public class JsonDao implements Dao {
 		}
 		Product product = getProduct(category.getProductId());
 		File dir = new File(product.getPath());
-		File file = IOHelper.searchForFile(dir, name + ".json");
+		File file = IOHelper.searchFile(dir, name + ".json");
 		return file != null;
 	}
 
@@ -622,7 +636,7 @@ public class JsonDao implements Dao {
 				moveTableFile(getTable(ppstId, productId), productId, newCategoryPath, newName);
 			}
 		} else if (table.getType() == TableType.PRECONDITION || table.getType() == TableType.POSTCONDITION) {
-			newName = newName + "_" + table.getType(); 
+			newName = newName + "_" + table.getType();
 		}
 		Product product = getProduct(productId);
 		String pathAfterProduct = table.getType().getSection().getDirName() + File.separator + newCategoryPath
@@ -633,4 +647,56 @@ public class JsonDao implements Dao {
 		file.renameTo(new File(product.getPath() + File.separator + pathAfterProduct));
 	}
 
+	/**
+	 * @param table
+	 * @param rowOrder
+	 *            - one-based order of the row in the table.
+	 * @return
+	 */
+	public List<Table> getTablesUsingRow(int productId, Table table, int rowOrder) throws Exception {
+		List<Table> result = new ArrayList<Table>();
+		List<Table> tables = getTablesOfProduct(productId, TableType.TABLE);
+		addTablesUsingRow(result, tables, table, rowOrder);
+		List<Table> preconditions = getTablesOfProduct(productId, TableType.PRECONDITION);
+		addTablesUsingRow(result, preconditions, table, rowOrder);
+		List<Table> postconditions = getTablesOfProduct(productId, TableType.POSTCONDITION);
+		addTablesUsingRow(result, postconditions, table, rowOrder);
+		List<Table> storages = getTablesOfProduct(productId, TableType.STORAGE);
+		addTablesUsingRow(result, storages, table, rowOrder);
+		return result;
+	}
+
+	private void addTablesUsingRow(List<Table> result, List<Table> tables, Table table, int rowOrder) {
+		for (Table foundTable : tables) {
+			KeyJson[] keys = foundTable.getTableJson().getKeys();
+			for (int i = 0; i < keys.length; i++) {
+				if (keys[i].getRefid() == table.getId()) {
+					String[][] values = foundTable.getTableJson().getValues();
+					for (int j = 0; j < values.length; j++) {
+						String[] indexes = values[j][i].split(";");
+						for (String index : indexes) {
+							if (index.equals(String.valueOf(rowOrder))) {
+								result.add(foundTable);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param table
+	 * @param keyOrder
+	 *            - zero-based key order.
+	 * @return
+	 */
+	public List<String> getValuesByKeyOrder(Table table, int keyOrder) {
+		List<String> values = new ArrayList<>();
+		for (String[] row : table.getTableJson().getValues()) {
+			values.add(row[keyOrder]);
+		}
+		return values;
+	}
 }

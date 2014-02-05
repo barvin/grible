@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.PostgresDao;
 import org.grible.model.TableType;
@@ -60,7 +60,7 @@ public class SaveCellValue extends HttpServlet {
 
 			Value value = DataManager.getInstance().getDao().getValue(id);
 			String oldValue = value.getValue();
-			value.setValue(StringEscapeUtils.unescapeHtml(strValue));
+			value.setValue(StringEscapeUtils.unescapeHtml4(strValue));
 
 			if (value.isStorage()) {
 				String[] strRows = value.getValue().split(";");

@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.model.Category;
 import org.grible.model.Key;
 import org.grible.model.Product;
@@ -673,38 +673,6 @@ public class PostgresDao implements Dao {
 
 		stmt.close();
 		return result;
-	}
-
-	public List<Table> getRefTablesOfProductByKeyId(int keyId, TableType type) throws SQLException {
-		List<Table> result = new ArrayList<Table>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		Integer categoryId = 0;
-		ResultSet rs = stmt.executeQuery("SELECT categoryid FROM tables WHERE id="
-				+ "(SELECT tableid FROM keys WHERE id=" + keyId + ")");
-		if (rs.next()) {
-			categoryId = rs.getInt("categoryid");
-		}
-		if (categoryId.equals(0)) {
-			ResultSet rs2 = stmt.executeQuery("SELECT categoryid FROM tables WHERE id="
-					+ "(SELECT parentid FROM tables WHERE id=" + "(SELECT tableid FROM keys WHERE id=" + keyId + "))");
-			if (rs2.next()) {
-				categoryId = rs2.getInt("categoryid");
-			}
-		}
-		ResultSet rs3 = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
-						+ "ON t.type=tt.id AND tt.name='" + type.toString().toLowerCase()
-						+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid="
-						+ "(SELECT productid FROM categories WHERE id=" + categoryId + ")) ORDER BY t.name");
-		while (rs3.next()) {
-			result.add(initTable(rs3));
-		}
-
-		stmt.close();
-		return result;
-
 	}
 
 	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId, String parentPath)

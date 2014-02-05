@@ -117,21 +117,39 @@ public class AddTable extends HttpServlet {
 			if (isCopy) {
 				int copyTableId = Integer.parseInt(request.getParameter("copytableid"));
 				boolean isOnlyColumns = Boolean.parseBoolean(request.getParameter("isonlycolumns"));
-				List<Key> keys = null;
-				if (type == TableType.ENUMERATION) {
-					List<String> keyName = new ArrayList<String>();
-					keyName.add(name);
-					DataManager.getInstance().getDao().insertKeys(tableId, keyName);
-					keys = DataManager.getInstance().getDao().getKeys(tableId);
+				if (isJson()) {
+					JsonDao dao = new JsonDao();
+					Table table = dao.getTable(tableId, productId);
+					Table tableToCopy = dao.getTable(copyTableId, productId);
+					table.getTableJson().setKeys(tableToCopy.getTableJson().getKeys());
+					if (isOnlyColumns) {
+						int keysCount = tableToCopy.getTableJson().getKeys().length;
+						String[][] values = new String[1][keysCount];
+						for (int i = 0; i < keysCount; i++) {
+							values[0][i] = "";
+						}
+						table.getTableJson().setValues(values);
+					} else {
+						table.getTableJson().setValues(tableToCopy.getTableJson().getValues());
+					}
+					table.save();
 				} else {
-					keys = DataManager.getInstance().getDao().insertKeysFromOneTableToAnother(copyTableId, tableId);
-				}
-				if (isOnlyColumns) {
-					int rowId = DataManager.getInstance().getDao().insertRow(tableId, 1);
-					DataManager.getInstance().getDao().insertValuesEmptyWithRowId(rowId, keys);
-				} else {
-					List<Row> oldRows = DataManager.getInstance().getDao().getRows(copyTableId);
-					DataManager.getInstance().getDao().insertValues(tableId, copyTableId, oldRows, keys);
+					List<Key> keys = null;
+					if (type == TableType.ENUMERATION) {
+						List<String> keyName = new ArrayList<String>();
+						keyName.add(name);
+						DataManager.getInstance().getDao().insertKeys(tableId, keyName);
+						keys = DataManager.getInstance().getDao().getKeys(tableId);
+					} else {
+						keys = DataManager.getInstance().getDao().insertKeysFromOneTableToAnother(copyTableId, tableId);
+					}
+					if (isOnlyColumns) {
+						int rowId = DataManager.getInstance().getDao().insertRow(tableId, 1);
+						DataManager.getInstance().getDao().insertValuesEmptyWithRowId(rowId, keys);
+					} else {
+						List<Row> oldRows = DataManager.getInstance().getDao().getRows(copyTableId);
+						DataManager.getInstance().getDao().insertValues(tableId, copyTableId, oldRows, keys);
+					}
 				}
 			} else {
 				if (isJson()) {

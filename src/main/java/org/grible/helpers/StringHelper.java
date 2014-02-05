@@ -2,8 +2,8 @@ package org.grible.helpers;
 
 import java.io.File;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.model.Product;
 import org.grible.model.Table;

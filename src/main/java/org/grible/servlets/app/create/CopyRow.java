@@ -21,11 +21,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.model.Row;
+import org.grible.model.Table;
 import org.grible.model.Value;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -53,33 +56,59 @@ public class CopyRow extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			
-			int rowId = Integer.parseInt(request.getParameter("rowid"));
+			String result = null;
 
-			Row currentRow = DataManager.getInstance().getDao().getRow(rowId);
-			int currentRowNumber = currentRow.getOrder();
-			int tableId = currentRow.getTableId();
-			List<Integer> rowIds = new ArrayList<Integer>();
-			List<Integer> rowNumbers = new ArrayList<Integer>();
-			List<Integer> oldRowNumbers = new ArrayList<Integer>();
-			List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
-			for (int i = rows.size() - 1; i >= 0; i--) {
-				rowIds.add(rows.get(i).getId());
-				if (rows.get(i).getOrder() > currentRowNumber) {
-					rowNumbers.add(i + 2);
-				} else {
-					rowNumbers.add(i + 1);
+			if (ServletHelper.isJson()) {
+				int tableId = Integer.parseInt(request.getParameter("tableid"));
+				int productId = Integer.parseInt(request.getParameter("product"));
+				int rowOrder = Integer.parseInt(request.getParameter("roworder")) - 1;
+
+				JsonDao dao = new JsonDao();
+				Table table = dao.getTable(tableId, productId);
+				String[][] values = table.getTableJson().getValues();
+				String[][] newValues = new String[values.length + 1][values[0].length];
+				for (int i = newValues.length - 1; i >= 0; i--) {
+					if (i > rowOrder) {
+						for (int j = 0; j < newValues[0].length; j++) {
+							newValues[i][j] = values[i - 1][j];
+						}
+					} else {
+						for (int j = 0; j < newValues[0].length; j++) {
+							newValues[i][j] = values[i][j];
+						}
+					}
 				}
-				oldRowNumbers.add(i + 1);
+				table.getTableJson().setValues(newValues);
+				table.save();
+				result = "success";
+			} else {
+				int rowId = Integer.parseInt(request.getParameter("rowid"));
+
+				Row currentRow = DataManager.getInstance().getDao().getRow(rowId);
+				int currentRowNumber = currentRow.getOrder();
+				int tableId = currentRow.getTableId();
+				List<Integer> rowIds = new ArrayList<Integer>();
+				List<Integer> rowNumbers = new ArrayList<Integer>();
+				List<Integer> oldRowNumbers = new ArrayList<Integer>();
+				List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+				for (int i = rows.size() - 1; i >= 0; i--) {
+					rowIds.add(rows.get(i).getId());
+					if (rows.get(i).getOrder() > currentRowNumber) {
+						rowNumbers.add(i + 2);
+					} else {
+						rowNumbers.add(i + 1);
+					}
+					oldRowNumbers.add(i + 1);
+				}
+				DataManager.getInstance().getDao().updateRows(rowIds, oldRowNumbers, rowNumbers);
+				currentRow.setOrder(currentRowNumber + 1);
+				int newRowId = DataManager.getInstance().getDao().insertRowCopy(currentRow);
+
+				List<Value> values = DataManager.getInstance().getDao().getValues(currentRow);
+				List<Integer> ids = DataManager.getInstance().getDao().insertValuesWithRowId(newRowId, values);
+
+				result = newRowId + ";" + StringUtils.join(ids, ";");
 			}
-			DataManager.getInstance().getDao().updateRows(rowIds, oldRowNumbers, rowNumbers);
-			currentRow.setOrder(currentRowNumber + 1);
-			int newRowId = DataManager.getInstance().getDao().insertRowCopy(currentRow);
-
-			List<Value> values = DataManager.getInstance().getDao().getValues(currentRow);
-			List<Integer> ids = DataManager.getInstance().getDao().insertValuesWithRowId(newRowId, values);
-
-			String result = newRowId + ";" + StringUtils.join(ids, ";");
 			out.print(result);
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());

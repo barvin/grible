@@ -26,10 +26,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.Value;
+import org.grible.model.json.KeyJson;
+import org.grible.servlets.ServletHelper;
 
 public class ExcelFile {
 
@@ -63,30 +65,50 @@ public class ExcelFile {
 			Sheet worksheet = workbook.createSheet(table.getName());
 
 			Row row1 = worksheet.createRow(0);
-			
+
 			Font keyFont = workbook.createFont();
 			keyFont.setColor(HSSFColor.WHITE.index);
 			keyFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-			
+
 			CellStyle keyCellStyle = workbook.createCellStyle();
 			keyCellStyle.setFont(keyFont);
 			keyCellStyle.setFillForegroundColor(HSSFColor.BLACK.index);
 			keyCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
 			keyCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
-			List<Key> keys = DataManager.getInstance().getDao().getKeys(table.getId());
-			for (int i = 0; i < keys.size(); i++) {
-				Cell cell = row1.createCell(i);
-				cell.setCellValue(keys.get(i).getName());
-				cell.setCellStyle(keyCellStyle);
-			}
 
-			List<org.grible.model.Row> rows = DataManager.getInstance().getDao().getRows(table.getId());
-			for (int i = 0; i < rows.size(); i++) {
-				Row excelRow = worksheet.createRow(i + 1);
-				List<Value> values = DataManager.getInstance().getDao().getValues(rows.get(i));
-				for (int j = 0; j < values.size(); j++) {
-					Cell cell = excelRow.createCell(j);
-					cell.setCellValue(values.get(j).getValue());
+			if (ServletHelper.isJson()) {
+				KeyJson[] keys = table.getTableJson().getKeys();
+				for (int i = 0; i < keys.length; i++) {
+					Cell cell = row1.createCell(i);
+					cell.setCellValue(keys[i].getName());
+					cell.setCellStyle(keyCellStyle);
+				}
+
+				String[][] values = table.getTableJson().getValues();
+				for (int i = 0; i < values.length; i++) {
+					Row excelRow = worksheet.createRow(i + 1);
+					for (int j = 0; j < values[i].length; j++) {
+						Cell cell = excelRow.createCell(j);
+						cell.setCellValue(values[i][j]);
+					}
+				}
+			} else {
+				PostgresDao dao = new PostgresDao();
+				List<Key> keys = dao.getKeys(table.getId());
+				for (int i = 0; i < keys.size(); i++) {
+					Cell cell = row1.createCell(i);
+					cell.setCellValue(keys.get(i).getName());
+					cell.setCellStyle(keyCellStyle);
+				}
+
+				List<org.grible.model.Row> rows = dao.getRows(table.getId());
+				for (int i = 0; i < rows.size(); i++) {
+					Row excelRow = worksheet.createRow(i + 1);
+					List<Value> values = dao.getValues(rows.get(i));
+					for (int j = 0; j < values.size(); j++) {
+						Cell cell = excelRow.createCell(j);
+						cell.setCellValue(values.get(j).getValue());
+					}
 				}
 			}
 

@@ -20,10 +20,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Table;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -52,7 +54,14 @@ public class ExportToExcel extends HttpServlet {
 				return;
 			}
 			int tableId = Integer.parseInt(request.getParameter("id"));
-			Table table = new PostgresDao().getTable(tableId);
+			Table table = null;
+			if (ServletHelper.isJson()) {
+				int productId = Integer.parseInt(request.getParameter("product"));
+				table = new JsonDao().getTable(tableId, productId);
+			} else {
+				table = new PostgresDao().getTable(tableId);
+			}
+
 			ExcelFile excelFile = new ExcelFile();
 			File exportDir = new File(getServletContext().getRealPath("") + "/export");
 			if (!exportDir.exists()) {

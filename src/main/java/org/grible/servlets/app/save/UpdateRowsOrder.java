@@ -22,7 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.model.Table;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class SaveTable
@@ -62,7 +65,32 @@ public class UpdateRowsOrder extends HttpServlet {
 					oldRowNumbers.add(Integer.parseInt(strOldOrder[i]));
 					modifiedRowNumbers.add(Integer.parseInt(strNewOrder[i]));
 				}
-				DataManager.getInstance().getDao().updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
+
+				if (ServletHelper.isJson()) {
+					int tableId = Integer.parseInt(request.getParameter("tableid"));
+					int productId = Integer.parseInt(request.getParameter("product"));
+					JsonDao dao = new JsonDao();
+					Table table = dao.getTable(tableId, productId);
+					String[][] values = table.getTableJson().getValues();
+					String[][] newValues = new String[values.length][values[0].length];
+					for (int i = 0; i < values.length; i++) {
+						boolean isMoved = false;
+						for (int j = 0; j < modifiedRowNumbers.size(); j++) {
+							if ((i + 1) == modifiedRowNumbers.get(j)) {
+								isMoved = true;
+								newValues[i] = values[oldRowNumbers.get(j) - 1];
+								break;
+							}
+						}
+						if (!isMoved) {
+							newValues[i] = values[i];
+						}
+					}
+					table.getTableJson().setValues(newValues);
+					table.save();
+				} else {
+					DataManager.getInstance().getDao().updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
+				}
 			}
 			out.print("success");
 

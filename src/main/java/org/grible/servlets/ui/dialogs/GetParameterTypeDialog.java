@@ -21,11 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.model.json.KeyJson;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -53,9 +56,28 @@ public class GetParameterTypeDialog extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			Key key = DataManager.getInstance().getDao().getKey(Integer.parseInt(request.getParameter("keyid")));
-			if (new PostgresDao().getTable(key.getTableId()).getType() != TableType.ENUMERATION) {
-				getDialog(out, key);
+
+			Table table = null;
+			int keyId = 0;
+			int keyOrder = 0;
+			int refTableId = 0;
+			int productId = Integer.parseInt(request.getParameter("product"));
+			if (ServletHelper.isJson()) {
+				int tableId = Integer.parseInt(request.getParameter("tableid"));
+				table = new JsonDao().getTable(tableId, productId);
+
+				keyOrder = Integer.parseInt(request.getParameter("keyorder"));
+				KeyJson[] keys = table.getTableJson().getKeys();
+				refTableId = keys[keyOrder - 1].getRefid();
+			} else {
+				Key key = DataManager.getInstance().getDao().getKey(Integer.parseInt(request.getParameter("keyid")));
+				table = new PostgresDao().getTable(key.getTableId());
+				refTableId = key.getReferenceTableId();
+				keyId = key.getId();
+			}
+
+			if (table.getType() != TableType.ENUMERATION) {
+				getDialog(out, refTableId, productId, keyId, keyOrder);
 			}
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
@@ -65,7 +87,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.close();
 	}
 
-	private void getDialog(PrintWriter out, Key key) throws Exception {
+	private void getDialog(PrintWriter out, int refTableId, int productId, int keyId, int keyOrder) throws Exception {
 		String textChecked = "";
 		String storageChecked = "";
 		String storageDisabled = "";
@@ -73,12 +95,17 @@ public class GetParameterTypeDialog extends HttpServlet {
 		String enumChecked = "";
 		String enumDisabled = "";
 		String enumSelectDisabled = "";
-		if (key.getReferenceTableId() == 0) {
+		if (refTableId == 0) {
 			textChecked = " checked=\"checked\" ";
 			storageSelectDisabled = "disabled=\"disabled\" ";
 			enumSelectDisabled = "disabled=\"disabled\" ";
 		} else {
-			Table refTable = new PostgresDao().getTable(key.getReferenceTableId());
+			Table refTable = null;
+			if (ServletHelper.isJson()) {
+				refTable = new JsonDao().getTable(refTableId, productId);
+			} else {
+				refTable = new PostgresDao().getTable(refTableId);
+			}
 			if (refTable.getType() == TableType.STORAGE) {
 				storageChecked = " checked=\"checked\" ";
 				enumSelectDisabled = "disabled=\"disabled\" ";
@@ -88,12 +115,12 @@ public class GetParameterTypeDialog extends HttpServlet {
 			}
 		}
 
-		List<Table> dataSotages = DataManager.getInstance().getDao().getRefTablesOfProductByKeyId(key.getId(), TableType.STORAGE);
+		List<Table> dataSotages = DataManager.getInstance().getDao().getTablesOfProduct(productId, TableType.STORAGE);
 		if (dataSotages.isEmpty()) {
 			storageDisabled = " disabled=\"disabled\" ";
 		}
 
-		List<Table> enums = DataManager.getInstance().getDao().getRefTablesOfProductByKeyId(key.getId(), TableType.ENUMERATION);
+		List<Table> enums = DataManager.getInstance().getDao().getTablesOfProduct(productId, TableType.ENUMERATION);
 		if (enums.isEmpty()) {
 			enumDisabled = " disabled=\"disabled\" ";
 		}
@@ -111,7 +138,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 
 		for (Table dataSotage : dataSotages) {
 			String selected = "";
-			if (key.getReferenceTableId() == dataSotage.getId()) {
+			if (refTableId == dataSotage.getId()) {
 				selected = "selected=\"selected\" ";
 			}
 			out.println("<option value=\"" + dataSotage.getId() + "\" " + selected + ">" + dataSotage.getName()
@@ -127,7 +154,7 @@ public class GetParameterTypeDialog extends HttpServlet {
 
 		for (Table enumeration : enums) {
 			String selected = "";
-			if (key.getReferenceTableId() == enumeration.getId()) {
+			if (refTableId == enumeration.getId()) {
 				selected = "selected=\"selected\" ";
 			}
 			out.println("<option value=\"" + enumeration.getId() + "\" " + selected + ">" + enumeration.getName()
@@ -137,7 +164,8 @@ public class GetParameterTypeDialog extends HttpServlet {
 		out.println("</select>");
 		out.println("<br><br>");
 		out.println("<div class=\"dialog-buttons right\">");
-		out.println("<button id=\"btn-apply-type\" class=\"ui-button\" keyid=\"" + key.getId() + "\">Apply</button>");
+		out.println("<button id=\"btn-apply-type\" class=\"ui-button\" keyid=\"" + keyId + "\" keyorder=\"" + keyOrder
+				+ "\">Apply</button>");
 		out.println("<button class=\"ui-button btn-cancel\">Cancel</button> ");
 		out.println("</div></div></div>");
 	}

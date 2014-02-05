@@ -21,12 +21,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -54,48 +55,101 @@ public class DeleteRow extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			int rowId = Integer.parseInt(request.getParameter("rowid"));
-			Row row = DataManager.getInstance().getDao().getRow(rowId);
-			int tableId = row.getTableId();
-			Table currentTable = new PostgresDao().getTable(tableId);
+			String result = null;
 
-			boolean isUsedByTables = false;
-			String error = "";
-			if (currentTable.getType() == TableType.STORAGE) {
-				List<Table> tablesUsingRow = DataManager.getInstance().getDao().getTablesUsingRow(rowId);
-				if (!tablesUsingRow.isEmpty()) {
-					isUsedByTables = true;
-					error = "ERROR: This row is used by:";
-					String tableName = "";
-					for (Table table : tablesUsingRow) {
-						if (table.getName() != null) {
-							tableName = table.getName();
-						} else {
-							tableName = "-";
+			if (ServletHelper.isJson()) {
+				int tableId = Integer.parseInt(request.getParameter("tableid"));
+				int productId = Integer.parseInt(request.getParameter("product"));
+				int rowOrder = Integer.parseInt(request.getParameter("roworder")) - 1;
+
+				JsonDao dao = new JsonDao();
+				Table table = dao.getTable(tableId, productId);
+
+				boolean isUsedByTables = false;
+				String error = "";
+				if (table.getType() == TableType.STORAGE) {
+					List<Table> tablesUsingRow = dao.getTablesUsingRow(productId, table, rowOrder + 1);
+					if (!tablesUsingRow.isEmpty()) {
+						isUsedByTables = true;
+						error = "ERROR: This row is used by:";
+						String tableName = "";
+						for (Table t : tablesUsingRow) {
+							if (t.getName() != null) {
+								tableName = t.getName();
+							} else {
+								tableName = "-";
+							}
+							error += "<br>- " + tableName + " (" + t.getType().toString().toLowerCase() + ");";
 						}
-						error += "<br>- " + tableName + " (" + table.getType().toString().toLowerCase() + ");";
 					}
 				}
-			}
-			if (isUsedByTables) {
-				out.print(error);
-			} else {
-				if (DataManager.getInstance().getDao().deleteRow(rowId)) {
-					List<Integer> rowIds = new ArrayList<Integer>();
-					List<Integer> oldRowNumbers = new ArrayList<Integer>();
-					List<Integer> rowNumbers = new ArrayList<Integer>();
-					List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
-					for (int i = 0; i < rows.size(); i++) {
-						rowIds.add(rows.get(i).getId());
-						oldRowNumbers.add(rows.get(i).getOrder());
-						rowNumbers.add(i + 1);
-					}
-					DataManager.getInstance().getDao().updateRows(rowIds, oldRowNumbers, rowNumbers);
-					out.print("success");
+
+				if (isUsedByTables) {
+					result = error;
 				} else {
-					out.print("Could not delete the row. See server log for details.");
+					String[][] values = table.getTableJson().getValues();
+					String[][] newValues = new String[values.length - 1][values[0].length];
+					for (int i = newValues.length - 1; i >= 0; i--) {
+						if (i >= rowOrder) {
+							for (int j = 0; j < newValues[0].length; j++) {
+								newValues[i][j] = values[i + 1][j];
+							}
+						} else {
+							for (int j = 0; j < newValues[0].length; j++) {
+								newValues[i][j] = values[i][j];
+							}
+						}
+					}
+					table.getTableJson().setValues(newValues);
+					table.save();
+					result = "success";
+				}
+			} else {
+				PostgresDao dao = new PostgresDao();
+				int rowId = Integer.parseInt(request.getParameter("rowid"));
+				Row row = dao.getRow(rowId);
+				int tableId = row.getTableId();
+				Table currentTable = dao.getTable(tableId);
+
+				boolean isUsedByTables = false;
+				String error = "";
+				if (currentTable.getType() == TableType.STORAGE) {
+					List<Table> tablesUsingRow = dao.getTablesUsingRow(rowId);
+					if (!tablesUsingRow.isEmpty()) {
+						isUsedByTables = true;
+						error = "ERROR: This row is used by:";
+						String tableName = "";
+						for (Table table : tablesUsingRow) {
+							if (table.getName() != null) {
+								tableName = table.getName();
+							} else {
+								tableName = "-";
+							}
+							error += "<br>- " + tableName + " (" + table.getType().toString().toLowerCase() + ");";
+						}
+					}
+				}
+				if (isUsedByTables) {
+					result = error;
+				} else {
+					if (dao.deleteRow(rowId)) {
+						List<Integer> rowIds = new ArrayList<Integer>();
+						List<Integer> oldRowNumbers = new ArrayList<Integer>();
+						List<Integer> rowNumbers = new ArrayList<Integer>();
+						List<Row> rows = dao.getRows(tableId);
+						for (int i = 0; i < rows.size(); i++) {
+							rowIds.add(rows.get(i).getId());
+							oldRowNumbers.add(rows.get(i).getOrder());
+							rowNumbers.add(i + 1);
+						}
+						dao.updateRows(rowIds, oldRowNumbers, rowNumbers);
+						result = "success";
+					} else {
+						result = "Could not delete the row. See server log for details.";
+					}
 				}
 			}
+			out.print(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 			out.print(e.getLocalizedMessage());

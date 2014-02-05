@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
@@ -121,8 +121,8 @@ public class GetTableValues extends HttpServlet {
 		UiKey[] uiKeys = new UiKey[keys.length];
 		for (int i = 0; i < keys.length; i++) {
 			uiKeys[i] = new UiKey();
-			uiKeys[i].setOrder(0);
-			uiKeys[i].setId(0);
+			uiKeys[i].setOrder(i + 1);
+			uiKeys[i].setId(i + 1);
 			uiKeys[i].setText(keys[i].getName());
 		}
 		uiTable.setKeys(uiKeys);
@@ -138,7 +138,7 @@ public class GetTableValues extends HttpServlet {
 			uiRows[i] = new UiRow();
 			if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
 				UiIndex uiIndex = new UiIndex();
-				uiIndex.setId(0);
+				uiIndex.setId(i + 1);
 				uiIndex.setOrder(i + 1);
 				uiRows[i].setIndex(uiIndex);
 			}
@@ -147,10 +147,10 @@ public class GetTableValues extends HttpServlet {
 				uiValues[j] = new UiValue();
 				uiValues[j].setStorage(keys[j].getType() == KeyType.STORAGE);
 				uiValues[j].setEnum(keys[j].getType() == KeyType.ENUMERATION);
-				uiValues[j].setRowid(0);
-				uiValues[j].setKeyid(0);
+				uiValues[j].setRowid(i + 1);
+				uiValues[j].setKeyid(j + 1);
 				uiValues[j].setId(0);
-				uiValues[j].setText(StringEscapeUtils.escapeHtml(values[i][j]));
+				uiValues[j].setText(StringEscapeUtils.escapeHtml4(values[i][j]));
 			}
 			uiRows[i].setValues(uiValues);
 			if (showUsage) {
@@ -211,7 +211,7 @@ public class GetTableValues extends HttpServlet {
 				uiValues[j].setRowid(values.get(i).get(j).getRowId());
 				uiValues[j].setKeyid(values.get(i).get(j).getKeyId());
 				uiValues[j].setId(values.get(i).get(j).getId());
-				uiValues[j].setText(StringEscapeUtils.escapeHtml(values.get(i).get(j).getValue()));
+				uiValues[j].setText(StringEscapeUtils.escapeHtml4(values.get(i).get(j).getValue()));
 			}
 			uiRows[i].setValues(uiValues);
 			if (showUsage) {

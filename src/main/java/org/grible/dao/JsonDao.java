@@ -85,9 +85,11 @@ public class JsonDao implements Dao {
 		Product product = getProduct(productId);
 		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
 		File[] subdirs = dir.listFiles();
-		for (File subdir : subdirs) {
-			if (subdir.isDirectory()) {
-				result.add(new Category(subdir.getName(), type, productId));
+		if (subdirs != null) {
+			for (File subdir : subdirs) {
+				if (subdir.isDirectory()) {
+					result.add(new Category(subdir.getName(), type, productId));
+				}
 			}
 		}
 		return result;
@@ -206,7 +208,7 @@ public class JsonDao implements Dao {
 		File[] files = dir.listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
-				return (file.isFile() && file.getName().contains(".json")
+				return (file.isFile() && file.getName().endsWith(".json")
 						&& !file.getName().contains("_PRECONDITION.json") && !file.getName().contains(
 						"_POSTCONDITION.json"));
 			}

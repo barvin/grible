@@ -16,11 +16,11 @@ public class IOHelper {
 		return null;
 	}
 	
-	public static void searchAllFiles(List<File> fileList, File dir, String fileNamePart) {
+	public static void searchAllFiles(List<File> fileList, File dir, String fileExtention) {
 		for (File temp : dir.listFiles()) {
 			if (temp.isDirectory()) {
-				searchAllFiles(fileList, temp, fileNamePart);
-			} else if (temp.getName().contains(fileNamePart)) {
+				searchAllFiles(fileList, temp, fileExtention);
+			} else if (temp.getName().endsWith(fileExtention)) {
 				fileList.add(temp);
 			}
 		}

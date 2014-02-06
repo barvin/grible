@@ -23,7 +23,7 @@ var source = '<div class="table-row key-row">' + '{{#if isIndex}}'
 		+ '<div class="table-cell ui-cell key-cell" key-order="{{order}}" id="{{id}}">{{text}}</div>' + '{{/each}}'
 		+ '{{#if info}}' + '<div class="table-cell ui-cell info-key-cell">{{tables}}</div>'
 		+ '<div class="table-cell ui-cell info-key-cell">{{storages}}</div>' + '{{/if}}' + '</div>'
-		+ '{{#each values}}' + '<div class="table-row value-row">' + '{{#if index}}' + '{{#with index}}'
+		+ '{{#each values}}' + '<div class="table-row ui-row value-row">' + '{{#if index}}' + '{{#with index}}'
 		+ '<div class="table-cell ui-cell index-cell" id="{{id}}">{{order}}</div>' + '{{/with}}' + '{{/if}}'
 		+ '{{#each values}}' + '<div class="table-cell ui-cell value-cell'
 		+ '{{#if isStorage}} storage-cell {{/if}} {{#if isEnum}} enum-cell {{/if}}"'
@@ -957,31 +957,41 @@ function initTopPanel() {
 			$(".data-item-selected > .changed-sign").remove();
 			$(this).removeClass("button-enabled");
 			$(this).addClass("button-disabled");
-			var valuesWaiting = $(".modified-value-cell").length;
-			$(".modified-value-cell").each(function(i) {
-				var $cell = $(this);
-				if ($cell.has("span")) {
-					$cell.find("span").remove();
-				}
-				if ($cell.has("div.tooltip")) {
-					$cell.find("div.tooltip").remove();
-				}
-				$.post("../SaveCellValue", {
-					id : $cell.attr('id'),
-					value : $cell.text()
+
+			if (isJson()) {
+				var keys = [];
+				$(".ui-cell.key-cell").each(function(i) {
+					keys[i] = $(this).text();
+				});
+				var values = [];
+				$(".ui-row.value-row").each(function(i) {
+					values[i] = "[";
+					$(this).find(".ui-cell.value-cell").each(function(j) {
+						if ($(this).has("span")) {
+							$(this).find("span").remove();
+						}
+						if ($(this).has("div.tooltip")) {
+							$(this).find("div.tooltip").remove();
+						}
+						if (j > 0) {
+							values[i] += ",";
+						}
+						values[i] += "\"" + $(this).text() + "\"";
+					});
+					values[i] += "]";
+				});
+				$.post("../SaveTable", {
+					tableid : tableId,
+					product : productId,
+					keys : keys,
+					values : values
 				}, function(data) {
 					if (data == "success") {
-						$cell.removeClass("modified-value-cell");
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
-					valuesWaiting--;
-					if (valuesWaiting == 0) {
+						$(".modified-value-cell").removeClass("modified-value-cell");
+						$(".modified-key-cell").removeClass("modified-key-cell");
 						$.post("../CheckForDuplicatedRows", {
-							id : tableId
+							id : tableId,
+							product : productId
 						}, function(data) {
 							var message = data.split("|");
 							if (message[0] == "true") {
@@ -993,52 +1003,97 @@ function initTopPanel() {
 								}
 							}
 						});
-					}
-				});
-			});
-			var keysWaiting = $(".modified-key-cell").length;
-			$(".modified-key-cell").each(function(i) {
-				var $key = $(this);
-				if ($key.has("span")) {
-					$key.find("span").remove();
-				}
-				if ($key.has("div.tooltip")) {
-					$key.find("div.tooltip").remove();
-				}
-				$.post("../SaveKeyValue", {
-					id : $key.attr('id'),
-					value : $key.text()
-				}, function(data) {
-					if (data == "success") {
-						$key.removeClass("modified-key-cell");
 					} else {
 						noty({
 							type : "error",
 							text : data
 						});
 					}
-					keysWaiting--;
-					if (keysWaiting == 0) {
-						var keyNames = $(".key-cell.ui-cell").map(function() {
-							return $(this).text();
-						}).get();
-						var usedNames = new Array();
-						for (var i = 0; i < keyNames.length - 1; i++) {
-							if ($.inArray(keyNames[i], usedNames) == -1) {
-								for (var j = i + 1; j < keyNames.length; j++) {
-									if (keyNames[i] === keyNames[j]) {
-										usedNames.push(keyNames[i]);
+				});
+			} else {
+				var valuesWaiting = $(".modified-value-cell").length;
+				$(".modified-value-cell").each(function(i) {
+					var $cell = $(this);
+					if ($cell.has("span")) {
+						$cell.find("span").remove();
+					}
+					if ($cell.has("div.tooltip")) {
+						$cell.find("div.tooltip").remove();
+					}
+					$.post("../SaveCellValue", {
+						id : $cell.attr('id'),
+						value : $cell.text()
+					}, function(data) {
+						if (data == "success") {
+							$cell.removeClass("modified-value-cell");
+						} else {
+							noty({
+								type : "error",
+								text : data
+							});
+						}
+						valuesWaiting--;
+						if (valuesWaiting == 0) {
+							$.post("../CheckForDuplicatedRows", {
+								id : tableId
+							}, function(data) {
+								var message = data.split("|");
+								if (message[0] == "true") {
+									for (var i = 1; i < message.length; i++) {
 										noty({
 											type : "warning",
-											text : "More than one parameter name '" + keyNames[i] + "'."
+											text : message[i]
 										});
+									}
+								}
+							});
+						}
+					});
+				});
+				var keysWaiting = $(".modified-key-cell").length;
+				$(".modified-key-cell").each(function(i) {
+					var $key = $(this);
+					if ($key.has("span")) {
+						$key.find("span").remove();
+					}
+					if ($key.has("div.tooltip")) {
+						$key.find("div.tooltip").remove();
+					}
+					$.post("../SaveKeyValue", {
+						id : $key.attr('id'),
+						value : $key.text()
+					}, function(data) {
+						if (data == "success") {
+							$key.removeClass("modified-key-cell");
+						} else {
+							noty({
+								type : "error",
+								text : data
+							});
+						}
+						keysWaiting--;
+						if (keysWaiting == 0) {
+							var keyNames = $(".key-cell.ui-cell").map(function() {
+								return $(this).text();
+							}).get();
+							var usedNames = new Array();
+							for (var i = 0; i < keyNames.length - 1; i++) {
+								if ($.inArray(keyNames[i], usedNames) == -1) {
+									for (var j = i + 1; j < keyNames.length; j++) {
+										if (keyNames[i] === keyNames[j]) {
+											usedNames.push(keyNames[i]);
+											noty({
+												type : "warning",
+												text : "More than one parameter name '" + keyNames[i] + "'."
+											});
+										}
 									}
 								}
 							}
 						}
-					}
+					});
 				});
-			});
+			}
 		}
 	});
 

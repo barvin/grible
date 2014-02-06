@@ -22,12 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.Value;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -56,23 +58,49 @@ public class CheckForDuplicatedRows extends HttpServlet {
 				return;
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = new PostgresDao().getTable(id);
+			int productId = Integer.parseInt(request.getParameter("product"));
+			PostgresDao pDao = null;
+			JsonDao jDao = null;
+			Table table = null;
+			if (ServletHelper.isJson()) {
+				jDao = new JsonDao();
+				table = jDao.getTable(id, productId);
+			} else {
+				pDao = new PostgresDao();
+				table = pDao.getTable(id); 
+			}
 
 			String message = "";
 
 			if (table.getType() == TableType.TABLE || table.getType() == TableType.STORAGE) {
 				if (table.isShowWarning()) {
-					List<String> strValues = new ArrayList<String>();
-					List<Row> rows = DataManager.getInstance().getDao().getRows(id);
-					for (Row row : rows) {
-						strValues.add(getCombinedValues(row));
-					}
-					for (int i = 0; i < rows.size(); i++) {
-						String currValue = strValues.remove(0);
-						if (strValues.contains(currValue)) {
-							int first = rows.get(i).getOrder();
-							int second = first + 1 + strValues.indexOf(currValue);
-							message += "|Duplicated rows detected: " + first + " and " + second + ".";
+					if (ServletHelper.isJson()) {
+						List<String> strValues = new ArrayList<String>();
+						List<Row> rows = DataManager.getInstance().getDao().getRows(id);
+						for (Row row : rows) {
+							strValues.add(getCombinedValues(row));
+						}
+						for (int i = 0; i < rows.size(); i++) {
+							String currValue = strValues.remove(0);
+							if (strValues.contains(currValue)) {
+								int first = rows.get(i).getOrder();
+								int second = first + 1 + strValues.indexOf(currValue);
+								message += "|Duplicated rows detected: " + first + " and " + second + ".";
+							}
+						}
+					} else {
+						List<String> strValues = new ArrayList<String>();
+						List<Row> rows = DataManager.getInstance().getDao().getRows(id);
+						for (Row row : rows) {
+							strValues.add(getCombinedValues(row));
+						}
+						for (int i = 0; i < rows.size(); i++) {
+							String currValue = strValues.remove(0);
+							if (strValues.contains(currValue)) {
+								int first = rows.get(i).getOrder();
+								int second = first + 1 + strValues.indexOf(currValue);
+								message += "|Duplicated rows detected: " + first + " and " + second + ".";
+							}
 						}
 					}
 				}

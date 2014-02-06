@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.security.Security;
-import org.grible.settings.AppTypes;
+import org.grible.servlets.ServletHelper;
 import org.grible.settings.GlobalSettings;
 
 /**
@@ -47,19 +47,19 @@ public class SaveSettings extends HttpServlet {
 			IOException {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
-		try {			
+		try {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
 			boolean isTooltipOnClick = Boolean.parseBoolean(request.getParameter("tooltiponclick"));
-			if (GlobalSettings.getInstance().getAppType() == AppTypes.POSTGRESQL) {
+			if (ServletHelper.isJson()) {
+				GlobalSettings.getInstance().getConfigJson().setTooltipOnClick(isTooltipOnClick);
+				GlobalSettings.getInstance().getConfigJson().save();
+			} else {
 				String userName = (String) request.getSession(false).getAttribute("userName");
 				PostgresDao dao = new PostgresDao();
 				User user = dao.getUserByName(userName);
 				dao.updateUserIsTooltipOnClick(user.getId(), isTooltipOnClick);
-			} else {
-				GlobalSettings.getInstance().getConfigJson().setTooltipOnClick(isTooltipOnClick);
-				GlobalSettings.getInstance().getConfigJson().save();
 			}
 			out.print("success");
 

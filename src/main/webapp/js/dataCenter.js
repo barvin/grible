@@ -640,7 +640,7 @@ function initFillDialog() {
 
 	function submitFill() {
 		var $value;
-		if ($("input.fill-value") > 0) {
+		if ($("input.fill-value").length > 0) {
 			$value = $("input.fill-value").val();
 		} else {
 			$value = $("select.enum-values").find("option:selected").text();

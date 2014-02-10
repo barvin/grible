@@ -148,25 +148,6 @@ public class JsonDao implements Dao {
 		return id;
 	}
 
-	@Override
-	public int insertRow(int tableId, int order) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int insertKey(int tableId, String name, int order, int referenceStorageId) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
-			throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
 	public Table getTable(int id, int productId) throws Exception {
 		Product product = getProduct(productId);
 		String path = product.getGribleJson().read().getPathById(id);
@@ -179,18 +160,6 @@ public class JsonDao implements Dao {
 		table.setTableJson();
 		table.setId(id);
 		return table;
-	}
-
-	@Override
-	public int getProductIdByPrimaryTableId(int tableId) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getProductIdBySecondaryTableId(int tableId) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override
@@ -223,30 +192,6 @@ public class JsonDao implements Dao {
 		return result;
 	}
 
-	@Override
-	public List<Key> getKeys(int tableId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Row> getRows(int tableId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<Value> getValues(Row row) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Table> getTablesUsingRow(int rowId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public Integer getChildTableId(int tableId, int productId, TableType childType) throws Exception {
 		Product product = getProduct(productId);
 		String parentPath = product.getGribleJson().read().getPathById(tableId);
@@ -263,36 +208,6 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public Category getCategory(int id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Value> getValues(Key key) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Row getRow(int id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Value getValue(int id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Key getKey(int id) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId, String parentPath)
 			throws Exception {
 		Product product = getProduct(productId);
@@ -301,73 +216,6 @@ public class JsonDao implements Dao {
 		if (dir.exists()) {
 			return 1;
 		}
-		return null;
-	}
-
-	@Override
-	public List<Integer> insertKeys(int tableId, List<String> keyNames) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Integer> insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int insertKeyCopy(Key currentKey) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public List<Integer> insertValuesWithKeyId(int newKeyId, List<Value> values) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
-			throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateRows(List<Integer> rowIds, List<Integer> rowNumbers) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int insertRowCopy(Row currentRow) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public List<Integer> insertValuesWithRowId(int newRowId, List<Value> values) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws Exception {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -407,37 +255,6 @@ public class JsonDao implements Dao {
 		return !file.exists();
 	}
 
-	@Override
-	public boolean deleteKey(int keyId) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean deleteRow(int rowId) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public List<Integer> insertRows(int tableId, int rowsNumber) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Integer> addRows(int tableId, int currRowsNumber, int rowsNumberToAdd) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void insertValues(List<Integer> rowIds, List<Integer> keyIds, ArrayList<ArrayList<String>> values)
-			throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
 	public void updateTable(Table table) throws Exception {
 		table.getTableJson().setClassName(table.getClassName());
 		table.getTableJson().setShowUsage(table.isShowUsage());
@@ -454,54 +271,6 @@ public class JsonDao implements Dao {
 				+ category.getName();
 		dir.renameTo(new File(product.getPath() + File.separator + category.getType().getSection().getDirName()
 				+ File.separator + newFullPath));
-	}
-
-	@Override
-	public void updateKeys(String[] keyIds, String[] keyValues) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateKeyValue(String id, String value) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int getRefStorageId(int keyId) throws Exception {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Row getRow(int refStorageId, int order) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void updateValues(ArrayList<Value> values) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateKey(Key key) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateValuesTypes(int keyId, boolean isStorage, String storageIds) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateValue(Value value) throws Exception {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -595,30 +364,6 @@ public class JsonDao implements Dao {
 		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
 		File file = IOHelper.searchFile(dir, name + ".json");
 		return file != null;
-	}
-
-	@Override
-	public List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void insertValues(int tableId, int oldTableId, List<Row> oldRows, List<Key> keys) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isTableTypeExist(String name) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public void moveTableFile(Table table, Integer productId, String newCategoryPath, String newName) throws Exception {

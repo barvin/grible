@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
@@ -67,7 +68,7 @@ public class CheckForDuplicatedRows extends HttpServlet {
 				table = jDao.getTable(id, productId);
 			} else {
 				pDao = new PostgresDao();
-				table = pDao.getTable(id); 
+				table = pDao.getTable(id);
 			}
 
 			String message = "";
@@ -76,14 +77,14 @@ public class CheckForDuplicatedRows extends HttpServlet {
 				if (table.isShowWarning()) {
 					if (ServletHelper.isJson()) {
 						List<String> strValues = new ArrayList<String>();
-						List<Row> rows = DataManager.getInstance().getDao().getRows(id);
-						for (Row row : rows) {
-							strValues.add(getCombinedValues(row));
+						String[][] values = table.getTableJson().getValues();
+						for (String[] row : values) {
+							strValues.add(StringUtils.join(row));
 						}
-						for (int i = 0; i < rows.size(); i++) {
+						for (int i = 0; i < values.length; i++) {
 							String currValue = strValues.remove(0);
 							if (strValues.contains(currValue)) {
-								int first = rows.get(i).getOrder();
+								int first = i + 1;
 								int second = first + 1 + strValues.indexOf(currValue);
 								message += "|Duplicated rows detected: " + first + " and " + second + ".";
 							}

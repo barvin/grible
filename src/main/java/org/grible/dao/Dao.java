@@ -47,8 +47,6 @@ public interface Dao {
 	public void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
 			throws Exception;
 
-	public Table getTable(String name, Integer categoryId) throws Exception;
-
 	/**
 	 * Method for 'tables' or 'storages'.
 	 */

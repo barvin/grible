@@ -182,12 +182,6 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public Table getTable(String name, Integer categoryId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public int getProductIdByPrimaryTableId(int tableId) throws Exception {
 		// TODO Auto-generated method stub
 		return 0;
@@ -598,7 +592,7 @@ public class JsonDao implements Dao {
 			return false;
 		}
 		Product product = getProduct(category.getProductId());
-		File dir = new File(product.getPath());
+		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
 		File file = IOHelper.searchFile(dir, name + ".json");
 		return file != null;
 	}
@@ -700,5 +694,18 @@ public class JsonDao implements Dao {
 			values.add(row[keyOrder]);
 		}
 		return values;
+	}
+
+	public Table getTable(String name, TableType type, Category category) throws Exception {
+		Product product = getProduct(category.getProductId());
+		File dir = new File(product.getPath() + File.separator + type.getSection().getDirName());
+		File file = IOHelper.searchFile(dir, name + ".json");
+		Table table = new Table(file);
+		table.setTableJson();
+		String path = type.getSection().getDirName() + File.separator;
+		path += StringHelper.getCategoryPathFromTable(table, category.getProductId(), type);
+		path += File.separator + name + ".json";
+		table.setId(product.getGribleJson().read().getIdByPath(path));
+		return table;
 	}
 }

@@ -22,10 +22,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.model.Key;
 import org.grible.model.Row;
+import org.grible.model.Table;
 import org.grible.model.Value;
+import org.grible.model.json.KeyJson;
+import org.grible.model.json.KeyType;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -70,9 +75,22 @@ public class GetStorageTooltip extends HttpServlet {
 			}
 
 			if (correctFormat) {
-				Value value = DataManager.getInstance().getDao().getValue(Integer.parseInt(request.getParameter("id")));
-				Integer[] storageIds = value.getStorageIds();
-				out.print(content + getStorageTooltip(storageIds));
+
+				if (ServletHelper.isJson()) {
+					int productId = Integer.parseInt(request.getParameter("product"));
+					int tableId = Integer.parseInt(request.getParameter("tableid"));
+					int keyOrder = Integer.parseInt(request.getParameter("keyorder"));
+					JsonDao dao = new JsonDao();
+					Table table = dao.getTable(tableId, productId);
+					KeyJson key = table.getTableJson().getKeys()[keyOrder - 1];
+					Table refTable = dao.getTable(key.getRefid(), productId);
+					out.print(content + getStorageTooltip(indexes, refTable, productId));
+				} else {
+					Value value = DataManager.getInstance().getDao()
+							.getValue(Integer.parseInt(request.getParameter("id")));
+					Integer[] storageIds = value.getStorageIds();
+					out.print(content + getStorageTooltip(storageIds));
+				}
 			} else {
 				out.print(content);
 			}
@@ -83,6 +101,41 @@ public class GetStorageTooltip extends HttpServlet {
 			out.flush();
 			out.close();
 		}
+	}
+
+	private String getStorageTooltip(String[] indexes, Table refTable, int productId) {
+		StringBuilder result = new StringBuilder("<div class=\"tooltip\"><div style=\"width: auto;\" class=\"table\">");
+		result.append("<div class=\"table-row key-row\">");
+		result.append("<div class=\"table-cell ui-cell-mini index-header-cell\">Index</div>");
+		KeyJson[] keys = refTable.getTableJson().getKeys();
+		for (KeyJson key : keys) {
+			result.append("<div class=\"table-cell ui-cell-mini key-cell\">");
+			result.append(key.getName());
+			result.append("</div>");
+		}
+		result.append("</div>");
+
+		String[][] rows = refTable.getTableJson().getValues();
+		for (int i = 0; i < indexes.length; i++) {
+			result.append("<div class=\"table-row value-row\">");
+			result.append("<div id=\"").append(indexes[i]);
+			result.append("\" class=\"table-cell ui-cell-mini index-cell\">");
+			result.append(indexes[i]);
+			result.append("</div>");
+			String[] values = rows[Integer.parseInt(indexes[i]) - 1];
+			for (int j = 0; j < values.length; j++) {
+				String storageCell = (keys[j].getType() == KeyType.STORAGE) ? " storage-cell" : "";
+				result.append("<div class=\"table-cell ui-cell-mini value-cell ");
+				result.append(storageCell).append("\">");
+				result.append(values[j]);
+				result.append("</div>");
+			}
+			result.append("</div>");
+		}
+		result.append("</div>");
+		result.append("<br><a href=\"/storages/?product=").append(productId).append("&id=").append(refTable.getId())
+				.append("\" target=\"_blank\">Open storage in the new tab</a></div>");
+		return result.toString();
 	}
 
 	private String getStorageTooltip(Integer[] integers) throws Exception {

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -135,7 +136,7 @@ public class ExcelFile {
 			Row row = sheet.getRow(i);
 			for (int j = 0; j < keysCount; j++) {
 				Cell cell = row.getCell(j);
-				addStringCellValueToList(values, cell);
+				values.add(getStringCellValue(cell));
 			}
 			result.add(values);
 		}
@@ -143,18 +144,24 @@ public class ExcelFile {
 		return result;
 	}
 
-	private void addStringCellValueToList(ArrayList<String> values, Cell cell) {
+	private String getStringCellValue(Cell cell) {
 		if (cell == null) {
-			values.add("");
-		} else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-			values.add(String.valueOf(cell.getNumericCellValue()));
-		} else if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
-			values.add(String.valueOf(cell.getBooleanCellValue()));
-		} else if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
-			values.add(cell.getCellFormula());
-		} else {
-			values.add(cell.getStringCellValue());
+			return "";
 		}
+		if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+			String result = String.valueOf(cell.getNumericCellValue());
+			if (result.endsWith(".0")) {
+				result = StringUtils.substringBeforeLast(result, ".0");
+			}
+			return result;
+		}
+		if (cell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
+			return String.valueOf(cell.getBooleanCellValue());
+		}
+		if (cell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+			return cell.getCellFormula();
+		}
+		return cell.getStringCellValue();
 	}
 
 	public List<String> getKeys() {
@@ -192,7 +199,7 @@ public class ExcelFile {
 		Row keysRow = sheet.getRow(0);
 		Row valuesRow = sheet.getRow(1);
 		for (int i = 0; i < keysRow.getPhysicalNumberOfCells(); i++) {
-			result.put(keysRow.getCell(i).getStringCellValue(), valuesRow.getCell(i).getStringCellValue());
+			result.put(getStringCellValue(keysRow.getCell(i)), getStringCellValue(valuesRow.getCell(i)));
 		}
 		return result;
 	}

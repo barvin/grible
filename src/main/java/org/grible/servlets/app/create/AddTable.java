@@ -154,7 +154,11 @@ public class AddTable extends HttpServlet {
 			} else {
 				if (isJson()) {
 					Table table = new JsonDao().getTable(tableId, productId);
-					table.getTableJson().setKeys(new KeyJson[] { new KeyJson("editme", KeyType.TEXT, 0) });
+					String keyName = "editme";
+					if (type == TableType.ENUMERATION) {
+						keyName = name;
+					}
+					table.getTableJson().setKeys(new KeyJson[] { new KeyJson(keyName, KeyType.TEXT, 0) });
 					table.getTableJson().setValues(new String[][] { { "" } });
 					table.save();
 				} else {

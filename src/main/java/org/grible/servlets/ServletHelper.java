@@ -272,25 +272,30 @@ public class ServletHelper {
 		if ((request.getSession(false) != null) && (request.getSession(false).getAttribute("importResult") != null)) {
 			String importResult = (String) request.getSession(false).getAttribute("importResult");
 
-			String applyPart = "var keyIds=new Array(); var refIds=new Array(); var types=new Array(); ";
-			List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
-			int i = 0;
-			for (Key key : keys) {
-				if (key.getReferenceTableId() != 0) {
-					String type = new PostgresDao().getTable(key.getReferenceTableId()).getType().toString()
-							.toLowerCase();
-					applyPart += "keyIds[" + i + "]=" + key.getId() + "; refIds[" + i + "]="
-							+ key.getReferenceTableId() + "; types[" + i + "]='" + type + "'; ";
-					i++;
-					key.setReferenceTableId(0);
-					DataManager.getInstance().getDao().updateKey(key);
-					DataManager.getInstance().getDao().updateValuesTypes(key.getId(), false, "NULL");
-				}
-			}
-			if (i > 0) {
-				applyPart += "applyParameterTypesAfterImport(keyIds, refIds, types);";
+			String applyPart = "";
+			if (isJson()) {
+
 			} else {
-				applyPart = "";
+				PostgresDao dao = new PostgresDao();
+				applyPart = "var keyIds=new Array(); var refIds=new Array(); var types=new Array(); ";
+				List<Key> keys = dao.getKeys(tableId);
+				int i = 0;
+				for (Key key : keys) {
+					if (key.getReferenceTableId() != 0) {
+						String type = dao.getTable(key.getReferenceTableId()).getType().toString().toLowerCase();
+						applyPart += "keyIds[" + i + "]=" + key.getId() + "; refIds[" + i + "]="
+								+ key.getReferenceTableId() + "; types[" + i + "]='" + type + "'; ";
+						i++;
+						key.setReferenceTableId(0);
+						dao.updateKey(key);
+						dao.updateValuesTypes(key.getId(), false, "NULL");
+					}
+				}
+				if (i > 0) {
+					applyPart += "applyParameterTypesAfterImport(keyIds, refIds, types);";
+				} else {
+					applyPart = "";
+				}
 			}
 			responseHtml.append("<script type=\"text/javascript\">");
 			responseHtml.append("$(window).on('load', function() { showImportResult(\"" + importResult + "\"); "
@@ -306,8 +311,13 @@ public class ServletHelper {
 			Table currTable = (Table) request.getSession(false).getAttribute("importedTable");
 			ExcelFile excelFile = (ExcelFile) request.getSession(false).getAttribute("importedFile");
 			responseHtml.append("<script type=\"text/javascript\">");
-			responseHtml.append("$(window).on('load', function() { showAdvancedImportDialog("
-					+ DataManager.getInstance().getDao().getRows(currTable.getId()).size() + ", "
+			int rowsCount = 0;
+			if (isJson()) {
+				rowsCount = currTable.getTableJson().getValues().length;
+			} else {
+				rowsCount = new PostgresDao().getRows(currTable.getId()).size();
+			}
+			responseHtml.append("$(window).on('load', function() { showAdvancedImportDialog(" + rowsCount + ", "
 					+ excelFile.getValues().size() + "); });");
 			responseHtml.append("</script>");
 		}

@@ -23,8 +23,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.excel.ExcelFile;
+import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -38,6 +43,8 @@ import org.grible.servlets.ServletHelper;
 @WebServlet("/StorageImport")
 public class StorageImport extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private PostgresDao pDao;
+	private JsonDao jDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -47,7 +54,8 @@ public class StorageImport extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -55,40 +63,68 @@ public class StorageImport extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			String className = request.getParameter("class");
-			String message = "";
-			int storageId = 0;
+			String className = Streams.asString(request.getPart("class").getInputStream());
 
 			Part filePart = request.getPart("file");
 			String fileName = ServletHelper.getFilename(filePart);
-			String storageName = fileName.substring(0, fileName.lastIndexOf(".xls"));
+			String storageName = StringUtils.substringBefore(fileName, ".xls");
 			int categoryId = Integer.parseInt(request.getParameter("category"));
-			Category category = new Category(categoryId);
+			String categoryPath = StringHelper.getFolderPathWithoutLastSeparator(request.getParameter("categorypath"));
+			int productId = Integer.parseInt(request.getParameter("product"));
+
 			InputStream filecontent = filePart.getInputStream();
 			ExcelFile excelFile = new ExcelFile(filecontent, ServletHelper.isXlsx(fileName));
 
-			if (DataManager.getInstance().getDao().isTableInProductExist(storageName, TableType.STORAGE, category)) {
-				Table table = DataManager.getInstance().getDao().getTable(storageName, categoryId);
+			Category category = null;
+			if (ServletHelper.isJson()) {
+				jDao = new JsonDao();
+				category = new Category(categoryPath, TableType.STORAGE, productId);
+			} else {
+				pDao = new PostgresDao();
+				category = new Category(categoryId);
+			}
 
-				int currentKeysCount = DataManager.getInstance().getDao().getKeys(table.getId()).size();
+			if (DataManager.getInstance().getDao().isTableInProductExist(storageName, TableType.STORAGE, category)) {
+
+				Table table = null;
+				int currentKeysCount = 0;
+				if (ServletHelper.isJson()) {
+					table = jDao.getTable(storageName, TableType.STORAGE, category);
+					currentKeysCount = table.getTableJson().getKeys().length;
+				} else {
+					table = pDao.getTable(storageName, categoryId);
+					currentKeysCount = DataManager.getInstance().getDao().getKeys(table.getId()).size();
+				}
 				int importedKeysCount = excelFile.getKeys().size();
+
 				if (currentKeysCount != importedKeysCount) {
-					throw new Exception("Parameters number is different.<br>In the current storage: " + currentKeysCount
-							+ ". In the Excel file: " + importedKeysCount + ".");
+					throw new Exception("Parameters number is different.<br>In the current storage: "
+							+ currentKeysCount + ". In the Excel file: " + importedKeysCount + ".");
 				}
 
-				request.getSession(false).setAttribute("importedTable", table);
+				request.getSession(true).setAttribute("importedTable", table);
 				request.getSession(false).setAttribute("importedFile", excelFile);
-				String destination = "/storages/?id=" + table.getId();
+				String destination = "/storages/?product=" + productId + "&id=" + table.getId();
 				response.sendRedirect(destination);
 			} else {
-				storageId = DataManager.getInstance().getDao().insertTable(storageName, TableType.STORAGE, category, null, className);
+				int storageId = 0;
+				storageId = DataManager.getInstance().getDao()
+						.insertTable(storageName, TableType.STORAGE, category, null, className);
 
-				List<Integer> keyIds = DataManager.getInstance().getDao().insertKeys(storageId, excelFile.getKeys());
-				ArrayList<ArrayList<String>> values = excelFile.getValues();
-				List<Integer> rowIds = DataManager.getInstance().getDao().insertRows(storageId, values.size());
-				DataManager.getInstance().getDao().insertValues(rowIds, keyIds, values);
+				if (ServletHelper.isJson()) {
+					Table table = jDao.getTable(storageId, productId);
+					table.getTableJson().setKeys(excelFile.getKeys());
+					table.getTableJson().setValues(excelFile.getValues());
+					table.save();
+				} else {
+					List<Integer> keyIds = DataManager.getInstance().getDao()
+							.insertKeys(storageId, excelFile.getKeys());
+					ArrayList<ArrayList<String>> values = excelFile.getValues();
+					List<Integer> rowIds = DataManager.getInstance().getDao().insertRows(storageId, values.size());
+					DataManager.getInstance().getDao().insertValues(rowIds, keyIds, values);
+				}
 
+				String message = "";
 				if (className.equals("")) {
 					message = "'" + storageName + "' storage was successfully imported. WARNING: Class name is empty.";
 				} else if (!className.endsWith("Info")) {
@@ -100,12 +136,11 @@ public class StorageImport extends HttpServlet {
 
 				String destination = "";
 				if (storageId > 0) {
-					destination = "/storages/?id=" + storageId;
+					destination = "/storages/?product=" + productId + "&id=" + storageId;
 				} else {
-					int productId = Integer.parseInt(request.getParameter("product"));
 					destination = "/storages/?product=" + productId;
 				}
-				request.getSession(false).setAttribute("importResult", message);
+				request.getSession(true).setAttribute("importResult", message);
 				response.sendRedirect(destination);
 			}
 		} catch (Exception e) {
@@ -113,7 +148,7 @@ public class StorageImport extends HttpServlet {
 			String destination = "/storages/?product=" + productId;
 			String message = "ERROR: " + e.getMessage();
 			e.printStackTrace();
-			request.getSession(false).setAttribute("importResult", message);
+			request.getSession(true).setAttribute("importResult", message);
 			response.sendRedirect(destination);
 		}
 	}

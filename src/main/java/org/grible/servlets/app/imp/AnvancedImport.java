@@ -22,13 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.excel.ExcelFile;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.Value;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -36,6 +37,7 @@ import org.grible.security.Security;
 @WebServlet("/AnvancedImport")
 public class AnvancedImport extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -45,7 +47,8 @@ public class AnvancedImport extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException {
@@ -58,13 +61,36 @@ public class AnvancedImport extends HttpServlet {
 			Table currTable = (Table) request.getSession(false).getAttribute("importedTable");
 			ExcelFile excelFile = (ExcelFile) request.getSession(false).getAttribute("importedFile");
 
-			String option = request.getParameter("option"); // "addtoend", "addfromrow"
+			String option = request.getParameter("option"); // "addtoend",
+															// "addfromrow"
+
+			if (!ServletHelper.isJson()) {
+				pDao = new PostgresDao();
+			}
 
 			if ("addtoend".equals(option)) {
-				ArrayList<ArrayList<String>> values = excelFile.getValues();
-				List<Integer> rowIds = DataManager.getInstance().getDao().addRows(currTable.getId(), DataManager.getInstance().getDao().getRows(currTable.getId()).size(),
-						values.size());
-				DataManager.getInstance().getDao().insertValues(rowIds, getKeyIds(DataManager.getInstance().getDao().getKeys(currTable.getId())), values);
+				ArrayList<ArrayList<String>> excelValues = excelFile.getValues();
+				if (ServletHelper.isJson()) {
+					String[][] oldValues = currTable.getTableJson().getValues();
+					String[][] newValues = new String[oldValues.length + excelValues.size()][oldValues[0].length];
+					for (int i = 0; i < newValues.length; i++) {
+						if (i < oldValues.length) {
+							for (int j = 0; j < newValues[0].length; j++) {
+								newValues[i][j] = oldValues[i][j];
+							}
+						} else {
+							for (int j = 0; j < newValues[0].length; j++) {
+								newValues[i][j] = excelValues.get(i - oldValues.length).get(j);
+							}
+						}
+					}
+					currTable.getTableJson().setValues(newValues);
+					currTable.save();
+				} else {
+					List<Integer> rowIds = pDao.addRows(currTable.getId(), pDao.getRows(currTable.getId()).size(),
+							excelValues.size());
+					pDao.insertValues(rowIds, getKeyIds(pDao.getKeys(currTable.getId())), excelValues);
+				}
 			} else if ("addfromrow".equals(option)) {
 				int startRow = 0;
 				if (request.getParameter("startrow") != null) {
@@ -76,34 +102,65 @@ public class AnvancedImport extends HttpServlet {
 				} else {
 					throw new Exception("ERROR: Start row is null.");
 				}
-				List<Row> rows = DataManager.getInstance().getDao().getRows(currTable.getId());
-				ArrayList<ArrayList<String>> newValues = excelFile.getValues();
-				int rowsCount = rows.size();
-				int newValuesCount = newValues.size();
-				if (startRow > rowsCount) {
-					throw new Exception("ERROR: Start row is out of range.");
-				}
-				int limit = rowsCount;
-				if (rowsCount > (startRow + newValuesCount - 1)) {
-					limit = newValuesCount;
-				}
-				for (int i = startRow - 1; i < limit; i++) {
-					List<Value> currValues = DataManager.getInstance().getDao().getValues(rows.get(i));
-					for (int j = 0; j < currValues.size(); j++) {
-						Value value = currValues.get(j);
-						value.setValue(newValues.get(0).get(j));
-						DataManager.getInstance().getDao().updateValue(value);
+
+				ArrayList<ArrayList<String>> excelValues = excelFile.getValues();
+				int excelValuesCount = excelValues.size();
+				
+				if (ServletHelper.isJson()) {
+					String[][] oldValues = currTable.getTableJson().getValues();
+
+					int rowsCount = oldValues.length;
+					if (startRow > rowsCount) {
+						throw new Exception("ERROR: Start row is out of range.");
 					}
-					newValues.remove(0);
-				}
-				if (newValues.size() > 0) {
-					List<Integer> rowIds = DataManager.getInstance().getDao().addRows(currTable.getId(), rowsCount, newValues.size());
-					DataManager.getInstance().getDao().insertValues(rowIds, getKeyIds(DataManager.getInstance().getDao().getKeys(currTable.getId())), newValues);
+					int limit = rowsCount;
+					if (rowsCount < (startRow - 1 + excelValuesCount)) {
+						limit = startRow - 1 + excelValuesCount;
+					}
+					String[][] newValues = new String[limit][oldValues[0].length];
+
+					for (int i = 0; i < limit; i++) {
+						if ((i < startRow - 1) || (i >= startRow - 1 + excelValuesCount)) {
+							for (int j = 0; j < newValues[0].length; j++) {
+								newValues[i][j] = oldValues[i][j];
+							}
+						} else {
+							for (int j = 0; j < newValues[0].length; j++) {
+								newValues[i][j] = excelValues.get(i - (startRow - 1)).get(j);
+							}
+						}
+					}
+					currTable.getTableJson().setValues(newValues);
+					currTable.save();
+				} else {
+					List<Row> rows = pDao.getRows(currTable.getId());
+					int rowsCount = rows.size();
+					if (startRow > rowsCount) {
+						throw new Exception("ERROR: Start row is out of range.");
+					}
+					int limit = rowsCount;
+					if (rowsCount > (startRow - 1 + excelValuesCount)) {
+						limit = startRow - 1 + excelValuesCount;
+					}
+					for (int i = startRow - 1; i < limit; i++) {
+						List<Value> currValues = pDao.getValues(rows.get(i));
+						for (int j = 0; j < currValues.size(); j++) {
+							Value value = currValues.get(j);
+							value.setValue(excelValues.get(0).get(j));
+							pDao.updateValue(value);
+						}
+						excelValues.remove(0);
+					}
+					if (excelValues.size() > 0) {
+						List<Integer> rowIds = pDao.addRows(currTable.getId(), rowsCount, excelValues.size());
+						pDao.insertValues(rowIds, getKeyIds(pDao.getKeys(currTable.getId())), excelValues);
+					}
 				}
 			}
-			request.getSession(false).setAttribute("importedTable", null);
+			request.getSession(true).setAttribute("importedTable", null);
 			request.getSession(false).setAttribute("importedFile", null);
-			String message = StringUtils.capitalize(currTable.getType().toString().toLowerCase()) + " imported successfully.";
+			String message = StringUtils.capitalize(currTable.getType().toString().toLowerCase())
+					+ " imported successfully.";
 			request.getSession(false).setAttribute("importResult", message);
 			out.print("success");
 		} catch (Exception e) {

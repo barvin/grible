@@ -267,6 +267,8 @@ function initLeftPanel() {
 													+ productId
 													+ '&category='
 													+ $id
+													+ '&categorypath='
+													+ getCategoryPath($(el))
 													+ '" method="post" enctype="multipart/form-data">'
 													+ fields
 													+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">Browse...</div>'
@@ -610,21 +612,39 @@ function initAddDataItemDialog() {
 
 function initFillDialog() {
 	initDialog();
-	$("input.fill-value").focus();
+	var $keyId = $("#dialog-btn-fill").attr("keyid");
 
-	$("input.fill-value").keypress(function(event) {
-		if (event.which === 13) {
-			submitFill();
-		}
-	});
+	if ($("div.enum-cell[keyid='" + $keyId + "']").length > 0) {
+		var $args = {
+			keyid : $keyId,
+			tableid : tableId,
+			product : productId,
+			content : ""
+		};
+		$.post("../GetEnumValues", $args, function(data) {
+			$("div.dialog-edit").html(data);
+		});
+	} else {
+		$("input.fill-value").focus();
+
+		$("input.fill-value").keypress(function(event) {
+			if (event.which === 13) {
+				submitFill();
+			}
+		});
+	}
 
 	$("#dialog-btn-fill").click(function() {
 		submitFill();
 	});
 
 	function submitFill() {
-		var $keyId = $("#dialog-btn-fill").attr("keyid");
-		var $value = $("input.fill-value").val();
+		var $value;
+		if ($("input.fill-value") > 0) {
+			$value = $("input.fill-value").val();
+		} else {
+			$value = $("select.enum-values").find("option:selected").text();
+		}
 		var $columnChanged = false;
 		$("div[keyid='" + $keyId + "']").each(function(i) {
 			if ($(this).text() != $value) {
@@ -1111,7 +1131,8 @@ function initTopPanel() {
 
 	$("#btn-class-data-item").click(function() {
 		$.post("../GetGeneratedClassDialog", {
-			id : tableId
+			id : tableId,
+			product : productId
 		}, function(data) {
 			$("body").append(data);
 			initGeneratedClassDialog(jQuery);
@@ -1806,7 +1827,9 @@ function enableKeyContextMenu() {
 													+ '<div class="ui-dialog-content">'
 													+ '<div class="table">'
 													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-													+ 'Value: </div><div class="table-cell dialog-cell dialog-edit"><input class="fill-value dialog-edit"></div>'
+													+ 'Value: </div><div class="table-cell dialog-cell dialog-edit">'
+													+ '<input class="fill-value dialog-edit">'
+													+ '</div>'
 													+ '</div>'
 													+ '</div>'
 													+ '<div class="dialog-buttons right">'
@@ -1873,10 +1896,20 @@ function initTooltipCells(elements) {
 				&& (!$value.hasClass("modified-value-cell"))) {
 			if ($value.has("div.tooltip").length == 0) {
 				var $content = $value.text();
-				var $args = {
-					id : $value.attr('id'),
-					content : $content
-				};
+				var $args;
+				if (isJson()) {
+					$args = {
+						product : productId,
+						tableid : tableId,
+						keyorder : $value.attr('keyid'),
+						content : $content
+					};
+				} else {
+					$args = {
+						id : $value.attr('id'),
+						content : $content
+					};
+				}
 				$.post("../GetStorageTooltip", $args, function(data) {
 					$value.html(data);
 					var $tooltip = $value.find("div.tooltip");
@@ -1894,10 +1927,20 @@ function initTooltipCells(elements) {
 		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "")
 				&& (!$value.hasClass("modified-value-cell")) && ($value.has("div.tooltip").length == 0)) {
 			var $content = $value.text();
-			var $args = {
-				id : $value.attr('id'),
-				content : $content
-			};
+			var $args;
+			if (isJson()) {
+				$args = {
+					product : productId,
+					tableid : tableId,
+					keyorder : $value.attr('keyid'),
+					content : $content
+				};
+			} else {
+				$args = {
+					id : $value.attr('id'),
+					content : $content
+				};
+			}
 			$.post("../GetStorageTooltip", $args, function(data) {
 				$value.html(data);
 				var $tooltip = $value.find("div.tooltip");
@@ -2288,7 +2331,7 @@ function showAdvancedImportDialog(currentRowsCount, importedRowsCount) {
 	var noteText = "";
 	if (tableType == "storage") {
 	} else {
-		noteText = "Note: Only General table will change. Preconditions and Postconditions are ignored.<br /><br />";
+		noteText = "<strong>Note:</strong> Only General table will change. Preconditions and Postconditions are ignored.<br /><br />";
 	}
 	var options = '<br/><br/><input type="radio" value="addtoend" name="import-option" checked="checked">Add to the end of the table'
 			+ '<br/><br/><input type="radio" value="addfromrow" name="import-option">Replace from row: '
@@ -2319,7 +2362,9 @@ function showAdvancedImportDialog(currentRowsCount, importedRowsCount) {
 function initAdvancedImportDialog() {
 	initDialog();
 	$(".btn-cancel").click(function() {
-		$(".ui-dialog").remove();
+		$.post("../ClearImportSessionParameters", function() {
+			$(".ui-dialog").remove();
+		});
 	});
 
 	$("input[value='addfromrow']").click(function() {

@@ -8,7 +8,10 @@ public class IOHelper {
 	public static File searchFile(File dir, String fileName) {
 		for (File temp : dir.listFiles()) {
 			if (temp.isDirectory()) {
-				searchFile(temp, fileName);
+				File result = searchFile(temp, fileName);
+				if (result != null) {
+					return result;
+				}
 			} else if (fileName.equalsIgnoreCase(temp.getName())) {
 				return temp;
 			}

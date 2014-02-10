@@ -117,7 +117,7 @@ public class ApplyParameterType extends HttpServlet {
 									out.print("ERROR: Data storage '" + refTable.getName()
 											+ "' does not contain row number " + strRow
 											+ ".<br>You specified it in row: " + (row + 1)
-											+ ".<br>You must first create this row in specified data storage.");
+											+ ".<br>You must first create this row in the specified data storage.");
 									out.flush();
 									out.close();
 									return;

@@ -19,9 +19,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.model.Table;
 import org.grible.model.json.KeyJson;
+import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 
 import com.google.gson.Gson;
@@ -54,15 +56,11 @@ public class SaveTable extends HttpServlet {
 			}
 			int tableId = Integer.parseInt(request.getParameter("tableid"));
 			int productId = Integer.parseInt(request.getParameter("product"));
-			Table table = new JsonDao().getTable(tableId, productId);
+			JsonDao dao = new JsonDao();
+			Table table = dao.getTable(tableId, productId);
 
 			String[] keyName = request.getParameterValues("keys[]");
 			KeyJson[] keys = table.getTableJson().getKeys();
-			for (int i = 0; i < keys.length; i++) {
-				keys[i].setName(keyName[i]);
-			}
-			table.getTableJson().setKeys(keys);
-
 			String[] valueRows = request.getParameterValues("values[]");
 			String[][] values = new String[valueRows.length][keys.length];
 
@@ -71,11 +69,34 @@ public class SaveTable extends HttpServlet {
 				String[] row = gson.fromJson(valueRows[i], String[].class);
 				for (int j = 0; j < row.length; j++) {
 					String value = row[j];
-					
+					if (keys[j].getType() == KeyType.STORAGE) {
+						String[] strIndexes = value.split(";");
+						for (String index : strIndexes) {
+							if (!StringUtils.isNumeric(index)) {
+								throw new Exception("ERROR: One of indexes in the row " + (i + 1) + " is not numeric.");
+							}
+							if (!"0".equals(index)) {
+								Table refTable = dao.getTable(keys[j].getRefid(), productId);
+								String[][] refRows = refTable.getTableJson().getValues();
+								if (refRows.length < Integer.parseInt(index)) {
+									throw new Exception("ERROR: Data storage '" + refTable.getName()
+											+ "' does not contain row number " + index
+											+ ".<br>You specified it in row: " + (i + 1)
+											+ ".<br>You must first create this row in the specified data storage.");
+								}
+							}
+						}
+
+					}
 					values[i][j] = value;
 				}
 			}
-			
+
+			for (int i = 0; i < keys.length; i++) {
+				keys[i].setName(keyName[i]);
+			}
+
+			table.getTableJson().setKeys(keys);
 			table.getTableJson().setValues(values);
 
 			table.save();

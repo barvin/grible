@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.grible.servlets.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Product;
 import org.grible.model.User;
@@ -30,6 +33,8 @@ import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
 import org.grible.uimodel.Section;
 import org.grible.uimodel.Sections;
+
+import com.google.gson.Gson;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -78,6 +83,8 @@ public class Home extends HttpServlet {
 			responseHtml.append("<script type=\"text/javascript\">");
 			responseHtml.append("var appType = \"")
 					.append(GlobalSettings.getInstance().getAppType().toString().toLowerCase()).append("\";");
+			responseHtml.append("var productsWhosePathsNotExist = ").append(getProductsWhosePathsNotExist())
+					.append(";");
 			responseHtml.append("</script>");
 			responseHtml.append("</head>");
 			responseHtml.append("<body>");
@@ -212,6 +219,22 @@ public class Home extends HttpServlet {
 			out.flush();
 			out.close();
 		}
+	}
+
+	private String getProductsWhosePathsNotExist() throws Exception {
+		List<Product> products = new JsonDao().getProducts();
+		List<String> productList = new ArrayList<>();
+		for (Product product : products) {
+			File dir = new File(product.getPath());
+			if (!dir.canWrite()) {
+				productList.add(product.getName());
+			}
+		}
+		String[] productArray = new String[productList.size()];
+		for (int i = 0; i < productArray.length; i++) {
+			productArray[i] = productList.get(i);
+		}
+		return new Gson().toJson(productArray, String[].class);
 	}
 
 	/**

@@ -46,66 +46,77 @@ $(window)
 										initAddProductDialog(jQuery);
 									});
 
-					$(".product-item").contextMenu({
-						menu : 'productMenu'
-					}, function(action, el, pos) {
-						var $id = $(el).attr("id");
-						if (action == "edit") {
-							$.post("GetEditProductDialog", {
-								id : $id
-							}, function(data) {
-								$("body").append(data);
-								initEditProductDialog(jQuery);
-							});
-						} else if (action == "delete") {
-							var message;
-							if (isJson()) {
-								message = "Are you sure you want to delete this product?<br>(Product directory will not be deleted)";
-							} else {
-								message = "Are you sure you want to delete this product?";
-							}
-							noty({
-								type : "confirm",
-								text : message,
-								buttons : [ {
-									addClass : 'btn btn-primary ui-button',
-									text : 'Delete',
-									onClick : function($noty) {
-										$noty.close();
-										$.post("DeleteProduct", {
-											id : $id
-										}, function(data) {
-											if (data == "success") {
-												noty({
-													type : "success",
-													text : "The product was deleted.",
-													timeout : 5000
-												});
-												$(el).parents(".table-row").remove();
+					$(".product-item")
+							.contextMenu(
+									{
+										menu : 'productMenu'
+									},
+									function(action, el, pos) {
+										var $id = $(el).attr("id");
+										if (action == "edit") {
+											$.post("GetEditProductDialog", {
+												id : $id
+											}, function(data) {
+												$("body").append(data);
+												initEditProductDialog(jQuery);
+											});
+										} else if (action == "delete") {
+											var message;
+											if (isJson()) {
+												message = "Are you sure you want to delete this product?<br>(Product directory will not be deleted)";
 											} else {
-												noty({
-													type : "error",
-													text : data
-												});
+												message = "Are you sure you want to delete this product?";
 											}
-										});
-									}
-								}, {
-									addClass : 'btn btn-danger ui-button',
-									text : 'Cancel',
-									onClick : function($noty) {
-										$noty.close();
-									}
-								} ]
-							});
-						}
-					});
+											noty({
+												type : "confirm",
+												text : message,
+												buttons : [ {
+													addClass : 'btn btn-primary ui-button',
+													text : 'Delete',
+													onClick : function($noty) {
+														$noty.close();
+														$.post("DeleteProduct", {
+															id : $id
+														}, function(data) {
+															if (data == "success") {
+																noty({
+																	type : "success",
+																	text : "The product was deleted.",
+																	timeout : 3000
+																});
+																$(el).parents(".table-row").remove();
+															} else {
+																noty({
+																	type : "error",
+																	text : data
+																});
+															}
+														});
+													}
+												}, {
+													addClass : 'btn btn-danger ui-button',
+													text : 'Cancel',
+													onClick : function($noty) {
+														$noty.close();
+													}
+												} ]
+											});
+										}
+									});
 
 					$(".section").each(function(i) {
 						if ($(this).width() < 250) {
 							$(this).css("padding-right", (250 - $(this).width()) + "px");
 						}
 					});
+
+					for (var i = 0; i < productsWhosePathsNotExist.length; i++) {
+						noty({
+							type : "warning",
+							text : "Directory of product '" + productsWhosePathsNotExist[i]
+									+ "' does not exist or does not have write permissions."
+						});
+					}
 
 					function initAddProductDialog() {
 						initDialog();

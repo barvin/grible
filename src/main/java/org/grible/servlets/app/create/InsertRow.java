@@ -27,6 +27,7 @@ import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.Value;
+import org.grible.model.json.KeyJson;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 
@@ -65,12 +66,26 @@ public class InsertRow extends HttpServlet {
 
 				JsonDao dao = new JsonDao();
 				Table table = dao.getTable(tableId, productId);
+				KeyJson[] keys = table.getTableJson().getKeys();
 				String[][] values = table.getTableJson().getValues();
 				String[][] newValues = new String[values.length + 1][values[0].length];
 				for (int i = newValues.length - 1; i >= 0; i--) {
 					if (i == rowOrder) {
 						for (int j = 0; j < newValues[0].length; j++) {
-							newValues[i][j] = "";
+							switch (keys[j].getType()) {
+							case STORAGE:
+								newValues[i][j] = "0";
+								break;
+
+							case ENUMERATION:
+								Table refTable = dao.getTable(keys[j].getRefid(), productId);
+								newValues[i][j] = dao.getValuesByKeyOrder(refTable, 0).get(0);
+								break;
+
+							default:
+								newValues[i][j] = "";
+								break;
+							}
 						}
 					} else if (i < rowOrder) {
 						for (int j = 0; j < newValues[0].length; j++) {

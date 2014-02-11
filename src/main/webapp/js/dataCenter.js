@@ -1520,9 +1520,27 @@ function initKeysAndIndexes() {
 				$("#waiting-bg").removeClass("loading");
 				if (isJson()) {
 					if (data == "success") {
-						loadTableValues({
-							id : tableId,
-							product : productId
+						$newRow = $row.clone(true);
+						$newRow.find(".ui-cell.selected-cell").removeClass("selected-cell");
+						$newRow.find(".ui-cell.index-cell").attr("id", $rowOrder);
+						$newRow.find(".ui-cell.modified-value-cell").removeClass("modified-value-cell");
+						$newRow.find(".ui-cell.value-cell:not(.enum-cell)").text("");
+						$newRow.find(".ui-cell.storage-cell").text("0");
+						$newRow.find(".ui-cell.value-cell").each(function(i) {
+							$(this).attr("rowid", $rowOrder);
+							$(this).attr("id", "0");
+						});
+						$newRow.insertBefore($row);
+						highlight($newRow);
+						$(".table-row.ui-row.value-row").each(function(i) {
+							if ((i + 1) >= $rowOrder) {
+								$(this).find(".ui-cell.index-cell").attr("id", i + 1);
+								$(this).find(".ui-cell.index-cell").text(i + 1);
+								var $newOrder = i + 1;
+								$(this).find(".ui-cell.value-cell").each(function(j) {
+									$(this).attr("rowid", $newOrder);
+								});
+							}
 						});
 					} else {
 						noty({
@@ -1568,9 +1586,23 @@ function initKeysAndIndexes() {
 				$("#waiting-bg").removeClass("loading");
 				if (isJson()) {
 					if (data == "success") {
-						loadTableValues({
-							id : tableId,
-							product : productId
+						$newRow = $row.clone(true);
+						$newRow.find(".ui-cell.index-cell").attr("id", $rowOrder);
+						$newRow.find(".ui-cell.value-cell").each(function(i) {
+							$(this).attr("rowid", $rowOrder);
+						});
+						$newRow.find(".ui-cell.value-cell").removeClass("selected-cell");
+						$newRow.insertAfter($row);
+						highlight($newRow);
+						$(".table-row.ui-row.value-row").each(function(i) {
+							if ((i + 1) >= $rowOrder) {
+								$(this).find(".ui-cell.index-cell").attr("id", i + 1);
+								$(this).find(".ui-cell.index-cell").text(i + 1);
+								var $newOrder = i + 1;
+								$(this).find(".ui-cell.value-cell").each(function(j) {
+									$(this).attr("rowid", $newOrder);
+								});
+							}
 						});
 					} else {
 						noty({

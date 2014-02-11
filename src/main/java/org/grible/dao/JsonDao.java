@@ -25,6 +25,8 @@ import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.json.KeyJson;
 import org.grible.settings.GlobalSettings;
+import org.grible.uimodel.Section;
+import org.grible.uimodel.Sections;
 
 /**
  * @author Maksym Barvinskyi
@@ -305,6 +307,25 @@ public class JsonDao implements Dao {
 
 		GlobalSettings.getInstance().getConfigJson().setProducts(productList);
 		GlobalSettings.getInstance().getConfigJson().save();
+		
+		File gribleJsonFile = new File(product.getGribleJson().getFilePath());
+		if (gribleJsonFile.exists()) {
+			for (Section section : Sections.getSections()) {
+				File dir = new File(path + File.separator + section.getDirName());
+				if (!dir.exists()) {
+					dir.mkdir();
+				}
+			}
+		} else {
+			product.getGribleJson().save();
+			for (Section section : Sections.getSections()) {
+				File dir = new File(path + File.separator + section.getDirName());
+				if (dir.exists()) {
+					dir.delete();
+				}
+				dir.mkdir();
+			}
+		}
 		return id;
 	}
 

@@ -26,8 +26,6 @@ import org.grible.model.Product;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.uimodel.Section;
-import org.grible.uimodel.Sections;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -75,28 +73,7 @@ public class AddProduct extends HttpServlet {
 						if (new JsonDao().isProductWithPathExists(path)) {
 							out.print("ERROR: Product with path '" + path + "' already exists.");
 						} else {
-							int id = DataManager.getInstance().getDao().insertProduct(name, path);
-							if (isJson()) {
-								Product thisProduct = DataManager.getInstance().getDao().getProduct(id);
-								File gribleJsonFile = new File(thisProduct.getGribleJson().getFilePath());
-								if (gribleJsonFile.exists()) {
-									for (Section section : Sections.getSections()) {
-										File dir = new File(path + File.separator + section.getDirName());
-										if (!dir.exists()) {
-											dir.mkdir();
-										}
-									}
-								} else {
-									thisProduct.getGribleJson().save();
-									for (Section section : Sections.getSections()) {
-										File dir = new File(path + File.separator + section.getDirName());
-										if (dir.exists()) {
-											dir.delete();
-										}
-										dir.mkdir();
-									}
-								}
-							}
+							DataManager.getInstance().getDao().insertProduct(name, path);
 							out.print("success");
 						}
 					}

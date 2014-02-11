@@ -1646,13 +1646,26 @@ function initKeysAndIndexes() {
 				if (data == "success") {
 					$row.hide(400, function() {
 						$row.remove();
-						$(".ui-cell.index-cell").each(function(i) {
-							if ((i + 1) >= $rowOrder) {
-								highlight($(this));
-								$(this).text(i + 1);
-							}
-						});
-
+						if (isJson()) {
+							$(".table-row.ui-row.value-row").each(function(i) {
+								if ((i + 1) >= $rowOrder) {
+									$(this).find(".ui-cell.index-cell").attr("id", i + 1);
+									$(this).find(".ui-cell.index-cell").text(i + 1);
+									highlight($(this).find(".ui-cell.index-cell"));
+									var $newOrder = i + 1;
+									$(this).find(".ui-cell.value-cell").each(function(j) {
+										$(this).attr("rowid", $newOrder);
+									});
+								}
+							});
+						} else {
+							$(".ui-cell.index-cell").each(function(i) {
+								if ((i + 1) >= $rowOrder) {
+									highlight($(this));
+									$(this).text(i + 1);
+								}
+							});
+						}
 					});
 				} else {
 					noty({

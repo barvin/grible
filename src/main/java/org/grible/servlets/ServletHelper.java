@@ -325,9 +325,10 @@ public class ServletHelper {
 
 	public static boolean isEnumValue(Value value) throws Exception {
 		boolean result = false;
-		Key key = DataManager.getInstance().getDao().getKey(value.getKeyId());
+		PostgresDao pdao = new PostgresDao();
+		Key key = pdao.getKey(value.getKeyId());
 		if (key.getReferenceTableId() != 0) {
-			Table refTable = new PostgresDao().getTable(key.getReferenceTableId());
+			Table refTable = pdao.getTable(key.getReferenceTableId());
 			if (refTable.getType() == TableType.ENUMERATION) {
 				result = true;
 			}

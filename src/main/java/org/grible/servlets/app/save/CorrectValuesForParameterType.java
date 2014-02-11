@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.Value;
@@ -37,6 +37,8 @@ import org.grible.servlets.ServletHelper;
 @WebServlet("/CorrectValuesForParameterType")
 public class CorrectValuesForParameterType extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private JsonDao jDao;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -58,6 +60,12 @@ public class CorrectValuesForParameterType extends HttpServlet {
 				return;
 			}
 
+			if (ServletHelper.isJson()) {
+				jDao = new JsonDao();
+			} else {
+				pDao = new PostgresDao();
+			}
+
 			int refTableId = 0;
 			if ((request.getParameter("refId") != null) && StringUtils.isNumeric(request.getParameter("refId"))) {
 				refTableId = Integer.parseInt(request.getParameter("refId"));
@@ -73,11 +81,11 @@ public class CorrectValuesForParameterType extends HttpServlet {
 				int tableId = Integer.parseInt(request.getParameter("tableid"));
 				productId = Integer.parseInt(request.getParameter("product"));
 				keyOrder = Integer.parseInt(request.getParameter("keyorder")) - 1;
-				table = new JsonDao().getTable(tableId, productId);
+				table = jDao.getTable(tableId, productId);
 				keyJson = table.getTableJson().getKeys()[keyOrder];
 			} else {
 				int keyId = Integer.parseInt(request.getParameter("keyId"));
-				key = DataManager.getInstance().getDao().getKey(keyId);
+				key = pDao.getKey(keyId);
 			}
 
 			if (type == KeyType.STORAGE) {
@@ -85,8 +93,7 @@ public class CorrectValuesForParameterType extends HttpServlet {
 					keyJson.setRefid(refTableId);
 					keyJson.setType(type);
 
-					JsonDao dao = new JsonDao();
-					List<String> columnValues = dao.getValuesByKeyOrder(table, keyOrder);
+					List<String> columnValues = jDao.getValuesByKeyOrder(table, keyOrder);
 					String[][] values = table.getTableJson().getValues();
 
 					for (int row = 0; row < columnValues.size(); row++) {
@@ -105,7 +112,7 @@ public class CorrectValuesForParameterType extends HttpServlet {
 					out.print("success");
 				} else {
 					key.setReferenceTableId(refTableId);
-					List<Value> values = DataManager.getInstance().getDao().getValues(key);
+					List<Value> values = pDao.getValues(key);
 					for (Value value : values) {
 						String[] strRows = value.getValue().split(";");
 						for (String strRow : strRows) {
@@ -122,15 +129,15 @@ public class CorrectValuesForParameterType extends HttpServlet {
 							String[] strRows = value.getValue().split(";");
 							Integer[] intRows = new Integer[strRows.length];
 							for (int i = 0; i < strRows.length; i++) {
-								intRows[i] = DataManager.getInstance().getDao()
+								intRows[i] = pDao
 										.getRow(refTableId, Integer.parseInt(strRows[i])).getId();
 							}
 							value.setStorageIds(intRows);
 						}
 						value.setIsStorage(true);
-						DataManager.getInstance().getDao().updateValue(value);
+						pDao.updateValue(value);
 					}
-					DataManager.getInstance().getDao().updateKey(key);
+					pDao.updateKey(key);
 					out.print("success");
 				}
 			} else {
@@ -162,9 +169,9 @@ public class CorrectValuesForParameterType extends HttpServlet {
 					out.print("success");
 				} else {
 					key.setReferenceTableId(refTableId);
-					Key enumKey = DataManager.getInstance().getDao().getKeys(refTableId).get(0);
-					List<Value> enumValues = DataManager.getInstance().getDao().getValues(enumKey);
-					List<Value> values = DataManager.getInstance().getDao().getValues(key);
+					Key enumKey = pDao.getKeys(refTableId).get(0);
+					List<Value> enumValues = pDao.getValues(enumKey);
+					List<Value> values = pDao.getValues(key);
 					for (Value value : values) {
 						boolean isValid = false;
 						for (Value enumValue : enumValues) {
@@ -177,8 +184,8 @@ public class CorrectValuesForParameterType extends HttpServlet {
 							value.setValue(enumValues.get(0).getValue());
 						}
 					}
-					DataManager.getInstance().getDao().updateKey(key);
-					DataManager.getInstance().getDao().updateValuesTypes(key.getId(), false, "NULL");
+					pDao.updateKey(key);
+					pDao.updateValuesTypes(key.getId(), false, "NULL");
 					out.print("success");
 				}
 			}

@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
 import org.grible.dao.PostgresDao;
 import org.grible.model.TableType;
 import org.grible.model.Value;
@@ -34,6 +33,7 @@ import org.grible.security.Security;
 @WebServlet("/SaveCellValue")
 public class SaveCellValue extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -54,30 +54,32 @@ public class SaveCellValue extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
+			pDao = new PostgresDao();
+			
 			String strId = request.getParameter("id");
 			String strValue = request.getParameter("value");
 			int id = Integer.parseInt(strId);
 
-			Value value = DataManager.getInstance().getDao().getValue(id);
+			Value value = pDao.getValue(id);
 			String oldValue = value.getValue();
 			value.setValue(StringEscapeUtils.unescapeHtml4(strValue));
 
 			if (value.isStorage()) {
 				String[] strRows = value.getValue().split(";");
-				int refStorageId = DataManager.getInstance().getDao().getRefStorageId(value.getKeyId());
+				int refStorageId = pDao.getRefStorageId(value.getKeyId());
 				for (int i = 0; i < strRows.length; i++) {
 					if (!StringUtils.isNumeric(strRows[i])) {
 						out.print("<br>ERROR: Indexes is not numeric. Row: "
-								+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
+								+ pDao.getRow(value.getRowId()).getOrder()
 								+ ".<br>If you want to set no index, set '0'.");
 						out.flush();
 						out.close();
 						return;
 					} else if ((!strRows[i].equals("0"))
-							&& (DataManager.getInstance().getDao().getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
-						out.print("<br>ERROR: Data storage '" + new PostgresDao().getTable(refStorageId).getName()
+							&& (pDao.getRow(refStorageId, Integer.parseInt(strRows[i]))) == null) {
+						out.print("<br>ERROR: Data storage '" + pDao.getTable(refStorageId).getName()
 								+ "' does not contain row number " + strRows[i] + ".<br>You specified it in row: "
-								+ DataManager.getInstance().getDao().getRow(value.getRowId()).getOrder()
+								+ pDao.getRow(value.getRowId()).getOrder()
 								+ ".<br>You must first create this row in specified data storage.");
 						out.flush();
 						out.close();
@@ -89,20 +91,20 @@ public class SaveCellValue extends HttpServlet {
 				} else {
 					Integer[] intRows = new Integer[strRows.length];
 					for (int i = 0; i < strRows.length; i++) {
-						intRows[i] = DataManager.getInstance().getDao()
+						intRows[i] = pDao
 								.getRow(refStorageId, Integer.parseInt(strRows[i])).getId();
 					}
 					value.setStorageIds(intRows);
 				}
 				value.setIsStorage(true);
 			} else if (isValueOfEnumeration(value)) {
-				List<Value> dependedValues = DataManager.getInstance().getDao().getValuesByEnumValue(value, oldValue);
+				List<Value> dependedValues = pDao.getValuesByEnumValue(value, oldValue);
 				for (Value dependedValue : dependedValues) {
 					dependedValue.setValue(value.getValue());
-					DataManager.getInstance().getDao().updateValue(dependedValue);
+					pDao.updateValue(dependedValue);
 				}
 			}
-			DataManager.getInstance().getDao().updateValue(value);
+			pDao.updateValue(value);
 			out.print("success");
 
 		} catch (Exception e) {
@@ -114,8 +116,8 @@ public class SaveCellValue extends HttpServlet {
 	}
 
 	private boolean isValueOfEnumeration(Value value) throws Exception {
-		return TableType.ENUMERATION == new PostgresDao().getTable(
-				DataManager.getInstance().getDao().getKey(value.getKeyId()).getTableId()).getType();
+		return TableType.ENUMERATION == pDao.getTable(
+				pDao.getKey(value.getKeyId()).getTableId()).getType();
 	}
 
 	/**

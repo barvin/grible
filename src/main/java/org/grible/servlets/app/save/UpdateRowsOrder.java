@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
@@ -89,7 +89,7 @@ public class UpdateRowsOrder extends HttpServlet {
 					table.getTableJson().setValues(newValues);
 					table.save();
 				} else {
-					DataManager.getInstance().getDao().updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
+					new PostgresDao().updateRows(modifiedRowIds, oldRowNumbers, modifiedRowNumbers);
 				}
 			}
 			out.print("success");

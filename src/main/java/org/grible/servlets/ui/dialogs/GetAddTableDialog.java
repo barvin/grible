@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.PostgresDao;
 import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Table;
@@ -67,7 +68,7 @@ public class GetAddTableDialog extends HttpServlet {
 				category = new Category(path, tableType, productId);
 			} else {
 				int categoryId = Integer.parseInt(request.getParameter("categoryid"));
-				category = DataManager.getInstance().getDao().getCategory(categoryId);
+				category = new PostgresDao().getCategory(categoryId);
 			}
 
 			if (!((category.getType() == TableType.TABLE) || (category.getType() == TableType.STORAGE) || (category

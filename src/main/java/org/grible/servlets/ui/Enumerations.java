@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.PostgresDao;
 import org.grible.model.User;
@@ -53,6 +54,11 @@ public class Enumerations extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
+			if ((!StringUtils.isNumeric(request.getParameter("product")))
+					&& (!StringUtils.isNumeric(request.getParameter("id")))) {
+				response.sendRedirect("/");
+				return;
+			}
 			StringBuilder responseHtml = new StringBuilder();
 
 			responseHtml.append("<!DOCTYPE html>");
@@ -63,10 +69,10 @@ public class Enumerations extends HttpServlet {
 
 			int productId;
 			int tableId;
-			if (request.getParameter("id") != null) {
+			if (StringUtils.isNumeric(request.getParameter("id"))) {
 				tableId = Integer.parseInt(request.getParameter("id"));
 				if (isMultipleUsers()) {
-					productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
+					productId = new PostgresDao().getProductIdByPrimaryTableId(tableId);
 				} else {
 					productId = Integer.parseInt(request.getParameter("product"));
 				}

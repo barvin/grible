@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.json.KeyJson;
@@ -89,16 +89,17 @@ public class DeleteKey extends HttpServlet {
 			} else {
 				int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-				int tableId = DataManager.getInstance().getDao().getKey(keyId).getTableId();
-				if (DataManager.getInstance().getDao().deleteKey(keyId)) {
+				PostgresDao pDao = new PostgresDao();
+				int tableId = pDao.getKey(keyId).getTableId();
+				if (pDao.deleteKey(keyId)) {
 					List<Integer> keyIds = new ArrayList<Integer>();
 					List<Integer> keyNumbers = new ArrayList<Integer>();
-					List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
+					List<Key> keys = pDao.getKeys(tableId);
 					for (int i = 0; i < keys.size(); i++) {
 						keyIds.add(keys.get(i).getId());
 						keyNumbers.add(i + 1);
 					}
-					DataManager.getInstance().getDao().updateKeys(keyIds, keyNumbers);
+					pDao.updateKeys(keyIds, keyNumbers);
 					result = "success";
 				} else {
 					result = "Could not delete the column. See server log for detail.";

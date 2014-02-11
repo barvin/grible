@@ -42,6 +42,8 @@ import org.grible.settings.GlobalSettings;
 @WebServlet("/AddTable")
 public class AddTable extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private JsonDao jDao;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -66,6 +68,13 @@ public class AddTable extends HttpServlet {
 			Category category = null;
 			Integer productId = 0;
 			Integer parentId = null;
+			
+			if (isJson()) {
+				jDao = new JsonDao();
+			} else {
+				pDao = new PostgresDao();
+			}
+			
 			if (isJson()) {
 				productId = Integer.parseInt(request.getParameter("product"));
 				TableType tableType = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
@@ -74,20 +83,19 @@ public class AddTable extends HttpServlet {
 					category = new Category(path, tableType, productId);
 				} else {
 					TableType currType = TableType.valueOf(request.getParameter("currTabletype").toUpperCase());
-					JsonDao dao = new JsonDao();
 					if (currType == TableType.TABLE) {
 						parentId = Integer.parseInt(request.getParameter("parentid"));
 					} else {
-						parentId = dao.getParentTableId(Integer.parseInt(request.getParameter("parentid")), productId,
+						parentId = jDao.getParentTableId(Integer.parseInt(request.getParameter("parentid")), productId,
 								currType);
 					}
 					String categoryPathFromTable = StringHelper.getCategoryPathFromTable(
-							dao.getTable(parentId, productId), productId, tableType);
+							jDao.getTable(parentId, productId), productId, tableType);
 					category = new Category(categoryPathFromTable, tableType, productId);
 				}
 			} else if (request.getParameter("categoryid") != null) {
 				int categoryId = Integer.parseInt(request.getParameter("categoryid"));
-				category = DataManager.getInstance().getDao().getCategory(categoryId);
+				category = pDao.getCategory(categoryId);
 			}
 
 			if ((!isJson()) && (request.getParameter("parentid") != null)) {
@@ -118,9 +126,8 @@ public class AddTable extends HttpServlet {
 				int copyTableId = Integer.parseInt(request.getParameter("copytableid"));
 				boolean isOnlyColumns = Boolean.parseBoolean(request.getParameter("isonlycolumns"));
 				if (isJson()) {
-					JsonDao dao = new JsonDao();
-					Table table = dao.getTable(tableId, productId);
-					Table tableToCopy = dao.getTable(copyTableId, productId);
+					Table table = jDao.getTable(tableId, productId);
+					Table tableToCopy = jDao.getTable(copyTableId, productId);
 					table.getTableJson().setKeys(tableToCopy.getTableJson().getKeys());
 					if (isOnlyColumns) {
 						int keysCount = tableToCopy.getTableJson().getKeys().length;
@@ -138,17 +145,17 @@ public class AddTable extends HttpServlet {
 					if (type == TableType.ENUMERATION) {
 						List<String> keyName = new ArrayList<String>();
 						keyName.add(name);
-						DataManager.getInstance().getDao().insertKeys(tableId, keyName);
-						keys = DataManager.getInstance().getDao().getKeys(tableId);
+						pDao.insertKeys(tableId, keyName);
+						keys = pDao.getKeys(tableId);
 					} else {
-						keys = DataManager.getInstance().getDao().insertKeysFromOneTableToAnother(copyTableId, tableId);
+						keys = pDao.insertKeysFromOneTableToAnother(copyTableId, tableId);
 					}
 					if (isOnlyColumns) {
-						int rowId = DataManager.getInstance().getDao().insertRow(tableId, 1);
-						DataManager.getInstance().getDao().insertValuesEmptyWithRowId(rowId, keys);
+						int rowId = pDao.insertRow(tableId, 1);
+						pDao.insertValuesEmptyWithRowId(rowId, keys);
 					} else {
-						List<Row> oldRows = DataManager.getInstance().getDao().getRows(copyTableId);
-						DataManager.getInstance().getDao().insertValues(tableId, copyTableId, oldRows, keys);
+						List<Row> oldRows = pDao.getRows(copyTableId);
+						pDao.insertValues(tableId, copyTableId, oldRows, keys);
 					}
 				}
 			} else {
@@ -168,10 +175,10 @@ public class AddTable extends HttpServlet {
 					} else {
 						keys.add("editme");
 					}
-					int keyId = DataManager.getInstance().getDao().insertKeys(tableId, keys).get(0);
-					DataManager.getInstance().getDao().insertRow(tableId, 1);
-					List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
-					DataManager.getInstance().getDao().insertValuesEmptyWithKeyId(keyId, rows);
+					int keyId = pDao.insertKeys(tableId, keys).get(0);
+					pDao.insertRow(tableId, 1);
+					List<Row> rows = pDao.getRows(tableId);
+					pDao.insertValuesEmptyWithKeyId(keyId, rows);
 				}
 			}
 			out.print(tableId);

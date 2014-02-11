@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
@@ -35,6 +36,8 @@ import org.grible.settings.GlobalSettings;
 @WebServlet("/tables/")
 public class Tables extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private JsonDao jDao;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -56,10 +59,18 @@ public class Tables extends HttpServlet {
 				return;
 			}
 
-			if ((request.getParameter("product") == null) && (request.getParameter("id") == null)) {
+			if ((!StringUtils.isNumeric(request.getParameter("product")))
+					&& (!StringUtils.isNumeric(request.getParameter("id")))) {
 				response.sendRedirect("/");
 				return;
 			}
+
+			if (isMultipleUsers()) {
+				pDao = new PostgresDao();
+			} else {
+				jDao = new JsonDao();
+			}
+
 			StringBuilder responseHtml = new StringBuilder();
 
 			responseHtml.append("<!DOCTYPE html>");
@@ -71,23 +82,24 @@ public class Tables extends HttpServlet {
 			int productId = 0;
 			int tableId = 0;
 			String tableType = "table";
-			if (request.getParameter("id") != null) {
+			if (StringUtils.isNumeric(request.getParameter("id"))) {
 				tableId = Integer.parseInt(request.getParameter("id"));
 				Table table = null;
-				
+
 				if (isMultipleUsers()) {
-					table = new PostgresDao().getTable(tableId);
+
+					table = pDao.getTable(tableId);
 					switch (table.getType()) {
 					case TABLE:
-						productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
+						productId = pDao.getProductIdByPrimaryTableId(tableId);
 						break;
 
 					case PRECONDITION:
-						productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
+						productId = pDao.getProductIdBySecondaryTableId(tableId);
 						break;
 
 					case POSTCONDITION:
-						productId = DataManager.getInstance().getDao().getProductIdBySecondaryTableId(tableId);
+						productId = pDao.getProductIdBySecondaryTableId(tableId);
 						break;
 
 					default:
@@ -95,7 +107,7 @@ public class Tables extends HttpServlet {
 					}
 				} else {
 					productId = Integer.parseInt(request.getParameter("product"));
-					table = new JsonDao().getTable(tableId, productId);
+					table = jDao.getTable(tableId, productId);
 				}
 				tableType = table.getType().toString().toLowerCase();
 			} else {
@@ -105,7 +117,7 @@ public class Tables extends HttpServlet {
 			User user = null;
 			if (isMultipleUsers()) {
 				String userName = (String) request.getSession(false).getAttribute("userName");
-				user = new PostgresDao().getUserByName(userName);
+				user = pDao.getUserByName(userName);
 			}
 
 			if (isMultipleUsers() && (!user.hasAccessToProduct(productId))) {

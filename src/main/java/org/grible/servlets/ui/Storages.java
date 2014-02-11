@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.PostgresDao;
 import org.grible.model.User;
@@ -54,7 +55,8 @@ public class Storages extends HttpServlet {
 				return;
 			}
 
-			if ((request.getParameter("product") == null) && (request.getParameter("id") == null)) {
+			if ((!StringUtils.isNumeric(request.getParameter("product")))
+					&& (!StringUtils.isNumeric(request.getParameter("id")))) {
 				response.sendRedirect("/");
 				return;
 			}
@@ -68,10 +70,10 @@ public class Storages extends HttpServlet {
 
 			int productId;
 			int tableId;
-			if (request.getParameter("id") != null) {
+			if (StringUtils.isNumeric(request.getParameter("id"))) {
 				tableId = Integer.parseInt(request.getParameter("id"));
 				if (isMultipleUsers()) {
-					productId = DataManager.getInstance().getDao().getProductIdByPrimaryTableId(tableId);
+					productId = new PostgresDao().getProductIdByPrimaryTableId(tableId);
 				} else {
 					productId = Integer.parseInt(request.getParameter("product"));
 				}
@@ -102,7 +104,7 @@ public class Storages extends HttpServlet {
 							.append(GlobalSettings.getInstance().getConfigJson().isTooltipOnClick()).append(";");
 				}
 				responseHtml.append("var appType = \"")
-				.append(GlobalSettings.getInstance().getAppType().toString().toLowerCase()).append("\";");
+						.append(GlobalSettings.getInstance().getAppType().toString().toLowerCase()).append("\";");
 				responseHtml.append("</script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
 				ServletHelper.showImportResult(request, responseHtml, tableId);
@@ -115,7 +117,8 @@ public class Storages extends HttpServlet {
 				} else {
 					responseHtml.append(ServletHelper.getUserPanel());
 				}
-				responseHtml.append(ServletHelper.getBreadCrumb("storages", DataManager.getInstance().getDao().getProduct(productId), "../img"));
+				responseHtml.append(ServletHelper.getBreadCrumb("storages", DataManager.getInstance().getDao()
+						.getProduct(productId), "../img"));
 				responseHtml.append(ServletHelper.getMain());
 				responseHtml.append(ServletHelper.getContextMenus("storage"));
 				responseHtml.append(ServletHelper.getLoadingGif());

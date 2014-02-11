@@ -93,7 +93,7 @@ public class StorageImport extends HttpServlet {
 					currentKeysCount = table.getTableJson().getKeys().length;
 				} else {
 					table = pDao.getTable(storageName, categoryId);
-					currentKeysCount = DataManager.getInstance().getDao().getKeys(table.getId()).size();
+					currentKeysCount = pDao.getKeys(table.getId()).size();
 				}
 				int importedKeysCount = excelFile.getKeys().size();
 
@@ -117,11 +117,10 @@ public class StorageImport extends HttpServlet {
 					table.getTableJson().setValues(excelFile.getValues());
 					table.save();
 				} else {
-					List<Integer> keyIds = DataManager.getInstance().getDao()
-							.insertKeys(storageId, excelFile.getKeys());
+					List<Integer> keyIds = pDao.insertKeys(storageId, excelFile.getKeys());
 					ArrayList<ArrayList<String>> values = excelFile.getValues();
-					List<Integer> rowIds = DataManager.getInstance().getDao().insertRows(storageId, values.size());
-					DataManager.getInstance().getDao().insertValues(rowIds, keyIds, values);
+					List<Integer> rowIds = pDao.insertRows(storageId, values.size());
+					pDao.insertValues(rowIds, keyIds, values);
 				}
 
 				String message = "";

@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Table;
 import org.grible.model.Value;
@@ -91,12 +91,13 @@ public class CopyKey extends HttpServlet {
 			} else {
 				int keyId = Integer.parseInt(request.getParameter("keyid"));
 
-				Key currentKey = DataManager.getInstance().getDao().getKey(keyId);
+				PostgresDao pDao = new PostgresDao();
+				Key currentKey = pDao.getKey(keyId);
 				int currentKeyNumber = currentKey.getOrder();
 				int tableId = currentKey.getTableId();
 				List<Integer> keyIds = new ArrayList<Integer>();
 				List<Integer> keyNumbers = new ArrayList<Integer>();
-				List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
+				List<Key> keys = pDao.getKeys(tableId);
 				for (int i = keys.size() - 1; i >= 0; i--) {
 					keyIds.add(keys.get(i).getId());
 					if (keys.get(i).getOrder() > currentKeyNumber) {
@@ -105,12 +106,12 @@ public class CopyKey extends HttpServlet {
 						keyNumbers.add(i + 1);
 					}
 				}
-				DataManager.getInstance().getDao().updateKeys(keyIds, keyNumbers);
+				pDao.updateKeys(keyIds, keyNumbers);
 				currentKey.setOrder(currentKeyNumber + 1);
-				int newKeyId = DataManager.getInstance().getDao().insertKeyCopy(currentKey);
+				int newKeyId = pDao.insertKeyCopy(currentKey);
 
-				List<Value> values = DataManager.getInstance().getDao().getValues(currentKey);
-				List<Integer> ids = DataManager.getInstance().getDao().insertValuesWithKeyId(newKeyId, values);
+				List<Value> values = pDao.getValues(currentKey);
+				List<Integer> ids = pDao.insertValuesWithKeyId(newKeyId, values);
 
 				result = newKeyId + ";" + StringUtils.join(ids, ";");
 			}

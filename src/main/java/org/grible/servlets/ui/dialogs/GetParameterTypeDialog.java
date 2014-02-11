@@ -70,8 +70,9 @@ public class GetParameterTypeDialog extends HttpServlet {
 				KeyJson[] keys = table.getTableJson().getKeys();
 				refTableId = keys[keyOrder - 1].getRefid();
 			} else {
-				Key key = DataManager.getInstance().getDao().getKey(Integer.parseInt(request.getParameter("keyid")));
-				table = new PostgresDao().getTable(key.getTableId());
+				PostgresDao pDao = new PostgresDao();
+				Key key = pDao.getKey(Integer.parseInt(request.getParameter("keyid")));
+				table = pDao.getTable(key.getTableId());
 				refTableId = key.getReferenceTableId();
 				keyId = key.getId();
 			}

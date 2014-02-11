@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.model.json.KeyJson;
 import org.grible.security.Security;
@@ -95,7 +95,7 @@ public class UpdateKeysOrder extends HttpServlet {
 					table.getTableJson().setValues(newValues);
 					table.save();
 				} else {
-					DataManager.getInstance().getDao().updateKeys(keyIds, keyNumbers);
+					new PostgresDao().updateKeys(keyIds, keyNumbers);
 				}
 			}
 			out.print("success");

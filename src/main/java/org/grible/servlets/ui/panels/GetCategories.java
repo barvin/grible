@@ -40,6 +40,8 @@ import org.grible.settings.GlobalSettings;
 public class GetCategories extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private int productId;
+	private JsonDao jDao;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -61,6 +63,12 @@ public class GetCategories extends HttpServlet {
 				return;
 			}
 
+			if (isJson()) {
+				jDao = new JsonDao();
+			} else {
+				pDao = new PostgresDao();
+			}
+
 			productId = Integer.parseInt(request.getParameter("productId"));
 			int tableId = Integer.parseInt(request.getParameter("tableId"));
 			String strTableType = request.getParameter("tableType");
@@ -69,9 +77,9 @@ public class GetCategories extends HttpServlet {
 			if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
 				tableType = TableType.TABLE;
 				if (isJson()) {
-					tableId = new JsonDao().getParentTableId(tableId, productId, tableType);
+					tableId = jDao.getParentTableId(tableId, productId, tableType);
 				} else {
-					tableId = new PostgresDao().getTable(tableId).getParentId();
+					tableId = pDao.getTable(tableId).getParentId();
 				}
 			}
 			List<Category> categories = DataManager.getInstance().getDao().getTopLevelCategories(productId, tableType);
@@ -124,23 +132,23 @@ public class GetCategories extends HttpServlet {
 
 	private boolean isOneOfParentCategoriesForTable(int tableId, Category category) throws Exception {
 		if (isJson()) {
-			Table table = new JsonDao().getTable(tableId, productId);
+			Table table = jDao.getTable(tableId, productId);
 			Product product = DataManager.getInstance().getDao().getProduct(productId);
 			String tableFilePath = StringUtils.substringAfter(table.getFile().getAbsolutePath(), product.getPath()
 					+ File.separator + category.getType().getSection().getDirName() + File.separator);
 			return tableFilePath.startsWith(category.getPath());
 		}
-		int parentCategoryId = new PostgresDao().getTable(tableId).getCategoryId();
+		int parentCategoryId = pDao.getTable(tableId).getCategoryId();
 		if (parentCategoryId == category.getId()) {
 			return true;
 		} else {
-			Category currentCategory = DataManager.getInstance().getDao().getCategory(parentCategoryId);
+			Category currentCategory = pDao.getCategory(parentCategoryId);
 			while (currentCategory.getParentId() > 0) {
 				parentCategoryId = currentCategory.getParentId();
 				if (parentCategoryId == category.getId()) {
 					return true;
 				}
-				currentCategory = DataManager.getInstance().getDao().getCategory(parentCategoryId);
+				currentCategory = pDao.getCategory(parentCategoryId);
 			}
 		}
 		return false;

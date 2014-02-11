@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
@@ -38,6 +37,8 @@ import org.grible.servlets.ServletHelper;
 @WebServlet("/CheckForDuplicatedRows")
 public class CheckForDuplicatedRows extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private PostgresDao pDao;
+	private JsonDao jDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -60,8 +61,6 @@ public class CheckForDuplicatedRows extends HttpServlet {
 			}
 			int id = Integer.parseInt(request.getParameter("id"));
 			int productId = Integer.parseInt(request.getParameter("product"));
-			PostgresDao pDao = null;
-			JsonDao jDao = null;
 			Table table = null;
 			if (ServletHelper.isJson()) {
 				jDao = new JsonDao();
@@ -91,7 +90,7 @@ public class CheckForDuplicatedRows extends HttpServlet {
 						}
 					} else {
 						List<String> strValues = new ArrayList<String>();
-						List<Row> rows = DataManager.getInstance().getDao().getRows(id);
+						List<Row> rows = pDao.getRows(id);
 						for (Row row : rows) {
 							strValues.add(getCombinedValues(row));
 						}
@@ -120,7 +119,7 @@ public class CheckForDuplicatedRows extends HttpServlet {
 
 	private String getCombinedValues(Row row) throws Exception {
 		StringBuilder builder = new StringBuilder();
-		List<Value> values = DataManager.getInstance().getDao().getValues(row);
+		List<Value> values = pDao.getValues(row);
 		for (Value value : values) {
 			builder.append(value.getValue());
 		}

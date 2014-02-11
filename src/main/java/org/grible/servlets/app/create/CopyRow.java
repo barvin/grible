@@ -22,8 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.Value;
@@ -84,13 +84,14 @@ public class CopyRow extends HttpServlet {
 			} else {
 				int rowId = Integer.parseInt(request.getParameter("rowid"));
 
-				Row currentRow = DataManager.getInstance().getDao().getRow(rowId);
+				PostgresDao pDao = new PostgresDao();
+				Row currentRow = pDao.getRow(rowId);
 				int currentRowNumber = currentRow.getOrder();
 				int tableId = currentRow.getTableId();
 				List<Integer> rowIds = new ArrayList<Integer>();
 				List<Integer> rowNumbers = new ArrayList<Integer>();
 				List<Integer> oldRowNumbers = new ArrayList<Integer>();
-				List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+				List<Row> rows = pDao.getRows(tableId);
 				for (int i = rows.size() - 1; i >= 0; i--) {
 					rowIds.add(rows.get(i).getId());
 					if (rows.get(i).getOrder() > currentRowNumber) {
@@ -100,12 +101,12 @@ public class CopyRow extends HttpServlet {
 					}
 					oldRowNumbers.add(i + 1);
 				}
-				DataManager.getInstance().getDao().updateRows(rowIds, oldRowNumbers, rowNumbers);
+				pDao.updateRows(rowIds, oldRowNumbers, rowNumbers);
 				currentRow.setOrder(currentRowNumber + 1);
-				int newRowId = DataManager.getInstance().getDao().insertRowCopy(currentRow);
+				int newRowId = pDao.insertRowCopy(currentRow);
 
-				List<Value> values = DataManager.getInstance().getDao().getValues(currentRow);
-				List<Integer> ids = DataManager.getInstance().getDao().insertValuesWithRowId(newRowId, values);
+				List<Value> values = pDao.getValues(currentRow);
+				List<Integer> ids = pDao.insertValuesWithRowId(newRowId, values);
 
 				result = newRowId + ";" + StringUtils.join(ids, ";");
 			}

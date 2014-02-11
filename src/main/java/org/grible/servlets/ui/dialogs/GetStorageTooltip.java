@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Key;
 import org.grible.model.Row;
 import org.grible.model.Table;
@@ -38,6 +38,8 @@ import org.grible.servlets.ServletHelper;
 @WebServlet("/GetStorageTooltip")
 public class GetStorageTooltip extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private JsonDao jDao;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -80,13 +82,14 @@ public class GetStorageTooltip extends HttpServlet {
 					int productId = Integer.parseInt(request.getParameter("product"));
 					int tableId = Integer.parseInt(request.getParameter("tableid"));
 					int keyOrder = Integer.parseInt(request.getParameter("keyorder"));
-					JsonDao dao = new JsonDao();
-					Table table = dao.getTable(tableId, productId);
+					jDao = new JsonDao();
+					Table table = jDao.getTable(tableId, productId);
 					KeyJson key = table.getTableJson().getKeys()[keyOrder - 1];
-					Table refTable = dao.getTable(key.getRefid(), productId);
+					Table refTable = jDao.getTable(key.getRefid(), productId);
 					out.print(content + getStorageTooltip(indexes, refTable, productId));
 				} else {
-					Value value = DataManager.getInstance().getDao()
+					pDao = new PostgresDao();
+					Value value = pDao
 							.getValue(Integer.parseInt(request.getParameter("id")));
 					Integer[] storageIds = value.getStorageIds();
 					out.print(content + getStorageTooltip(storageIds));
@@ -142,9 +145,9 @@ public class GetStorageTooltip extends HttpServlet {
 		if (integers != null) {
 			StringBuilder result = new StringBuilder(
 					"<div class=\"tooltip\"><div style=\"width: auto;\" class=\"table\">");
-			int tableId = DataManager.getInstance().getDao().getRow(integers[0]).getTableId();
+			int tableId = pDao.getRow(integers[0]).getTableId();
 
-			List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
+			List<Key> keys = pDao.getKeys(tableId);
 			result.append("<div class=\"table-row key-row\">");
 			result.append("<div class=\"table-cell ui-cell-mini index-header-cell\">Index</div>");
 			for (Key key : keys) {
@@ -155,8 +158,8 @@ public class GetStorageTooltip extends HttpServlet {
 			result.append("</div>");
 
 			for (int i = 0; i < integers.length; i++) {
-				Row row = DataManager.getInstance().getDao().getRow(integers[i]);
-				List<Value> values = DataManager.getInstance().getDao().getValues(row);
+				Row row = pDao.getRow(integers[i]);
+				List<Value> values = pDao.getValues(row);
 				result.append("<div class=\"table-row value-row\">");
 				result.append("<div id=\"").append(row.getId());
 				result.append("\" class=\"table-cell ui-cell-mini index-cell\">");

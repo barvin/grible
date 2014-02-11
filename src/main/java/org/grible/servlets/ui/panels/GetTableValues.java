@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.json.ui.UiIndex;
@@ -56,6 +55,9 @@ public class GetTableValues extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private boolean showUsage;
 	private TableType tableType;
+	private JsonDao jDao;
+	private PostgresDao pDao;
+	private int productId;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -79,10 +81,12 @@ public class GetTableValues extends HttpServlet {
 			int tableId = Integer.parseInt(request.getParameter("id"));
 			Table table = null;
 			if (isJson()) {
-				int productId = Integer.parseInt(request.getParameter("product"));
-				table = new JsonDao().getTable(tableId, productId);
+				jDao = new JsonDao();
+				productId = Integer.parseInt(request.getParameter("product"));
+				table = jDao.getTable(tableId, productId);
 			} else {
-				table = new PostgresDao().getTable(tableId);
+				pDao = new PostgresDao();
+				table = pDao.getTable(tableId);
 			}
 
 			tableType = table.getType();
@@ -90,15 +94,15 @@ public class GetTableValues extends HttpServlet {
 
 			UiTable uiTable = new UiTable();
 			if (isJson()) {
-				transformTableToUiTable(table.getTableJson(), uiTable);
+				transformTableToUiTable(table, uiTable);
 			} else {
-				List<Key> keys = DataManager.getInstance().getDao().getKeys(tableId);
+				List<Key> keys = pDao.getKeys(tableId);
 				writeKeys(uiTable, keys);
 
-				List<Row> rows = DataManager.getInstance().getDao().getRows(tableId);
+				List<Row> rows = pDao.getRows(tableId);
 				ArrayList<ArrayList<Value>> values = new ArrayList<ArrayList<Value>>();
 				for (Row row : rows) {
-					values.add(DataManager.getInstance().getDao().getValues(row));
+					values.add(pDao.getValues(row));
 				}
 				writeValues(uiTable, values);
 			}
@@ -111,13 +115,14 @@ public class GetTableValues extends HttpServlet {
 		out.close();
 	}
 
-	private void transformTableToUiTable(TableJson table, UiTable uiTable) {
+	private void transformTableToUiTable(Table table, UiTable uiTable) throws Exception {
 		if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
 			uiTable.setIndex(true);
 		} else {
 			uiTable.setIndex(false);
 		}
-		KeyJson[] keys = table.getKeys();
+		TableJson tableJson = table.getTableJson();
+		KeyJson[] keys = tableJson.getKeys();
 		UiKey[] uiKeys = new UiKey[keys.length];
 		for (int i = 0; i < keys.length; i++) {
 			uiKeys[i] = new UiKey();
@@ -132,7 +137,7 @@ public class GetTableValues extends HttpServlet {
 			uiInfo.setTables("Used in storages");
 			uiTable.setInfo(uiInfo);
 		}
-		String[][] values = table.getValues();
+		String[][] values = tableJson.getValues();
 		UiRow[] uiRows = new UiRow[values.length];
 		for (int i = 0; i < values.length; i++) {
 			uiRows[i] = new UiRow();
@@ -155,11 +160,10 @@ public class GetTableValues extends HttpServlet {
 			uiRows[i].setValues(uiValues);
 			if (showUsage) {
 				if (values[i].length > 0) {
-					// List<Table> tables = DataManager.getInstance().getDao()
-					// .getTablesUsingRow(values.get(i).get(0).getRowId());
+					List<Table> tables = jDao.getTablesUsingRow(productId, table, (i + 1));
 					UiInfo uiInfo = new UiInfo();
-					uiInfo.setTables("");
-					uiInfo.setStorages("");
+					uiInfo.setTables(getTestTableOccurences(tables));
+					uiInfo.setStorages(getDataStorageOccurences(tables));
 					uiRows[i].setInfo(uiInfo);
 				}
 			}
@@ -216,8 +220,7 @@ public class GetTableValues extends HttpServlet {
 			uiRows[i].setValues(uiValues);
 			if (showUsage) {
 				if (!values.get(i).isEmpty()) {
-					List<Table> tables = DataManager.getInstance().getDao()
-							.getTablesUsingRow(values.get(i).get(0).getRowId());
+					List<Table> tables = pDao.getTablesUsingRow(values.get(i).get(0).getRowId());
 					UiInfo uiInfo = new UiInfo();
 					uiInfo.setTables(getTestTableOccurences(tables));
 					uiInfo.setStorages(getDataStorageOccurences(tables));
@@ -237,7 +240,9 @@ public class GetTableValues extends HttpServlet {
 				}
 			} else if (TableType.PRECONDITION == tables.get(i).getType()
 					|| TableType.POSTCONDITION == tables.get(i).getType()) {
-				String tableName = new PostgresDao().getTable(tables.get(i).getParentId()).getName();
+				String tableName = isJson() ? jDao.getTable(
+						jDao.getParentTableId(tables.get(i).getId(), productId, tables.get(i).getType()), productId)
+						.getName() : pDao.getTable(tables.get(i).getParentId()).getName();
 				if (!tableNames.contains(tableName)) {
 					tableNames.add(tableName);
 				}

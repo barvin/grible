@@ -39,6 +39,8 @@ import org.grible.settings.GlobalSettings;
 @WebServlet("/GetEditTableDialog")
 public class GetEditTableDialog extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private JsonDao jDao;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -64,9 +66,11 @@ public class GetEditTableDialog extends HttpServlet {
 
 			Table table = null;
 			if (isJson()) {
-				table = new JsonDao().getTable(id, productId);
+				jDao = new JsonDao();
+				table = jDao.getTable(id, productId);
 			} else {
-				table = new PostgresDao().getTable(id);
+				pDao = new PostgresDao();
+				table = pDao.getTable(id);
 			}
 			if ((table.getType() == TableType.TABLE) || (table.getType() == TableType.STORAGE)
 					|| (table.getType() == TableType.ENUMERATION)) {
@@ -149,7 +153,7 @@ public class GetEditTableDialog extends HttpServlet {
 		Category currCategory = category;
 		String fullPath = category.getName();
 		while (currCategory.getParentId() != 0) {
-			currCategory = DataManager.getInstance().getDao().getCategory(currCategory.getParentId());
+			currCategory = pDao.getCategory(currCategory.getParentId());
 			fullPath = StringUtils.join(new Object[] { currCategory.getName(), "/", fullPath });
 		}
 		return fullPath;

@@ -90,7 +90,7 @@ public class TableImport extends HttpServlet {
 					currentKeysCount = table.getTableJson().getKeys().length;
 				} else {
 					table = pDao.getTable(tableName, categoryId);
-					currentKeysCount = DataManager.getInstance().getDao().getKeys(table.getId()).size();
+					currentKeysCount = pDao.getKeys(table.getId()).size();
 				}
 
 				int importedKeysCount = excelFile.getKeys().size();
@@ -113,9 +113,9 @@ public class TableImport extends HttpServlet {
 					table.getTableJson().setValues(excelFile.getValues());
 					table.save();
 				} else {
-					List<Integer> keyIds = DataManager.getInstance().getDao().insertKeys(tableId, excelFile.getKeys());
+					List<Integer> keyIds = pDao.insertKeys(tableId, excelFile.getKeys());
 					ArrayList<ArrayList<String>> values = excelFile.getValues();
-					List<Integer> rowIds = DataManager.getInstance().getDao().insertRows(tableId, values.size());
+					List<Integer> rowIds = pDao.insertRows(tableId, values.size());
 					pDao.insertValues(rowIds, keyIds, values);
 				}
 
@@ -131,9 +131,8 @@ public class TableImport extends HttpServlet {
 						table.getTableJson().setValues(precondValues);
 						table.save();
 					} else {
-						List<Integer> precondKeyIds = DataManager.getInstance().getDao()
-								.insertKeys(precondTableId, precondKeyNames);
-						List<Integer> precondRowIds = DataManager.getInstance().getDao().insertRows(precondTableId, 1);
+						List<Integer> precondKeyIds = pDao.insertKeys(precondTableId, precondKeyNames);
+						List<Integer> precondRowIds = pDao.insertRows(precondTableId, 1);
 						pDao.insertValues(precondRowIds, precondKeyIds, precondValues);
 					}
 				}
@@ -150,10 +149,8 @@ public class TableImport extends HttpServlet {
 						table.getTableJson().setValues(postcondValues);
 						table.save();
 					} else {
-						List<Integer> postcondKeyIds = DataManager.getInstance().getDao()
-								.insertKeys(postcondTableId, postcondKeyNames);
-						List<Integer> postcondRowIds = DataManager.getInstance().getDao()
-								.insertRows(postcondTableId, 1);
+						List<Integer> postcondKeyIds = pDao.insertKeys(postcondTableId, postcondKeyNames);
+						List<Integer> postcondRowIds = pDao.insertRows(postcondTableId, 1);
 						pDao.insertValues(postcondRowIds, postcondKeyIds, postcondValues);
 					}
 				}

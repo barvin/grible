@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.grible.dao.DataManager;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Row;
 import org.grible.model.Table;
@@ -35,6 +34,7 @@ import org.grible.security.Security;
 @WebServlet("/PingModifiedTime")
 public class PingModifiedTime extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -55,15 +55,17 @@ public class PingModifiedTime extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
+			pDao = new PostgresDao();
+
 			int id = Integer.parseInt(request.getParameter("id"));
-			Table table = new PostgresDao().getTable(id);
+			Table table = pDao.getTable(id);
 
 			String message = "";
 
 			if (table.getType() == TableType.TABLE || table.getType() == TableType.STORAGE) {
 				if (table.isShowWarning()) {
 					List<String> strValues = new ArrayList<String>();
-					List<Row> rows = DataManager.getInstance().getDao().getRows(id);
+					List<Row> rows = pDao.getRows(id);
 					for (Row row : rows) {
 						strValues.add(getCombinedValues(row));
 					}
@@ -91,7 +93,7 @@ public class PingModifiedTime extends HttpServlet {
 
 	private String getCombinedValues(Row row) throws Exception {
 		StringBuilder builder = new StringBuilder();
-		List<Value> values = DataManager.getInstance().getDao().getValues(row);
+		List<Value> values = pDao.getValues(row);
 		for (Value value : values) {
 			builder.append(value.getValue());
 		}

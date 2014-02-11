@@ -280,6 +280,16 @@ public class JsonDao implements Dao {
 		}
 		return null;
 	}
+	
+	public boolean isProductWithPathExists(String path) throws Exception {
+		List<Product> productList = getProducts();
+		for (Product product : productList) {
+			if (product.getPath().equals(path)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public int insertProduct(String name, String path) throws Exception {

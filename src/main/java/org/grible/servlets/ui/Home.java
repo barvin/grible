@@ -75,6 +75,10 @@ public class Home extends HttpServlet {
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/top.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/defaultVarsHome.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/default.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\">");
+			responseHtml.append("var appType = \"")
+					.append(GlobalSettings.getInstance().getAppType().toString().toLowerCase()).append("\";");
+			responseHtml.append("</script>");
 			responseHtml.append("</head>");
 			responseHtml.append("<body>");
 

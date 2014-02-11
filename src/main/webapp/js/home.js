@@ -58,9 +58,15 @@ $(window)
 								initEditProductDialog(jQuery);
 							});
 						} else if (action == "delete") {
+							var message;
+							if (isJson()) {
+								message = "Are you sure you want to delete this product?<br>(Product directory will not be deleted)";
+							} else {
+								message = "Are you sure you want to delete this product?";
+							}
 							noty({
 								type : "confirm",
-								text : "Are you sure you want to delete this product?",
+								text : message,
 								buttons : [ {
 									addClass : 'btn btn-primary ui-button',
 									text : 'Delete',
@@ -125,7 +131,7 @@ $(window)
 
 						function submitAddProduct() {
 							var args;
-							if ($("#lbl-user").length == 0) {
+							if (isJson()) {
 								args = {
 									name : $("input.product-name").val(),
 									path : $("input.product-path").val()
@@ -139,6 +145,47 @@ $(window)
 								if (data == "success") {
 									$("#add-product-dialog").remove();
 									location.reload(true);
+								} else if (data == "folder-not-exists") {
+									noty({
+										type : "confirm",
+										text : "Directory '" + $("input.product-path").val()
+												+ "' does not exist.<br>Do you want to create it?",
+										buttons : [ {
+											addClass : 'btn btn-primary ui-button',
+											text : 'Create directory',
+											onClick : function($noty) {
+												$noty.close();
+												$.post("CreateDirectory", {
+													path : $("input.product-path").val()
+												}, function(data) {
+													if (data == "success") {
+														$.post("AddProduct", args, function(data) {
+															if (data == "success") {
+																$("#add-product-dialog").remove();
+																location.reload(true);
+															} else {
+																noty({
+																	type : "error",
+																	text : data
+																});
+															}
+														});
+													} else {
+														noty({
+															type : "error",
+															text : data
+														});
+													}
+												});
+											}
+										}, {
+											addClass : 'btn btn-danger ui-button',
+											text : 'Cancel',
+											onClick : function($noty) {
+												$noty.close();
+											}
+										} ]
+									});
 								} else {
 									noty({
 										type : "error",
@@ -190,7 +237,7 @@ $(window)
 						function submitEditProduct() {
 							var $id = $("#dialog-btn-edit-product").attr("product-id");
 							var args;
-							if ($("#lbl-user").length == 0) {
+							if (isJson()) {
 								args = {
 									id : $id,
 									name : $("input.product-name").val(),
@@ -220,3 +267,7 @@ $(window)
 						});
 					}
 				});
+
+function isJson() {
+	return appType == "json";
+}

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.DataManager;
+import org.grible.dao.JsonDao;
 import org.grible.model.Product;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
@@ -62,41 +63,43 @@ public class AddProduct extends HttpServlet {
 				out.print("ERROR: Product name cannot be empty.");
 			} else if ("".equals(path)) {
 				out.print("ERROR: Product path cannot be empty.");
-			} else if (!exists(path)) {
-				out.print("ERROR: Directory '" + path + "' does not exist. Please, create this folder first.");
 			} else {
-				Product product = DataManager.getInstance().getDao().getProduct(name);
-				if (product != null) {
-					out.print("ERROR: Product with name '" + name + "' already exists.");
+				if (isJson() && (!exists(path))) {
+					out.print("folder-not-exists");
 				} else {
-					try {
+					Product product = DataManager.getInstance().getDao().getProduct(name);
+					if (product != null) {
+						out.print("ERROR: Product with name '" + name + "' already exists.");
+					} else {
 						path = (path == null) ? "" : path;
-						int id = DataManager.getInstance().getDao().insertProduct(name, path);
-						if (isJson()) {
-							Product thisProduct = DataManager.getInstance().getDao().getProduct(id);
-							File gribleJsonFile = new File(thisProduct.getGribleJson().getFilePath());
-							if (gribleJsonFile.exists()) {
-								for (Section section : Sections.getSections()) {
-									File dir = new File(path + File.separator + section.getDirName());
-									if (!dir.exists()) {
+						if (new JsonDao().isProductWithPathExists(path)) {
+							out.print("ERROR: Product with path '" + path + "' already exists.");
+						} else {
+							int id = DataManager.getInstance().getDao().insertProduct(name, path);
+							if (isJson()) {
+								Product thisProduct = DataManager.getInstance().getDao().getProduct(id);
+								File gribleJsonFile = new File(thisProduct.getGribleJson().getFilePath());
+								if (gribleJsonFile.exists()) {
+									for (Section section : Sections.getSections()) {
+										File dir = new File(path + File.separator + section.getDirName());
+										if (!dir.exists()) {
+											dir.mkdir();
+										}
+									}
+								} else {
+									thisProduct.getGribleJson().save();
+									for (Section section : Sections.getSections()) {
+										File dir = new File(path + File.separator + section.getDirName());
+										if (dir.exists()) {
+											dir.delete();
+										}
 										dir.mkdir();
 									}
 								}
-							} else {
-								thisProduct.getGribleJson().save();
-								for (Section section : Sections.getSections()) {
-									File dir = new File(path + File.separator + section.getDirName());
-									if (dir.exists()) {
-										dir.delete();
-									}
-									dir.mkdir();
-								}
 							}
+							out.print("success");
 						}
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
-					out.print("success");
 				}
 			}
 		} catch (Exception e) {

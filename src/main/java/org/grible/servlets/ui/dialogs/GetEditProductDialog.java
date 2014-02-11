@@ -54,7 +54,7 @@ public class GetEditProductDialog extends HttpServlet {
 			int id = Integer.parseInt(request.getParameter("id"));
 			Product product = DataManager.getInstance().getDao().getProduct(id);
 			String name = product.getName();
-			
+
 			out.println("<div id=\"edit-product-dialog\" class=\"ui-dialog\">");
 			out.println("<div class=\"ui-dialog-title\">Edit product</div>");
 			out.println("<div class=\"ui-dialog-content\">");
@@ -68,7 +68,7 @@ public class GetEditProductDialog extends HttpServlet {
 			if (isPathPresent()) {
 				out.println("<div class=\"table-row\">");
 				out.println("<div class=\"table-cell dialog-cell dialog-label\">Path:</div>");
-				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"product-path dialog-edit\" value=\""
+				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"product-path dialog-edit\" disabled=\"disabled\" value=\""
 						+ product.getPath() + "\" size=\"50\"></div>");
 				out.println("</div>");
 			}

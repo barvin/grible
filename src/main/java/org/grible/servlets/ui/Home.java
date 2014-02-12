@@ -73,7 +73,7 @@ public class Home extends HttpServlet {
 			responseHtml.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />");
 			responseHtml.append("<link href=\"css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-1.9.1.min.js\"></script>");
-			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-ui-1.10.2.custom.min.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-ui.min.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/jquery.noty.js\"></script>");

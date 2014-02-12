@@ -1644,7 +1644,7 @@ function initKeysAndIndexes() {
 			$.post("../DeleteRow", $args, function(data) {
 				$("#waiting-bg").removeClass("loading");
 				if (data == "success") {
-					$row.hide(400, function() {
+					$row.hide("explode", 500, function() {
 						$row.remove();
 						if (isJson()) {
 							$(".table-row.ui-row.value-row").each(function(i) {
@@ -1721,10 +1721,36 @@ function enableKeyContextMenu() {
 							$.post("../InsertKey", $args, function(data) {
 								if (isJson()) {
 									if (data == "success") {
-										loadTableValues({
-											id : tableId,
-											product : productId
+										$(".ui-cell.key-cell").each(function(i) {
+											if ((i + 1) >= $keyOrder) {
+												$(this).attr("key-order", (i + 2));
+												$(this).attr("id", (i + 2));
+											}
 										});
+										for (var i = $(".key-cell.ui-cell").length; i > 0; i--) {
+											if (i >= $keyOrder) {
+												$("div[keyid='" + i + "']").attr("keyid", (i + 1));
+											}
+										}
+
+										$newKey = $(el).clone(true);
+										$newKey.text("editme");
+										$newKey.attr("id", $keyOrder);
+										$newKey.attr("key-order", $keyOrder);
+										$newKey.insertBefore($(el));
+										highlight($newKey);
+
+										$column.each(function(i) {
+											$newCell = $(this).clone(true);
+											$newCell.removeClass("modified-value-cell");
+											$newCell.removeClass("storage-cell");
+											$newCell.removeClass("selected-cell");
+											$newCell.text("");
+											$newCell.attr("keyid", $keyOrder);
+											$newCell.insertBefore($(this));
+											highlight($newCell);
+										});
+
 									} else {
 										noty({
 											type : "error",
@@ -1783,9 +1809,30 @@ function enableKeyContextMenu() {
 							$.post("../CopyKey", $args, function(data) {
 								if (isJson()) {
 									if (data == "success") {
-										loadTableValues({
-											id : tableId,
-											product : productId
+										$(".ui-cell.key-cell").each(function(i) {
+											if ((i + 1) >= $keyOrder) {
+												$(this).attr("key-order", (i + 2));
+												$(this).attr("id", (i + 2));
+											}
+										});
+										for (var i = $(".key-cell.ui-cell").length; i > 0; i--) {
+											if (i >= $keyOrder) {
+												$("div[keyid='" + i + "']").attr("keyid", (i + 1));
+											}
+										}
+
+										$newKey = $(el).clone(true);
+										$newKey.attr("id", $keyOrder);
+										$newKey.attr("key-order", $keyOrder);
+										$newKey.insertBefore($(el));
+										highlight($newKey);
+
+										$column.each(function(i) {
+											$newCell = $(this).clone(true);
+											$newCell.removeClass("selected-cell");
+											$newCell.attr("keyid", $keyOrder);
+											$newCell.insertBefore($(this));
+											highlight($newCell);
 										});
 									} else {
 										noty({
@@ -1841,10 +1888,21 @@ function enableKeyContextMenu() {
 							$.post("../DeleteKey", $args, function(data) {
 								if (data == "success") {
 									if (isJson()) {
-										loadTableValues({
-											id : tableId,
-											product : productId
+										$(el).hide("explode", 500);
+										var $keyCount = $(".key-cell.ui-cell").length;
+										$column.hide("explode", 500, function() {
+											$(el).remove();
+											$column.remove();
+											$(".ui-cell.key-cell").each(function(i) {
+												if ((i + 1) >= $keyOrder) {
+													$(this).attr("key-order", (i + 1));
+													$(this).attr("id", (i + 1));
+												}
+											});
 										});
+										for (var i = (parseInt($keyOrder) + 1); i <= $keyCount; i++) {
+											$("div[keyid='" + i + "']").attr("keyid", (i - 1));
+										}
 									} else {
 										$(el).hide(400);
 										$column.hide(400, function() {

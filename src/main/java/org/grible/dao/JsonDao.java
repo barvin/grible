@@ -228,10 +228,29 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public List<Table> getTablesUsingStorage(Table table) throws Exception {
+	public List<Table> getTablesUsingStorage(Table table, int productId) throws Exception {
 		List<Table> result = new ArrayList<Table>();
-		// TODO Auto-generated method stub
+		List<Table> tables = getTablesOfProduct(productId, TableType.TABLE);
+		addTablesUsingTable(result, tables, table);
+		List<Table> preconditions = getTablesOfProduct(productId, TableType.PRECONDITION);
+		addTablesUsingTable(result, preconditions, table);
+		List<Table> postconditions = getTablesOfProduct(productId, TableType.POSTCONDITION);
+		addTablesUsingTable(result, postconditions, table);
+		List<Table> storages = getTablesOfProduct(productId, TableType.STORAGE);
+		addTablesUsingTable(result, storages, table);
 		return result;
+	}
+	
+	private void addTablesUsingTable(List<Table> result, List<Table> tables, Table table) {
+		for (Table foundTable : tables) {
+			KeyJson[] keys = foundTable.getTableJson().getKeys();
+			for (int i = 0; i < keys.length; i++) {
+				if (keys[i].getRefid() == table.getId()) {
+					result.add(foundTable);
+					break;
+				}
+			}
+		}
 	}
 
 	@Override

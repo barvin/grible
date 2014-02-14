@@ -948,7 +948,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Table> getTablesUsingStorage(Table table) throws SQLException {
+	public List<Table> getTablesUsingStorage(Table table, int productId) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();

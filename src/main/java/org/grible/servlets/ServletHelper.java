@@ -227,7 +227,7 @@ public class ServletHelper {
 		boolean isUsedByTables = false;
 		String error = "";
 		if ((currentTable.getType() == TableType.STORAGE) || (currentTable.getType() == TableType.ENUMERATION)) {
-			List<Table> tablesUsingThisStorage = DataManager.getInstance().getDao().getTablesUsingStorage(currentTable);
+			List<Table> tablesUsingThisStorage = DataManager.getInstance().getDao().getTablesUsingStorage(currentTable, productId);
 			if (!tablesUsingThisStorage.isEmpty()) {
 				isUsedByTables = true;
 				error = "ERROR: " + StringUtils.capitalize(currentTable.getType().toString().toLowerCase()) + " '"

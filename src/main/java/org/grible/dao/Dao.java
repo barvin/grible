@@ -43,7 +43,7 @@ public interface Dao {
 
 	public boolean deleteCategory(Category category) throws Exception;
 
-	public List<Table> getTablesUsingStorage(Table storage) throws Exception;
+	public List<Table> getTablesUsingStorage(Table storage, int productId) throws Exception;
 
 	public boolean deleteTable(Table table, int productId) throws Exception;
 

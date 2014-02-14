@@ -200,8 +200,10 @@ public class ServletHelper {
 		responseHtml.append("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
 		responseHtml.append("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
 		responseHtml.append("<link href=\"../css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
-		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.9.1.min.js\"></script>");
+		responseHtml.append("<link href=\"../css/jquery.handsontable.full.css\" rel=\"stylesheet\" type=\"text/css\" />");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.11.0.min.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-ui.min.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.handsontable.full.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");

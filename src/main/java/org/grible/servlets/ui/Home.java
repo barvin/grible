@@ -83,8 +83,10 @@ public class Home extends HttpServlet {
 			responseHtml.append("<script type=\"text/javascript\">");
 			responseHtml.append("var appType = \"")
 					.append(GlobalSettings.getInstance().getAppType().toString().toLowerCase()).append("\";");
-			responseHtml.append("var productsWhosePathsNotExist = ").append(getProductsWhosePathsNotExist())
-					.append(";");
+			if (!isMultipleUsers()) {
+				responseHtml.append("var productsWhosePathsNotExist = ").append(getProductsWhosePathsNotExist())
+						.append(";");
+			}
 			responseHtml.append("</script>");
 			responseHtml.append("</head>");
 			responseHtml.append("<body>");

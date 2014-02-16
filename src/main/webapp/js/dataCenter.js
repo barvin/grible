@@ -1364,8 +1364,38 @@ function highlight(element) {
 }
 
 function loadTableValues(args) {
-	$.post("../GetTableValues", args, function(data) {
-		$(".entities-values").html(template(jQuery.parseJSON(data)));
+	$.post("../GetTableValues", args, function(res) {
+
+		var storageCellRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+			Handsontable.renderers.TextRenderer.apply(this, arguments);
+			$(td).css({
+				color : "#0066c5"
+			});
+		};
+
+		var $data = jQuery.parseJSON(res);
+		var $storages = $data.storages.split(";");
+		for (var i = 0; i < $storages.length; i++) {
+			$storages[i] = parseInt($storages[i]);
+		}
+
+		$("#table-container").handsontable({
+			data : $data.values,
+			manualColumnMove : true,
+			manualColumnResize : true,
+			contextMenu : true,
+			width : $("#table-container").width(),
+			height : $("#table-container").height(),
+			rowHeaders : $data.isIndex,
+			colHeaders : $data.keys,
+			cells : function(row, col, prop) {
+				if ($.inArray(col, $storages) > -1) {
+					this.renderer = storageCellRenderer;
+				}
+			}
+		});
+
+		// $(".entities-values").html(template(jQuery.parseJSON(data)));
 		initTableValues(jQuery);
 		initKeysAndIndexes(jQuery);
 		if (isChrome()) {

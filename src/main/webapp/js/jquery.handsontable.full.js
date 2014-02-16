@@ -205,18 +205,12 @@ Handsontable.Core = function (rootElement, userSettings) {
     , instance = this
     , GridSettings = function () {};
 
-  Handsontable.helper.extend(GridSettings.prototype, DefaultSettings.prototype); // create
-																					// grid
-																					// settings
-																					// as a
-																					// copy
-																					// of
-																					// default
-																					// settings
-  Handsontable.helper.extend(GridSettings.prototype, userSettings); // overwrite
-																	// defaults
-																	// with user
-																	// settings
+  // create grid settings as a copy of default settings
+  Handsontable.helper.extend(GridSettings.prototype, DefaultSettings.prototype);
+  
+  // overwrite defaults with user settings  
+  Handsontable.helper.extend(GridSettings.prototype, userSettings);
+  
   Handsontable.helper.extend(GridSettings.prototype, expandType(userSettings));
 
   this.rootElement = rootElement;
@@ -2850,7 +2844,7 @@ Handsontable.TableView = function (instance) {
         className: 'current',
         border: {
           width: 2,
-          color: '#5292F7',
+          color: '#367F86',
           style: 'solid',
           cornerVisible: function () {
             return that.settings.fillHandle && !that.isCellEdited() && !instance.selection.isMultiple()
@@ -2861,7 +2855,7 @@ Handsontable.TableView = function (instance) {
         className: 'area',
         border: {
           width: 1,
-          color: '#89AFF9',
+          color: '#367F86',
           style: 'solid',
           cornerVisible: function () {
             return that.settings.fillHandle && !that.isCellEdited() && instance.selection.isMultiple()
@@ -6492,12 +6486,11 @@ Handsontable.cellLookup = {
  * originally forked from: https://github.com/jamespadolsey/jQuery.fn.autoResize
  * which is now located here: https://github.com/alexbardas/jQuery.fn.autoResize
  * though the mostly maintained for is here:
- * https://github.com/dpashkevich/jQuery.fn.autoResize/network
- *  -- This program is free software. It comes without any warranty, to the
- * extent permitted by applicable law. You can redistribute it and/or modify it
- * under the terms of the Do What The Fuck You Want To Public License, Version
- * 2, as published by Sam Hocevar. See http://sam.zoy.org/wtfpl/COPYING for more
- * details.
+ * https://github.com/dpashkevich/jQuery.fn.autoResize/network -- This program
+ * is free software. It comes without any warranty, to the extent permitted by
+ * applicable law. You can redistribute it and/or modify it under the terms of
+ * the Do What The Fuck You Want To Public License, Version 2, as published by
+ * Sam Hocevar. See http://sam.zoy.org/wtfpl/COPYING for more details.
  */
 
 (function($){
@@ -10906,8 +10899,7 @@ function Walkontable(settings) {
   /*
 	 * if (window.Handsontable) { Handsontable.PluginHooks.add('beforeChange',
 	 * function () { if (that.rowHeightCache) { that.rowHeightCache.length = 0; }
-	 * });
-	 *  }
+	 * }); }
 	 */
 }
 
@@ -11278,10 +11270,9 @@ WalkontableDom.prototype.isVisible = function (elem) {
 	// case
   /*
 	 * if (!WalkontableDom.prototype.hasOffsetParent(elem)) { return false;
-	 * //fixes problem with UI Bootstrap <tabs> directive }
-	 *  // if (elem.offsetWidth > 0 || (elem.parentNode &&
-	 * elem.parentNode.offsetWidth > 0)) { //IE10 was mistaken here if
-	 * (elem.offsetWidth > 0) { return true; }
+	 * //fixes problem with UI Bootstrap <tabs> directive } // if
+	 * (elem.offsetWidth > 0 || (elem.parentNode && elem.parentNode.offsetWidth >
+	 * 0)) { //IE10 was mistaken here if (elem.offsetWidth > 0) { return true; }
 	 */
 
   // slow method
@@ -13777,8 +13768,7 @@ function WalkontableViewport(instance) {
  * //is table outside viewport top edge else if (scrollTop > tableTop +
  * tableFakeHeight) { return -2; }
  * 
- * //table is in viewport but how much exactly? else {
- *  } };
+ * //table is in viewport but how much exactly? else { } };
  */
 
 // used by scrollbar

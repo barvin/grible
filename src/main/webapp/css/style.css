@@ -149,8 +149,8 @@ a:hover,a:hover>.link-infront {
 	border: 1px solid #DDDDDD;
 }
 
-.value-row:hover {
-	background-color: #ECF7F7;
+.handsontable .current-row {
+  background-color: #ECF7F7;
 }
 
 .index-cell {

@@ -1388,11 +1388,39 @@ function loadTableValues(args) {
 			height : $("#table-container").height(),
 			rowHeaders : $data.isIndex,
 			colHeaders : $data.keys,
+			currentRowClassName : 'current-row',
+			autoWrapRow : true,
 			cells : function(row, col, prop) {
 				if ($.inArray(col, $storages) > -1) {
 					this.renderer = storageCellRenderer;
 				}
-			}
+			},
+			afterChange : function(changes, source) {
+				if (changes != null) {
+					var isDataChanged = false;
+					for (var i = 0; i < changes.length; i++) {
+						if (changes[i][2] !== changes[i][3]) {
+							isDataChanged = true;
+							break;
+						}
+					}
+					if (isDataChanged) {
+						enableSaveButton();
+					}
+				}
+			},
+			afterCreateRow : function(index, amount) {
+				enableSaveButton();
+			},
+			afterCreateCol : function(index, amount) {
+				enableSaveButton();
+			},
+			afterRemoveRow : function(index, amount) {
+				enableSaveButton();
+			},
+			afterRemoveCol : function(index, amount) {
+				enableSaveButton();
+			},
 		});
 
 		// $(".entities-values").html(template(jQuery.parseJSON(data)));

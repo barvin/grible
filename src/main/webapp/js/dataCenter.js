@@ -979,27 +979,9 @@ function initTopPanel() {
 			$(this).addClass("button-disabled");
 
 			if (isJson()) {
-				var keys = [];
-				$(".ui-cell.key-cell").each(function(i) {
-					keys[i] = $(this).text();
-				});
-				var values = [];
-				$(".ui-row.value-row").each(function(i) {
-					values[i] = "[";
-					$(this).find(".ui-cell.value-cell").each(function(j) {
-						if ($(this).has("span")) {
-							$(this).find("span").remove();
-						}
-						if ($(this).has("div.tooltip")) {
-							$(this).find("div.tooltip").remove();
-						}
-						if (j > 0) {
-							values[i] += ",";
-						}
-						values[i] += "\"" + $(this).text() + "\"";
-					});
-					values[i] += "]";
-				});
+				var tableContainer = $("#table-container").handsontable('getInstance');
+				var keys = tableContainer.getColHeader();
+				var values = tableContainer.getData();
 				$.post("../SaveTable", {
 					tableid : tableId,
 					product : productId,
@@ -1373,6 +1355,11 @@ function loadTableValues(args) {
 			});
 		};
 
+		var modifiedCellRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+			Handsontable.renderers.TextRenderer.apply(this, arguments);
+			$(td).addClass("modified-value-cell");
+		};
+
 		var $data = jQuery.parseJSON(res);
 		var $storages = $data.storages.split(";");
 		for (var i = 0; i < $storages.length; i++) {
@@ -1390,18 +1377,29 @@ function loadTableValues(args) {
 			colHeaders : $data.keys,
 			currentRowClassName : 'current-row',
 			autoWrapRow : true,
-			cells : function(row, col, prop) {
-				if ($.inArray(col, $storages) > -1) {
-					this.renderer = storageCellRenderer;
-				}
-			},
+//			cells : function(row, col, prop) {
+//				if ($.inArray(col, $storages) > -1) {
+//					this.renderer = storageCellRenderer;
+//				}
+//			},
 			afterChange : function(changes, source) {
 				if (changes != null) {
 					var isDataChanged = false;
+					//var tableContainer = $("#table-container").handsontable('getInstance');
 					for (var i = 0; i < changes.length; i++) {
 						if (changes[i][2] !== changes[i][3]) {
 							isDataChanged = true;
-							break;
+							// modified-value-cell
+							$("#table-container").handsontable({
+								cells : function(row, col, prop) {
+									if (row == changes[i][0] && col == changes[i][1]) {
+										this.renderer = modifiedCellRenderer;
+									}
+								}
+							});
+							// var cell = tableContainer.getCell(changes[i][0],
+							// changes[i][1]);
+							// cell.addClass("modified-value-cell");
 						}
 					}
 					if (isDataChanged) {

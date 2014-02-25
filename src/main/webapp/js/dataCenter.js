@@ -978,142 +978,57 @@ function initTopPanel() {
 			$(this).removeClass("button-enabled");
 			$(this).addClass("button-disabled");
 
-			if (isJson()) {
-				var tableContainer = $("#table-container").handsontable('getInstance');
-				var keys = tableContainer.getColHeader();
-				var keyTypes = [];
-				var keyRefids = [];
-				var values = [];
-				var data = tableContainer.getData();
-				$.each(data, function(index, rowValues) {
-					var row = "[\"";
-					row += rowValues.join("\",\"");
-					row += "\"]";
-					values.push(row);
-				});
-				
-				$(".handsontable thead th").each(function(i) {
-					if (i > 0) {
-						keyTypes.push($(this).attr("type"));
-						keyRefids.push($(this).attr("refid"));
-					}
-				});
-				$.post("../SaveTable", {
-					tableid : tableId,
-					product : productId,
-					keys : keys,
-					keyTypes : keyTypes,
-					keyRefids : keyRefids,
-					values : values
-				}, function(data) {
-					if (data == "success") {
-						$(".modified-value-cell").removeClass("modified-value-cell");
-						$(".modified-key-cell").removeClass("modified-key-cell");
-						$.post("../CheckForDuplicatedRows", {
-							id : tableId,
-							product : productId
-						}, function(data) {
-							var message = data.split("|");
-							if (message[0] == "true") {
-								for (var i = 1; i < message.length; i++) {
-									noty({
-										type : "warning",
-										text : message[i]
-									});
-								}
-							}
-						});
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
-				});
-			} else {
-				var valuesWaiting = $(".modified-value-cell").length;
-				$(".modified-value-cell").each(function(i) {
-					var $cell = $(this);
-					if ($cell.has("span")) {
-						$cell.find("span").remove();
-					}
-					if ($cell.has("div.tooltip")) {
-						$cell.find("div.tooltip").remove();
-					}
-					$.post("../SaveCellValue", {
-						id : $cell.attr('id'),
-						value : $cell.text()
+			var $tableContainer = $("#table-container").handsontable('getInstance');
+			var $keyNames = $tableContainer.getColHeader();
+			var $keyTypes = [];
+			var $keyRefids = [];
+			var $values = [];
+			var $data = $tableContainer.getData();
+			$.each($data, function(index, rowValues) {
+				var row = "[\"";
+				row += rowValues.join("\",\"");
+				row += "\"]";
+				$values.push(row);
+			});
+
+			$(".handsontable thead th").each(function(i) {
+				if (i > 0) {
+					$keyTypes.push($(this).attr("type"));
+					$keyRefids.push($(this).attr("refid"));
+				}
+			});
+			$.post("../SaveTable", {
+				tableid : tableId,
+				product : productId,
+				keys : $keyNames,
+				keyTypes : $keyTypes,
+				keyRefids : $keyRefids,
+				values : $values
+			}, function(data) {
+				if (data == "success") {
+					$("td[modified]").removeAttr("modified");
+					$(".current-row").removeClass("current-row");
+					$.post("../CheckForDuplicatedRows", {
+						id : tableId,
+						product : productId
 					}, function(data) {
-						if (data == "success") {
-							$cell.removeClass("modified-value-cell");
-						} else {
-							noty({
-								type : "error",
-								text : data
-							});
-						}
-						valuesWaiting--;
-						if (valuesWaiting == 0) {
-							$.post("../CheckForDuplicatedRows", {
-								id : tableId
-							}, function(data) {
-								var message = data.split("|");
-								if (message[0] == "true") {
-									for (var i = 1; i < message.length; i++) {
-										noty({
-											type : "warning",
-											text : message[i]
-										});
-									}
-								}
-							});
-						}
-					});
-				});
-				var keysWaiting = $(".modified-key-cell").length;
-				$(".modified-key-cell").each(function(i) {
-					var $key = $(this);
-					if ($key.has("span")) {
-						$key.find("span").remove();
-					}
-					if ($key.has("div.tooltip")) {
-						$key.find("div.tooltip").remove();
-					}
-					$.post("../SaveKeyValue", {
-						id : $key.attr('id'),
-						value : $key.text()
-					}, function(data) {
-						if (data == "success") {
-							$key.removeClass("modified-key-cell");
-						} else {
-							noty({
-								type : "error",
-								text : data
-							});
-						}
-						keysWaiting--;
-						if (keysWaiting == 0) {
-							var keyNames = $(".key-cell.ui-cell").map(function() {
-								return $(this).text();
-							}).get();
-							var usedNames = new Array();
-							for (var i = 0; i < keyNames.length - 1; i++) {
-								if ($.inArray(keyNames[i], usedNames) == -1) {
-									for (var j = i + 1; j < keyNames.length; j++) {
-										if (keyNames[i] === keyNames[j]) {
-											usedNames.push(keyNames[i]);
-											noty({
-												type : "warning",
-												text : "More than one parameter name '" + keyNames[i] + "'."
-											});
-										}
-									}
-								}
+						var message = data.split("|");
+						if (message[0] == "true") {
+							for (var i = 1; i < message.length; i++) {
+								noty({
+									type : "warning",
+									text : message[i]
+								});
 							}
 						}
 					});
-				});
-			}
+				} else {
+					noty({
+						type : "error",
+						text : data
+					});
+				}
+			});
 		}
 	});
 
@@ -1410,7 +1325,7 @@ function loadTableValues(args) {
 					for (var i = 0; i < changes.length; i++) {
 						if (changes[i][2] !== changes[i][3]) {
 							isDataChanged = true;
-							break;
+							$("td.current").attr("modified", true);
 						}
 					}
 					if (isDataChanged) {

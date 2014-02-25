@@ -504,11 +504,11 @@ h3.category-item:hover {
 	border: 1px inset #eee;
 }
 
-.modified-value-cell {
+.handsontable td[modified] {
 	background-color: #FFF3B3;
 }
 
-.modified-key-cell {
+.handsontable th[modified] {
 	background-color: #7F774F;
 }
 

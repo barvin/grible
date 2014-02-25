@@ -197,9 +197,9 @@ public class ServletHelper {
 	public static String getIncludes() {
 		StringBuilder responseHtml = new StringBuilder();
 		responseHtml.append("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
-		responseHtml.append("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
 		responseHtml.append("<link href=\"../css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
 		responseHtml.append("<link href=\"../css/jquery.handsontable.full.css\" rel=\"stylesheet\" type=\"text/css\" />");
+		responseHtml.append("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.11.0.min.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-ui.min.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.handsontable.full.js\"></script>");

@@ -1,10 +1,11 @@
 package org.grible.json.ui;
 
+import org.grible.model.json.KeyJson;
+
 public class UiTable {
 	private boolean isIndex;
-	private String[] keys;
+	private KeyJson[] keys;
 	private String[][] values;
-	private String storages;
 	private UiInfo info;
 
 	public boolean isIndex() {
@@ -15,11 +16,11 @@ public class UiTable {
 		this.isIndex = isIndex;
 	}
 
-	public String[] getKeys() {
+	public KeyJson[] getKeys() {
 		return keys;
 	}
 
-	public void setKeys(String[] keys) {
+	public void setKeys(KeyJson[] keys) {
 		this.keys = keys;
 	}
 
@@ -37,14 +38,6 @@ public class UiTable {
 
 	public void setValues(String[][] values) {
 		this.values = values;
-	}
-
-	public String getStorages() {
-		return storages;
-	}
-
-	public void setStorages(String storages) {
-		this.storages = storages;
 	}
 
 }

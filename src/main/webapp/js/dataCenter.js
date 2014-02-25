@@ -981,11 +981,29 @@ function initTopPanel() {
 			if (isJson()) {
 				var tableContainer = $("#table-container").handsontable('getInstance');
 				var keys = tableContainer.getColHeader();
-				var values = tableContainer.getData();
+				var keyTypes = [];
+				var keyRefids = [];
+				var values = [];
+				var data = tableContainer.getData();
+				$.each(data, function(index, rowValues) {
+					var row = "[\"";
+					row += rowValues.join("\",\"");
+					row += "\"]";
+					values.push(row);
+				});
+				
+				$(".handsontable thead th").each(function(i) {
+					if (i > 0) {
+						keyTypes.push($(this).attr("type"));
+						keyRefids.push($(this).attr("refid"));
+					}
+				});
 				$.post("../SaveTable", {
 					tableid : tableId,
 					product : productId,
 					keys : keys,
+					keyTypes : keyTypes,
+					keyRefids : keyRefids,
 					values : values
 				}, function(data) {
 					if (data == "success") {
@@ -1361,12 +1379,17 @@ function loadTableValues(args) {
 		};
 
 		var $data = jQuery.parseJSON(res);
-		var $storages = $data.storages.split(";");
-		for (var i = 0; i < $storages.length; i++) {
-			$storages[i] = parseInt($storages[i]);
+		var $colNames = [];
+		var $colTypes = [];
+		var $colRefids = [];
+		for (var i = 0; i < $data.keys.length; i++) {
+			$colNames[i] = $data.keys[i].name;
+			$colTypes[i] = $data.keys[i].type;
+			$colRefids[i] = $data.keys[i].refid;
 		}
 
-		$("#table-container").handsontable({
+		var $tableContainer = $("#table-container");
+		$tableContainer.handsontable({
 			data : $data.values,
 			manualColumnMove : true,
 			manualColumnResize : true,
@@ -1374,32 +1397,20 @@ function loadTableValues(args) {
 			width : $("#table-container").width(),
 			height : $("#table-container").height(),
 			rowHeaders : $data.isIndex,
-			colHeaders : $data.keys,
+			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
 			autoWrapRow : true,
-//			cells : function(row, col, prop) {
-//				if ($.inArray(col, $storages) > -1) {
-//					this.renderer = storageCellRenderer;
-//				}
-//			},
+			afterGetColHeader : function(col, TH) {
+				TH.setAttribute("type", $colTypes[col]);
+				TH.setAttribute("refid", $colRefids[col]);
+			},
 			afterChange : function(changes, source) {
 				if (changes != null) {
 					var isDataChanged = false;
-					//var tableContainer = $("#table-container").handsontable('getInstance');
 					for (var i = 0; i < changes.length; i++) {
 						if (changes[i][2] !== changes[i][3]) {
 							isDataChanged = true;
-							// modified-value-cell
-							$("#table-container").handsontable({
-								cells : function(row, col, prop) {
-									if (row == changes[i][0] && col == changes[i][1]) {
-										this.renderer = modifiedCellRenderer;
-									}
-								}
-							});
-							// var cell = tableContainer.getCell(changes[i][0],
-							// changes[i][1]);
-							// cell.addClass("modified-value-cell");
+							break;
 						}
 					}
 					if (isDataChanged) {
@@ -1412,6 +1423,8 @@ function loadTableValues(args) {
 			},
 			afterCreateCol : function(index, amount) {
 				enableSaveButton();
+				$colTypes.splice(index, 0, "text");
+				$colRefids.splice(index, 0, "0");
 			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
@@ -1421,7 +1434,6 @@ function loadTableValues(args) {
 			},
 		});
 
-		// $(".entities-values").html(template(jQuery.parseJSON(data)));
 		initTableValues(jQuery);
 		initKeysAndIndexes(jQuery);
 		if (isChrome()) {
@@ -1493,12 +1505,6 @@ function initTableValues() {
 		$(this).addClass("selected-cell");
 		if ($(".value-cell").has("input").length > 0) {
 			modifyValueCell();
-		}
-	});
-
-	$(".selected-cell").keypress("c", function(event) {
-		if (event.ctrlKey) {
-			// TODO: Copy to clipboard.
 		}
 	});
 }

@@ -22,26 +22,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
-import org.grible.json.ui.UiIndex;
 import org.grible.json.ui.UiInfo;
-import org.grible.json.ui.UiKey;
-import org.grible.json.ui.UiRow;
 import org.grible.json.ui.UiTable;
-import org.grible.json.ui.UiValue;
-import org.grible.model.Key;
-import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
-import org.grible.model.Value;
-import org.grible.model.json.KeyJson;
-import org.grible.model.json.KeyType;
 import org.grible.model.json.TableJson;
 import org.grible.security.Security;
-import org.grible.servlets.ServletHelper;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
 
@@ -123,17 +112,7 @@ public class GetTableValues extends HttpServlet {
 			uiTable.setIndex(false);
 		}
 		TableJson tableJson = table.getTableJson();
-		KeyJson[] keys = tableJson.getKeys();
-		String[] strKeys = new String[keys.length];
-		String storages = "";
-		for (int i = 0; i < strKeys.length; i++) {
-			strKeys[i] = keys[i].getName();
-			if (keys[i].getType() == KeyType.STORAGE) {
-				storages += i + ";";
-			}
-		}
-		uiTable.setKeys(strKeys);
-		uiTable.setStorages(StringUtils.substringBeforeLast(storages, ";"));
+		uiTable.setKeys(tableJson.getKeys());
 
 		String[][] values = tableJson.getValues();
 		uiTable.setValues(values);

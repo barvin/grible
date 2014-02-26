@@ -25,10 +25,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
+import org.grible.json.ui.UiColumn;
 import org.grible.json.ui.UiInfo;
 import org.grible.json.ui.UiTable;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.model.json.KeyJson;
 import org.grible.model.json.TableJson;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
@@ -112,7 +114,37 @@ public class GetTableValues extends HttpServlet {
 			uiTable.setIndex(false);
 		}
 		TableJson tableJson = table.getTableJson();
-		uiTable.setKeys(tableJson.getKeys());
+		KeyJson[] keys = tableJson.getKeys();
+		uiTable.setKeys(keys);
+
+		UiColumn[] columns = new UiColumn[keys.length];
+		for (int i = 0; i < columns.length; i++) {
+			columns[i] = new UiColumn();
+			switch (keys[i].getType()) {
+			case TEXT:
+				columns[i].setType("text");
+				columns[i].setAllowInvalid(true);
+				break;
+				
+			case STORAGE:
+				columns[i].setType("text");
+				columns[i].setAllowInvalid(false);
+				break;
+				
+			case ENUMERATION:
+				columns[i].setType("dropdown");
+				columns[i].setAllowInvalid(false);
+				Table refTable = jDao.getTable(keys[i].getRefid(), productId);
+				String[] source = jDao.getValuesByKeyOrder(refTable, 0).toArray(new String[0]);
+				columns[i].setSource(source);
+				break;
+
+			default:
+				break;
+			}
+
+		}
+		uiTable.setColumns(columns);
 
 		String[][] values = tableJson.getValues();
 		uiTable.setValues(values);
@@ -123,6 +155,7 @@ public class GetTableValues extends HttpServlet {
 			uiInfo.setTables("Used in storages");
 			uiTable.setInfo(uiInfo);
 		}
+
 		// UiRow[] uiRows = new UiRow[values.length];
 		// for (int i = 0; i < values.length; i++) {
 		// uiRows[i] = new UiRow();

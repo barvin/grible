@@ -1287,11 +1287,15 @@ function loadTableValues(args) {
 				color : "#0066c5"
 			});
 		};
-
-		var modifiedCellRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-			Handsontable.renderers.TextRenderer.apply(this, arguments);
-			$(td).addClass("modified-value-cell");
+		var storageValidatorRegExp = function(value, callback) {
+			if (/^\d+[;\d+]*$/.test(value)) {
+				callback(true);
+			} else {
+				callback(false);
+			}
 		};
+
+		var $changedCells = [];
 
 		var $data = jQuery.parseJSON(res);
 		var $colNames = [];
@@ -1302,6 +1306,8 @@ function loadTableValues(args) {
 			$colTypes[i] = $data.keys[i].type;
 			$colRefids[i] = $data.keys[i].refid;
 		}
+
+		var $columns = $data.columns;
 
 		var $tableContainer = $("#table-container");
 		$tableContainer.handsontable({
@@ -1325,29 +1331,89 @@ function loadTableValues(args) {
 					for (var i = 0; i < changes.length; i++) {
 						if (changes[i][2] !== changes[i][3]) {
 							isDataChanged = true;
-							$("td.current").attr("modified", true);
+							$changedCells.push({
+								row : changes[i][0],
+								col : changes[i][1]
+							});
 						}
 					}
 					if (isDataChanged) {
 						enableSaveButton();
+						setModifiedCells();
 					}
 				}
 			},
 			afterCreateRow : function(index, amount) {
 				enableSaveButton();
+				for (var i = 0; i < $changedCells.length; i++) {
+					if ($changedCells[i].row >= index) {
+						$changedCells[i].row++;
+					}
+				}
+				setModifiedCells();
+			},
+			beforeCreateCol : function(index, amount) {
+				$columns.splice(index, 0, {
+					type : "text",
+					allowInvalid : true
+				});
 			},
 			afterCreateCol : function(index, amount) {
 				enableSaveButton();
 				$colTypes.splice(index, 0, "text");
 				$colRefids.splice(index, 0, "0");
+				for (var i = 0; i < $changedCells.length; i++) {
+					if ($changedCells[i].col >= index) {
+						$changedCells[i].col++;
+					}
+				}
+				setModifiedCells();
 			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
+				for (var i = 0; i < $changedCells.length; i++) {
+					if ($changedCells[i].row >= index) {
+						$changedCells[i].row--;
+					}
+				}
+				setModifiedCells();
 			},
 			afterRemoveCol : function(index, amount) {
 				enableSaveButton();
+				for (var i = 0; i < $changedCells.length; i++) {
+					if ($changedCells[i].col >= index) {
+						$changedCells[i].col--;
+					}
+				}
+				setModifiedCells();
 			},
+			afterInit : function() {
+				var $instance = $tableContainer.handsontable('getInstance');
+				$instance.updateSettings({
+					cells : function(row, col, prop) {
+						var cellProperties = {};
+						cellProperties.type = $columns[col].type;
+						cellProperties.allowInvalid = $columns[col].allowInvalid;
+						if ($columns[col].type === "dropdown") {
+							cellProperties.source = $columns[col].source;
+						}
+						if ($columns[col].type === "text" && $columns[col].allowInvalid == false) {
+							cellProperties.renderer = storageCellRenderer;
+							cellProperties.validator = storageValidatorRegExp;
+						}
+						return cellProperties;
+					}
+				});
+			}
 		});
+
+		function setModifiedCells() {
+			$(".handsontable td[modified]").removeAttr("modified");
+			for (var i = 0; i < $changedCells.length; i++) {
+				var td = $tableContainer.handsontable("getCell", $changedCells[i].row, $changedCells[i].col);
+				td.setAttribute("modified", true);
+			}
+		}
 
 		initTableValues(jQuery);
 		initKeysAndIndexes(jQuery);

@@ -3,6 +3,7 @@ package org.grible.model.json;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.grible.json.ui.UiColumn;
 import org.grible.model.TableType;
 
 public class TableJson {
@@ -12,6 +13,7 @@ public class TableJson {
 	private boolean showWarning;
 	private KeyJson[] keys;
 	private String[][] values;
+	private UiColumn[] columns;
 
 	public TableType getType() {
 		return type;
@@ -75,6 +77,14 @@ public class TableJson {
 				values[i][j] = valuesList.get(i).get(j);
 			}
 		}
+	}
+
+	public UiColumn[] getColumns() {
+		return columns;
+	}
+
+	public void setColumns(UiColumn[] columns) {
+		this.columns = columns;
 	}
 
 }

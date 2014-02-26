@@ -7,6 +7,7 @@ public class UiTable {
 	private KeyJson[] keys;
 	private String[][] values;
 	private UiInfo info;
+	private UiColumn[] columns;
 
 	public boolean isIndex() {
 		return isIndex;
@@ -38,6 +39,14 @@ public class UiTable {
 
 	public void setValues(String[][] values) {
 		this.values = values;
+	}
+
+	public UiColumn[] getColumns() {
+		return columns;
+	}
+
+	public void setColumns(UiColumn[] columns) {
+		this.columns = columns;
 	}
 
 }

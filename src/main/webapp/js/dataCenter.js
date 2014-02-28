@@ -1404,6 +1404,9 @@ function loadTableValues(args) {
 						return cellProperties;
 					}
 				});
+				$instance.validateCells(function(callback) {
+					callback;
+				});
 			}
 		});
 

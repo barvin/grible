@@ -31,6 +31,7 @@ import org.grible.json.ui.UiTable;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.json.KeyJson;
+import org.grible.model.json.KeyType;
 import org.grible.model.json.TableJson;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
@@ -97,6 +98,14 @@ public class GetTableValues extends HttpServlet {
 				// values.add(pDao.getValues(row));
 				// }
 				// writeValues(uiTable, values);
+				uiTable.setIndex(true);
+				uiTable.setKeys(new KeyJson[] { new KeyJson("editme", KeyType.TEXT, 0) });
+				UiColumn[] columns = new UiColumn[1];
+				columns[0] = new UiColumn();
+				columns[0].setType("text");
+				columns[0].setAllowInvalid(true);
+				uiTable.setColumns(columns);
+				uiTable.setValues(new String[][] { { "" } });
 			}
 			out.print(new Gson().toJson(uiTable));
 		} catch (Exception e) {
@@ -125,12 +134,12 @@ public class GetTableValues extends HttpServlet {
 				columns[i].setType("text");
 				columns[i].setAllowInvalid(true);
 				break;
-				
+
 			case STORAGE:
 				columns[i].setType("text");
 				columns[i].setAllowInvalid(false);
 				break;
-				
+
 			case ENUMERATION:
 				columns[i].setType("dropdown");
 				columns[i].setAllowInvalid(false);

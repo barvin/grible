@@ -70,7 +70,7 @@ public class AddProduct extends HttpServlet {
 						out.print("ERROR: Product with name '" + name + "' already exists.");
 					} else {
 						path = (path == null) ? "" : path;
-						if (new JsonDao().isProductWithPathExists(path)) {
+						if (isJson() && (new JsonDao().isProductWithPathExists(path))) {
 							out.print("ERROR: Product with path '" + path + "' already exists.");
 						} else {
 							DataManager.getInstance().getDao().insertProduct(name, path);

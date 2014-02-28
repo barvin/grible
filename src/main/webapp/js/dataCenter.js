@@ -1,3 +1,5 @@
+var $changedCells = [];
+
 $(window).on("load", function() {
 	var docHeight = $(window).height() - 95;
 	var docWidth = $(window).width() - 45;
@@ -14,6 +16,7 @@ $(window).on("load", function() {
 	$("#table-container").height(mainHeight);
 	$(".left-panel").height(mainHeight);
 	$("#entities-list").height(mainHeight);
+
 });
 
 $().ready(initialize());
@@ -1006,6 +1009,7 @@ function initTopPanel() {
 				values : $values
 			}, function(data) {
 				if (data == "success") {
+					$changedCells = [];
 					$("td[modified]").removeAttr("modified");
 					$(".current-row").removeClass("current-row");
 					$.post("../CheckForDuplicatedRows", {
@@ -1295,8 +1299,6 @@ function loadTableValues(args) {
 			}
 		};
 
-		var $changedCells = [];
-
 		var $data = jQuery.parseJSON(res);
 		var $colNames = [];
 		var $colTypes = [];
@@ -1308,6 +1310,21 @@ function loadTableValues(args) {
 		}
 
 		var $columns = $data.columns;
+		var setColumnTypes = function(row, col, prop) {
+			var cellProperties = {};
+			if (col <= $columns.length - 1) {
+				cellProperties.type = $columns[col].type;
+				cellProperties.allowInvalid = $columns[col].allowInvalid;
+				if ($columns[col].type === "dropdown") {
+					cellProperties.source = $columns[col].source;
+				}
+				if ($columns[col].type === "text" && $columns[col].allowInvalid == false) {
+					cellProperties.renderer = storageCellRenderer;
+					cellProperties.validator = storageValidatorRegExp;
+				}
+			}
+			return cellProperties;
+		};
 
 		var $tableContainer = $("#table-container");
 		$tableContainer.handsontable({
@@ -1320,6 +1337,7 @@ function loadTableValues(args) {
 			rowHeaders : $data.isIndex,
 			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
+			cells : setColumnTypes,
 			autoWrapRow : true,
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
@@ -1351,12 +1369,14 @@ function loadTableValues(args) {
 					}
 				}
 				setModifiedCells();
-			},
-			beforeCreateCol : function(index, amount) {
-				$columns.splice(index, 0, {
-					type : "text",
-					allowInvalid : true
-				});
+				for (var i = 0; i < $columns.length; i++) {
+					if ($columns[i].type === "dropdown") {
+						$tableContainer.handsontable("setDataAtCell", index, i, $columns[i].source[0]);
+					}
+					if ($columns[i].type === "text" && $columns[i].allowInvalid == false) {
+						$tableContainer.handsontable("setDataAtCell", index, i, "0");
+					}
+				}
 			},
 			afterCreateCol : function(index, amount) {
 				enableSaveButton();
@@ -1368,11 +1388,18 @@ function loadTableValues(args) {
 					}
 				}
 				setModifiedCells();
+				$columns.splice(index, 0, {
+					type : "text",
+					allowInvalid : true
+				});
+				setColumnTypes();
 			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
 				for (var i = 0; i < $changedCells.length; i++) {
-					if ($changedCells[i].row >= index) {
+					if ($changedCells[i].row === index) {
+						$changedCells.slice(i, 1);
+					} else if ($changedCells[i].row > index) {
 						$changedCells[i].row--;
 					}
 				}
@@ -1381,7 +1408,9 @@ function loadTableValues(args) {
 			afterRemoveCol : function(index, amount) {
 				enableSaveButton();
 				for (var i = 0; i < $changedCells.length; i++) {
-					if ($changedCells[i].col >= index) {
+					if ($changedCells[i].col === index) {
+						$changedCells.slice(i, 1);
+					} else if ($changedCells[i].col > index) {
 						$changedCells[i].col--;
 					}
 				}
@@ -1389,21 +1418,6 @@ function loadTableValues(args) {
 			},
 			afterInit : function() {
 				var $instance = $tableContainer.handsontable('getInstance');
-				$instance.updateSettings({
-					cells : function(row, col, prop) {
-						var cellProperties = {};
-						cellProperties.type = $columns[col].type;
-						cellProperties.allowInvalid = $columns[col].allowInvalid;
-						if ($columns[col].type === "dropdown") {
-							cellProperties.source = $columns[col].source;
-						}
-						if ($columns[col].type === "text" && $columns[col].allowInvalid == false) {
-							cellProperties.renderer = storageCellRenderer;
-							cellProperties.validator = storageValidatorRegExp;
-						}
-						return cellProperties;
-					}
-				});
 				$instance.validateCells(function(callback) {
 					callback;
 				});
@@ -1414,7 +1428,9 @@ function loadTableValues(args) {
 			$(".handsontable td[modified]").removeAttr("modified");
 			for (var i = 0; i < $changedCells.length; i++) {
 				var td = $tableContainer.handsontable("getCell", $changedCells[i].row, $changedCells[i].col);
-				td.setAttribute("modified", true);
+				if (td != null) {
+					td.setAttribute("modified", true);
+				}
 			}
 		}
 

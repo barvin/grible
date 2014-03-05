@@ -153,7 +153,6 @@ public class Tables extends HttpServlet {
 				responseHtml.append(ServletHelper.getBreadCrumb("tables", DataManager.getInstance().getDao()
 						.getProduct(productId), "../img"));
 				responseHtml.append(ServletHelper.getMain());
-				responseHtml.append(ServletHelper.getContextMenus("table"));
 				responseHtml.append(ServletHelper.getLoadingGif());
 			}
 			responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));

@@ -212,163 +212,163 @@ function initLeftPanel() {
 		});
 	}
 
-	$(".category-item")
-			.contextMenu(
-					{
-						menu : 'categoryMenu'
-					},
-					function(action, el, pos) {
-						var $id = $(el).attr("id");
-						if (action == "add") {
-							var $args;
-							if (isJson()) {
-								$args = {
-									product : productId,
-									tabletype : tableType,
-									path : getCategoryPath($(el))
-								};
-							} else {
-								$args = {
-									categoryid : $id
-								};
-							}
-							$.post("../GetAddTableDialog", $args, function(data) {
-								$("body").append(data);
-								initAddDataItemDialog(jQuery);
-							});
-						} else if (action == "import") {
-							var dialogText = "";
-							var servlet = "";
-							var fields = "";
-							if (tableType == "storage") {
-								dialogText = "<br />Only .XLS or .XLSX files are acceptable. Only first sheet will be processed."
-										+ "<br />Make sure \"Index\" column or any other help data is absent. File name would be storage name."
-										+ "<br /><br />";
-								servlet = "../StorageImport";
-								fields = '<div class="table"><div class="table-row"><div class="table-cell dialog-cell dialog-label">Class name:</div><div class="table-cell dialog-cell dialog-edit">'
-										+ '<input name="class"></div></div></div>';
-							} else {
-								dialogText = "<br />Only .XLS or .XLSX files are acceptable."
-										+ "<br />First sheet will be processed as the General data sheet."
-										+ "<br />If \"Preconditions\" sheet is present, it will be processed as Preconditions (1st row - the row of keys, 2nd - the row of values)."
-										+ "<br />If \"Postconditions\" sheet is present, it will be processed as Postconditions (1st row - the row of keys, 2nd - the row of values)."
-										+ "<br />Make sure \"Index\" column or any other help data is absent. Table name will be taken from the Excel file name."
-										+ "<br /><br />";
-								servlet = "../TableImport";
-							}
-							$("body")
-									.append(
-											'<div id="import-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Import data '
-													+ tableType
-													+ '</div>'
-													+ '<div class="ui-dialog-content">'
-													+ dialogText
-													+ '<form action="'
-													+ servlet
-													+ '?product='
-													+ productId
-													+ '&category='
-													+ $id
-													+ '&categorypath='
-													+ getCategoryPath($(el))
-													+ '" method="post" enctype="multipart/form-data">'
-													+ fields
-													+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">Browse...</div>'
-													+ '<input id="file" type="file" name="file" size="1"/></div>'
-													+ '<div class="dialog-buttons right"><input type="submit" class="ui-button" value="Import">'
-													+ '</input> <button class="ui-button btn-cancel">Cancel</button></div></form></div></div>');
-							initImportDialog(jQuery);
-						} else if (action == "add-category") {
-							$("body")
-									.append(
-											'<div id="add-category-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Add category</div>'
-													+ '<div class="ui-dialog-content">'
-													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>'
-													+ '</div>'
-													+ '</div>'
-													+ '<div class="dialog-buttons right">'
-													+ '<button id="dialog-btn-add-category" parentid="'
-													+ $id
-													+ '" parent-path="'
-													+ getCategoryPath($(el))
-													+ '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-													+ '</div></div></div>');
-							initAddCategoryDialog(jQuery);
-						} else if (action == "edit") {
-							$("body")
-									.append(
-											'<div id="edit-category-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Edit category</div>'
-													+ '<div class="ui-dialog-content">'
-													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="'
-													+ $(el).text().trim()
-													+ '"></div>'
-													+ '</div>'
-													+ '</div>'
-													+ '<div class="dialog-buttons right">'
-													+ '<button id="dialog-btn-edit-category" category-id="'
-													+ $id
-													+ '" path="'
-													+ getCategoryPath($(el))
-													+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
-													+ '</div></div></div>');
-							initEditCategoryDialog(jQuery);
-						} else if (action == "delete") {
-							noty({
-								type : "confirm",
-								text : "Are you sure you want to delete this category?",
-								buttons : [ {
-									addClass : 'btn btn-primary ui-button',
-									text : 'Delete',
-									onClick : function($noty) {
-										$noty.close();
-										var $args;
-										if (isJson()) {
-											$args = {
-												product : productId,
-												tabletype : tableType,
-												path : getCategoryPath($(el))
-											};
-										} else {
-											$args = {
-												id : $id
-											};
-										}
-										$.post("../DeleteCategory", $args, function(data) {
-											if (data == "success") {
-												noty({
-													type : "success",
-													text : "The category was deleted.",
-													timeout : 3000
-												});
-												$(el).remove();
-												history.pushState({
-													product : productId
-												}, "", "?product=" + productId);
-											} else {
-												noty({
-													type : "error",
-													text : data
-												});
-											}
-										});
-									}
-								}, {
-									addClass : 'btn btn-danger ui-button',
-									text : 'Cancel',
-									onClick : function($noty) {
-										$noty.close();
-									}
-								} ]
-							});
-						}
-					});
+//	$(".category-item")
+//			.contextMenu(
+//					{
+//						menu : 'categoryMenu'
+//					},
+//					function(action, el, pos) {
+//						var $id = $(el).attr("id");
+//						if (action == "add") {
+//							var $args;
+//							if (isJson()) {
+//								$args = {
+//									product : productId,
+//									tabletype : tableType,
+//									path : getCategoryPath($(el))
+//								};
+//							} else {
+//								$args = {
+//									categoryid : $id
+//								};
+//							}
+//							$.post("../GetAddTableDialog", $args, function(data) {
+//								$("body").append(data);
+//								initAddDataItemDialog(jQuery);
+//							});
+//						} else if (action == "import") {
+//							var dialogText = "";
+//							var servlet = "";
+//							var fields = "";
+//							if (tableType == "storage") {
+//								dialogText = "<br />Only .XLS or .XLSX files are acceptable. Only first sheet will be processed."
+//										+ "<br />Make sure \"Index\" column or any other help data is absent. File name would be storage name."
+//										+ "<br /><br />";
+//								servlet = "../StorageImport";
+//								fields = '<div class="table"><div class="table-row"><div class="table-cell dialog-cell dialog-label">Class name:</div><div class="table-cell dialog-cell dialog-edit">'
+//										+ '<input name="class"></div></div></div>';
+//							} else {
+//								dialogText = "<br />Only .XLS or .XLSX files are acceptable."
+//										+ "<br />First sheet will be processed as the General data sheet."
+//										+ "<br />If \"Preconditions\" sheet is present, it will be processed as Preconditions (1st row - the row of keys, 2nd - the row of values)."
+//										+ "<br />If \"Postconditions\" sheet is present, it will be processed as Postconditions (1st row - the row of keys, 2nd - the row of values)."
+//										+ "<br />Make sure \"Index\" column or any other help data is absent. Table name will be taken from the Excel file name."
+//										+ "<br /><br />";
+//								servlet = "../TableImport";
+//							}
+//							$("body")
+//									.append(
+//											'<div id="import-dialog" class="ui-dialog">'
+//													+ '<div class="ui-dialog-title">Import data '
+//													+ tableType
+//													+ '</div>'
+//													+ '<div class="ui-dialog-content">'
+//													+ dialogText
+//													+ '<form action="'
+//													+ servlet
+//													+ '?product='
+//													+ productId
+//													+ '&category='
+//													+ $id
+//													+ '&categorypath='
+//													+ getCategoryPath($(el))
+//													+ '" method="post" enctype="multipart/form-data">'
+//													+ fields
+//													+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">Browse...</div>'
+//													+ '<input id="file" type="file" name="file" size="1"/></div>'
+//													+ '<div class="dialog-buttons right"><input type="submit" class="ui-button" value="Import">'
+//													+ '</input> <button class="ui-button btn-cancel">Cancel</button></div></form></div></div>');
+//							initImportDialog(jQuery);
+//						} else if (action == "add-category") {
+//							$("body")
+//									.append(
+//											'<div id="add-category-dialog" class="ui-dialog">'
+//													+ '<div class="ui-dialog-title">Add category</div>'
+//													+ '<div class="ui-dialog-content">'
+//													+ '<div class="table">'
+//													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+//													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>'
+//													+ '</div>'
+//													+ '</div>'
+//													+ '<div class="dialog-buttons right">'
+//													+ '<button id="dialog-btn-add-category" parentid="'
+//													+ $id
+//													+ '" parent-path="'
+//													+ getCategoryPath($(el))
+//													+ '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
+//													+ '</div></div></div>');
+//							initAddCategoryDialog(jQuery);
+//						} else if (action == "edit") {
+//							$("body")
+//									.append(
+//											'<div id="edit-category-dialog" class="ui-dialog">'
+//													+ '<div class="ui-dialog-title">Edit category</div>'
+//													+ '<div class="ui-dialog-content">'
+//													+ '<div class="table">'
+//													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+//													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="'
+//													+ $(el).text().trim()
+//													+ '"></div>'
+//													+ '</div>'
+//													+ '</div>'
+//													+ '<div class="dialog-buttons right">'
+//													+ '<button id="dialog-btn-edit-category" category-id="'
+//													+ $id
+//													+ '" path="'
+//													+ getCategoryPath($(el))
+//													+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
+//													+ '</div></div></div>');
+//							initEditCategoryDialog(jQuery);
+//						} else if (action == "delete") {
+//							noty({
+//								type : "confirm",
+//								text : "Are you sure you want to delete this category?",
+//								buttons : [ {
+//									addClass : 'btn btn-primary ui-button',
+//									text : 'Delete',
+//									onClick : function($noty) {
+//										$noty.close();
+//										var $args;
+//										if (isJson()) {
+//											$args = {
+//												product : productId,
+//												tabletype : tableType,
+//												path : getCategoryPath($(el))
+//											};
+//										} else {
+//											$args = {
+//												id : $id
+//											};
+//										}
+//										$.post("../DeleteCategory", $args, function(data) {
+//											if (data == "success") {
+//												noty({
+//													type : "success",
+//													text : "The category was deleted.",
+//													timeout : 3000
+//												});
+//												$(el).remove();
+//												history.pushState({
+//													product : productId
+//												}, "", "?product=" + productId);
+//											} else {
+//												noty({
+//													type : "error",
+//													text : data
+//												});
+//											}
+//										});
+//									}
+//								}, {
+//									addClass : 'btn btn-danger ui-button',
+//									text : 'Cancel',
+//									onClick : function($noty) {
+//										$noty.close();
+//									}
+//								} ]
+//							});
+//						}
+//					});
 
 	$("#btn-add-category")
 			.click(
@@ -817,25 +817,6 @@ function initTopPanel() {
 		}
 	}
 
-	$("#btn-sort-keys").click(function() {
-		if ($("#cbx-sort-keys").is("input:checked")) {
-			$("#cbx-sort-keys").prop("checked", false);
-			enableKeyContextMenu(jQuery);
-		} else {
-			$("#cbx-sort-keys").prop("checked", true);
-			enableCoulumnsMoving();
-		}
-	});
-
-	$("#cbx-sort-keys").click(function(event) {
-		event.stopPropagation();
-		if ($(this).is("input:checked")) {
-			enableCoulumnsMoving();
-		} else {
-			enableKeyContextMenu(jQuery);
-		}
-	});
-
 	$("#btn-show-usage").click(function() {
 		if ($("#cbx-show-usage").is("input:checked")) {
 			$("#cbx-show-usage").prop("checked", false);
@@ -1119,67 +1100,6 @@ function setDuplicateWarning(show) {
 	});
 }
 
-function enableCoulumnsMoving() {
-	$(".key-cell").destroyContextMenu();
-	$(".key-row").sortable({
-		cursor : "move",
-		delay : 50,
-		items : "> .key-cell",
-		forcePlaceholderSize : false,
-		containment : "parent",
-		axis : "x",
-		update : function(event, ui) {
-			$('#cbx-sort-keys').attr("checked", false);
-			var keyIds = [];
-			var newOrder = [];
-			var oldOrder = [];
-			var modifiedStart = -1;
-			$(".ui-cell.key-cell").each(function(i) {
-				if ($(this).attr('key-order') != (i + 1)) {
-					if (modifiedStart == -1) {
-						modifiedStart = i;
-					}
-					keyIds[i - modifiedStart] = $(this).attr('id');
-					newOrder[i - modifiedStart] = i + 1;
-					oldOrder[i - modifiedStart] = $(this).attr('key-order');
-				}
-			});
-			$.post("../UpdateKeysOrder", {
-				modkeyids : keyIds,
-				modkeynumbers : newOrder,
-				tableid : tableId,
-				product : productId
-			}, function(data) {
-				if (data == "success") {
-					$(".key-cell").each(function(i) {
-						$(this).attr("key-order", (i + 1));
-					});
-					$(".value-row").each(function(i) {
-						var sortedCells = $(this).find(".ui-cell.value-cell").sort(function(a, b) {
-							var contentA = parseInt($(".key-cell[id='" + $(a).attr('keyid') + "']").attr('key-order'));
-							var contentB = parseInt($(".key-cell[id='" + $(b).attr('keyid') + "']").attr('key-order'));
-							return (contentA < contentB) ? -1 : (contentA > contentB) ? 1 : 0;
-						});
-						$(this).find(".value-cell").remove();
-						if ($(this).find(".info-cell").length > 0) {
-							sortedCells.insertBefore($(this).find(".info-cell").first());
-						} else {
-							$(this).append(sortedCells);
-						}
-					});
-					initTableValues(jQuery);
-				} else {
-					noty({
-						type : "error",
-						text : data
-					});
-				}
-				enableKeyContextMenu(jQuery);
-			});
-		}
-	});
-}
-
 function initEditDataItemDialog() {
 	initDialog();
 	$("input.data-item-name").focus();
@@ -1421,6 +1341,108 @@ function loadTableValues(args) {
 				$instance.validateCells(function(callback) {
 					callback;
 				});
+				
+				
+				
+				$.contextMenu({
+			        selector: '.handsontable thead th', 
+			        items: {
+			            // <input type="text">
+			            name: {
+			                name: "Column name",
+			                type: 'text',
+			                value: $(this).find("span.colHeader").text(),
+			                icon: "edit",
+			                events: {
+			                    keyup: function(e) {
+			                        // add some fancy key handling here?
+			                        window.console && console.log('key: '+ e.keyCode); 
+			                    }
+			                }
+			            },
+			            sep1: "---------",
+			            // <input type="checkbox">
+			            yesno: {
+			                name: "Boolean", 
+			                type: 'checkbox', 
+			                selected: true
+			            },
+			            sep2: "---------",
+			            // <input type="radio">
+			            radio1: {
+			                name: "Radio1", 
+			                type: 'radio', 
+			                radio: 'radio', 
+			                value: '1'
+			            },
+			            radio2: {
+			                name: "Radio2", 
+			                type: 'radio', 
+			                radio: 'radio', 
+			                value: '2', 
+			                selected: true
+			            },
+			            radio3: {
+			                name: "Radio3", 
+			                type: 'radio', 
+			                radio: 'radio', 
+			                value: '3'
+			            },
+			            radio4: {
+			                name: "Radio3", 
+			                type: 'radio', 
+			                radio: 'radio', 
+			                value: '4', 
+			                disabled: true
+			            },
+			            sep3: "---------",
+			            // <select>
+			            select: {
+			                name: "Select", 
+			                type: 'select', 
+			                options: {1: 'one', 2: 'two', 3: 'three'}, 
+			                selected: 2
+			            },
+			            // <textarea>
+			            area1: {
+			                name: "Textarea with height", 
+			                type: 'textarea', 
+			                value: "Hello World", 
+			                height: 40
+			            },
+			            area2: {
+			                name: "Textarea", 
+			                type: 'textarea', 
+			                value: "Hello World"
+			            },
+			            sep4: "---------",
+			            key: {
+			                name: "Something Clickable", 
+			                callback: $.noop
+			            }
+			        }, 
+			        events: {
+			            show: function(opt) {
+			                // this is the trigger element
+			                var $this = this;
+			                // import states from data store 
+			                $.contextMenu.setInputValues(opt, $this.data());
+			                // this basically fills the input commands from an object
+			                // like {name: "foo", yesno: true, radio: "3", …}
+			            }, 
+			            hide: function(opt) {
+			                // this is the trigger element
+			                var $this = this;
+			                // export states to data store
+			                $.contextMenu.getInputValues(opt, $this.data());
+			                // this basically dumps the input commands' values to an object
+			                // like {name: "foo", yesno: true, radio: "3", …}
+			            }
+			        }
+			    });
+				
+				
+				
 			}
 		});
 
@@ -1435,7 +1457,6 @@ function loadTableValues(args) {
 		}
 
 		initTableValues(jQuery);
-		initKeysAndIndexes(jQuery);
 		if (isChrome()) {
 			$("#main .table-cell").removeClass("floatleft");
 		}
@@ -1446,601 +1467,10 @@ function initTableValues() {
 
 	$("#waiting-bg").removeClass("loading");
 
-	$("html").click(function() {
-		if ($(".selected-cell").length > 0) {
-			$(".selected-cell").removeClass("selected-cell");
-		}
-	});
-
-	$(".entities-values").sortable({
-		cursor : "move",
-		delay : 50,
-		items : "> .value-row",
-		forcePlaceholderSize : true,
-		update : function(event, ui) {
-			var rowIds = [];
-			var oldOrder = [];
-			var newOrder = [];
-			var modifiedStart = -1;
-			$(".ui-cell.index-cell").each(function(i) {
-				if ($(this).text() != (i + 1)) {
-					if (modifiedStart == -1) {
-						modifiedStart = i;
-					}
-					rowIds[i - modifiedStart] = $(this).attr('id');
-					oldOrder[i - modifiedStart] = $(this).text();
-					newOrder[i - modifiedStart] = i + 1;
-				}
-			});
-			$.post("../UpdateRowsOrder", {
-				rowids : rowIds,
-				oldorder : oldOrder,
-				neworder : newOrder,
-				tableid : tableId,
-				product : productId
-			}, function(data) {
-				if (data == "success") {
-					for (var j = 0; j < rowIds.length; j++) {
-						var modifiedIndexCell = $(".ui-cell.index-cell[id='" + rowIds[j] + "']");
-						highlight(modifiedIndexCell);
-						modifiedIndexCell.text(j + modifiedStart + 1);
-					}
-				} else {
-					noty({
-						type : "error",
-						text : data
-					});
-				}
-			});
-		}
-	});
-
-	initValueCells($(".value-cell:not(:has(> input.changed-value))"));
-	initTooltipCells($(".storage-cell"));
-	initEnumCells($(".enum-cell"));
-
-	$(".value-cell").click(function(event) {
-		event.stopPropagation();
-		$(".selected-cell").removeClass("selected-cell");
-		$(this).addClass("selected-cell");
-		if ($(".value-cell").has("input").length > 0) {
-			modifyValueCell();
-		}
-	});
-}
-
-function initValueCells(cells) {
-	cells.dblclick(function() {
-		discardEnumCellChanges();
-		var $cell = $(this);
-		$cell.removeClass("selected-cell");
-		if ($cell.has("span")) {
-			$cell.find("span").remove();
-		}
-		if ($cell.has("div.tooltip")) {
-			$cell.find("div.tooltip").remove();
-		}
-		var $content = $cell.text().replace(/'/g, "&#39;");
-		var $width = $cell.width();
-		$cell.html("<input class='changed-value' value='" + $content
-				+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
-		$cell.find("input.changed-value").css("width", $width + "px");
-		$cell.find("input.changed-value").focus();
-		$cell.find("input.changed-value").select();
-		initEditableCell(jQuery);
-	});
 }
 
 function isNumber(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function initKeysAndIndexes() {
-	if (tableType != "enumeration") {
-		$(".key-cell").dblclick(
-				function() {
-					var $key = $(this);
-					if ($key.has("span")) {
-						$key.find("span").remove();
-					}
-					var $content = $key.text().replace(/'/g, "&#39;");
-					var $width = $key.width();
-					$key.html("<input class='changed-value' value='" + $content
-							+ "' /><span class='old-value' style='display: none;'>" + $content + "</span>");
-					$key.find("input.changed-value").css("width", $width + "px");
-					$key.find("input.changed-value").focus();
-					$key.find("input.changed-value").select();
-					initEditableKeyCell(jQuery);
-				});
-	}
-
-	$(".ui-cell.index-cell").contextMenu({
-		menu : "rowMenu"
-	}, function(action, el, pos) {
-		var $rowId = $(el).attr("id");
-		var $rowOrder = parseInt($(el).text());
-		var $row = $(el).parent();
-
-		var $args;
-		if (isJson()) {
-			$args = {
-				tableid : tableId,
-				product : productId,
-				roworder : $rowOrder
-			};
-		} else {
-			$args = {
-				rowid : $rowId
-			};
-		}
-		if (action == "add") {
-			if ($(".index-cell.ui-cell").length == 1) {
-				$("#rowMenu").enableContextMenuItems("#delete");
-			}
-			$("#waiting-bg").addClass("loading");
-			$.post("../InsertRow", $args, function(data) {
-				$("#waiting-bg").removeClass("loading");
-				if (isJson()) {
-					if (data == "success") {
-						$newRow = $row.clone(true);
-						$newRow.find(".ui-cell.selected-cell").removeClass("selected-cell");
-						$newRow.find(".ui-cell.index-cell").attr("id", $rowOrder);
-						$newRow.find(".ui-cell.modified-value-cell").removeClass("modified-value-cell");
-						$newRow.find(".ui-cell.value-cell:not(.enum-cell)").text("");
-						$newRow.find(".ui-cell.storage-cell").text("0");
-						$newRow.find(".ui-cell.value-cell").each(function(i) {
-							$(this).attr("rowid", $rowOrder);
-							$(this).attr("id", "0");
-						});
-						$newRow.insertBefore($row);
-						highlight($newRow);
-						$(".table-row.ui-row.value-row").each(function(i) {
-							if ((i + 1) >= $rowOrder) {
-								$(this).find(".ui-cell.index-cell").attr("id", i + 1);
-								$(this).find(".ui-cell.index-cell").text(i + 1);
-								var $newOrder = i + 1;
-								$(this).find(".ui-cell.value-cell").each(function(j) {
-									$(this).attr("rowid", $newOrder);
-								});
-							}
-						});
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
-				} else {
-					var newIds = data.split(";");
-					if (newIds.length > 1) {
-						$newRow = $row.clone(true);
-						$newRow.find(".ui-cell.selected-cell").removeClass("selected-cell");
-						$newRow.find(".ui-cell.index-cell").attr("id", newIds[0]);
-						$newRow.find(".ui-cell.modified-value-cell").removeClass("modified-value-cell");
-						$newRow.find(".ui-cell.value-cell:not(.enum-cell)").text("");
-						$newRow.find(".ui-cell.storage-cell").text("0");
-						$newRow.find(".ui-cell.value-cell").each(function(i) {
-							$(this).attr("rowid", newIds[0]);
-							$(this).attr("id", newIds[i + 1]);
-						});
-						$newRow.insertBefore($row);
-						highlight($newRow);
-						$(".ui-cell.index-cell").each(function(i) {
-							if ((i + 1) >= $rowOrder) {
-								$(this).text(i + 1);
-							}
-						});
-
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
-				}
-			});
-		} else if (action == "copy") {
-			if ($(".index-cell.ui-cell").length == 1) {
-				$("#rowMenu").enableContextMenuItems("#delete");
-			}
-			$("#waiting-bg").addClass("loading");
-			$.post("../CopyRow", $args, function(data) {
-				$("#waiting-bg").removeClass("loading");
-				if (isJson()) {
-					if (data == "success") {
-						$newRow = $row.clone(true);
-						$newRow.find(".ui-cell.index-cell").attr("id", $rowOrder);
-						$newRow.find(".ui-cell.value-cell").each(function(i) {
-							$(this).attr("rowid", $rowOrder);
-						});
-						$newRow.find(".ui-cell.value-cell").removeClass("selected-cell");
-						$newRow.insertAfter($row);
-						highlight($newRow);
-						$(".table-row.ui-row.value-row").each(function(i) {
-							if ((i + 1) >= $rowOrder) {
-								$(this).find(".ui-cell.index-cell").attr("id", i + 1);
-								$(this).find(".ui-cell.index-cell").text(i + 1);
-								var $newOrder = i + 1;
-								$(this).find(".ui-cell.value-cell").each(function(j) {
-									$(this).attr("rowid", $newOrder);
-								});
-							}
-						});
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
-				} else {
-					var newIds = data.split(";");
-					if (newIds.length > 1) {
-						$newRow = $row.clone(true);
-						$newRow.find(".ui-cell.index-cell").attr("id", newIds[0]);
-						$newRow.find(".ui-cell.value-cell").each(function(i) {
-							$(this).attr("rowid", newIds[0]);
-							$(this).attr("id", newIds[i + 1]);
-						});
-						$newRow.find(".ui-cell.value-cell").removeClass("selected-cell");
-						$newRow.insertAfter($row);
-						highlight($newRow);
-						$(".ui-cell.index-cell").each(function(i) {
-							if ((i + 1) > $rowOrder) {
-								$(this).text(i + 1);
-							}
-						});
-
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
-				}
-			});
-		} else if (action == "delete") {
-			if ($(".index-cell.ui-cell").length == 2) {
-				$("#rowMenu").disableContextMenuItems("#delete");
-			}
-			$("#waiting-bg").addClass("loading");
-			$.post("../DeleteRow", $args, function(data) {
-				$("#waiting-bg").removeClass("loading");
-				if (data == "success") {
-					$row.hide("explode", 500, function() {
-						$row.remove();
-						if (isJson()) {
-							$(".table-row.ui-row.value-row").each(function(i) {
-								if ((i + 1) >= $rowOrder) {
-									$(this).find(".ui-cell.index-cell").attr("id", i + 1);
-									$(this).find(".ui-cell.index-cell").text(i + 1);
-									highlight($(this).find(".ui-cell.index-cell"));
-									var $newOrder = i + 1;
-									$(this).find(".ui-cell.value-cell").each(function(j) {
-										$(this).attr("rowid", $newOrder);
-									});
-								}
-							});
-						} else {
-							$(".ui-cell.index-cell").each(function(i) {
-								if ((i + 1) >= $rowOrder) {
-									highlight($(this));
-									$(this).text(i + 1);
-								}
-							});
-						}
-					});
-				} else {
-					noty({
-						type : "error",
-						text : data
-					});
-				}
-			});
-		}
-	});
-
-	$(".ui-cell.index-cell").mousedown(function(event) {
-		if (event.which === 3) {
-			selectRow($(this).attr("id"));
-		}
-	});
-
-	$("#rowMenu").enableContextMenuItems("#add,#copy,#delete");
-
-	if ($(".index-cell.ui-cell").length == 1) {
-		$("#rowMenu").disableContextMenuItems("#delete");
-	}
-
-	enableKeyContextMenu(jQuery);
-}
-
-function enableKeyContextMenu() {
-	$(".key-cell")
-			.contextMenu(
-					{
-						menu : "keyMenu"
-					},
-					function(action, el, pos) {
-						var $keyId = $(el).attr("id");
-						var $keyOrder = $(el).attr("key-order");
-						var $column = $("div[keyid='" + $keyId + "']");
-						if (action == "add") {
-							if ($(".key-cell.ui-cell").length == 1) {
-								$("#keyMenu").enableContextMenuItems("#delete");
-							}
-							var $args;
-							if (isJson()) {
-								$args = {
-									tableid : tableId,
-									product : productId,
-									keyorder : $keyOrder
-								};
-							} else {
-								$args = {
-									keyid : $keyId
-								};
-							}
-							$.post("../InsertKey", $args, function(data) {
-								if (isJson()) {
-									if (data == "success") {
-										$(".ui-cell.key-cell").each(function(i) {
-											if ((i + 1) >= $keyOrder) {
-												$(this).attr("key-order", (i + 2));
-												$(this).attr("id", (i + 2));
-											}
-										});
-										for (var i = $(".key-cell.ui-cell").length; i > 0; i--) {
-											if (i >= $keyOrder) {
-												$("div[keyid='" + i + "']").attr("keyid", (i + 1));
-											}
-										}
-
-										$newKey = $(el).clone(true);
-										$newKey.text("editme");
-										$newKey.attr("id", $keyOrder);
-										$newKey.attr("key-order", $keyOrder);
-										$newKey.insertBefore($(el));
-										highlight($newKey);
-
-										$column.each(function(i) {
-											$newCell = $(this).clone(true);
-											$newCell.removeClass("modified-value-cell");
-											$newCell.removeClass("storage-cell");
-											$newCell.removeClass("selected-cell");
-											$newCell.text("");
-											$newCell.attr("keyid", $keyOrder);
-											$newCell.insertBefore($(this));
-											highlight($newCell);
-										});
-
-									} else {
-										noty({
-											type : "error",
-											text : data
-										});
-									}
-								} else {
-									var newIds = data.split(";");
-									if (newIds.length > 1) {
-										$newKey = $(el).clone(true);
-										$newKey.attr("id", newIds[0]);
-										$newKey.text("editme");
-										$newKey.insertBefore($(el));
-										highlight($newKey);
-
-										$column.each(function(i) {
-											$newCell = $(this).clone(true);
-											$newCell.removeClass("modified-value-cell");
-											$newCell.removeClass("storage-cell");
-											$newCell.removeClass("selected-cell");
-											$newCell.text("");
-											$newCell.attr("keyid", newIds[0]);
-											$newCell.attr("id", newIds[i + 1]);
-											$newCell.insertBefore($(this));
-											highlight($newCell);
-										});
-										$(".ui-cell.key-cell").each(function(i) {
-											if ((i + 1) >= $keyOrder) {
-												$(this).attr("key-order", (i + 1));
-											}
-										});
-									} else {
-										noty({
-											type : "error",
-											text : data
-										});
-									}
-								}
-							});
-						} else if (action == "copy") {
-							if ($(".key-cell.ui-cell").length == 1) {
-								$("#keyMenu").enableContextMenuItems("#delete");
-							}
-							var $args;
-							if (isJson()) {
-								$args = {
-									tableid : tableId,
-									product : productId,
-									keyorder : $keyOrder
-								};
-							} else {
-								$args = {
-									keyid : $keyId
-								};
-							}
-							$.post("../CopyKey", $args, function(data) {
-								if (isJson()) {
-									if (data == "success") {
-										$(".ui-cell.key-cell").each(function(i) {
-											if ((i + 1) >= $keyOrder) {
-												$(this).attr("key-order", (i + 2));
-												$(this).attr("id", (i + 2));
-											}
-										});
-										for (var i = $(".key-cell.ui-cell").length; i > 0; i--) {
-											if (i >= $keyOrder) {
-												$("div[keyid='" + i + "']").attr("keyid", (i + 1));
-											}
-										}
-
-										$newKey = $(el).clone(true);
-										$newKey.attr("id", $keyOrder);
-										$newKey.attr("key-order", $keyOrder);
-										$newKey.insertBefore($(el));
-										highlight($newKey);
-
-										$column.each(function(i) {
-											$newCell = $(this).clone(true);
-											$newCell.removeClass("selected-cell");
-											$newCell.attr("keyid", $keyOrder);
-											$newCell.insertBefore($(this));
-											highlight($newCell);
-										});
-									} else {
-										noty({
-											type : "error",
-											text : data
-										});
-									}
-								} else {
-									var newIds = data.split(";");
-									if (newIds.length > 1) {
-										$newKey = $(el).clone(true);
-										$newKey.attr("id", newIds[0]);
-										$newKey.insertAfter($(el));
-										highlight($newKey);
-
-										$column.each(function(i) {
-											$newCell = $(this).clone(true);
-											$newCell.attr("keyid", newIds[0]);
-											$newCell.attr("id", newIds[i + 1]);
-											$newCell.removeClass("selected-cell");
-											$newCell.insertAfter($(this));
-											highlight($newCell);
-										});
-										$(".ui-cell.key-cell").each(function(i) {
-											if ((i + 1) > $keyOrder) {
-												$(this).attr("key-order", (i + 1));
-											}
-										});
-									} else {
-										noty({
-											type : "error",
-											text : data
-										});
-									}
-								}
-							});
-						} else if (action == "delete") {
-							if ($(".key-cell.ui-cell").length == 2) {
-								$("#keyMenu").disableContextMenuItems("#delete");
-							}
-							var $args;
-							if (isJson()) {
-								$args = {
-									tableid : tableId,
-									product : productId,
-									keyorder : $keyOrder
-								};
-							} else {
-								$args = {
-									keyid : $keyId
-								};
-							}
-							$.post("../DeleteKey", $args, function(data) {
-								if (data == "success") {
-									if (isJson()) {
-										$(el).hide("explode", 500);
-										var $keyCount = $(".key-cell.ui-cell").length;
-										$column.hide("explode", 500, function() {
-											$(el).remove();
-											$column.remove();
-											$(".ui-cell.key-cell").each(function(i) {
-												if ((i + 1) >= $keyOrder) {
-													$(this).attr("key-order", (i + 1));
-													$(this).attr("id", (i + 1));
-												}
-											});
-										});
-										for (var i = (parseInt($keyOrder) + 1); i <= $keyCount; i++) {
-											$("div[keyid='" + i + "']").attr("keyid", (i - 1));
-										}
-									} else {
-										$(el).hide(400);
-										$column.hide(400, function() {
-											$(el).remove();
-											$column.remove();
-											$(".ui-cell.key-cell").each(function(i) {
-												if ((i + 1) >= $keyOrder) {
-													$(this).attr("key-order", (i + 1));
-												}
-											});
-										});
-									}
-								} else {
-									noty({
-										type : "error",
-										text : data
-									});
-								}
-							});
-						} else if (action == "fill") {
-							$("body")
-									.append(
-											'<div id="fill-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Fill column with value</div>'
-													+ '<div class="ui-dialog-content">'
-													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-													+ 'Value: </div><div class="table-cell dialog-cell dialog-edit">'
-													+ '<input class="fill-value dialog-edit">'
-													+ '</div>'
-													+ '</div>'
-													+ '</div>'
-													+ '<div class="dialog-buttons right">'
-													+ '<button id="dialog-btn-fill" keyid="'
-													+ $keyId
-													+ '" class="ui-button">Fill</button> <button class="ui-button btn-cancel">Cancel</button>'
-													+ '</div></div></div>');
-							initFillDialog(jQuery);
-						} else if (action == "parameter") {
-							var $args;
-							if (isJson()) {
-								$args = {
-									tableid : tableId,
-									product : productId,
-									keyorder : $keyOrder
-								};
-							} else {
-								$args = {
-									product : productId,
-									keyid : $keyId
-								};
-							}
-							$.post("../GetParameterTypeDialog", $args, function(data) {
-								$("body").append(data);
-								initParameterTypeDialog(jQuery);
-							});
-
-						}
-					});
-
-	$(".key-cell").mousedown(function(event) {
-		if (event.which === 3) {
-			selectColumn($(this).attr("id"));
-		}
-	});
-
-	if ((tableType == "table") || (tableType == "storage")) {
-		$("#keyMenu").enableContextMenuItems("#add,#copy,#fill,#delete");
-	} else {
-		$("#keyMenu").enableContextMenuItems("#add,#copy,#delete");
-		$("#keyMenu").disableContextMenuItems("#fill");
-	}
-
-	if ($(".key-cell.ui-cell").length == 1) {
-		$("#keyMenu").disableContextMenuItems("#delete");
-	}
 }
 
 function initTooltipCells(elements) {
@@ -2152,28 +1582,6 @@ function initTooltipCells(elements) {
 			}
 		}
 	}
-}
-
-function initEditableKeyCell() {
-	$("html").click(function() {
-		if ($(".key-cell").has("input").length > 0) {
-			modifyKeyCell();
-		}
-	});
-
-	$(".key-cell > input").keypress(function(event) {
-		if (event.which === 13) {
-			modifyKeyCell();
-		}
-	});
-
-	$("input.changed-value").click(function(event) {
-		event.stopPropagation();
-	});
-
-	$("input.changed-value").dblclick(function(event) {
-		event.stopPropagation();
-	});
 }
 
 function initParameterTypeDialog() {
@@ -2342,124 +1750,6 @@ function initParameterTypeDialog() {
 	});
 }
 
-function modifyKeyCell() {
-	if ($(".key-cell").has("input").length > 0) {
-		var $cell = $(".key-cell").has("input");
-		var $oldContent = $cell.find("span.old-value").text();
-		var $newContent = $cell.find("input.changed-value").val();
-
-		if ($oldContent != $newContent) {
-			enableSaveButton();
-			$cell.addClass("modified-key-cell");
-		}
-		$cell.html($newContent);
-	}
-}
-
-function initEnumCells(elements) {
-	elements.off("dblclick");
-	elements.dblclick(function() {
-		discardEnumCellChanges();
-		var $cell = $(this);
-		var $content = $cell.text().replace(/'/g, "&#39;");
-		var $args = {
-			keyid : $cell.attr('keyid'),
-			tableid : tableId,
-			product : productId,
-			content : $content
-		};
-		$cell.removeClass("selected-cell");
-		if ($cell.has("span")) {
-			$cell.find("span").remove();
-		}
-		if ($cell.has("div.tooltip")) {
-			$cell.find("div.tooltip").remove();
-		}
-
-		$.post("../GetEnumValues", $args, function(data) {
-			$cell.html(data);
-			$cell.addClass("no-padding");
-			initEditableEnumCell(jQuery);
-		});
-	});
-}
-
-function initEditableCell() {
-	$("html").click(function() {
-		if ($(".value-cell").has("input").length > 0) {
-			modifyValueCell();
-		}
-	});
-
-	$(".value-cell > input").keypress(function(event) {
-		if (event.which === 13) {
-			modifyValueCell();
-		}
-	});
-
-	$("input.changed-value").click(function(event) {
-		event.stopPropagation();
-	});
-
-	$("input.changed-value").dblclick(function(event) {
-		event.stopPropagation();
-	});
-}
-
-function initEditableEnumCell() {
-	$("html").click(function() {
-		discardEnumCellChanges();
-	});
-
-	$(".enum-cell > select").change(function() {
-		enableSaveButton();
-		var $cell = $(this).parent();
-		$cell.removeClass("selected-cell");
-		$cell.addClass("modified-value-cell");
-		var $newContent = $(this).find("option:selected").text();
-		$cell.removeClass("no-padding");
-		$cell.html($newContent);
-	});
-
-	$("select.enum-values").click(function(event) {
-		event.stopPropagation();
-	});
-
-	$("select.enum-values").dblclick(function(event) {
-		event.stopPropagation();
-	});
-}
-
-function discardEnumCellChanges() {
-	if ($(".enum-cell").has("select").length > 0) {
-		var $cell = $(".enum-cell > select").parent();
-		$cell.removeClass("selected-cell");
-		var $content = $(".enum-cell > select > option:selected").text();
-		$cell.html($content);
-		$cell.removeClass("no-padding");
-	}
-}
-
-function modifyValueCell() {
-	var $cell = $(".value-cell").has("input");
-	var $oldContent = $cell.find("span.old-value").text();
-	var $newContent = $cell.find("input.changed-value").val();
-	if ($oldContent != $newContent) {
-		enableSaveButton();
-		$cell.removeClass("selected-cell");
-		$cell.addClass("modified-value-cell");
-	}
-	if ($cell.hasClass("storage-cell") && $newContent.match(/\d+-\d+/)) {
-		var start = parseInt($newContent.substring(0, $newContent.indexOf("-")));
-		var end = parseInt($newContent.substring($newContent.indexOf("-") + 1));
-		$newContent = start;
-		for (var i = start + 1; i < end + 1; i++) {
-			$newContent += ";" + i;
-		}
-	}
-	$cell.html($newContent);
-}
-
 function enableSaveButton() {
 	$(".data-item-selected:not(:has(> img.changed-sign))").append(
 			" <img class='changed-sign' src='../img/modified.png'>");
@@ -2587,16 +1877,6 @@ function applyParameterTypesAfterImport(keyIds, refIds, types) {
 			}
 		});
 	}
-}
-
-function selectRow(id) {
-	$(".selected-cell").removeClass("selected-cell");
-	$(".value-cell[rowid=" + id + "]").addClass("selected-cell");
-}
-
-function selectColumn(id) {
-	$(".selected-cell").removeClass("selected-cell");
-	$(".value-cell[keyid=" + id + "]").addClass("selected-cell");
 }
 
 function confirmLeavingUnsavedTable(url) {

@@ -120,7 +120,6 @@ public class Storages extends HttpServlet {
 				responseHtml.append(ServletHelper.getBreadCrumb("storages", DataManager.getInstance().getDao()
 						.getProduct(productId), "../img"));
 				responseHtml.append(ServletHelper.getMain());
-				responseHtml.append(ServletHelper.getContextMenus("storage"));
 				responseHtml.append(ServletHelper.getLoadingGif());
 			}
 			responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));

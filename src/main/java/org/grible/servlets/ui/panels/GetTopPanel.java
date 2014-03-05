@@ -89,11 +89,6 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
 
-				responseHtml.append("<div id=\"data-item-options\">");
-				responseHtml.append("<div id=\"btn-sort-keys\" class=\"checkbox-option\">");
-				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" />");
-				responseHtml.append("<span class=\"icon-button-text\">Enable columns moving</span></div>");
-
 				String usage = "";
 				if (table.isShowUsage()) {
 					usage = "checked=\"checked\"";
@@ -249,9 +244,6 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
 				responseHtml.append("<div id=\"data-item-options\">");
-				responseHtml.append("<div id=\"btn-sort-keys\" class=\"checkbox-option\">");
-				responseHtml.append("<input id=\"cbx-sort-keys\" type=\"checkbox\" />");
-				responseHtml.append("<span class=\"icon-button-text\">Enable columns moving</span></div>");
 				responseHtml.append(showWarning);
 				responseHtml.append("<div id=\"btn-export-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/export-icon.png\">");

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.json.ui.UiColumn;
@@ -154,6 +155,9 @@ public class GetTableValues extends HttpServlet {
 
 		}
 		uiTable.setColumns(columns);
+		
+		List<Table> dataSotages = DataManager.getInstance().getDao().getTablesOfProduct(productId, TableType.STORAGE);
+		
 
 		String[][] values = tableJson.getValues();
 		uiTable.setValues(values);
@@ -164,104 +168,11 @@ public class GetTableValues extends HttpServlet {
 			uiInfo.setTables("Used in storages");
 			uiTable.setInfo(uiInfo);
 		}
-
-		// UiRow[] uiRows = new UiRow[values.length];
-		// for (int i = 0; i < values.length; i++) {
-		// uiRows[i] = new UiRow();
-		// if (tableType == TableType.STORAGE || tableType == TableType.TABLE ||
-		// tableType == TableType.ENUMERATION) {
-		// UiIndex uiIndex = new UiIndex();
-		// uiIndex.setId(i + 1);
-		// uiIndex.setOrder(i + 1);
-		// uiRows[i].setIndex(uiIndex);
-		// }
-		// UiValue[] uiValues = new UiValue[values[i].length];
-		// for (int j = 0; j < values[i].length; j++) {
-		// uiValues[j] = new UiValue();
-		// uiValues[j].setStorage(keys[j].getType() == KeyType.STORAGE);
-		// uiValues[j].setEnum(keys[j].getType() == KeyType.ENUMERATION);
-		// uiValues[j].setRowid(i + 1);
-		// uiValues[j].setKeyid(j + 1);
-		// uiValues[j].setId(0);
-		// uiValues[j].setText(StringEscapeUtils.escapeHtml4(values[i][j]));
-		// }
-		// uiRows[i].setValues(uiValues);
-		// if (showUsage) {
-		// if (values[i].length > 0) {
-		// List<Table> tables = jDao.getTablesUsingRow(productId, table, (i +
-		// 1));
-		// UiInfo uiInfo = new UiInfo();
-		// uiInfo.setTables(getTestTableOccurences(tables));
-		// uiInfo.setStorages(getDataStorageOccurences(tables));
-		// uiRows[i].setInfo(uiInfo);
-		// }
-		// }
-		// }
 	}
 
 	private boolean isJson() throws Exception {
 		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
-
-	// private void writeKeys(UiTable uiTable, List<Key> keys) {
-	// if (tableType == TableType.STORAGE || tableType == TableType.TABLE ||
-	// tableType == TableType.ENUMERATION) {
-	// uiTable.setIndex(true);
-	// } else {
-	// uiTable.setIndex(false);
-	// }
-	// UiKey[] uiKeys = new UiKey[keys.size()];
-	// for (int i = 0; i < keys.size(); i++) {
-	// uiKeys[i] = new UiKey();
-	// uiKeys[i].setOrder(keys.get(i).getOrder());
-	// uiKeys[i].setId(keys.get(i).getId());
-	// uiKeys[i].setText(keys.get(i).getName());
-	// }
-	// uiTable.setKeys(uiKeys);
-	// if (showUsage) {
-	// UiInfo uiInfo = new UiInfo();
-	// uiInfo.setTables("Used in tables");
-	// uiInfo.setTables("Used in storages");
-	// uiTable.setInfo(uiInfo);
-	// }
-	// }
-	//
-	// private void writeValues(UiTable uiTable, ArrayList<ArrayList<Value>>
-	// values) throws Exception {
-	// UiRow[] uiRows = new UiRow[values.size()];
-	// for (int i = 0; i < values.size(); i++) {
-	// uiRows[i] = new UiRow();
-	// if (tableType == TableType.STORAGE || tableType == TableType.TABLE ||
-	// tableType == TableType.ENUMERATION) {
-	// UiIndex uiIndex = new UiIndex();
-	// uiIndex.setId(values.get(i).get(0).getRowId());
-	// uiIndex.setOrder(i + 1);
-	// uiRows[i].setIndex(uiIndex);
-	// }
-	// UiValue[] uiValues = new UiValue[values.get(i).size()];
-	// for (int j = 0; j < values.get(i).size(); j++) {
-	// uiValues[j] = new UiValue();
-	// uiValues[j].setStorage(values.get(i).get(j).isStorage());
-	// uiValues[j].setEnum(ServletHelper.isEnumValue(values.get(i).get(j)));
-	// uiValues[j].setRowid(values.get(i).get(j).getRowId());
-	// uiValues[j].setKeyid(values.get(i).get(j).getKeyId());
-	// uiValues[j].setId(values.get(i).get(j).getId());
-	// uiValues[j].setText(StringEscapeUtils.escapeHtml4(values.get(i).get(j).getValue()));
-	// }
-	// uiRows[i].setValues(uiValues);
-	// if (showUsage) {
-	// if (!values.get(i).isEmpty()) {
-	// List<Table> tables =
-	// pDao.getTablesUsingRow(values.get(i).get(0).getRowId());
-	// UiInfo uiInfo = new UiInfo();
-	// uiInfo.setTables(getTestTableOccurences(tables));
-	// uiInfo.setStorages(getDataStorageOccurences(tables));
-	// uiRows[i].setInfo(uiInfo);
-	// }
-	// }
-	// }
-	// uiTable.setValues(uiRows);
-	// }
 
 	private String getTestTableOccurences(List<Table> tables) throws Exception {
 		List<String> tableNames = new ArrayList<String>();

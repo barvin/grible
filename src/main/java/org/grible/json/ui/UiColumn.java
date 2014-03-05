@@ -4,6 +4,7 @@ public class UiColumn {
 	private String type;
 	private boolean allowInvalid;
 	private String[] source;
+	private int refTableSelected;
 
 	public String getType() {
 		return type;
@@ -27,6 +28,14 @@ public class UiColumn {
 
 	public void setSource(String[] source) {
 		this.source = source;
+	}
+
+	public int getRefTableSelected() {
+		return refTableSelected;
+	}
+
+	public void setRefTableSelected(int refTableSelected) {
+		this.refTableSelected = refTableSelected;
 	}
 
 }

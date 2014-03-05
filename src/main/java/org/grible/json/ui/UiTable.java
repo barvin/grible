@@ -8,6 +8,8 @@ public class UiTable {
 	private String[][] values;
 	private UiInfo info;
 	private UiColumn[] columns;
+	private String[] storages;
+	private String[] enumerations;
 
 	public boolean isIndex() {
 		return isIndex;
@@ -47,6 +49,22 @@ public class UiTable {
 
 	public void setColumns(UiColumn[] columns) {
 		this.columns = columns;
+	}
+
+	public String[] getStorages() {
+		return storages;
+	}
+
+	public void setStorages(String[] storages) {
+		this.storages = storages;
+	}
+
+	public String[] getEnumerations() {
+		return enumerations;
+	}
+
+	public void setEnumerations(String[] enumerations) {
+		this.enumerations = enumerations;
 	}
 
 }

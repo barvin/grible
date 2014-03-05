@@ -1347,7 +1347,6 @@ function loadTableValues(args) {
 				$.contextMenu({
 			        selector: '.handsontable thead th', 
 			        items: {
-			            // <input type="text">
 			            name: {
 			                name: "Column name",
 			                type: 'text',
@@ -1361,66 +1360,18 @@ function loadTableValues(args) {
 			                }
 			            },
 			            sep1: "---------",
-			            // <input type="checkbox">
-			            yesno: {
-			                name: "Boolean", 
-			                type: 'checkbox', 
-			                selected: true
-			            },
-			            sep2: "---------",
-			            // <input type="radio">
-			            radio1: {
-			                name: "Radio1", 
-			                type: 'radio', 
-			                radio: 'radio', 
-			                value: '1'
-			            },
-			            radio2: {
-			                name: "Radio2", 
-			                type: 'radio', 
-			                radio: 'radio', 
-			                value: '2', 
-			                selected: true
-			            },
-			            radio3: {
-			                name: "Radio3", 
-			                type: 'radio', 
-			                radio: 'radio', 
-			                value: '3'
-			            },
-			            radio4: {
-			                name: "Radio3", 
-			                type: 'radio', 
-			                radio: 'radio', 
-			                value: '4', 
-			                disabled: true
-			            },
-			            sep3: "---------",
-			            // <select>
 			            select: {
 			                name: "Select", 
 			                type: 'select', 
-			                options: {1: 'one', 2: 'two', 3: 'three'}, 
+			                options: {1:'one',2: 'two',3: 'three'}, 
 			                selected: 2
 			            },
-			            // <textarea>
-			            area1: {
-			                name: "Textarea with height", 
-			                type: 'textarea', 
-			                value: "Hello World", 
-			                height: 40
-			            },
-			            area2: {
-			                name: "Textarea", 
-			                type: 'textarea', 
-			                value: "Hello World"
-			            },
-			            sep4: "---------",
+			            sep2: "---------",
 			            key: {
-			                name: "Something Clickable", 
+			                name: "Save", 
 			                callback: $.noop
 			            }
-			        }, 
+			        },
 			        events: {
 			            show: function(opt) {
 			                // this is the trigger element

@@ -134,11 +134,20 @@ public class GetTableValues extends HttpServlet {
 			case TEXT:
 				columns[i].setType("text");
 				columns[i].setAllowInvalid(true);
+				columns[i].setRefTableSelected(0);
 				break;
 
 			case STORAGE:
 				columns[i].setType("text");
 				columns[i].setAllowInvalid(false);
+				
+				
+				//TODO: AAA!
+				
+				columns[i].setRefTableSelected(0);
+				
+				
+				
 				break;
 
 			case ENUMERATION:
@@ -147,6 +156,7 @@ public class GetTableValues extends HttpServlet {
 				Table refTable = jDao.getTable(keys[i].getRefid(), productId);
 				String[] source = jDao.getValuesByKeyOrder(refTable, 0).toArray(new String[0]);
 				columns[i].setSource(source);
+				columns[i].setRefTableSelected(0);
 				break;
 
 			default:
@@ -155,9 +165,24 @@ public class GetTableValues extends HttpServlet {
 
 		}
 		uiTable.setColumns(columns);
-		
+
 		List<Table> dataSotages = DataManager.getInstance().getDao().getTablesOfProduct(productId, TableType.STORAGE);
-		
+		if (!dataSotages.isEmpty()) {
+			String[] storages = new String[dataSotages.size()];
+			for (int i = 0; i < storages.length; i++) {
+				storages[i] = dataSotages.get(i).getName();
+			}
+			uiTable.setStorages(storages);
+		}
+
+		List<Table> enumerations = DataManager.getInstance().getDao().getTablesOfProduct(productId, TableType.ENUMERATION);
+		if (!enumerations.isEmpty()) {
+			String[] enumNames = new String[enumerations.size()];
+			for (int i = 0; i < enumNames.length; i++) {
+				enumNames[i] = enumerations.get(i).getName();
+			}
+			uiTable.setEnumerations(enumNames);
+		}
 
 		String[][] values = tableJson.getValues();
 		uiTable.setValues(values);

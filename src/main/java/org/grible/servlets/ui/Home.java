@@ -210,7 +210,6 @@ public class Home extends HttpServlet {
 				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));
 			}
 
-			responseHtml.append(getContextMenus());
 			responseHtml.append("</body>");
 			responseHtml.append("</html>");
 			out.print(responseHtml.toString());
@@ -268,14 +267,5 @@ public class Home extends HttpServlet {
 			responseHtml.append("</div>");
 		}
 		responseHtml.append("</div>");
-	}
-
-	public String getContextMenus() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("<ul id=\"productMenu\" class=\"contextMenu\">");
-		builder.append("<li class=\"edit\"><a href=\"#edit\">Edit product</a></li>");
-		builder.append("<li class=\"delete\"><a href=\"#delete\">Delete product</a></li>");
-		builder.append("</ul>");
-		return builder.toString();
 	}
 }

@@ -88,7 +88,9 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
-
+				
+				responseHtml.append("<div id=\"data-item-options\">");
+				
 				String usage = "";
 				if (table.isShowUsage()) {
 					usage = "checked=\"checked\"";

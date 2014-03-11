@@ -21,18 +21,14 @@ $(window).on("load", function() {
 
 $().ready(initialize());
 
-var source = '<div class="table-row key-row">' + '{{#if isIndex}}'
-		+ '<div class="table-cell ui-cell index-header-cell">Index</div>' + '{{/if}}' + '{{#each keys}}'
-		+ '<div class="table-cell ui-cell key-cell" key-order="{{order}}" id="{{id}}">{{text}}</div>' + '{{/each}}'
-		+ '{{#if info}}' + '<div class="table-cell ui-cell info-key-cell">{{tables}}</div>'
-		+ '<div class="table-cell ui-cell info-key-cell">{{storages}}</div>' + '{{/if}}' + '</div>'
+var source = '<div class="table-row key-row">' + '{{#if isIndex}}' + '<div class="table-cell ui-cell index-header-cell">Index</div>' + '{{/if}}' + '{{#each keys}}'
+		+ '<div class="table-cell ui-cell key-cell" key-order="{{order}}" id="{{id}}">{{text}}</div>' + '{{/each}}' + '{{#if info}}'
+		+ '<div class="table-cell ui-cell info-key-cell">{{tables}}</div>' + '<div class="table-cell ui-cell info-key-cell">{{storages}}</div>' + '{{/if}}' + '</div>'
 		+ '{{#each values}}' + '<div class="table-row ui-row value-row">' + '{{#if index}}' + '{{#with index}}'
-		+ '<div class="table-cell ui-cell index-cell" id="{{id}}">{{order}}</div>' + '{{/with}}' + '{{/if}}'
-		+ '{{#each values}}' + '<div class="table-cell ui-cell value-cell'
-		+ '{{#if isStorage}} storage-cell {{/if}} {{#if isEnum}} enum-cell {{/if}}"'
-		+ 'rowid="{{rowid}}" keyid="{{keyid}}" id="{{id}}">{{text}}</div>' + '{{/each}}' + '{{#if info}}'
-		+ '<div class="table-cell ui-cell info-cell">{{tables}}</div>'
-		+ '<div class="table-cell ui-cell info-cell">{{storages}}</div>' + '{{/if}}' + '</div>' + '{{/each}}';
+		+ '<div class="table-cell ui-cell index-cell" id="{{id}}">{{order}}</div>' + '{{/with}}' + '{{/if}}' + '{{#each values}}' + '<div class="table-cell ui-cell value-cell'
+		+ '{{#if isStorage}} storage-cell {{/if}} {{#if isEnum}} enum-cell {{/if}}"' + 'rowid="{{rowid}}" keyid="{{keyid}}" id="{{id}}">{{text}}</div>' + '{{/each}}'
+		+ '{{#if info}}' + '<div class="table-cell ui-cell info-cell">{{tables}}</div>' + '<div class="table-cell ui-cell info-cell">{{storages}}</div>' + '{{/if}}' + '</div>'
+		+ '{{/each}}';
 var template = Handlebars.compile(source);
 
 function initialize() {
@@ -41,10 +37,8 @@ function initialize() {
 			function(e, xhr, settings, exception) {
 				var exrrorText = xhr.responseText.substring(xhr.responseText.indexOf("<h1>"));
 				$("body").append(
-						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>'
-								+ '<div class="ui-dialog-content">' + 'Location: ' + settings.url + '<br><br>'
-								+ exrrorText + '<br><br>' + '<div class="right">'
-								+ '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
+						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>' + '<div class="ui-dialog-content">' + 'Location: ' + settings.url
+								+ '<br><br>' + exrrorText + '<br><br>' + '<div class="right">' + '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
 				initOneButtonDialog(jQuery);
 			});
 
@@ -192,11 +186,9 @@ function initLeftPanel() {
 		} else {
 			$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
 			if (isJson()) {
-				$breadcrumb.append("<a href='/" + tableType + "s/?product=" + productId + "&id=" + tableId
-						+ "'><span id='" + tableType + "-name'>" + name + "</span></a>");
+				$breadcrumb.append("<a href='/" + tableType + "s/?product=" + productId + "&id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
 			} else {
-				$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType
-						+ "-name'>" + name + "</span></a>");
+				$breadcrumb.append("<a href='/" + tableType + "s/?id=" + tableId + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
 			}
 		}
 
@@ -220,13 +212,13 @@ function initLeftPanel() {
 						name : "Add " + tableType,
 						icon : "add",
 						callback : function() {
-							var $id = $trigger.attr("id");
+							var $id = $(this).attr("id");
 							var $args;
 							if (isJson()) {
 								$args = {
 									product : productId,
 									tabletype : tableType,
-									path : getCategoryPath($(el))
+									path : getCategoryPath($(this))
 								};
 							} else {
 								$args = {
@@ -243,14 +235,13 @@ function initLeftPanel() {
 						name : "Import " + tableType,
 						icon : "import",
 						callback : function() {
-							var $id = $trigger.attr("id");
+							var $id = $(this).attr("id");
 							var dialogText = "";
 							var servlet = "";
 							var fields = "";
 							if (tableType == "storage") {
 								dialogText = "<br />Only .XLS or .XLSX files are acceptable. Only first sheet will be processed."
-										+ "<br />Make sure \"Index\" column or any other help data is absent. File name would be storage name."
-										+ "<br /><br />";
+										+ "<br />Make sure \"Index\" column or any other help data is absent. File name would be storage name." + "<br /><br />";
 								servlet = "../StorageImport";
 								fields = '<div class="table"><div class="table-row"><div class="table-cell dialog-cell dialog-label">Class name:</div><div class="table-cell dialog-cell dialog-edit">'
 										+ '<input name="class"></div></div></div>';
@@ -259,32 +250,17 @@ function initLeftPanel() {
 										+ "<br />First sheet will be processed as the General data sheet."
 										+ "<br />If \"Preconditions\" sheet is present, it will be processed as Preconditions (1st row - the row of keys, 2nd - the row of values)."
 										+ "<br />If \"Postconditions\" sheet is present, it will be processed as Postconditions (1st row - the row of keys, 2nd - the row of values)."
-										+ "<br />Make sure \"Index\" column or any other help data is absent. Table name will be taken from the Excel file name."
-										+ "<br /><br />";
+										+ "<br />Make sure \"Index\" column or any other help data is absent. Table name will be taken from the Excel file name." + "<br /><br />";
 								servlet = "../TableImport";
 							}
-							$("body")
-									.append(
-											'<div id="import-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Import data '
-													+ tableType
-													+ '</div>'
-													+ '<div class="ui-dialog-content">'
-													+ dialogText
-													+ '<form action="'
-													+ servlet
-													+ '?product='
-													+ productId
-													+ '&category='
-													+ $id
-													+ '&categorypath='
-													+ getCategoryPath($(el))
-													+ '" method="post" enctype="multipart/form-data">'
-													+ fields
-													+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">Browse...</div>'
-													+ '<input id="file" type="file" name="file" size="1"/></div>'
-													+ '<div class="dialog-buttons right"><input type="submit" class="ui-button" value="Import">'
-													+ '</input> <button class="ui-button btn-cancel">Cancel</button></div></form></div></div>');
+							$("body").append(
+									'<div id="import-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Import data ' + tableType + '</div>'
+											+ '<div class="ui-dialog-content">' + dialogText + '<form action="' + servlet + '?product=' + productId + '&category=' + $id
+											+ '&categorypath=' + getCategoryPath($(this)) + '" method="post" enctype="multipart/form-data">' + fields
+											+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">Browse...</div>'
+											+ '<input id="file" type="file" name="file" size="1"/></div>'
+											+ '<div class="dialog-buttons right"><input type="submit" class="ui-button" value="Import">'
+											+ '</input> <button class="ui-button btn-cancel">Cancel</button></div></form></div></div>');
 							initImportDialog(jQuery);
 						}
 					},
@@ -293,24 +269,14 @@ function initLeftPanel() {
 						name : "Add subcategory",
 						icon : "add",
 						callback : function() {
-							var $id = $trigger.attr("id");
-							$("body")
-									.append(
-											'<div id="add-category-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Add category</div>'
-													+ '<div class="ui-dialog-content">'
-													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>'
-													+ '</div>'
-													+ '</div>'
-													+ '<div class="dialog-buttons right">'
-													+ '<button id="dialog-btn-add-category" parentid="'
-													+ $id
-													+ '" parent-path="'
-													+ getCategoryPath($(el))
-													+ '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-													+ '</div></div></div>');
+							var $id = $(this).attr("id");
+							$("body").append(
+									'<div id="add-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Add category</div>' + '<div class="ui-dialog-content">'
+											+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+											+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>' + '</div>' + '</div>'
+											+ '<div class="dialog-buttons right">' + '<button id="dialog-btn-add-category" parentid="' + $id + '" parent-path="'
+											+ getCategoryPath($(this)) + '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
+											+ '</div></div></div>');
 							initAddCategoryDialog(jQuery);
 						}
 					},
@@ -318,26 +284,14 @@ function initLeftPanel() {
 						name : "Edit category",
 						icon : "edit",
 						callback : function() {
-							var $id = $trigger.attr("id");
-							$("body")
-									.append(
-											'<div id="edit-category-dialog" class="ui-dialog">'
-													+ '<div class="ui-dialog-title">Edit category</div>'
-													+ '<div class="ui-dialog-content">'
-													+ '<div class="table">'
-													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="'
-													+ $(el).text().trim()
-													+ '"></div>'
-													+ '</div>'
-													+ '</div>'
-													+ '<div class="dialog-buttons right">'
-													+ '<button id="dialog-btn-edit-category" category-id="'
-													+ $id
-													+ '" path="'
-													+ getCategoryPath($(el))
-													+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
-													+ '</div></div></div>');
+							var $id = $(this).attr("id");
+							$("body").append(
+									'<div id="edit-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Edit category</div>' + '<div class="ui-dialog-content">'
+											+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+											+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="' + $(this).text().trim()
+											+ '"></div>' + '</div>' + '</div>' + '<div class="dialog-buttons right">' + '<button id="dialog-btn-edit-category" category-id="' + $id
+											+ '" path="' + getCategoryPath($(this)) + '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
+											+ '</div></div></div>');
 							initEditCategoryDialog(jQuery);
 						}
 					},
@@ -345,7 +299,8 @@ function initLeftPanel() {
 						name : "Delete category",
 						icon : "delete",
 						callback : function() {
-							var $id = $trigger.attr("id");
+							var $thisCategory = $(this);
+							var $id = $thisCategory.attr("id");
 							noty({
 								type : "confirm",
 								text : "Are you sure you want to delete this category?",
@@ -359,7 +314,7 @@ function initLeftPanel() {
 											$args = {
 												product : productId,
 												tabletype : tableType,
-												path : getCategoryPath($(el))
+												path : getCategoryPath($thisCategory)
 											};
 										} else {
 											$args = {
@@ -373,7 +328,7 @@ function initLeftPanel() {
 													text : "The category was deleted.",
 													timeout : 3000
 												});
-												$(el).remove();
+												$thisCategory.remove();
 												history.pushState({
 													product : productId
 												}, "", "?product=" + productId);
@@ -398,24 +353,18 @@ function initLeftPanel() {
 				},
 			});
 
-	$("#btn-add-category")
-			.click(
-					function() {
-						$("body")
-								.append(
-										'<div id="add-category-dialog" class="ui-dialog">'
-												+ '<div class="ui-dialog-title">Add category</div>'
-												+ '<div class="ui-dialog-content">'
-												+ '<div class="table">'
-												+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-												+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>'
-												+ '</div>'
-												+ '</div>'
-												+ '<div class="dialog-buttons right">'
-												+ '<button id="dialog-btn-add-category" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-												+ '</div></div></div>');
-						initAddCategoryDialog(jQuery);
-					});
+	$("#btn-add-category").click(
+			function() {
+				$("body")
+						.append(
+								'<div id="add-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Add category</div>' + '<div class="ui-dialog-content">'
+										+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+										+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>' + '</div>' + '</div>'
+										+ '<div class="dialog-buttons right">'
+										+ '<button id="dialog-btn-add-category" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
+										+ '</div></div></div>');
+				initAddCategoryDialog(jQuery);
+			});
 
 	initDelimiter();
 
@@ -433,8 +382,7 @@ function initLeftPanel() {
 
 		var $breadcrumb = $("#breadcrumb");
 		$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
-		$breadcrumb.append("<a href='" + window.location + "'><span id='" + tableType + "-name'>" + name
-				+ "</span></a>");
+		$breadcrumb.append("<a href='" + window.location + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
 
 		loadTableValues({
 			id : tableId,
@@ -991,7 +939,10 @@ function initTopPanel() {
 			$(this).addClass("button-disabled");
 
 			var $tableContainer = $("#table-container").handsontable('getInstance');
-			var $keyNames = $tableContainer.getColHeader();
+			var $keyNames = [];
+			$(".handsontable thead th span.colHeader").each(function(i) {
+				$keyNames[i] = $(this).text();
+			});
 			var $keyTypes = [];
 			var $keyRefids = [];
 			var $values = [];
@@ -1020,6 +971,7 @@ function initTopPanel() {
 				if (data == "success") {
 					$changedCells = [];
 					$("td[modified]").removeAttr("modified");
+					$("th[modified]").removeAttr("modified");
 					$(".current-row").removeClass("current-row");
 					$.post("../CheckForDuplicatedRows", {
 						id : tableId,
@@ -1275,17 +1227,17 @@ function loadTableValues(args) {
 		};
 
 		var $isStoragesEmpty = $data.storages == null;
-		var $storageNames = {};
+		var $storages = {};
 		var $isEnumerationsEmpty = $data.enumerations == null;
-		var $enumNames = {};
+		var $enums = {};
 		if (!$isStoragesEmpty) {
 			for (var i = 0; i < $data.storages.length; i++) {
-				$storageNames[i + 1] = $data.storages[i];
+				$storages[$data.storageIds[i]] = $data.storages[i];
 			}
 		}
 		if (!$isEnumerationsEmpty) {
 			for (var i = 0; i < $data.enumerations.length; i++) {
-				$enumNames[i + 1] = $data.enumerations[i];
+				$enums[$data.enumerationIds[i]] = $data.enumerations[i];
 			}
 		}
 
@@ -1389,16 +1341,13 @@ function loadTableValues(args) {
 					if (i > 0) {
 						var $colHeader = $(this);
 						var $colName = $colHeader.find("span.colHeader").text();
+
 						var isTextRadioSelected = false;
 						var isStorageRadioSelected = false;
 						var isEnumRadioSelected = false;
-						if ($columns[i - 1].type === "dropdown") {
-							isEnumRadioSelected = true;
-						} else if ($columns[i - 1].allowInvalid == true) {
-							isTextRadioSelected = true;
-						} else {
-							isStorageRadioSelected = true;
-						}
+
+						var storageSelected = 0;
+						var enumSelected = 0;
 						$.contextMenu({
 							selector : ".handsontable thead th:nth-child(" + (i + 1) + ")",
 							items : {
@@ -1406,43 +1355,63 @@ function loadTableValues(args) {
 									name : "Column name",
 									type : 'text',
 									value : $colName,
-									icon : "edit",
+									icon : "edit"
 								},
 								sep1 : "---------",
 								textradio : {
 									name : "Text",
-									type : "radio",
-									selected : isTextRadioSelected
+									type : "radio"
 								},
 								storageradio : {
 									name : "Data storage",
 									type : "radio",
-									disabled : $isStoragesEmpty,
-									selected : isStorageRadioSelected
+									disabled : $isStoragesEmpty
 								},
 								storageselect : {
 									type : "select",
 									disabled : $isStoragesEmpty,
-									selected : $columns[i - 1].refTableSelected,
-									options : $storageNames
+									options : $storages
 								},
 								enumradio : {
 									name : "Enumeration",
 									type : "radio",
-									disabled : $isEnumerationsEmpty,
-									selected : isEnumRadioSelected
+									disabled : $isEnumerationsEmpty
 								},
 								enumselect : {
 									type : "select",
 									disabled : $isEnumerationsEmpty,
-									selected : $columns[i - 1].refTableSelected,
-									options : $enumNames
+									options : $enums
 								},
 								sep2 : "---------",
 								save : {
 									name : "Save",
 									icon : "save",
-									callback : $.noop
+									callback : function(key, opt) {
+										if (opt.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
+											$colHeader.find("span.colHeader").text(opt.inputs["name"].$input.val());
+											$colHeader.attr("modified", true);
+											enableSaveButton();
+										}
+										var isTextTypeChanged = opt.inputs["textradio"].$input.is(":checked") != isTextRadioSelected;
+										var isStorageTypeChanged = opt.inputs["storageradio"].$input.is(":checked") != isStorageRadioSelected;
+										var isEnumTypeChanged = opt.inputs["enumradio"].$input.is(":checked") != isEnumRadioSelected;
+										var isStorageIdChanged = opt.inputs["storageselect"].$input.val() != storageSelected;
+										var isEnumIdChanged = opt.inputs["enumselect"].$input.val() != enumSelected;
+										if (isTextTypeChanged || isStorageTypeChanged || isEnumTypeChanged || isStorageIdChanged || isEnumIdChanged) {
+											if (opt.inputs["textradio"].$input.is(":checked")) {
+												$colHeader.attr("type", "text");
+												$colHeader.attr("refid", "0");
+											} else if (opt.inputs["storageradio"].$input.is(":checked")) {
+												$colHeader.attr("type", "storage");
+												$colHeader.attr("refid", opt.inputs["storageselect"].$input.val());
+											} else {
+												$colHeader.attr("type", "enumeration");
+												$colHeader.attr("refid", opt.inputs["enumselect"].$input.val());
+											}
+											$colHeader.attr("modified", true);
+											enableSaveButton();
+										}
+									}
 								}
 							},
 							events : {
@@ -1452,12 +1421,30 @@ function loadTableValues(args) {
 											$(this).find("span").remove();
 										}
 									});
-									var $this = this;
-									$.contextMenu.setInputValues(opt, $this.data());
-								},
-								hide : function(opt) {
-									var $this = this;
-									$.contextMenu.getInputValues(opt, $this.data());
+									storageSelected = $colHeader.attr("refid");
+									enumSelected = $colHeader.attr("refid");
+									if ($colHeader.attr("type") === "text") {
+										isTextRadioSelected = true;
+										isStorageRadioSelected = false;
+										isEnumRadioSelected = false;
+										storageSelected = $data.storageIds[0];
+										enumSelected = $data.enumerationIds[0];
+									} else if ($colHeader.attr("type") === "storage") {
+										isTextRadioSelected = false;
+										isStorageRadioSelected = true;
+										isEnumRadioSelected = false;
+										enumSelected = $data.enumerationIds[0];
+									} else {
+										isTextRadioSelected = false;
+										isStorageRadioSelected = false;
+										isEnumRadioSelected = true;
+										storageSelected = $data.storageIds[0];
+									}
+									opt.items.textradio.selected = isTextRadioSelected;
+									opt.items.storageradio.selected = isStorageRadioSelected;
+									opt.items.enumradio.selected = isEnumRadioSelected;
+									opt.items.storageselect.selected = storageSelected;
+									opt.items.enumselect.selected = enumSelected;
 								}
 							}
 						});
@@ -1508,8 +1495,7 @@ function initTooltipCells(elements) {
 
 	function initTooltipCellsOnClick(value) {
 		var $value = value;
-		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "")
-				&& (!$value.hasClass("modified-value-cell"))) {
+		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))) {
 			if ($value.has("div.tooltip").length == 0) {
 				var $content = $value.text();
 				var $args;
@@ -1540,8 +1526,8 @@ function initTooltipCells(elements) {
 
 	function initTooltipCellsOnHover(value) {
 		var $value = value;
-		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "")
-				&& (!$value.hasClass("modified-value-cell")) && ($value.has("div.tooltip").length == 0)) {
+		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))
+				&& ($value.has("div.tooltip").length == 0)) {
 			var $content = $value.text();
 			var $args;
 			if (isJson()) {
@@ -1649,122 +1635,119 @@ function initParameterTypeDialog() {
 		$(".select-enum").prop("disabled", false);
 	}
 
-	$("#btn-apply-type").click(
-			function() {
-				var $id = $(this).attr("keyid");
-				var $order = $(this).attr("keyorder");
-				var $dialog = $("#parameter-type-dialog");
-				var $type = $dialog.find("input:checked").val();
-				var $select;
-				if ($type == "storage") {
-					$select = $dialog.find("select.select-storage");
-				} else {
-					$select = $dialog.find("select.select-enum");
-				}
-				var $refId = $select.find("option:selected").val();
-				var $args;
+	$("#btn-apply-type").click(function() {
+		var $id = $(this).attr("keyid");
+		var $order = $(this).attr("keyorder");
+		var $dialog = $("#parameter-type-dialog");
+		var $type = $dialog.find("input:checked").val();
+		var $select;
+		if ($type == "storage") {
+			$select = $dialog.find("select.select-storage");
+		} else {
+			$select = $dialog.find("select.select-enum");
+		}
+		var $refId = $select.find("option:selected").val();
+		var $args;
+		if (isJson()) {
+			$args = {
+				keyorder : $order,
+				type : $type,
+				refId : $refId,
+				tableid : tableId,
+				product : productId
+			};
+		} else {
+			$args = {
+				keyId : $id,
+				type : $type,
+				refId : $refId
+			};
+		}
+		$.post("../ApplyParameterType", $args, function(data) {
+			if (data == "success") {
+				noty({
+					type : "success",
+					text : "New type was successfully applied.",
+					timeout : 3000
+				});
+				$(".ui-dialog").remove();
 				if (isJson()) {
-					$args = {
-						keyorder : $order,
-						type : $type,
-						refId : $refId,
-						tableid : tableId,
+					loadTableValues({
+						id : tableId,
 						product : productId
-					};
+					});
 				} else {
-					$args = {
-						keyId : $id,
-						type : $type,
-						refId : $refId
-					};
+					var $column = $("div[keyid='" + $id + "']");
+					if ($type == "text") {
+						$column.find("div.tooltip").remove();
+						$column.off();
+						$column.removeClass("storage-cell");
+						initValueCells($column);
+						modifyKeyCell();
+					} else if ($type == "storage") {
+						$column.addClass("storage-cell");
+						initTooltipCells($column);
+						modifyKeyCell();
+					} else {
+						$column.addClass("enum-cell");
+						initEnumCells($column);
+						modifyKeyCell();
+					}
 				}
-				$.post("../ApplyParameterType", $args, function(data) {
-					if (data == "success") {
-						noty({
-							type : "success",
-							text : "New type was successfully applied.",
-							timeout : 3000
-						});
-						$(".ui-dialog").remove();
-						if (isJson()) {
-							loadTableValues({
-								id : tableId,
-								product : productId
-							});
-						} else {
-							var $column = $("div[keyid='" + $id + "']");
-							if ($type == "text") {
-								$column.find("div.tooltip").remove();
-								$column.off();
-								$column.removeClass("storage-cell");
-								initValueCells($column);
-								modifyKeyCell();
-							} else if ($type == "storage") {
-								$column.addClass("storage-cell");
-								initTooltipCells($column);
-								modifyKeyCell();
-							} else {
-								$column.addClass("enum-cell");
-								initEnumCells($column);
-								modifyKeyCell();
-							}
-						}
-					} else if (data == "need-correction") {
-						var message;
-						if ($type == "storage") {
-							message = "Some values in the column are not numeric."
-									+ " Would you like to correct these values to the valid format ('0')?";
-						} else {
-							message = "Some values in the column are not from the enumeration or empty."
-									+ " Would you like to correct these values to one of the enumeration values?";
-						}
+			} else if (data == "need-correction") {
+				var message;
+				if ($type == "storage") {
+					message = "Some values in the column are not numeric." + " Would you like to correct these values to the valid format ('0')?";
+				} else {
+					message = "Some values in the column are not from the enumeration or empty." + " Would you like to correct these values to one of the enumeration values?";
+				}
 
-						noty({
-							type : "confirm",
-							text : message,
-							buttons : [ {
-								addClass : 'btn btn-primary ui-button',
-								text : 'Correct values',
-								onClick : function($noty) {
-									$(".ui-dialog").remove();
-									$noty.close();
-									$.post("../CorrectValuesForParameterType", $args, function(data) {
-										if (data == "success") {
-											loadTableValues({
-												id : tableId,
-												product : productId
-											});
-										} else {
-											noty({
-												type : "error",
-												text : data
-											});
-										}
+				noty({
+					type : "confirm",
+					text : message,
+					buttons : [ {
+						addClass : 'btn btn-primary ui-button',
+						text : 'Correct values',
+						onClick : function($noty) {
+							$(".ui-dialog").remove();
+							$noty.close();
+							$.post("../CorrectValuesForParameterType", $args, function(data) {
+								if (data == "success") {
+									loadTableValues({
+										id : tableId,
+										product : productId
+									});
+								} else {
+									noty({
+										type : "error",
+										text : data
 									});
 								}
-							}, {
-								addClass : 'btn btn-danger ui-button',
-								text : 'Cancel',
-								onClick : function($noty) {
-									$noty.close();
-									$(".ui-dialog").remove();
-								}
-							} ]
-						});
-
-					} else if (data == "not-changed") {
-						noty({
-							text : "This parameter is already has this type.",
-							timeout : 3000
-						});
-					} else {
-						noty({
-							type : "error",
-							text : data
-						});
-					}
+							});
+						}
+					}, {
+						addClass : 'btn btn-danger ui-button',
+						text : 'Cancel',
+						onClick : function($noty) {
+							$noty.close();
+							$(".ui-dialog").remove();
+						}
+					} ]
 				});
-			});
+
+			} else if (data == "not-changed") {
+				noty({
+					text : "This parameter is already has this type.",
+					timeout : 3000
+				});
+			} else {
+				noty({
+					type : "error",
+					text : data
+				});
+			}
+		});
+	});
 
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
@@ -1772,8 +1755,7 @@ function initParameterTypeDialog() {
 }
 
 function enableSaveButton() {
-	$(".data-item-selected:not(:has(> img.changed-sign))").append(
-			" <img class='changed-sign' src='../img/modified.png'>");
+	$(".data-item-selected:not(:has(> img.changed-sign))").append(" <img class='changed-sign' src='../img/modified.png'>");
 	$("#btn-save-data-item").removeClass("button-disabled");
 	$("#btn-save-data-item").addClass("button-enabled");
 }
@@ -1810,28 +1792,15 @@ function showAdvancedImportDialog(currentRowsCount, importedRowsCount) {
 		noteText = "<strong>Note:</strong> Only General table will change. Preconditions and Postconditions are ignored.<br /><br />";
 	}
 	var options = '<br/><br/><input type="radio" value="addtoend" name="import-option" checked="checked">Add to the end of the table'
-			+ '<br/><br/><input type="radio" value="addfromrow" name="import-option">Replace from row: '
-			+ '<input id="start-row" size="4" disabled="disabled" value="1"/>';
-	$("body")
-			.append(
-					'<div id="advanced-import-dialog" class="ui-dialog">'
-							+ '<div class="ui-dialog-title">Import existing data '
-							+ tableType
-							+ '</div>'
-							+ '<div class="ui-dialog-content">'
-							+ '<br />Data '
-							+ tableType
-							+ ' with the same name was found.<br /><br /><br />'
-							+ '<div class="table"><div class="table-row">'
-							+ '<div class="table-cell dialog-cell dialog-label">Rows in the current '
-							+ tableType
-							+ ':</div><div class="table-cell dialog-cell">'
-							+ currentRowsCount
-							+ '</div></div><div class="table-row"><div class="table-cell dialog-cell dialog-label">Rows in the file being imported:</div>'
-							+ '<div class="table-cell dialog-cell">' + importedRowsCount + '</div></div></div>'
-							+ '<br/><br/>How would you like to apply changes?' + options + '<br /><br />' + noteText
-							+ '<div class="dialog-buttons right"><button class="ui-button btn-apply">Apply</button> '
-							+ '<button class="ui-button btn-cancel">Cancel</button></div></div></div>');
+			+ '<br/><br/><input type="radio" value="addfromrow" name="import-option">Replace from row: ' + '<input id="start-row" size="4" disabled="disabled" value="1"/>';
+	$("body").append(
+			'<div id="advanced-import-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Import existing data ' + tableType + '</div>' + '<div class="ui-dialog-content">'
+					+ '<br />Data ' + tableType + ' with the same name was found.<br /><br /><br />' + '<div class="table"><div class="table-row">'
+					+ '<div class="table-cell dialog-cell dialog-label">Rows in the current ' + tableType + ':</div><div class="table-cell dialog-cell">' + currentRowsCount
+					+ '</div></div><div class="table-row"><div class="table-cell dialog-cell dialog-label">Rows in the file being imported:</div>'
+					+ '<div class="table-cell dialog-cell">' + importedRowsCount + '</div></div></div>' + '<br/><br/>How would you like to apply changes?' + options
+					+ '<br /><br />' + noteText + '<div class="dialog-buttons right"><button class="ui-button btn-apply">Apply</button> '
+					+ '<button class="ui-button btn-cancel">Cancel</button></div></div></div>');
 	initAdvancedImportDialog(jQuery);
 }
 

@@ -138,20 +138,11 @@ public class GetTableValues extends HttpServlet {
 			case TEXT:
 				columns[i].setType("text");
 				columns[i].setAllowInvalid(true);
-				columns[i].setRefTableSelected(0);
 				break;
 
 			case STORAGE:
 				columns[i].setType("text");
 				columns[i].setAllowInvalid(false);
-				if (!dataSotages.isEmpty()) {
-					for (int j = 0; j < dataSotages.size(); j++) {
-						if (dataSotages.get(j).getId() == keys[i].getRefid()) {
-							columns[i].setRefTableSelected(j + 1);
-							break;
-						}
-					}
-				}
 				break;
 
 			case ENUMERATION:
@@ -160,14 +151,6 @@ public class GetTableValues extends HttpServlet {
 				Table refTable = jDao.getTable(keys[i].getRefid(), productId);
 				String[] source = jDao.getValuesByKeyOrder(refTable, 0).toArray(new String[0]);
 				columns[i].setSource(source);
-				if (!enumerations.isEmpty()) {
-					for (int j = 0; j < enumerations.size(); j++) {
-						if (enumerations.get(j).getId() == keys[i].getRefid()) {
-							columns[i].setRefTableSelected(j + 1);
-							break;
-						}
-					}
-				}
 				break;
 
 			default:
@@ -178,18 +161,24 @@ public class GetTableValues extends HttpServlet {
 		uiTable.setColumns(columns);
 
 		if (!dataSotages.isEmpty()) {
+			int[] storageIds = new int[dataSotages.size()];
 			String[] storages = new String[dataSotages.size()];
-			for (int i = 0; i < storages.length; i++) {
+			for (int i = 0; i < dataSotages.size(); i++) {
+				storageIds[i] = dataSotages.get(i).getId();
 				storages[i] = dataSotages.get(i).getName();
 			}
+			uiTable.setStorageIds(storageIds);
 			uiTable.setStorages(storages);
 		}
 
 		if (!enumerations.isEmpty()) {
+			int[] enumIds = new int[enumerations.size()];
 			String[] enumNames = new String[enumerations.size()];
-			for (int i = 0; i < enumNames.length; i++) {
+			for (int i = 0; i < enumerations.size(); i++) {
+				enumIds[i] = enumerations.get(i).getId();
 				enumNames[i] = enumerations.get(i).getName();
 			}
+			uiTable.setEnumerationIds(enumIds);
 			uiTable.setEnumerations(enumNames);
 		}
 

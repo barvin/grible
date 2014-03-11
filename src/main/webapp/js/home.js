@@ -46,21 +46,28 @@ $(window)
 										initAddProductDialog(jQuery);
 									});
 
-					$(".product-item")
-							.contextMenu(
-									{
-										menu : 'productMenu'
-									},
-									function(action, el, pos) {
-										var $id = $(el).attr("id");
-										if (action == "edit") {
+					$
+							.contextMenu({
+								selector : ".product-item",
+								items : {
+									edit : {
+										name : "Edit product",
+										icon : "edit",
+										callback : function() {
+											var $id = $(this).attr("id");
 											$.post("GetEditProductDialog", {
 												id : $id
 											}, function(data) {
 												$("body").append(data);
 												initEditProductDialog(jQuery);
 											});
-										} else if (action == "delete") {
+										}
+									},
+									"delete" : {
+										name : "Delete product",
+										icon : "delete",
+										callback : function() {
+											var $id = $(this).attr("id");
 											var message;
 											if (isJson()) {
 												message = "Are you sure you want to delete this product?<br>(Product directory will not be deleted)";
@@ -102,7 +109,9 @@ $(window)
 												} ]
 											});
 										}
-									});
+									}
+								}
+							});
 
 					$(".section").each(function(i) {
 						if ($(this).width() < 250) {

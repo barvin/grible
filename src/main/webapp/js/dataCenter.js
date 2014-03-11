@@ -212,179 +212,191 @@ function initLeftPanel() {
 		});
 	}
 
-	// $(".category-item")
-	// .contextMenu(
-	// {
-	// menu : 'categoryMenu'
-	// },
-	// function(action, el, pos) {
-	// var $id = $(el).attr("id");
-	// if (action == "add") {
-	// var $args;
-	// if (isJson()) {
-	// $args = {
-	// product : productId,
-	// tabletype : tableType,
-	// path : getCategoryPath($(el))
-	// };
-	// } else {
-	// $args = {
-	// categoryid : $id
-	// };
-	// }
-	// $.post("../GetAddTableDialog", $args, function(data) {
-	// $("body").append(data);
-	// initAddDataItemDialog(jQuery);
-	// });
-	// } else if (action == "import") {
-	// var dialogText = "";
-	// var servlet = "";
-	// var fields = "";
-	// if (tableType == "storage") {
-	// dialogText = "<br />Only .XLS or .XLSX files are acceptable. Only first
-	// sheet will be processed."
-	// + "<br />Make sure \"Index\" column or any other help data is absent.
-	// File name would be storage name."
-	// + "<br /><br />";
-	// servlet = "../StorageImport";
-	// fields = '<div class="table"><div class="table-row"><div
-	// class="table-cell dialog-cell dialog-label">Class name:</div><div
-	// class="table-cell dialog-cell dialog-edit">'
-	// + '<input name="class"></div></div></div>';
-	// } else {
-	// dialogText = "<br />Only .XLS or .XLSX files are acceptable."
-	// + "<br />First sheet will be processed as the General data sheet."
-	// + "<br />If \"Preconditions\" sheet is present, it will be processed as
-	// Preconditions (1st row - the row of keys, 2nd - the row of values)."
-	// + "<br />If \"Postconditions\" sheet is present, it will be processed as
-	// Postconditions (1st row - the row of keys, 2nd - the row of values)."
-	// + "<br />Make sure \"Index\" column or any other help data is absent.
-	// Table name will be taken from the Excel file name."
-	// + "<br /><br />";
-	// servlet = "../TableImport";
-	// }
-	// $("body")
-	// .append(
-	// '<div id="import-dialog" class="ui-dialog">'
-	// + '<div class="ui-dialog-title">Import data '
-	// + tableType
-	// + '</div>'
-	// + '<div class="ui-dialog-content">'
-	// + dialogText
-	// + '<form action="'
-	// + servlet
-	// + '?product='
-	// + productId
-	// + '&category='
-	// + $id
-	// + '&categorypath='
-	// + getCategoryPath($(el))
-	// + '" method="post" enctype="multipart/form-data">'
-	// + fields
-	// + '<div class="fileform"><div id="fileformlabel"></div><div
-	// class="selectbutton ui-button">Browse...</div>'
-	// + '<input id="file" type="file" name="file" size="1"/></div>'
-	// + '<div class="dialog-buttons right"><input type="submit"
-	// class="ui-button" value="Import">'
-	// + '</input> <button class="ui-button
-	// btn-cancel">Cancel</button></div></form></div></div>');
-	// initImportDialog(jQuery);
-	// } else if (action == "add-category") {
-	// $("body")
-	// .append(
-	// '<div id="add-category-dialog" class="ui-dialog">'
-	// + '<div class="ui-dialog-title">Add category</div>'
-	// + '<div class="ui-dialog-content">'
-	// + '<div class="table">'
-	// + '<div class="table-row"><div class="table-cell dialog-cell
-	// dialog-label">'
-	// + 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input
-	// class="category-name dialog-edit"></div>'
-	// + '</div>'
-	// + '</div>'
-	// + '<div class="dialog-buttons right">'
-	// + '<button id="dialog-btn-add-category" parentid="'
-	// + $id
-	// + '" parent-path="'
-	// + getCategoryPath($(el))
-	// + '" class="ui-button">Add</button> <button class="ui-button
-	// btn-cancel">Cancel</button>'
-	// + '</div></div></div>');
-	// initAddCategoryDialog(jQuery);
-	// } else if (action == "edit") {
-	// $("body")
-	// .append(
-	// '<div id="edit-category-dialog" class="ui-dialog">'
-	// + '<div class="ui-dialog-title">Edit category</div>'
-	// + '<div class="ui-dialog-content">'
-	// + '<div class="table">'
-	// + '<div class="table-row"><div class="table-cell dialog-cell
-	// dialog-label">'
-	// + 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input
-	// class="category-name dialog-edit" value="'
-	// + $(el).text().trim()
-	// + '"></div>'
-	// + '</div>'
-	// + '</div>'
-	// + '<div class="dialog-buttons right">'
-	// + '<button id="dialog-btn-edit-category" category-id="'
-	// + $id
-	// + '" path="'
-	// + getCategoryPath($(el))
-	// + '" class="ui-button">Save</button> <button class="ui-button
-	// btn-cancel">Cancel</button>'
-	// + '</div></div></div>');
-	// initEditCategoryDialog(jQuery);
-	// } else if (action == "delete") {
-	// noty({
-	// type : "confirm",
-	// text : "Are you sure you want to delete this category?",
-	// buttons : [ {
-	// addClass : 'btn btn-primary ui-button',
-	// text : 'Delete',
-	// onClick : function($noty) {
-	// $noty.close();
-	// var $args;
-	// if (isJson()) {
-	// $args = {
-	// product : productId,
-	// tabletype : tableType,
-	// path : getCategoryPath($(el))
-	// };
-	// } else {
-	// $args = {
-	// id : $id
-	// };
-	// }
-	// $.post("../DeleteCategory", $args, function(data) {
-	// if (data == "success") {
-	// noty({
-	// type : "success",
-	// text : "The category was deleted.",
-	// timeout : 3000
-	// });
-	// $(el).remove();
-	// history.pushState({
-	// product : productId
-	// }, "", "?product=" + productId);
-	// } else {
-	// noty({
-	// type : "error",
-	// text : data
-	// });
-	// }
-	// });
-	// }
-	// }, {
-	// addClass : 'btn btn-danger ui-button',
-	// text : 'Cancel',
-	// onClick : function($noty) {
-	// $noty.close();
-	// }
-	// } ]
-	// });
-	// }
-	// });
+	$
+			.contextMenu({
+				selector : ".category-item",
+				items : {
+					add : {
+						name : "Add " + tableType,
+						icon : "add",
+						callback : function() {
+							var $id = $trigger.attr("id");
+							var $args;
+							if (isJson()) {
+								$args = {
+									product : productId,
+									tabletype : tableType,
+									path : getCategoryPath($(el))
+								};
+							} else {
+								$args = {
+									categoryid : $id
+								};
+							}
+							$.post("../GetAddTableDialog", $args, function(data) {
+								$("body").append(data);
+								initAddDataItemDialog(jQuery);
+							});
+						}
+					},
+					import : {
+						name : "Import " + tableType,
+						icon : "import",
+						callback : function() {
+							var $id = $trigger.attr("id");
+							var dialogText = "";
+							var servlet = "";
+							var fields = "";
+							if (tableType == "storage") {
+								dialogText = "<br />Only .XLS or .XLSX files are acceptable. Only first sheet will be processed."
+										+ "<br />Make sure \"Index\" column or any other help data is absent. File name would be storage name."
+										+ "<br /><br />";
+								servlet = "../StorageImport";
+								fields = '<div class="table"><div class="table-row"><div class="table-cell dialog-cell dialog-label">Class name:</div><div class="table-cell dialog-cell dialog-edit">'
+										+ '<input name="class"></div></div></div>';
+							} else {
+								dialogText = "<br />Only .XLS or .XLSX files are acceptable."
+										+ "<br />First sheet will be processed as the General data sheet."
+										+ "<br />If \"Preconditions\" sheet is present, it will be processed as Preconditions (1st row - the row of keys, 2nd - the row of values)."
+										+ "<br />If \"Postconditions\" sheet is present, it will be processed as Postconditions (1st row - the row of keys, 2nd - the row of values)."
+										+ "<br />Make sure \"Index\" column or any other help data is absent. Table name will be taken from the Excel file name."
+										+ "<br /><br />";
+								servlet = "../TableImport";
+							}
+							$("body")
+									.append(
+											'<div id="import-dialog" class="ui-dialog">'
+													+ '<div class="ui-dialog-title">Import data '
+													+ tableType
+													+ '</div>'
+													+ '<div class="ui-dialog-content">'
+													+ dialogText
+													+ '<form action="'
+													+ servlet
+													+ '?product='
+													+ productId
+													+ '&category='
+													+ $id
+													+ '&categorypath='
+													+ getCategoryPath($(el))
+													+ '" method="post" enctype="multipart/form-data">'
+													+ fields
+													+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">Browse...</div>'
+													+ '<input id="file" type="file" name="file" size="1"/></div>'
+													+ '<div class="dialog-buttons right"><input type="submit" class="ui-button" value="Import">'
+													+ '</input> <button class="ui-button btn-cancel">Cancel</button></div></form></div></div>');
+							initImportDialog(jQuery);
+						}
+					},
+					sep1 : "---------",
+					addCategory : {
+						name : "Add subcategory",
+						icon : "add",
+						callback : function() {
+							var $id = $trigger.attr("id");
+							$("body")
+									.append(
+											'<div id="add-category-dialog" class="ui-dialog">'
+													+ '<div class="ui-dialog-title">Add category</div>'
+													+ '<div class="ui-dialog-content">'
+													+ '<div class="table">'
+													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>'
+													+ '</div>'
+													+ '</div>'
+													+ '<div class="dialog-buttons right">'
+													+ '<button id="dialog-btn-add-category" parentid="'
+													+ $id
+													+ '" parent-path="'
+													+ getCategoryPath($(el))
+													+ '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
+													+ '</div></div></div>');
+							initAddCategoryDialog(jQuery);
+						}
+					},
+					edit : {
+						name : "Edit category",
+						icon : "edit",
+						callback : function() {
+							var $id = $trigger.attr("id");
+							$("body")
+									.append(
+											'<div id="edit-category-dialog" class="ui-dialog">'
+													+ '<div class="ui-dialog-title">Edit category</div>'
+													+ '<div class="ui-dialog-content">'
+													+ '<div class="table">'
+													+ '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+													+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="'
+													+ $(el).text().trim()
+													+ '"></div>'
+													+ '</div>'
+													+ '</div>'
+													+ '<div class="dialog-buttons right">'
+													+ '<button id="dialog-btn-edit-category" category-id="'
+													+ $id
+													+ '" path="'
+													+ getCategoryPath($(el))
+													+ '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
+													+ '</div></div></div>');
+							initEditCategoryDialog(jQuery);
+						}
+					},
+					"delete" : {
+						name : "Delete category",
+						icon : "delete",
+						callback : function() {
+							var $id = $trigger.attr("id");
+							noty({
+								type : "confirm",
+								text : "Are you sure you want to delete this category?",
+								buttons : [ {
+									addClass : 'btn btn-primary ui-button',
+									text : 'Delete',
+									onClick : function($noty) {
+										$noty.close();
+										var $args;
+										if (isJson()) {
+											$args = {
+												product : productId,
+												tabletype : tableType,
+												path : getCategoryPath($(el))
+											};
+										} else {
+											$args = {
+												id : $id
+											};
+										}
+										$.post("../DeleteCategory", $args, function(data) {
+											if (data == "success") {
+												noty({
+													type : "success",
+													text : "The category was deleted.",
+													timeout : 3000
+												});
+												$(el).remove();
+												history.pushState({
+													product : productId
+												}, "", "?product=" + productId);
+											} else {
+												noty({
+													type : "error",
+													text : data
+												});
+											}
+										});
+									}
+								}, {
+									addClass : 'btn btn-danger ui-button',
+									text : 'Cancel',
+									onClick : function($noty) {
+										$noty.close();
+									}
+								} ]
+							});
+						}
+					},
+				},
+			});
 
 	$("#btn-add-category")
 			.click(
@@ -1264,10 +1276,8 @@ function loadTableValues(args) {
 
 		var $isStoragesEmpty = $data.storages == null;
 		var $storageNames = {};
-		var $storageSelected = 0;
 		var $isEnumerationsEmpty = $data.enumerations == null;
 		var $enumNames = {};
-		var $enumSelected = 0;
 		if (!$isStoragesEmpty) {
 			for (var i = 0; i < $data.storages.length; i++) {
 				$storageNames[i + 1] = $data.storages[i];
@@ -1379,6 +1389,16 @@ function loadTableValues(args) {
 					if (i > 0) {
 						var $colHeader = $(this);
 						var $colName = $colHeader.find("span.colHeader").text();
+						var isTextRadioSelected = false;
+						var isStorageRadioSelected = false;
+						var isEnumRadioSelected = false;
+						if ($columns[i - 1].type === "dropdown") {
+							isEnumRadioSelected = true;
+						} else if ($columns[i - 1].allowInvalid == true) {
+							isTextRadioSelected = true;
+						} else {
+							isStorageRadioSelected = true;
+						}
 						$.contextMenu({
 							selector : ".handsontable thead th:nth-child(" + (i + 1) + ")",
 							items : {
@@ -1387,38 +1407,35 @@ function loadTableValues(args) {
 									type : 'text',
 									value : $colName,
 									icon : "edit",
-									events : {
-										keyup : function(e) {
-											// add some fancy key handling here?
-											window.console && console.log('key: ' + e.keyCode);
-										}
-									}
 								},
 								sep1 : "---------",
 								textradio : {
 									name : "Text",
-									type : "radio"
+									type : "radio",
+									selected : isTextRadioSelected
 								},
 								storageradio : {
 									name : "Data storage",
 									type : "radio",
-									disabled : $isStoragesEmpty
+									disabled : $isStoragesEmpty,
+									selected : isStorageRadioSelected
 								},
 								storageselect : {
 									type : "select",
 									disabled : $isStoragesEmpty,
-									selected : 2,
+									selected : $columns[i - 1].refTableSelected,
 									options : $storageNames
 								},
 								enumradio : {
 									name : "Enumeration",
 									type : "radio",
-									disabled : $isEnumerationsEmpty
+									disabled : $isEnumerationsEmpty,
+									selected : isEnumRadioSelected
 								},
 								enumselect : {
 									type : "select",
 									disabled : $isEnumerationsEmpty,
-									selected : 1,
+									selected : $columns[i - 1].refTableSelected,
 									options : $enumNames
 								},
 								sep2 : "---------",

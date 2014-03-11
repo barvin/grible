@@ -108,6 +108,10 @@
 	background-image: url(../img/add-icon.png);
 }
 
+.context-menu-item.icon-import {
+	background-image: url(../img/import-icon.png);
+}
+
 /* vertically align inside labels */
 .context-menu-input>label>* {
 	vertical-align: top;

@@ -1114,9 +1114,8 @@ function loadTableValues(args) {
 
 		var storageCellRenderer = function(instance, td, row, col, prop, value, cellProperties) {
 			Handsontable.renderers.TextRenderer.apply(this, arguments);
-			$(td).css({
-				color : "#0066c5"
-			});
+			$(td).addClass("storage-cell");
+			$(td).attr("refid", $(".handsontable thead th:nth-child(" + (col + 2) + ")").attr("refid"));
 		};
 		var storageValidatorRegExp = function(value, callback) {
 			if (/^\d+[;\d+]*$/.test(value)) {
@@ -1178,8 +1177,8 @@ function loadTableValues(args) {
 			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
 			cells : setColumnTypes,
-//			width : $("#table-container").width(),
-//			height : $("#table-container").height(),
+			// width : $("#table-container").width(),
+			// height : $("#table-container").height(),
 			autoWrapRow : true,
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
@@ -1263,7 +1262,7 @@ function loadTableValues(args) {
 					disableSaveButton();
 				}
 				$(".handsontable thead th").each(function(i) {
-					if (i > 0) {
+					if ($(this).find("span.colHeader").length > 0) {
 						var $colHeader = $(this);
 						var $colName = $colHeader.find("span.colHeader").text();
 
@@ -1420,6 +1419,9 @@ function loadTableValues(args) {
 						});
 					}
 				});
+
+				initTooltipCells($(".storage-cell"));
+
 			},
 		});
 
@@ -1487,25 +1489,15 @@ function initTooltipCells(elements) {
 		}
 	}
 
-	function initTooltipCellsOnHover(value) {
-		var $value = value;
-		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))
-				&& ($value.has("div.tooltip").length == 0)) {
+	function initTooltipCellsOnHover(td) {
+		var $value = td;
+		if (($value.text() != "0") && ($value.text() != "") && ($value.has("div.tooltip").length == 0)) {
 			var $content = $value.text();
-			var $args;
-			if (isJson()) {
-				$args = {
-					product : productId,
-					tableid : tableId,
-					keyorder : $value.attr('keyid'),
-					content : $content
-				};
-			} else {
-				$args = {
-					id : $value.attr('id'),
-					content : $content
-				};
-			}
+			var $args = {
+				product : productId,
+				refid : $value.attr("refid"),
+				content : $content
+			};
 			$.post("../GetStorageTooltip", $args, function(data) {
 				$value.html(data);
 				var $tooltip = $value.find("div.tooltip");

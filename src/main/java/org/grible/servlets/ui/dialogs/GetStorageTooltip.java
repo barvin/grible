@@ -80,12 +80,9 @@ public class GetStorageTooltip extends HttpServlet {
 
 				if (ServletHelper.isJson()) {
 					int productId = Integer.parseInt(request.getParameter("product"));
-					int tableId = Integer.parseInt(request.getParameter("tableid"));
-					int keyOrder = Integer.parseInt(request.getParameter("keyorder"));
+					int refId = Integer.parseInt(request.getParameter("refid"));
 					jDao = new JsonDao();
-					Table table = jDao.getTable(tableId, productId);
-					KeyJson key = table.getTableJson().getKeys()[keyOrder - 1];
-					Table refTable = jDao.getTable(key.getRefid(), productId);
+					Table refTable = jDao.getTable(refId, productId);
 					out.print(content + getStorageTooltip(indexes, refTable, productId));
 				} else {
 					pDao = new PostgresDao();

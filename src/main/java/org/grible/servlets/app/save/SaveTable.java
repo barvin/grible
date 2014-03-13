@@ -12,6 +12,7 @@ package org.grible.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.model.Table;
 import org.grible.model.json.KeyJson;
@@ -76,29 +78,33 @@ public class SaveTable extends HttpServlet {
 				String[] row = gson.fromJson(valueRows[i], String[].class);
 				for (int j = 0; j < row.length; j++) {
 					String value = row[j];
-					// if (keys[j].getType() == KeyType.STORAGE) {
-					// String[] strIndexes = value.split(";");
-					// for (String index : strIndexes) {
-					// if (!StringUtils.isNumeric(index)) {
-					// throw new Exception("ERROR: One of indexes in the row " +
-					// (i + 1) + " is not numeric.");
-					// }
-					// if (!"0".equals(index)) {
-					// Table refTable = dao.getTable(keys[j].getRefid(),
-					// productId);
-					// String[][] refRows = refTable.getTableJson().getValues();
-					// if (refRows.length < Integer.parseInt(index)) {
-					// throw new Exception("ERROR: Data storage '" +
-					// refTable.getName()
-					// + "' does not contain row number " + index
-					// + ".<br>You specified it in row: " + (i + 1)
-					// +
-					// ".<br>You must first create this row in the specified data storage.");
-					// }
-					// }
-					// }
-					//
-					// }
+					if (keys[j].getType() == KeyType.STORAGE) {
+						String[] strIndexes = value.split(";");
+						for (String index : strIndexes) {
+							if (!StringUtils.isNumeric(index)) {
+								throw new Exception("ERROR: One of indexes in the row " + (i + 1) + " is not numeric.");
+							}
+							if (!"0".equals(index)) {
+								Table refTable = dao.getTable(keys[j].getRefid(), productId);
+								String[][] refRows = refTable.getTableJson().getValues();
+								if (refRows.length < Integer.parseInt(index)) {
+									throw new Exception("ERROR: Data storage '" + refTable.getName()
+											+ "' does not contain row number " + index
+											+ ".<br>You specified it in row: " + (i + 1)
+											+ ".<br>You must first create this row in the specified data storage.");
+								}
+							}
+						}
+
+					} else if (keys[j].getType() == KeyType.ENUMERATION) {
+						Table refTable = dao.getTable(keys[j].getRefid(), productId);
+						List<String> enumValues = dao.getValuesByKeyOrder(refTable, 0);
+						if (!enumValues.contains(value)) {
+							throw new Exception("ERROR: Enumeration '" + refTable.getName()
+									+ "' does not contain value '" + value + "'.<br>You specified it in row: "
+									+ (i + 1) + ".");
+						}
+					}
 					values[i][j] = value;
 				}
 			}

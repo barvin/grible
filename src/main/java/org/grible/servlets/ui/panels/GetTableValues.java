@@ -89,6 +89,8 @@ public class GetTableValues extends HttpServlet {
 			if (isJson()) {
 				transformTableToUiTable(table, uiTable);
 			} else {
+				// TODO: implement PostgreSQL part.
+				
 				// List<Key> keys = pDao.getKeys(tableId);
 				// writeKeys(uiTable, keys);
 				//

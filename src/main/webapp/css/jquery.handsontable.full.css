@@ -30,13 +30,6 @@
 	border-collapse: separate;
 	/*it must be separate, otherwise there are offset miscalculations in WebKit: http://stackoverflow.com/questions/2655987/border-collapse-differences-in-ff-and-webkit*/
 	position: relative;
-	/*this actually only changes appearance of user selection - does not make text unselectable
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--o-user-select: none;
--ms-user-select: none;
-/*user-select: none; /*no browser supports unprefixed version*/
 	border-spacing: 0;
 	margin: 0;
 	border-width: 0;
@@ -46,6 +39,12 @@
 	/* reset bootstrap table style. for more info see: https://github.com/warpech/jquery-handsontable/issues/224 */
 	max-width: none;
 	max-height: none;
+	-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+	-ms-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+	-o-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+	font-size: 12px;
 }
 
 .handsontable col {
@@ -375,16 +374,12 @@ ul.context-menu-list li {
 	position: absolute;
 }
 
-.htContextMenu table.htCore {
-	outline: 1px solid #bbb;
-}
-
 .htContextMenu .wtBorder {
 	visibility: hidden;
 }
 
 .htContextMenu table tbody tr td {
-	background: white;
+	background: none repeat scroll 0 0 #EEE;
 	border-width: 0;
 	padding: 4px 6px 0px 6px;
 	cursor: pointer;
@@ -403,7 +398,8 @@ ul.context-menu-list li {
 }
 
 .htContextMenu table tbody tr td.current {
-	background: rgb(233, 233, 233);
+	background: none repeat scroll 0 0 #367F86;
+	color: #EEE;
 }
 
 .htContextMenu table tbody tr td.htSeparator {

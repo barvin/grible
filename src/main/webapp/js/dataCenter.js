@@ -21,16 +21,6 @@ $(window).on("load", function() {
 
 $().ready(initialize());
 
-var source = '<div class="table-row key-row">' + '{{#if isIndex}}' + '<div class="table-cell ui-cell index-header-cell">Index</div>' + '{{/if}}' + '{{#each keys}}'
-		+ '<div class="table-cell ui-cell key-cell" key-order="{{order}}" id="{{id}}">{{text}}</div>' + '{{/each}}' + '{{#if info}}'
-		+ '<div class="table-cell ui-cell info-key-cell">{{tables}}</div>' + '<div class="table-cell ui-cell info-key-cell">{{storages}}</div>' + '{{/if}}' + '</div>'
-		+ '{{#each values}}' + '<div class="table-row ui-row value-row">' + '{{#if index}}' + '{{#with index}}'
-		+ '<div class="table-cell ui-cell index-cell" id="{{id}}">{{order}}</div>' + '{{/with}}' + '{{/if}}' + '{{#each values}}' + '<div class="table-cell ui-cell value-cell'
-		+ '{{#if isStorage}} storage-cell {{/if}} {{#if isEnum}} enum-cell {{/if}}"' + 'rowid="{{rowid}}" keyid="{{keyid}}" id="{{id}}">{{text}}</div>' + '{{/each}}'
-		+ '{{#if info}}' + '<div class="table-cell ui-cell info-cell">{{tables}}</div>' + '<div class="table-cell ui-cell info-cell">{{storages}}</div>' + '{{/if}}' + '</div>'
-		+ '{{/each}}';
-var template = Handlebars.compile(source);
-
 function initialize() {
 
 	$(document).ajaxError(
@@ -589,60 +579,6 @@ function initAddDataItemDialog() {
 	});
 }
 
-function initFillDialog() {
-	initDialog();
-	var $keyId = $("#dialog-btn-fill").attr("keyid");
-
-	if ($("div.enum-cell[keyid='" + $keyId + "']").length > 0) {
-		var $args = {
-			keyid : $keyId,
-			tableid : tableId,
-			product : productId,
-			content : ""
-		};
-		$.post("../GetEnumValues", $args, function(data) {
-			$("div.dialog-edit").html(data);
-		});
-	} else {
-		$("input.fill-value").focus();
-
-		$("input.fill-value").keypress(function(event) {
-			if (event.which === 13) {
-				submitFill();
-			}
-		});
-	}
-
-	$("#dialog-btn-fill").click(function() {
-		submitFill();
-	});
-
-	function submitFill() {
-		var $value;
-		if ($("input.fill-value").length > 0) {
-			$value = $("input.fill-value").val();
-		} else {
-			$value = $("select.enum-values").find("option:selected").text();
-		}
-		var $columnChanged = false;
-		$("div[keyid='" + $keyId + "']").each(function(i) {
-			if ($(this).text() != $value) {
-				$(this).text($value);
-				$(this).addClass("modified-value-cell");
-				$columnChanged = true;
-			}
-		});
-		if ($columnChanged) {
-			enableSaveButton();
-		}
-		$(".ui-dialog").remove();
-	}
-
-	$(".btn-cancel").click(function() {
-		$(".ui-dialog").remove();
-	});
-}
-
 function initAddCategoryDialog() {
 	initDialog();
 	$("input.category-name").focus();
@@ -934,10 +870,7 @@ function initTopPanel() {
 
 	$("#btn-save-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
-			$(".data-item-selected > .changed-sign").remove();
-			$(this).removeClass("button-enabled");
-			$(this).addClass("button-disabled");
-
+			disableSaveButton();
 			var $tableContainer = $("#table-container").handsontable('getInstance');
 			var $keyNames = [];
 			$(".handsontable thead th span.colHeader").each(function(i) {
@@ -1247,12 +1180,12 @@ function loadTableValues(args) {
 			manualColumnMove : true,
 			manualColumnResize : true,
 			contextMenu : true,
-			width : $("#table-container").width(),
-			height : $("#table-container").height(),
 			rowHeaders : $data.isIndex,
 			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
 			cells : setColumnTypes,
+//			width : $("#table-container").width(),
+//			height : $("#table-container").height(),
 			autoWrapRow : true,
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
@@ -1331,12 +1264,10 @@ function loadTableValues(args) {
 				}
 				setModifiedCells();
 			},
-			afterInit : function() {
-				var $instance = $tableContainer.handsontable('getInstance');
-				$instance.validateCells(function(callback) {
-					callback;
-				});
-
+			afterRender : function() {
+				if ($(".handsontable td.htInvalid").length > 0) {
+					disableSaveButton();
+				}
 				$(".handsontable thead th").each(function(i) {
 					if (i > 0) {
 						var $colHeader = $(this);
@@ -1398,13 +1329,58 @@ function loadTableValues(args) {
 										var isStorageIdChanged = opt.inputs["storageselect"].$input.val() != storageSelected;
 										var isEnumIdChanged = opt.inputs["enumselect"].$input.val() != enumSelected;
 										if (isTextTypeChanged || isStorageTypeChanged || isEnumTypeChanged || isStorageIdChanged || isEnumIdChanged) {
+											var $tableInstance = $tableContainer.handsontable('getInstance');
 											if (opt.inputs["textradio"].$input.is(":checked")) {
+												$columns[i - 1].type = "text";
+												$columns[i - 1].allowInvalid = true;
+												$tableInstance.updateSettings({
+													cells : setColumnTypes
+												});
+
+												$colTypes[i - 1] = "text";
+												$colRefids[i - 1] = "0";
 												$colHeader.attr("type", "text");
 												$colHeader.attr("refid", "0");
 											} else if (opt.inputs["storageradio"].$input.is(":checked")) {
+												$columns[i - 1].type = "text";
+												$columns[i - 1].allowInvalid = false;
+												$tableInstance.updateSettings({
+													cells : setColumnTypes
+												});
+												$tableInstance.validateCells(function() {
+													$tableInstance.render();
+												});
+
+												$colTypes[i - 1] = "storage";
+												$colRefids[i - 1] = opt.inputs["storageselect"].$input.val();
 												$colHeader.attr("type", "storage");
 												$colHeader.attr("refid", opt.inputs["storageselect"].$input.val());
 											} else {
+												$columns[i - 1].type = "dropdown";
+												$columns[i - 1].allowInvalid = false;
+												$.post("../GetEnumValues", {
+													tableid : opt.inputs["enumselect"].$input.val(),
+													product : productId
+												}, function(options) {
+													var optionsArray = jQuery.parseJSON(options);
+													$columns[i - 1].source = optionsArray;
+													$tableInstance.updateSettings({
+														cells : setColumnTypes
+													});
+													var changes = [];
+													for (var j = 0; j < $tableInstance.countRows(); j++) {
+														if (optionsArray.indexOf($tableInstance.getDataAtCell(j, (i - 1))) == -1) {
+															changes.push([ j, (i - 1), optionsArray[0] ]);
+														}
+													}
+													$tableInstance.setDataAtCell(changes);
+													$tableInstance.validateCells(function() {
+														$tableInstance.render();
+													});
+												});
+
+												$colTypes[i - 1] = "enumeration";
+												$colRefids[i - 1] = opt.inputs["enumselect"].$input.val();
 												$colHeader.attr("type", "enumeration");
 												$colHeader.attr("refid", opt.inputs["enumselect"].$input.val());
 											}
@@ -1450,8 +1426,7 @@ function loadTableValues(args) {
 						});
 					}
 				});
-
-			}
+			},
 		});
 
 		function setModifiedCells() {
@@ -1752,6 +1727,12 @@ function initParameterTypeDialog() {
 	$(".btn-cancel").click(function() {
 		$(".ui-dialog").remove();
 	});
+}
+
+function disableSaveButton() {
+	$(".data-item-selected > .changed-sign").remove();
+	$("#btn-save-data-item").removeClass("button-enabled");
+	$("#btn-save-data-item").addClass("button-disabled");
 }
 
 function enableSaveButton() {

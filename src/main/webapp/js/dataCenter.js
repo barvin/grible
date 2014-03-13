@@ -1109,12 +1109,6 @@ function initGeneratedClassDialog() {
 	});
 }
 
-function highlight(element) {
-	element.effect("highlight", {
-		color : "#FFF3B3"
-	}, 600);
-}
-
 function loadTableValues(args) {
 	$.post("../GetTableValues", args, function(res) {
 
@@ -1439,17 +1433,11 @@ function loadTableValues(args) {
 			}
 		}
 
-		initTableValues(jQuery);
+		$("#waiting-bg").removeClass("loading");
 		if (isChrome()) {
 			$("#main .table-cell").removeClass("floatleft");
 		}
 	});
-}
-
-function initTableValues() {
-
-	$("#waiting-bg").removeClass("loading");
-
 }
 
 function isNumber(n) {
@@ -1564,169 +1552,6 @@ function initTooltipCells(elements) {
 			}
 		}
 	}
-}
-
-function initParameterTypeDialog() {
-	initDialog();
-	$("input[value='storage']").click(function() {
-		onStorageClick();
-	});
-
-	$("#label-option-storage").click(function() {
-		$("input[value='storage']").click();
-		onStorageClick();
-	});
-
-	function onStorageClick() {
-		$(".select-storage").prop("disabled", false);
-		$(".select-enum").prop("disabled", true);
-	}
-
-	$("input[value='text']").click(function() {
-		onTextClick();
-	});
-
-	$("#label-option-text").click(function() {
-		$("input[value='text']").click();
-		onTextClick();
-	});
-
-	function onTextClick() {
-		$(".select-storage").prop("disabled", true);
-		$(".select-enum").prop("disabled", true);
-	}
-
-	$("input[value='enumeration']").click(function() {
-		onEnumClick();
-	});
-
-	$("#label-option-enumeration").click(function() {
-		$("input[value='enumeration']").click();
-		onEnumClick();
-	});
-
-	function onEnumClick() {
-		$(".select-storage").prop("disabled", true);
-		$(".select-enum").prop("disabled", false);
-	}
-
-	$("#btn-apply-type").click(function() {
-		var $id = $(this).attr("keyid");
-		var $order = $(this).attr("keyorder");
-		var $dialog = $("#parameter-type-dialog");
-		var $type = $dialog.find("input:checked").val();
-		var $select;
-		if ($type == "storage") {
-			$select = $dialog.find("select.select-storage");
-		} else {
-			$select = $dialog.find("select.select-enum");
-		}
-		var $refId = $select.find("option:selected").val();
-		var $args;
-		if (isJson()) {
-			$args = {
-				keyorder : $order,
-				type : $type,
-				refId : $refId,
-				tableid : tableId,
-				product : productId
-			};
-		} else {
-			$args = {
-				keyId : $id,
-				type : $type,
-				refId : $refId
-			};
-		}
-		$.post("../ApplyParameterType", $args, function(data) {
-			if (data == "success") {
-				noty({
-					type : "success",
-					text : "New type was successfully applied.",
-					timeout : 3000
-				});
-				$(".ui-dialog").remove();
-				if (isJson()) {
-					loadTableValues({
-						id : tableId,
-						product : productId
-					});
-				} else {
-					var $column = $("div[keyid='" + $id + "']");
-					if ($type == "text") {
-						$column.find("div.tooltip").remove();
-						$column.off();
-						$column.removeClass("storage-cell");
-						initValueCells($column);
-						modifyKeyCell();
-					} else if ($type == "storage") {
-						$column.addClass("storage-cell");
-						initTooltipCells($column);
-						modifyKeyCell();
-					} else {
-						$column.addClass("enum-cell");
-						initEnumCells($column);
-						modifyKeyCell();
-					}
-				}
-			} else if (data == "need-correction") {
-				var message;
-				if ($type == "storage") {
-					message = "Some values in the column are not numeric." + " Would you like to correct these values to the valid format ('0')?";
-				} else {
-					message = "Some values in the column are not from the enumeration or empty." + " Would you like to correct these values to one of the enumeration values?";
-				}
-
-				noty({
-					type : "confirm",
-					text : message,
-					buttons : [ {
-						addClass : 'btn btn-primary ui-button',
-						text : 'Correct values',
-						onClick : function($noty) {
-							$(".ui-dialog").remove();
-							$noty.close();
-							$.post("../CorrectValuesForParameterType", $args, function(data) {
-								if (data == "success") {
-									loadTableValues({
-										id : tableId,
-										product : productId
-									});
-								} else {
-									noty({
-										type : "error",
-										text : data
-									});
-								}
-							});
-						}
-					}, {
-						addClass : 'btn btn-danger ui-button',
-						text : 'Cancel',
-						onClick : function($noty) {
-							$noty.close();
-							$(".ui-dialog").remove();
-						}
-					} ]
-				});
-
-			} else if (data == "not-changed") {
-				noty({
-					text : "This parameter is already has this type.",
-					timeout : 3000
-				});
-			} else {
-				noty({
-					type : "error",
-					text : data
-				});
-			}
-		});
-	});
-
-	$(".btn-cancel").click(function() {
-		$(".ui-dialog").remove();
-	});
 }
 
 function disableSaveButton() {

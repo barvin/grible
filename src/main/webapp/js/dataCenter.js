@@ -1460,23 +1460,14 @@ function initTooltipCells(elements) {
 
 	function initTooltipCellsOnClick(value) {
 		var $value = value;
-		if (($value.has("span.old-value").length == 0) && ($value.text() != "0") && ($value.text() != "") && (!$value.hasClass("modified-value-cell"))) {
+		if (($value.text() != "0") && ($value.text() != "")) {
 			if ($value.has("div.tooltip").length == 0) {
 				var $content = $value.text();
-				var $args;
-				if (isJson()) {
-					$args = {
+				var $args = {
 						product : productId,
-						tableid : tableId,
-						keyorder : $value.attr('keyid'),
+						refid : $value.attr("refid"),
 						content : $content
 					};
-				} else {
-					$args = {
-						id : $value.attr('id'),
-						content : $content
-					};
-				}
 				$.post("../GetStorageTooltip", $args, function(data) {
 					$value.html(data);
 					var $tooltip = $value.find("div.tooltip");

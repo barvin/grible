@@ -275,7 +275,6 @@ public class JsonDao implements Dao {
 
 	public void updateTable(Table table) throws Exception {
 		table.getTableJson().setClassName(table.getClassName());
-		table.getTableJson().setShowUsage(table.isShowUsage());
 		table.getTableJson().setShowWarning(table.isShowWarning());
 		table.save();
 	}

@@ -6,7 +6,7 @@ public class UiTable {
 	private boolean isIndex;
 	private KeyJson[] keys;
 	private String[][] values;
-	private UiInfo info;
+	private UiRowsUsage info;
 	private UiColumn[] columns;
 	private int[] storageIds;
 	private String[] storages;
@@ -29,11 +29,11 @@ public class UiTable {
 		this.keys = keys;
 	}
 
-	public UiInfo getInfo() {
+	public UiRowsUsage getInfo() {
 		return info;
 	}
 
-	public void setInfo(UiInfo info) {
+	public void setInfo(UiRowsUsage info) {
 		this.info = info;
 	}
 

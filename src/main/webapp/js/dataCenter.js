@@ -974,28 +974,52 @@ function initTopPanel() {
 function setRowsUsage(usage) {
 	$("#data-item-options").off("mouseleave");
 	$("#data-item-options").hide(1);
-	$("#waiting-bg").addClass("loading");
 	$("#data-item-options").on("mouseleave", function() {
 		$("#data-item-options").slideUp(150);
 	});
-	$.post("../SetRowsUsage", {
-		id : tableId,
-		product : productId,
-		usage : usage
-	}, function(data) {
-		$("#waiting-bg").removeClass("loading");
-		if (data == "success") {
-			loadTableValues({
-				id : tableId,
-				product : productId
-			});
-		} else {
-			noty({
-				type : "error",
-				text : data
-			});
-		}
-	});
+	if (usage) {
+		$("#waiting-bg").addClass("loading");
+		$.post("../GetRowsUsage", {
+			tableid : tableId,
+			product : productId
+		}, function(res) {
+			$("#waiting-bg").removeClass("loading");
+			try {
+				var $rowsUsage = jQuery.parseJSON(res);
+				var $tableInstance = $("#table-container").handsontable('getInstance');
+				var countCols = $tableInstance.countCols();
+				$tableInstance.alter('insert_col', countCols, 2);
+				countCols += 2;
+
+				var changes = [];
+				for (var i = 0; i < $tableInstance.countRows(); i++) {
+					changes.push([ i, countCols - 2, $rowsUsage.tables[i] ]);
+					changes.push([ i, countCols - 1, $rowsUsage.storages[i] ]);
+				}
+				$tableInstance.setDataAtCell(changes);
+
+				$tableInstance.updateSettings({
+					cells : function(row, col, prop) {
+						var cellProperties = {};
+						if (countCols - col < 3) {
+							cellProperties.readOnly = true;
+						}
+						return cellProperties;
+					}
+				});
+
+			} catch (err) {
+				noty({
+					type : "error",
+					text : err.message
+				});
+			}
+		});
+	} else {
+		var $tableInstance = $("#table-container").handsontable('getInstance');
+		var countCols = $tableInstance.countCols();
+		$tableInstance.alter('remove_col', countCols - 2, 2);
+	}
 }
 
 function setDuplicateWarning(show) {
@@ -1166,6 +1190,7 @@ function loadTableValues(args) {
 				$enums[$data.enumerationIds[i]] = $data.enumerations[i];
 			}
 		}
+		var $isRowsUsageShown = false;
 
 		var $tableContainer = $("#table-container");
 		$tableContainer.handsontable({
@@ -1220,20 +1245,23 @@ function loadTableValues(args) {
 				}
 			},
 			afterCreateCol : function(index, amount) {
-				enableSaveButton();
-				$colTypes.splice(index, 0, "text");
-				$colRefids.splice(index, 0, "0");
-				for (var i = 0; i < $changedCells.length; i++) {
-					if ($changedCells[i].col >= index) {
-						$changedCells[i].col++;
+				if (amount == 1) {
+					enableSaveButton();
+					$colTypes.splice(index, 0, "text");
+					$colRefids.splice(index, 0, "0");
+					for (var i = 0; i < $changedCells.length; i++) {
+						if ($changedCells[i].col >= index) {
+							$changedCells[i].col++;
+						}
 					}
+					setModifiedCells();
+					$columns.splice(index, 0, {
+						type : "text",
+						allowInvalid : true
+					});
+				} else if (amount == 2) {
+					$isRowsUsageShown = true;
 				}
-				setModifiedCells();
-				$columns.splice(index, 0, {
-					type : "text",
-					allowInvalid : true
-				});
-				setColumnTypes();
 			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
@@ -1257,12 +1285,33 @@ function loadTableValues(args) {
 				}
 				setModifiedCells();
 			},
+			afterInit : function() {
+				if (tableType == "enumeration") {
+					var $tableInstance = $tableContainer.handsontable('getInstance');
+					$tableInstance.updateSettings({
+						contextMenu : [ 'row_above', 'row_below', 'hsep1', 'remove_row', 'hsep3', 'undo', 'redo' ]
+					});
+				}
+			},
 			afterRender : function() {
 				if ($(".handsontable td.htInvalid").length > 0) {
 					disableSaveButton();
 				}
+				if ($isRowsUsageShown) {
+					var countCols = $(".handsontable thead th").length;
+					$(".handsontable thead th span.colHeader").each(function(i) {
+						if (i == countCols - 3) {
+							console.log($(this).text());
+							$(this).text("Used in tables");
+						} else if (i == countCols - 2) {
+							console.log($(this).text());
+							$(this).text("Used in storages");
+						}
+					});
+					$isRowsUsageShown = false;
+				}
 				$(".handsontable thead th").each(function(i) {
-					if ($(this).find("span.colHeader").length > 0) {
+					if (($(this).find("span.colHeader").length > 0) && (tableType != "enumeration") && ($(this).attr("type") != "undefined")) {
 						var $colHeader = $(this);
 						var $colName = $colHeader.find("span.colHeader").text();
 
@@ -1419,9 +1468,7 @@ function loadTableValues(args) {
 						});
 					}
 				});
-
 				initTooltipCells($(".storage-cell"));
-
 			},
 		});
 
@@ -1464,10 +1511,10 @@ function initTooltipCells(elements) {
 			if ($value.has("div.tooltip").length == 0) {
 				var $content = $value.text();
 				var $args = {
-						product : productId,
-						refid : $value.attr("refid"),
-						content : $content
-					};
+					product : productId,
+					refid : $value.attr("refid"),
+					content : $content
+				};
 				$.post("../GetStorageTooltip", $args, function(data) {
 					$value.html(data);
 					var $tooltip = $value.find("div.tooltip");

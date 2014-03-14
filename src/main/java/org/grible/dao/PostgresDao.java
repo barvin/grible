@@ -96,7 +96,6 @@ public class PostgresDao implements Dao {
 			result.setParentId(rs.getInt("parentid"));
 		}
 		result.setClassName(rs.getString("className"));
-		result.setShowUsage(rs.getBoolean("showusage"));
 		result.setShowWarning(rs.getBoolean("showwarning"));
 		result.setModifiedTime(rs.getTimestamp("modifiedtime"));
 		return result;
@@ -1083,7 +1082,7 @@ public class PostgresDao implements Dao {
 		}
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
-				+ table.getParentId() + ", showusage=" + table.isShowUsage() + ", showwarning=" + table.isShowWarning()
+				+ table.getParentId() + ", showwarning=" + table.isShowWarning()
 				+ ", modifiedtime='" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(table.getModifiedTime())
 				+ "' WHERE id=" + table.getId());
 

@@ -91,12 +91,8 @@ public class GetTopPanel extends HttpServlet {
 				
 				responseHtml.append("<div id=\"data-item-options\">");
 				
-				String usage = "";
-				if (table.isShowUsage()) {
-					usage = "checked=\"checked\"";
-				}
 				responseHtml.append("<div id=\"btn-show-usage\" class=\"checkbox-option\">");
-				responseHtml.append("<input id=\"cbx-show-usage\" type=\"checkbox\" ").append(usage).append(" />");
+				responseHtml.append("<input id=\"cbx-show-usage\" type=\"checkbox\" />");
 				responseHtml.append("<span class=\"icon-button-text\">Show rows usage</span></div>");
 
 				String warning = "";

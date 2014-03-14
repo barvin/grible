@@ -31,7 +31,6 @@ public class Table {
 	private Integer parentId;
 	private String name;
 	private String className;
-	private boolean showUsage;
 	private boolean showWarning;
 	private Date modifiedTime;
 
@@ -91,14 +90,6 @@ public class Table {
 		this.categoryId = categoryId;
 	}
 
-	public boolean isShowUsage() {
-		return showUsage;
-	}
-
-	public void setShowUsage(boolean showUsage) {
-		this.showUsage = showUsage;
-	}
-
 	public Integer getParentId() {
 		return parentId;
 	}
@@ -145,7 +136,6 @@ public class Table {
 		br.close();
 		setType(tableJson.getType());
 		setClassName(tableJson.getClassName());
-		setShowUsage(tableJson.isShowUsage());
 		setShowWarning(tableJson.isShowWarning());
 		this.tableJson = tableJson;
 	}

@@ -12,8 +12,6 @@ package org.grible.servlets.ui.panels;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -22,12 +20,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.json.ui.UiColumn;
-import org.grible.json.ui.UiInfo;
 import org.grible.json.ui.UiTable;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -46,7 +42,6 @@ import com.google.gson.Gson;
 @WebServlet("/GetTableValues")
 public class GetTableValues extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private boolean showUsage;
 	private TableType tableType;
 	private JsonDao jDao;
 	private PostgresDao pDao;
@@ -83,7 +78,6 @@ public class GetTableValues extends HttpServlet {
 			}
 
 			tableType = table.getType();
-			showUsage = table.isShowUsage();
 
 			UiTable uiTable = new UiTable();
 			if (isJson()) {
@@ -186,46 +180,10 @@ public class GetTableValues extends HttpServlet {
 
 		String[][] values = tableJson.getValues();
 		uiTable.setValues(values);
-
-		if (showUsage) {
-			UiInfo uiInfo = new UiInfo();
-			uiInfo.setTables("Used in tables");
-			uiInfo.setTables("Used in storages");
-			uiTable.setInfo(uiInfo);
-		}
 	}
 
 	private boolean isJson() throws Exception {
 		return GlobalSettings.getInstance().getAppType() == AppTypes.JSON;
 	}
 
-	private String getTestTableOccurences(List<Table> tables) throws Exception {
-		List<String> tableNames = new ArrayList<String>();
-		for (int i = 0; i < tables.size(); i++) {
-			if (TableType.TABLE == tables.get(i).getType()) {
-				if (!tableNames.contains(tables.get(i).getName())) {
-					tableNames.add(tables.get(i).getName());
-				}
-			} else if (TableType.PRECONDITION == tables.get(i).getType()
-					|| TableType.POSTCONDITION == tables.get(i).getType()) {
-				String tableName = isJson() ? jDao.getTable(
-						jDao.getParentTableId(tables.get(i).getId(), productId, tables.get(i).getType()), productId)
-						.getName() : pDao.getTable(tables.get(i).getParentId()).getName();
-				if (!tableNames.contains(tableName)) {
-					tableNames.add(tableName);
-				}
-			}
-		}
-		return StringUtils.join(tableNames, ", ");
-	}
-
-	private String getDataStorageOccurences(List<Table> tables) throws SQLException {
-		List<String> tableNames = new ArrayList<String>();
-		for (int i = 0; i < tables.size(); i++) {
-			if (TableType.STORAGE == tables.get(i).getType()) {
-				tableNames.add(tables.get(i).getName());
-			}
-		}
-		return StringUtils.join(tableNames, ", ");
-	}
 }

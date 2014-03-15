@@ -1,4 +1,6 @@
 var $changedCells = [];
+var $isRowsUsageShown = false;
+var $isRowsUsageJustTurnedOn = false;
 
 $(window).on("load", function() {
 	var docHeight = $(window).height() - 95;
@@ -873,8 +875,11 @@ function initTopPanel() {
 			disableSaveButton();
 			var $tableContainer = $("#table-container").handsontable('getInstance');
 			var $keyNames = [];
+			var $colHeadersCount = $(".handsontable thead th span.colHeader").length;
 			$(".handsontable thead th span.colHeader").each(function(i) {
-				$keyNames[i] = $(this).text();
+				if (!$isRowsUsageShown || ($isRowsUsageShown && i < $colHeadersCount - 2)) {
+					$keyNames[i] = $(this).text();
+				}
 			});
 			var $keyTypes = [];
 			var $keyRefids = [];
@@ -882,6 +887,9 @@ function initTopPanel() {
 			var $data = $tableContainer.getData();
 			$.each($data, function(index, rowValues) {
 				var row = "[\"";
+				if ($isRowsUsageShown) {
+					rowValues.splice(rowValues.length - 2, 2);
+				}
 				row += rowValues.join("\",\"");
 				row += "\"]";
 				$values.push(row);
@@ -977,6 +985,7 @@ function setRowsUsage(usage) {
 	$("#data-item-options").on("mouseleave", function() {
 		$("#data-item-options").slideUp(150);
 	});
+	$isRowsUsageShown = usage;
 	if (usage) {
 		$("#waiting-bg").addClass("loading");
 		$.post("../GetRowsUsage", {
@@ -985,6 +994,7 @@ function setRowsUsage(usage) {
 		}, function(res) {
 			$("#waiting-bg").removeClass("loading");
 			try {
+				$isRowsUsageJustTurnedOn = true;
 				var $rowsUsage = jQuery.parseJSON(res);
 				var $tableInstance = $("#table-container").handsontable('getInstance');
 				var countCols = $tableInstance.countCols();
@@ -997,15 +1007,20 @@ function setRowsUsage(usage) {
 					changes.push([ i, countCols - 1, $rowsUsage.storages[i] ]);
 				}
 				$tableInstance.setDataAtCell(changes);
+				var $newColHeader = $tableInstance.getColHeader();
+				$newColHeader[$newColHeader.length - 2] = "Used in tables";
+				$newColHeader[$newColHeader.length - 1] = "Used in storages";
 
 				$tableInstance.updateSettings({
+					width : $("#table-container").width(),
 					cells : function(row, col, prop) {
 						var cellProperties = {};
 						if (countCols - col < 3) {
 							cellProperties.readOnly = true;
 						}
 						return cellProperties;
-					}
+					},
+					colHeaders : $newColHeader
 				});
 
 			} catch (err) {
@@ -1162,7 +1177,9 @@ function loadTableValues(args) {
 		var $columns = $data.columns;
 		var setColumnTypes = function(row, col, prop) {
 			var cellProperties = {};
+			console.log("$columns = " + $columns.length);
 			if (col <= $columns.length - 1) {
+				cellProperties.readOnly = false;
 				cellProperties.type = $columns[col].type;
 				cellProperties.allowInvalid = $columns[col].allowInvalid;
 				if ($columns[col].type === "dropdown") {
@@ -1172,6 +1189,8 @@ function loadTableValues(args) {
 					cellProperties.renderer = storageCellRenderer;
 					cellProperties.validator = storageValidatorRegExp;
 				}
+			} else if (col - $columns.length < 2) {
+				cellProperties.readOnly = true;
 			}
 			return cellProperties;
 		};
@@ -1190,7 +1209,6 @@ function loadTableValues(args) {
 				$enums[$data.enumerationIds[i]] = $data.enumerations[i];
 			}
 		}
-		var $isRowsUsageShown = false;
 
 		var $tableContainer = $("#table-container");
 		$tableContainer.handsontable({
@@ -1202,15 +1220,15 @@ function loadTableValues(args) {
 			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
 			cells : setColumnTypes,
-			// width : $("#table-container").width(),
-			// height : $("#table-container").height(),
+			width : $("#table-container").width(),
+			height : $("#table-container").height(),
 			autoWrapRow : true,
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
 				TH.setAttribute("refid", $colRefids[col]);
 			},
 			afterChange : function(changes, source) {
-				if (changes != null) {
+				if (changes != null && !$isRowsUsageJustTurnedOn) {
 					var isDataChanged = false;
 					for (var i = 0; i < changes.length; i++) {
 						if (changes[i][2] !== changes[i][3]) {
@@ -1225,6 +1243,9 @@ function loadTableValues(args) {
 						enableSaveButton();
 						setModifiedCells();
 					}
+				}
+				if ($isRowsUsageJustTurnedOn) {
+					$isRowsUsageJustTurnedOn = false;
 				}
 			},
 			afterCreateRow : function(index, amount) {
@@ -1259,8 +1280,11 @@ function loadTableValues(args) {
 						type : "text",
 						allowInvalid : true
 					});
-				} else if (amount == 2) {
-					$isRowsUsageShown = true;
+					if ($isRowsUsageShown) {
+						$tableContainer.handsontable("updateSettings", {
+							cells : setColumnTypes
+						});
+					}
 				}
 			},
 			afterRemoveRow : function(index, amount) {
@@ -1275,15 +1299,17 @@ function loadTableValues(args) {
 				setModifiedCells();
 			},
 			afterRemoveCol : function(index, amount) {
-				enableSaveButton();
-				for (var i = 0; i < $changedCells.length; i++) {
-					if ($changedCells[i].col === index) {
-						$changedCells.slice(i, 1);
-					} else if ($changedCells[i].col > index) {
-						$changedCells[i].col--;
+				if (amount == 1) {
+					enableSaveButton();
+					for (var i = 0; i < $changedCells.length; i++) {
+						if ($changedCells[i].col === index) {
+							$changedCells.slice(i, 1);
+						} else if ($changedCells[i].col > index) {
+							$changedCells[i].col--;
+						}
 					}
+					setModifiedCells();
 				}
-				setModifiedCells();
 			},
 			afterInit : function() {
 				if (tableType == "enumeration") {
@@ -1296,19 +1322,6 @@ function loadTableValues(args) {
 			afterRender : function() {
 				if ($(".handsontable td.htInvalid").length > 0) {
 					disableSaveButton();
-				}
-				if ($isRowsUsageShown) {
-					var countCols = $(".handsontable thead th").length;
-					$(".handsontable thead th span.colHeader").each(function(i) {
-						if (i == countCols - 3) {
-							console.log($(this).text());
-							$(this).text("Used in tables");
-						} else if (i == countCols - 2) {
-							console.log($(this).text());
-							$(this).text("Used in storages");
-						}
-					});
-					$isRowsUsageShown = false;
 				}
 				$(".handsontable thead th").each(function(i) {
 					if (($(this).find("span.colHeader").length > 0) && (tableType != "enumeration") && ($(this).attr("type") != "undefined")) {

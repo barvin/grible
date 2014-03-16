@@ -117,6 +117,57 @@
 				class="ui-button">
 		</div>
 	</div>
+	<div id="json-settings" class="setting-table hiddensettings">
+		<input type="radio" name="exportfromdb" value="false"
+			checked="checked"> I do not have any data to export from
+		PostgreSQL database <br> <input type="radio" name="exportfromdb"
+			value="true">I have some data in the Grible database, I would
+		like to export it to JSON files
+		<div class="table">
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database host:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dbhost" value="localhost" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database port:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dbport" value="5432" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database name:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dbname" value="grible" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database user name:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dblogin" value="postgres" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database user password:</div>
+				<div class="table-cell dialog-cell">
+					<input type="password" class="dialog-edit" name="dbpswd" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">
+					Destination path on your computer:
+				</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="destination" value="C:\Tools\Grible\Temp" disabled="disabled">
+				</div>
+			</div>
+		</div>
+		<div class="dialog-buttons right">
+			<input id="btn-export" type="button" value="Finish"
+				class="ui-button">
+		</div>
+	</div>
 	<div id="console" class="hiddensettings"></div>
 	<div id="success"></div>
 	<div id="footer" class="page-bottom">

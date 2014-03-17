@@ -3,17 +3,14 @@ package org.grible.model.json;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.grible.json.ui.UiColumn;
 import org.grible.model.TableType;
 
 public class TableJson {
 	private TableType type;
 	private String className;
-	private boolean showUsage;
 	private boolean showWarning;
 	private KeyJson[] keys;
 	private String[][] values;
-	private UiColumn[] columns;
 
 	public TableType getType() {
 		return type;
@@ -29,14 +26,6 @@ public class TableJson {
 
 	public void setClassName(String className) {
 		this.className = className;
-	}
-
-	public boolean isShowUsage() {
-		return showUsage;
-	}
-
-	public void setShowUsage(boolean showUsage) {
-		this.showUsage = showUsage;
 	}
 
 	public boolean isShowWarning() {
@@ -78,13 +67,4 @@ public class TableJson {
 			}
 		}
 	}
-
-	public UiColumn[] getColumns() {
-		return columns;
-	}
-
-	public void setColumns(UiColumn[] columns) {
-		this.columns = columns;
-	}
-
 }

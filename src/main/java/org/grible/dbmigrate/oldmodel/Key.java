@@ -8,19 +8,37 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.grible.model;
+package org.grible.dbmigrate.oldmodel;
 
-public class Row {
+public class Key {
 	private int id;
 	private int tableId;
+	private String name;
 	private int order;
+	private int referenceTableId;
 
-	public Row(int id) {
+	public Key(int id) {
 		this.id = id;
 	}
 
 	public int getId() {
 		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setReferenceTableId(int referenceTableId) {
+		this.referenceTableId = referenceTableId;
+	}
+
+	public int getReferenceTableId() {
+		return referenceTableId;
 	}
 
 	public int getOrder() {
@@ -30,11 +48,12 @@ public class Row {
 	public void setOrder(int order) {
 		this.order = order;
 	}
+
 	public int getTableId() {
 		return tableId;
 	}
 
-	public void setTableId(int storageId) {
-		this.tableId = storageId;
+	public void setTableId(int tableId) {
+		this.tableId = tableId;
 	}
 }

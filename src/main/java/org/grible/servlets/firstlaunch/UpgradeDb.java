@@ -21,14 +21,14 @@ import org.postgresql.util.PSQLException;
 /**
  * Servlet implementation class DBConnect
  */
-@WebServlet("/InitDB")
-public class InitDB extends HttpServlet {
+@WebServlet("/UpgradeDb")
+public class UpgradeDb extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public InitDB() {
+	public UpgradeDb() {
 		super();
 	}
 
@@ -41,19 +41,14 @@ public class InitDB extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		try {
-			boolean createNewDb = Boolean.parseBoolean(request.getParameter("createnew"));
 			PostgresDao dao = new PostgresDao();
-			if (createNewDb) {
-				migrateCleanly(request, dao, "grible_init.sql");
-			} else {
-				String currentVersion = dao.getCurrentDbVersion();
-				List<Migration> migrations = Migrations.getMigrationsSinceVersion(currentVersion);
-				for (Migration migration : migrations) {
-					String fileName = migration.getFileName();
-					migrateCleanly(request, dao, fileName);
-					if (migration.getVersion().equals("0.9.0")) {
-						MigrationActions.moveDataToKeysAndValuesColumns();
-					}
+			String currentVersion = dao.getCurrentDbVersion();
+			List<Migration> migrations = Migrations.getMigrationsSinceVersion(currentVersion);
+			for (Migration migration : migrations) {
+				String fileName = migration.getFileName();
+				migrateCleanly(request, dao, fileName);
+				if (migration.getVersion().equals("0.9.0")) {
+					MigrationActions.moveDataToKeysAndValuesColumns();
 				}
 			}
 			out.print("Done.");
@@ -71,8 +66,8 @@ public class InitDB extends HttpServlet {
 		}
 	}
 
-	private void migrateCleanly(HttpServletRequest request, PostgresDao dao, String fileName) throws Exception, SQLException,
-			PSQLException {
+	private void migrateCleanly(HttpServletRequest request, PostgresDao dao, String fileName) throws Exception,
+			SQLException, PSQLException {
 		String query = Migrations.getSQLQuery(request, fileName);
 		try {
 			dao.executeUpdate(query);
@@ -82,5 +77,4 @@ public class InitDB extends HttpServlet {
 			}
 		}
 	}
-
 }

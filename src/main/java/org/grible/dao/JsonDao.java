@@ -132,7 +132,6 @@ public class JsonDao implements Dao {
 		Table table = new Table(file);
 		table.getTableJson().setType(type);
 		table.getTableJson().setClassName(className);
-		table.getTableJson().setShowUsage(false);
 		table.getTableJson().setShowWarning(true);
 		table.save();
 		table.setTableJson();

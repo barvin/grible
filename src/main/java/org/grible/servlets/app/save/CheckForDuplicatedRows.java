@@ -24,10 +24,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
-import org.grible.model.Row;
+import org.grible.dbmigrate.oldmodel.Row;
+import org.grible.dbmigrate.oldmodel.Value;
 import org.grible.model.Table;
 import org.grible.model.TableType;
-import org.grible.model.Value;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 

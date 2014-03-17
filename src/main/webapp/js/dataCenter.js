@@ -1177,7 +1177,6 @@ function loadTableValues(args) {
 		var $columns = $data.columns;
 		var setColumnTypes = function(row, col, prop) {
 			var cellProperties = {};
-			console.log("$columns = " + $columns.length);
 			if (col <= $columns.length - 1) {
 				cellProperties.readOnly = false;
 				cellProperties.type = $columns[col].type;
@@ -1373,9 +1372,14 @@ function loadTableValues(args) {
 									name : "Save",
 									icon : "save",
 									callback : function(key, opt) {
+										var $tableInstance = $tableContainer.handsontable('getInstance');
 										if (opt.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
-											$colHeader.find("span.colHeader").text(opt.inputs["name"].$input.val());
 											$colHeader.attr("modified", true);
+											var $newColHeader = $tableInstance.getColHeader();
+											$newColHeader[i - 1] = opt.inputs["name"].$input.val();
+											$tableInstance.updateSettings({
+												colHeaders : $newColHeader
+											});
 											enableSaveButton();
 										}
 										var isTextTypeChanged = opt.inputs["textradio"].$input.is(":checked") != isTextRadioSelected;
@@ -1384,7 +1388,6 @@ function loadTableValues(args) {
 										var isStorageIdChanged = opt.inputs["storageselect"].$input.val() != storageSelected;
 										var isEnumIdChanged = opt.inputs["enumselect"].$input.val() != enumSelected;
 										if (isTextTypeChanged || isStorageTypeChanged || isEnumTypeChanged || isStorageIdChanged || isEnumIdChanged) {
-											var $tableInstance = $tableContainer.handsontable('getInstance');
 											if (opt.inputs["textradio"].$input.is(":checked")) {
 												$columns[i - 1].type = "text";
 												$columns[i - 1].allowInvalid = true;
@@ -1458,18 +1461,26 @@ function loadTableValues(args) {
 										isTextRadioSelected = true;
 										isStorageRadioSelected = false;
 										isEnumRadioSelected = false;
-										storageSelected = $data.storageIds[0];
-										enumSelected = $data.enumerationIds[0];
+										if ($data.storageIds != null) {
+											storageSelected = $data.storageIds[0];
+										}
+										if ($data.enumerationIds != null) {
+											enumSelected = $data.enumerationIds[0];
+										}
 									} else if ($colHeader.attr("type") === "storage") {
 										isTextRadioSelected = false;
 										isStorageRadioSelected = true;
 										isEnumRadioSelected = false;
-										enumSelected = $data.enumerationIds[0];
+										if ($data.enumerationIds != null) {
+											enumSelected = $data.enumerationIds[0];
+										}
 									} else {
 										isTextRadioSelected = false;
 										isStorageRadioSelected = false;
 										isEnumRadioSelected = true;
-										storageSelected = $data.storageIds[0];
+										if ($data.storageIds != null) {
+											storageSelected = $data.storageIds[0];
+										}
 									}
 									opt.items.textradio.selected = isTextRadioSelected;
 									opt.items.storageradio.selected = isStorageRadioSelected;

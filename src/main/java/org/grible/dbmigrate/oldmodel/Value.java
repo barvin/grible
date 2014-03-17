@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.grible.model;
+package org.grible.dbmigrate.oldmodel;
 
 
 public class Value {

@@ -95,7 +95,7 @@ $(window).on(
 									// create database | validate database
 									// structure
 									var $message = "<br>Creating database... ";
-									if ($("input[value='false']:checked").length > 0) {
+									if ($("input[name='createnewdb'][value='false']").is(":checked")) {
 										$message = "<br>Validating database structure... ";
 									}
 									writeToConsole($message);

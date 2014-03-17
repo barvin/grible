@@ -20,16 +20,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.grible.dbmigrate.oldmodel.Key;
+import org.grible.dbmigrate.oldmodel.Row;
+import org.grible.dbmigrate.oldmodel.Value;
 import org.grible.model.Category;
-import org.grible.model.Key;
 import org.grible.model.Product;
-import org.grible.model.Row;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.User;
 import org.grible.model.UserPermission;
-import org.grible.model.Value;
+import org.grible.model.json.KeyJson;
 import org.grible.settings.GlobalSettings;
+
+import com.google.gson.Gson;
 
 /**
  * @author Maksym Barvinskyi
@@ -98,6 +101,9 @@ public class PostgresDao implements Dao {
 		result.setClassName(rs.getString("className"));
 		result.setShowWarning(rs.getBoolean("showwarning"));
 		result.setModifiedTime(rs.getTimestamp("modifiedtime"));
+		Gson gson = new Gson();
+		result.setKeys(gson.fromJson(rs.getString("keys"), KeyJson[].class));
+		result.setValues(gson.fromJson(rs.getString("values"), String[][].class));
 		return result;
 	}
 
@@ -180,6 +186,20 @@ public class PostgresDao implements Dao {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM products WHERE id=" + id);
 		while (rs.next()) {
 			result = initProduct(rs);
+		}
+
+		rs.close();
+		stmt.close();
+		return result;
+	}
+
+	public String getCurrentDbVersion() throws SQLException {
+		String result = "";
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT dbversion FROM version");
+		if (rs.next()) {
+			result = rs.getString("dbversion");
 		}
 
 		rs.close();
@@ -453,7 +473,7 @@ public class PostgresDao implements Dao {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-				+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type "
+				+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type "
 				+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.id=" + id);
 
 		if (rs.next()) {
@@ -471,7 +491,7 @@ public class PostgresDao implements Dao {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, t.classname, "
-						+ "t.showusage, t.showwarning, t.modifiedtime, tt.name as type "
+						+ "t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type "
 						+ "FROM tables as t JOIN tabletypes as tt ON t.type=tt.id AND t.name='"
 						+ name
 						+ "' AND t.categoryid IN (SELECT id FROM categories WHERE productid=(SELECT productid FROM categories WHERE id="
@@ -524,7 +544,7 @@ public class PostgresDao implements Dao {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
 						+ "ON t.type=tt.id AND t.categoryid=" + category.getId() + " ORDER BY t.name");
 		while (rs.next()) {
 			result.add(initTable(rs));
@@ -581,7 +601,7 @@ public class PostgresDao implements Dao {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
 						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM rows WHERE id IN "
 						+ "(SELECT rowid FROM values WHERE " + rowId + " = ANY (storagerows))) ORDER BY t.id");
 		while (rs.next()) {
@@ -953,7 +973,7 @@ public class PostgresDao implements Dao {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
 						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + table.getId()
 						+ ") ORDER BY t.id");
 		while (rs.next()) {
@@ -1080,11 +1100,13 @@ public class PostgresDao implements Dao {
 		if (finalName != null) {
 			finalName = "'" + finalName + "'";
 		}
+		Gson gson = new Gson();
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
-				+ table.getParentId() + ", showwarning=" + table.isShowWarning()
-				+ ", modifiedtime='" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(table.getModifiedTime())
-				+ "' WHERE id=" + table.getId());
+				+ table.getParentId() + ", showwarning=" + table.isShowWarning() + ", modifiedtime='"
+				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(table.getModifiedTime()) + "', keys='"
+				+ gson.toJson(table.getKeys()) + "' values='" + gson.toJson(table.getValues()) + "' WHERE id="
+				+ table.getId());
 
 		stmt.close();
 	}
@@ -1255,30 +1277,6 @@ public class PostgresDao implements Dao {
 		stmt.close();
 	}
 
-	public void executeUpdateNoFail(String query) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		try {
-			stmt.executeUpdate(query);
-		} catch (Exception e) {
-			System.out.println("INFO: Exception ignored: " + e.getLocalizedMessage());
-		}
-		stmt.close();
-	}
-
-	public String executeSelect(String query) throws SQLException {
-		ResultSet rs = null;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		String result = null;
-		rs = stmt.executeQuery(query);
-		if (rs.next()) {
-			result = rs.getString(1);
-		}
-		stmt.close();
-		return result;
-	}
-
 	public boolean deleteProduct(int productId) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1342,7 +1340,7 @@ public class PostgresDao implements Dao {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt
 				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showusage, t.showwarning, t.modifiedtime, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
 						+ "ON t.type=tt.id AND t.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
 						+ " AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
 						+ "')) ORDER BY t.name");
@@ -1442,5 +1440,21 @@ public class PostgresDao implements Dao {
 			return false;
 		}
 		return true;
+	}
+
+	public List<Table> getAllTables() throws Exception {
+		ArrayList<Table> result = new ArrayList<Table>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt
+				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
+						+ "ON t.type=tt.id ORDER BY t.name");
+		while (rs.next()) {
+			result.add(initTable(rs));
+		}
+
+		stmt.close();
+		return result;
 	}
 }

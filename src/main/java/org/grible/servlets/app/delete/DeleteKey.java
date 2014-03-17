@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
-import org.grible.model.Key;
+import org.grible.dbmigrate.oldmodel.Key;
 import org.grible.model.Table;
 import org.grible.model.json.KeyJson;
 import org.grible.security.Security;

@@ -28,9 +28,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.grible.dao.PostgresDao;
-import org.grible.model.Key;
+import org.grible.dbmigrate.oldmodel.Key;
+import org.grible.dbmigrate.oldmodel.Value;
 import org.grible.model.Table;
-import org.grible.model.Value;
 import org.grible.model.json.KeyJson;
 import org.grible.servlets.ServletHelper;
 
@@ -102,7 +102,7 @@ public class ExcelFile {
 					cell.setCellStyle(keyCellStyle);
 				}
 
-				List<org.grible.model.Row> rows = dao.getRows(table.getId());
+				List<org.grible.dbmigrate.oldmodel.Row> rows = dao.getRows(table.getId());
 				for (int i = 0; i < rows.size(); i++) {
 					Row excelRow = worksheet.createRow(i + 1);
 					List<Value> values = dao.getValues(rows.get(i));

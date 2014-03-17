@@ -49,6 +49,9 @@ public class UpgradeDb extends HttpServlet {
 				migrateCleanly(request, dao, fileName);
 				if (migration.getVersion().equals("0.9.0")) {
 					MigrationActions.moveDataToKeysAndValuesColumns();
+					dao.executeUpdate("DROP TABLE \"values\" CASCADE");
+					dao.executeUpdate("DROP TABLE keys CASCADE");
+					dao.executeUpdate("DROP TABLE rows CASCADE");
 				}
 			}
 			out.print("Done.");

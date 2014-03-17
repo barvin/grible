@@ -40,6 +40,10 @@ public class MigrationActions {
 					newValues[i][j] = rowValues.get(j).getValue();
 				}
 			}
+			
+			table.setKeys(newKeys);
+			table.setValues(newValues);
+			dao.updateTable(table);
 		}
 	}
 }

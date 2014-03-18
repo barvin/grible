@@ -16,6 +16,7 @@ import org.grible.model.Category;
 import org.grible.model.Product;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.model.json.Key;
 
 /**
  * @author Maksym Barvinskyi
@@ -32,9 +33,11 @@ public interface Dao {
 
 	public List<Category> getChildCategories(Category category) throws Exception;
 
-	public int insertCategory(TableType type, int productId, String name, Integer parentId, String parentPath) throws Exception;
+	public int insertCategory(TableType type, int productId, String name, Integer parentId, String parentPath)
+			throws Exception;
 
-	public int insertTable(String name, TableType type, Category category, Integer parentId, String className) throws Exception;
+	public int insertTable(String name, TableType type, Category category, Integer parentId, String className,
+			Key[] keys, String[][] values) throws Exception;
 
 	public List<Table> getTablesByCategory(Category category) throws Exception;
 
@@ -62,4 +65,6 @@ public interface Dao {
 	public boolean isTableInProductExist(String name, TableType type, Category category) throws Exception;
 
 	public void updateTable(Table table) throws Exception;
+	
+	public List<String> getValuesByKeyOrder(Table table, int keyOrder);
 }

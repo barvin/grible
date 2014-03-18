@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
@@ -108,8 +108,8 @@ public class GetStorageTooltip extends HttpServlet {
 		StringBuilder result = new StringBuilder("<div class=\"tooltip\"><div style=\"width: auto;\" class=\"table\">");
 		result.append("<div class=\"table-row key-row\">");
 		result.append("<div class=\"table-cell ui-cell-mini index-header-cell\"></div>");
-		KeyJson[] keys = refTable.getTableJson().getKeys();
-		for (KeyJson key : keys) {
+		Key[] keys = refTable.getTableJson().getKeys();
+		for (Key key : keys) {
 			result.append("<div class=\"table-cell ui-cell-mini key-cell\">");
 			result.append(key.getName());
 			result.append("</div>");

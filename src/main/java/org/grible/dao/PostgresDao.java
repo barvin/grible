@@ -19,17 +19,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.grible.dbmigrate.oldmodel.Key;
-import org.grible.dbmigrate.oldmodel.Row;
-import org.grible.dbmigrate.oldmodel.Value;
+import org.grible.dbmigrate.oldmodel.OldKey;
+import org.grible.dbmigrate.oldmodel.OldRow;
+import org.grible.dbmigrate.oldmodel.OldValue;
 import org.grible.model.Category;
 import org.grible.model.Product;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.User;
 import org.grible.model.UserPermission;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 import org.grible.settings.GlobalSettings;
 
 import com.google.gson.Gson;
@@ -102,7 +101,7 @@ public class PostgresDao implements Dao {
 		result.setShowWarning(rs.getBoolean("showwarning"));
 		result.setModifiedTime(rs.getTimestamp("modifiedtime"));
 		Gson gson = new Gson();
-		result.setKeys(gson.fromJson(rs.getString("keys"), KeyJson[].class));
+		result.setKeys(gson.fromJson(rs.getString("keys"), Key[].class));
 		result.setValues(gson.fromJson(rs.getString("values"), String[][].class));
 		return result;
 	}
@@ -135,8 +134,8 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	private Key initKey(ResultSet rs) throws SQLException {
-		Key result = new Key(rs.getInt("id"));
+	private OldKey initKey(ResultSet rs) throws SQLException {
+		OldKey result = new OldKey(rs.getInt("id"));
 		result.setName(rs.getString("name"));
 		result.setTableId(rs.getInt("tableid"));
 		result.setOrder(rs.getInt("order"));
@@ -144,15 +143,15 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	private Row initRow(ResultSet rs) throws SQLException {
-		Row result = new Row(rs.getInt("id"));
+	private OldRow initRow(ResultSet rs) throws SQLException {
+		OldRow result = new OldRow(rs.getInt("id"));
 		result.setTableId(rs.getInt("tableid"));
 		result.setOrder(rs.getInt("order"));
 		return result;
 	}
 
-	private Value initValue(ResultSet rs) throws SQLException {
-		Value result = new Value(rs.getInt("id"));
+	private OldValue initValue(ResultSet rs) throws SQLException {
+		OldValue result = new OldValue(rs.getInt("id"));
 		result.setKeyId(rs.getInt("keyid"));
 		result.setRowId(rs.getInt("rowid"));
 		result.setValue(rs.getString("value"));
@@ -197,12 +196,24 @@ public class PostgresDao implements Dao {
 		String result = "";
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT dbversion FROM version");
-		if (rs.next()) {
-			result = rs.getString("dbversion");
+		ResultSet rs = stmt.executeQuery("SELECT tablename FROM pg_tables WHERE schemaname='public'");
+		boolean isVersionTableExist = false;
+		while (rs.next()) {
+			if (rs.getString("tablename").equals("version")) {
+				isVersionTableExist = true;
+				break;
+			}
 		}
-
 		rs.close();
+		if (isVersionTableExist) {
+			result = "0.8.x";
+		} else {
+			ResultSet rs2 = stmt.executeQuery("SELECT dbversion FROM version");
+			if (rs2.next()) {
+				result = rs2.getString("dbversion");
+			}
+			rs2.close();
+		}
 		stmt.close();
 		return result;
 	}
@@ -274,8 +285,8 @@ public class PostgresDao implements Dao {
 		return id;
 	}
 
-	public int insertTable(String name, TableType type, Category category, Integer parentId, String className)
-			throws SQLException {
+	public int insertTable(String name, TableType type, Category category, Integer parentId, String className,
+			Key[] keys, String[][] values) throws SQLException {
 		int id = 0;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -283,8 +294,10 @@ public class PostgresDao implements Dao {
 		if (className != null) {
 			finalClassName = "'" + className + "'";
 		}
-		stmt.executeUpdate("INSERT INTO tables(name, type, categoryid, parentid, classname) VALUES ('" + name + "', "
-				+ type.getId() + ", " + category.getId() + ", " + parentId + ", " + finalClassName + ")");
+		Gson gson = new Gson();
+		stmt.executeUpdate("INSERT INTO tables(name, type, categoryid, parentid, classname, keys, values) VALUES ('"
+				+ name + "', " + type.getId() + ", " + category.getId() + ", " + parentId + ", " + finalClassName
+				+ ", '" + gson.toJson(keys) + "', '" + gson.toJson(escape(values)) + "')");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM tables ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {
 			id = rs.getInt("id");
@@ -292,47 +305,6 @@ public class PostgresDao implements Dao {
 
 		stmt.close();
 		return id;
-	}
-
-	public int insertRow(int tableId, int order) throws SQLException {
-		int id = 0;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("INSERT INTO rows(tableid, \"order\") VALUES (" + tableId + ", " + order + ")");
-		ResultSet rs = stmt.executeQuery("SELECT id FROM rows ORDER BY id DESC LIMIT 1");
-		if (rs.next()) {
-			id = rs.getInt("id");
-		}
-
-		stmt.close();
-		return id;
-	}
-
-	public int insertKey(int tableId, String name, int order, int referenceStorageId) throws SQLException {
-		int id = 0;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		String finalRefStorageId = (referenceStorageId == 0) ? "NULL" : String.valueOf(referenceStorageId);
-		stmt.executeUpdate("INSERT INTO keys(tableid, name, \"order\", reftable) VALUES (" + tableId + ", '" + name
-				+ "', " + order + ", " + finalRefStorageId + ")");
-		ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
-		if (rs.next()) {
-			id = rs.getInt("id");
-		}
-
-		stmt.close();
-		return id;
-	}
-
-	public void insertValue(int rowId, int keyId, String value, boolean isStorage, String storageIdsAsString)
-			throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		value = value.replace("'", "''");
-		stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) VALUES (" + rowId + ", "
-				+ keyId + ", '" + value + "', " + isStorage + ", " + storageIdsAsString + ")");
-
-		stmt.close();
 	}
 
 	public boolean deleteUser(String userId) throws SQLException {
@@ -554,8 +526,8 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Key> getKeys(int tableId) throws SQLException {
-		ArrayList<Key> result = new ArrayList<Key>();
+	public List<OldKey> getOldKeys(int tableId) throws SQLException {
+		ArrayList<OldKey> result = new ArrayList<OldKey>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT * FROM keys WHERE tableid=" + tableId + " ORDER BY \"order\"");
@@ -567,8 +539,8 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Row> getRows(int tableId) throws SQLException {
-		ArrayList<Row> result = new ArrayList<Row>();
+	public List<OldRow> getOldRows(int tableId) throws SQLException {
+		ArrayList<OldRow> result = new ArrayList<OldRow>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT * FROM rows WHERE tableid=" + tableId + " ORDER BY \"order\"");
@@ -580,8 +552,8 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public ArrayList<Value> getValues(Row row) throws SQLException {
-		ArrayList<Value> result = new ArrayList<Value>();
+	public ArrayList<OldValue> getOldValues(OldRow row) throws SQLException {
+		ArrayList<OldValue> result = new ArrayList<OldValue>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT v.id, v.keyid, v.rowid, v.value, v.isstorage, v.storagerows, "
@@ -595,18 +567,22 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Table> getTablesUsingRow(int rowId) throws SQLException {
+	public List<Table> getTablesUsingRow(int tableId, int rowOrder) throws SQLException {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
-						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM rows WHERE id IN "
-						+ "(SELECT rowid FROM values WHERE " + rowId + " = ANY (storagerows))) ORDER BY t.id");
-		while (rs.next()) {
-			result.add(initTable(rs));
-		}
+		// TODO: finish
+		// ResultSet rs = stmt
+		// .executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+		// +
+		// "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
+		// +
+		// "ON t.type=tt.id AND t.id IN (SELECT tableid FROM rows WHERE id IN "
+		// + "(SELECT rowid FROM values WHERE " + rowId +
+		// " = ANY (storagerows))) ORDER BY t.id");
+		// while (rs.next()) {
+		// result.add(initTable(rs));
+		// }
 
 		stmt.close();
 		return result;
@@ -640,60 +616,6 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Value> getValues(Key key) throws SQLException {
-		List<Value> result = new ArrayList<Value>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT v.id, v.keyid, v.rowid, v.value, v.isstorage, v.storagerows, "
-				+ "r.\"order\" FROM values as v JOIN rows as r ON v.rowid=r.id AND v.keyid=" + key.getId()
-				+ " ORDER BY r.\"order\"");
-		while (rs.next()) {
-			result.add(initValue(rs));
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public Row getRow(int id) throws SQLException {
-		Row result = null;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM rows WHERE id=" + id);
-		if (rs.next()) {
-			result = initRow(rs);
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public Value getValue(int id) throws SQLException {
-		Value result = null;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM values WHERE id=" + id);
-		if (rs.next()) {
-			result = initValue(rs);
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public Key getKey(int id) throws SQLException {
-		Key result = null;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM keys WHERE id=" + id);
-		if (rs.next()) {
-			result = initKey(rs);
-		}
-
-		stmt.close();
-		return result;
-	}
-
 	public Integer getCategoryId(String name, int productId, TableType type, Integer parentId, String parentPath)
 			throws SQLException {
 		Integer result = null;
@@ -714,88 +636,6 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Integer> insertKeys(int tableId, List<String> keyNames) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < keyNames.size(); i++) {
-			stmt.executeUpdate("INSERT INTO keys" + "(tableid, name, \"order\", reftable) VALUES (" + tableId + ", '"
-					+ keyNames.get(i) + "', " + (i + 1) + ", NULL)");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
-			}
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public List<Integer> insertValuesEmptyWithKeyId(int keyId, List<Row> rows) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (Row row : rows) {
-			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) VALUES (" + row.getId()
-					+ ", " + keyId + ", '', false, null)");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
-			}
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public void updateKeys(List<Integer> keyIds, List<Integer> keyNumbers) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < keyIds.size(); i++) {
-			stmt.executeUpdate("UPDATE keys SET \"order\"=-" + (i + 1) + " " + "WHERE id=" + keyIds.get(i));
-		}
-		for (int i = 0; i < keyIds.size(); i++) {
-			stmt.executeUpdate("UPDATE keys SET \"order\"=" + keyNumbers.get(i) + " " + "WHERE id=" + keyIds.get(i));
-		}
-
-		stmt.close();
-	}
-
-	public int insertKeyCopy(Key currentKey) throws SQLException {
-		int result = 0;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		String finalRefStorageId = (currentKey.getReferenceTableId() == 0) ? "NULL" : String.valueOf(currentKey
-				.getReferenceTableId());
-		stmt.executeUpdate("INSERT INTO keys(tableid, name, \"order\", reftable) VALUES (" + currentKey.getTableId()
-				+ ", '" + currentKey.getName() + "'," + currentKey.getOrder() + ", " + finalRefStorageId + ")");
-		ResultSet rs = stmt.executeQuery("SELECT id FROM keys ORDER BY id DESC LIMIT 1");
-		if (rs.next()) {
-			result = rs.getInt("id");
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public List<Integer> insertValuesWithKeyId(int newKeyId, List<Value> values) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (Value value : values) {
-			stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ value.getRowId() + ", " + newKeyId + ", '" + escape(value.getValue()) + "', " + value.isStorage()
-					+ ", " + value.getStorageIdsAsString() + ")");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
-			}
-		}
-
-		stmt.close();
-		return result;
-	}
-
 	/**
 	 * Adds escaping symbols to the value, so that it could be properly inserted
 	 * to the database.
@@ -803,153 +643,13 @@ public class PostgresDao implements Dao {
 	 * @param value
 	 * @return value that is ready for DB inserting.
 	 */
-	private String escape(String value) {
-		return value.replace("'", "''");
-	}
-
-	public void updateRows(List<Integer> rowIds, List<Integer> oldRowNumbers, List<Integer> modifiedRowNumbers)
-			throws SQLException {
-		List<Value> values = new ArrayList<Value>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < rowIds.size(); i++) {
-			stmt.executeUpdate("UPDATE rows SET \"order\"=-" + (i + 1) + " " + "WHERE id=" + rowIds.get(i));
-		}
-		for (int i = 0; i < rowIds.size(); i++) {
-			stmt.executeUpdate("UPDATE rows SET \"order\"=" + modifiedRowNumbers.get(i) + " " + "WHERE id="
-					+ rowIds.get(i));
-
-			ResultSet rs = stmt.executeQuery("SELECT * FROM values WHERE " + rowIds.get(i) + " = ANY (storagerows)");
-			while (rs.next()) {
-				values.add(initValue(rs));
-			}
-			rs.close();
-		}
-
-		for (Value value : values) {
-			String oldValueRows[] = value.getValue().split(";");
-			String newValueRows[] = oldValueRows.clone();
-			for (int i = 0; i < oldValueRows.length; i++) {
-				for (int j = 0; j < oldRowNumbers.size(); j++) {
-					if (oldValueRows[i].equals(String.valueOf(oldRowNumbers.get(j)))) {
-						newValueRows[i] = String.valueOf(modifiedRowNumbers.get(j));
-					}
-				}
-			}
-			String newValue = StringUtils.join(newValueRows, ";");
-			value.setValue(newValue);
-			updateValue(value);
-		}
-
-		stmt.close();
-	}
-
-	public void updateRows(List<Integer> rowIds, List<Integer> rowNumbers) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < rowIds.size(); i++) {
-			stmt.executeUpdate("UPDATE rows SET \"order\"=" + rowNumbers.get(i) + " " + "WHERE id=" + rowIds.get(i));
-		}
-
-		stmt.close();
-	}
-
-	public int insertRowCopy(Row currentRow) throws SQLException {
-		int result = 0;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("INSERT INTO rows(tableid, \"order\") VALUES (" + currentRow.getTableId() + ", "
-				+ currentRow.getOrder() + ")");
-		ResultSet rs = stmt.executeQuery("SELECT id FROM rows ORDER BY id DESC LIMIT 1");
-		if (rs.next()) {
-			result = rs.getInt("id");
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public List<Integer> insertValuesWithRowId(int newRowId, List<Value> values) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (Value value : values) {
-			stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ newRowId + ", " + value.getKeyId() + ", '" + escape(value.getValue()) + "', " + value.isStorage()
-					+ ", " + value.getStorageIdsAsString() + ")");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
+	private String[][] escape(String[][] values) {
+		for (int i = 0; i < values.length; i++) {
+			for (int j = 0; j < values[0].length; j++) {
+				values[i][j] = values[i][j].replace("'", "''");
 			}
 		}
-
-		stmt.close();
-		return result;
-	}
-
-	public List<Integer> insertValuesEmptyByRowIdFromExistingRow(int rowId, List<Value> values) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (Value value : values) {
-			value.setRowId(rowId);
-			value.setStorageIds(null);
-
-			if (value.isStorage()) {
-				value.setValue("0");
-			} else {
-				Key key = getKey(value.getKeyId());
-				if (key.getReferenceTableId() == 0) {
-					value.setValue("");
-				}
-			}
-
-			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ value.getRowId() + ", " + value.getKeyId() + ", '" + escape(value.getValue()) + "', "
-					+ value.isStorage() + ", " + value.getStorageIdsAsString() + ")");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
-			}
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public List<Integer> insertValuesEmptyWithRowId(int rowId, List<Key> keys) throws Exception {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (Key key : keys) {
-			Value value = new Value(0);
-			value.setIsStorage(false);
-			value.setValue("");
-			value.setKeyId(key.getId());
-			value.setRowId(rowId);
-			value.setStorageIds(null);
-			if (key.getReferenceTableId() != 0) {
-				Table refTable = getTable(key.getReferenceTableId());
-				if (refTable.getType() == TableType.STORAGE) {
-					value.setIsStorage(true);
-					value.setValue("0");
-				} else if (refTable.getType() == TableType.ENUMERATION) {
-					String firstValue = getValues(getKeys(refTable.getId()).get(0)).get(0).getValue();
-					value.setValue(firstValue);
-				}
-			}
-
-			stmt.executeUpdate("INSERT INTO values(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-					+ value.getRowId() + ", " + value.getKeyId() + ", '" + escape(value.getValue()) + "', "
-					+ value.isStorage() + ", " + value.getStorageIdsAsString() + ")");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM values ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
-			}
-		}
-
-		stmt.close();
-		return result;
+		return values;
 	}
 
 	public boolean deleteCategory(Category category) throws SQLException {
@@ -1011,88 +711,6 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public boolean deleteKey(int keyId) throws SQLException {
-		boolean result = false;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("DELETE FROM values WHERE keyid=" + keyId);
-		stmt.executeUpdate("DELETE FROM keys WHERE id=" + keyId);
-
-		ResultSet rs = stmt.executeQuery("SELECT id FROM keys WHERE id=" + keyId);
-		if (!rs.next()) {
-			result = true;
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public boolean deleteRow(int rowId) throws SQLException {
-		boolean result = false;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("DELETE FROM values WHERE rowid=" + rowId);
-		stmt.executeUpdate("DELETE FROM rows WHERE id=" + rowId);
-
-		ResultSet rs = stmt.executeQuery("SELECT id FROM rows WHERE id=" + rowId);
-		if (!rs.next()) {
-			result = true;
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public List<Integer> insertRows(int tableId, int rowsNumber) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < rowsNumber; i++) {
-			stmt.executeUpdate("INSERT INTO rows(tableid, \"order\") VALUES (" + tableId + ", " + (i + 1) + ")");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM rows ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
-			}
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public List<Integer> addRows(int tableId, int currRowsNumber, int rowsNumberToAdd) throws SQLException {
-		List<Integer> result = new ArrayList<Integer>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = currRowsNumber; i < currRowsNumber + rowsNumberToAdd; i++) {
-			stmt.executeUpdate("INSERT INTO rows(tableid, \"order\") VALUES (" + tableId + ", " + (i + 1) + ")");
-			ResultSet rs = stmt.executeQuery("SELECT id FROM rows ORDER BY id DESC LIMIT 1");
-			if (rs.next()) {
-				result.add(rs.getInt("id"));
-			}
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public void insertValues(List<Integer> rowIds, List<Integer> keyIds, ArrayList<ArrayList<String>> values)
-			throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < rowIds.size(); i++) {
-			int rowId = rowIds.get(i);
-			ArrayList<String> rowValues = values.get(i);
-			for (int j = 0; j < keyIds.size(); j++) {
-				int keyId = keyIds.get(j);
-				String value = rowValues.get(j).replace("'", "''");
-				stmt.executeUpdate("INSERT INTO values" + "(rowid, keyid, value, isstorage, storagerows) " + "VALUES ("
-						+ rowId + ", " + keyId + ", '" + value + "', false, NULL)");
-			}
-		}
-
-		stmt.close();
-	}
-
 	public void updateTable(Table table) throws Exception {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1119,24 +737,6 @@ public class PostgresDao implements Dao {
 		stmt.close();
 	}
 
-	public void updateKeys(String[] keyIds, String[] keyValues) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (int i = 0; i < keyIds.length; i++) {
-			stmt.executeUpdate("UPDATE keys SET name='" + keyValues[i] + "' " + "WHERE id=" + keyIds[i]);
-		}
-
-		stmt.close();
-	}
-
-	public void updateKeyValue(String id, String value) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE keys SET name='" + value.replace("'", "''") + "' " + "WHERE id=" + id);
-
-		stmt.close();
-	}
-
 	public int getRefStorageId(int keyId) throws SQLException {
 		int result = 0;
 		Connection conn = getConnection();
@@ -1148,64 +748,6 @@ public class PostgresDao implements Dao {
 
 		stmt.close();
 		return result;
-	}
-
-	public Row getRow(int refStorageId, int order) throws SQLException {
-		Row result = null;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt
-				.executeQuery("SELECT * FROM rows WHERE tableid=" + refStorageId + " AND \"order\"=" + order);
-		if (rs.next()) {
-			result = initRow(rs);
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public void updateValues(ArrayList<Value> values) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (Value value : values) {
-			stmt.executeUpdate("UPDATE values SET rowid=" + value.getRowId() + ", keyid=" + value.getKeyId()
-					+ ", value='" + escape(value.getValue()) + "', isstorage=" + value.isStorage() + ", storagerows="
-					+ value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
-		}
-
-		stmt.close();
-	}
-
-	public void updateKey(Key key) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		String finalRefTableId = "null";
-		if (key.getReferenceTableId() != 0) {
-			finalRefTableId = String.valueOf(key.getReferenceTableId());
-		}
-		stmt.executeUpdate("UPDATE keys SET name='" + key.getName() + "', " + "\"order\"=" + key.getOrder() + ", "
-				+ "reftable=" + finalRefTableId + " " + "WHERE id=" + key.getId());
-
-		stmt.close();
-	}
-
-	public void updateValuesTypes(int keyId, boolean isStorage, String storageIds) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE values SET isstorage=" + isStorage + ", " + "storagerows=" + storageIds + " "
-				+ "WHERE keyid=" + keyId);
-
-		stmt.close();
-	}
-
-	public void updateValue(Value value) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("UPDATE values " + "SET rowid=" + value.getRowId() + ", keyid=" + value.getKeyId()
-				+ ", value='" + escape(value.getValue()) + "', isstorage=" + value.isStorage() + ", " + "storagerows="
-				+ value.getStorageIdsAsString() + " " + "WHERE id=" + value.getId());
-
-		stmt.close();
 	}
 
 	public boolean isLastAdmin(String userId) throws SQLException {
@@ -1300,32 +842,6 @@ public class PostgresDao implements Dao {
 		return true;
 	}
 
-	public void turnOffKeyReftableConstraint() throws Exception {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		try {
-			stmt.executeUpdate("ALTER TABLE ONLY keys DROP CONSTRAINT keys_reftable_fkey");
-		} catch (Exception e) {
-			if (!e.getMessage().contains("constraint \"keys_reftable_fkey\" of relation \"keys\" does not exist")) {
-				throw e;
-			}
-		}
-		stmt.close();
-	}
-
-	public void turnOnKeyReftableConstraint() throws Exception {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		try {
-			stmt.executeUpdate("ALTER TABLE ONLY keys ADD CONSTRAINT keys_reftable_fkey FOREIGN KEY (reftable) REFERENCES tables(id)");
-		} catch (Exception e) {
-			if (!e.getMessage().contains("constraint \"keys_reftable_fkey\" for relation \"keys\" already exists")) {
-				throw e;
-			}
-		}
-		stmt.close();
-	}
-
 	public void updateProduct(Product product) throws SQLException {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -1371,77 +887,6 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Key> insertKeysFromOneTableToAnother(int copyTableId, int tableId) throws SQLException {
-		List<Key> result = new ArrayList<Key>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate("INSERT INTO keys (tableid, name, \"order\", reftable) " + "SELECT " + tableId
-				+ ", name, \"order\", reftable FROM keys WHERE tableid=" + copyTableId);
-
-		ResultSet rs = stmt.executeQuery("SELECT * FROM keys WHERE tableid=" + tableId);
-		while (rs.next()) {
-			result.add(initKey(rs));
-		}
-
-		stmt.close();
-		return result;
-	}
-
-	public void insertValues(int tableId, int oldTableId, List<Row> oldRows, List<Key> keys) throws SQLException {
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		for (Row oldRow : oldRows) {
-			stmt.executeUpdate("INSERT INTO rows (tableid, \"order\") VALUES (" + tableId + ", " + oldRow.getOrder()
-					+ ")");
-			for (Key key : keys) {
-				stmt.executeUpdate("INSERT INTO values (rowid, keyid, value, isstorage, storagerows) "
-						+ "SELECT (SELECT id FROM rows WHERE tableid=" + tableId + " AND \"order\"="
-						+ oldRow.getOrder() + "), " + key.getId()
-						+ ", value, isstorage, storagerows FROM values WHERE rowid=" + oldRow.getId() + " AND keyid="
-						+ "(SELECT id FROM keys WHERE tableid=" + oldTableId + " AND \"order\"=" + key.getOrder() + ")");
-			}
-		}
-		stmt.close();
-	}
-
-	public boolean isTableTypeExist(String name) throws SQLException {
-		boolean result = false;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT id FROM tabletypes WHERE name ='" + name.toLowerCase() + "'");
-		if (rs.next()) {
-			result = true;
-		}
-		stmt.close();
-		return result;
-	}
-
-	public List<Value> getValuesByEnumValue(Value enumValue, String oldValue) throws Exception {
-		int enumId = getTable(getKey(enumValue.getKeyId()).getTableId()).getId();
-		List<Value> result = new ArrayList<Value>();
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM values WHERE value='" + oldValue
-				+ "' AND keyid IN (SELECT id FROM keys WHERE reftable=" + enumId + ")");
-		while (rs.next()) {
-			result.add(initValue(rs));
-		}
-		stmt.close();
-		return result;
-	}
-
-	public boolean columnExist(String table, String column) {
-		try {
-			Connection conn = getConnection();
-			Statement stmt = conn.createStatement();
-			stmt.executeQuery("SELECT " + column + " FROM " + table + " LIMIT 1");
-			stmt.close();
-		} catch (SQLException e) {
-			return false;
-		}
-		return true;
-	}
-
 	public List<Table> getAllTables() throws Exception {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
@@ -1456,5 +901,20 @@ public class PostgresDao implements Dao {
 
 		stmt.close();
 		return result;
+	}
+
+	/**
+	 * @param table
+	 * @param keyOrder
+	 *            - zero-based key order.
+	 * @return
+	 */
+	@Override
+	public List<String> getValuesByKeyOrder(Table table, int keyOrder) {
+		List<String> values = new ArrayList<>();
+		for (String[] row : table.getValues()) {
+			values.add(row[keyOrder]);
+		}
+		return values;
 	}
 }

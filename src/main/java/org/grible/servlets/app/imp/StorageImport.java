@@ -12,8 +12,6 @@ package org.grible.servlets.app.imp;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -33,6 +31,7 @@ import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.model.json.Key;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 
@@ -93,9 +92,9 @@ public class StorageImport extends HttpServlet {
 					currentKeysCount = table.getTableJson().getKeys().length;
 				} else {
 					table = pDao.getTable(storageName, categoryId);
-					currentKeysCount = pDao.getKeys(table.getId()).size();
+					currentKeysCount = pDao.getOldKeys(table.getId()).size();
 				}
-				int importedKeysCount = excelFile.getKeys().size();
+				int importedKeysCount = excelFile.getKeys().length;
 
 				if (currentKeysCount != importedKeysCount) {
 					throw new Exception("Parameters number is different.<br>In the current storage: "
@@ -108,20 +107,10 @@ public class StorageImport extends HttpServlet {
 				response.sendRedirect(destination);
 			} else {
 				int storageId = 0;
+				Key[] keys = excelFile.getKeys();
+				String[][] values = excelFile.getValues();
 				storageId = DataManager.getInstance().getDao()
-						.insertTable(storageName, TableType.STORAGE, category, null, className);
-
-				if (ServletHelper.isJson()) {
-					Table table = jDao.getTable(storageId, productId);
-					table.getTableJson().setKeys(excelFile.getKeys());
-					table.getTableJson().setValues(excelFile.getValues());
-					table.save();
-				} else {
-					List<Integer> keyIds = pDao.insertKeys(storageId, excelFile.getKeys());
-					ArrayList<ArrayList<String>> values = excelFile.getValues();
-					List<Integer> rowIds = pDao.insertRows(storageId, values.size());
-					pDao.insertValues(rowIds, keyIds, values);
-				}
+						.insertTable(storageName, TableType.STORAGE, category, null, className, keys, values);
 
 				String message = "";
 				if (className.equals("")) {

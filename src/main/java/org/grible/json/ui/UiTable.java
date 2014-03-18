@@ -1,10 +1,10 @@
 package org.grible.json.ui;
 
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 
 public class UiTable {
 	private boolean isIndex;
-	private KeyJson[] keys;
+	private Key[] keys;
 	private String[][] values;
 	private UiRowsUsage info;
 	private UiColumn[] columns;
@@ -21,11 +21,11 @@ public class UiTable {
 		this.isIndex = isIndex;
 	}
 
-	public KeyJson[] getKeys() {
+	public Key[] getKeys() {
 		return keys;
 	}
 
-	public void setKeys(KeyJson[] keys) {
+	public void setKeys(Key[] keys) {
 		this.keys = keys;
 	}
 

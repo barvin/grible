@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.grible.dbmigrate.oldmodel;
 
-
-public class Value {
+public class OldValue {
 	private int id;
 	private int keyId;
 	private int rowId;
@@ -19,7 +18,7 @@ public class Value {
 	private boolean isStorage;
 	private Integer[] storageIds;
 
-	public Value(int id) {
+	public OldValue(int id) {
 		this.id = id;
 	}
 

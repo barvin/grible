@@ -140,7 +140,6 @@ public class Tables extends HttpServlet {
 				}
 				responseHtml.append("</script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
-				ServletHelper.showImportResult(request, responseHtml, tableId);
 				ServletHelper.showAdvancedImportDialog(request, responseHtml);
 
 				responseHtml.append("</head>");

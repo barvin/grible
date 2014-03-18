@@ -106,7 +106,6 @@ public class Enumerations extends HttpServlet {
 						.append(GlobalSettings.getInstance().getAppType().toString().toLowerCase()).append("\";");
 				responseHtml.append("</script>");
 				responseHtml.append("<script type=\"text/javascript\" src=\"../js/dataCenter.js\"></script>");
-				ServletHelper.showImportResult(request, responseHtml, tableId);
 				ServletHelper.showAdvancedImportDialog(request, responseHtml);
 
 				responseHtml.append("</head>");

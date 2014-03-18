@@ -12,7 +12,6 @@ package org.grible.servlets.ui.dialogs;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -24,11 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
-import org.grible.dbmigrate.oldmodel.Key;
-import org.grible.dbmigrate.oldmodel.Value;
 import org.grible.model.Table;
 import org.grible.model.TableType;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
@@ -142,9 +139,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			if (ServletHelper.isJson()) {
 				strValues = jDao.getValuesByKeyOrder(table, 0);
 			} else {
-				Key key = pDao.getKeys(table.getId()).get(0);
-				List<Value> values = pDao.getValues(key);
-				strValues = getStringValues(values);
+				strValues = pDao.getValuesByKeyOrder(table, 0);
 			}
 			fields.append(StringUtils.join(strValues, ", "));
 			fields.append(";<br>}");
@@ -154,14 +149,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			e.printStackTrace();
 		}
 		return pack.toString();
-	}
-
-	private List<String> getStringValues(List<Value> values) {
-		List<String> result = new ArrayList<String>();
-		for (Value value : values) {
-			result.add(value.getValue());
-		}
-		return result;
 	}
 
 	private String getCSharpEnum() {
@@ -178,9 +165,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			if (ServletHelper.isJson()) {
 				strValues = jDao.getValuesByKeyOrder(table, 0);
 			} else {
-				Key key = pDao.getKeys(table.getId()).get(0);
-				List<Value> values = pDao.getValues(key);
-				strValues = getStringValues(values);
+				strValues = pDao.getValuesByKeyOrder(table, 0);
 			}
 			fields.append(StringUtils.join(strValues, ", "));
 			fields.append("<br>}");
@@ -216,88 +201,60 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append("(HashMap&lt;String, String&gt; data) {");
 			constructor.append("<br>super(data);");
 
+			Key[] keys = null;
 			if (ServletHelper.isJson()) {
-				KeyJson[] keys = table.getTableJson().getKeys();
-				for (int i = 0; i < keys.length; i++) {
-					String keyName = keys[i].getName();
-					String fieldName = StringUtils.uncapitalize(keyName).replace(" ", "");
-					String type = "String";
-					String method = "getString(\"" + keyName + "\");";
-
-					List<String> values = jDao.getValuesByKeyOrder(table, i);
-					if (keys[i].getType() == KeyType.TEXT) {
-						if (StringUtils.join(values, "").matches("[true|false]+")) {
-							type = "boolean";
-							method = "getBoolean(\"" + keyName + "\");";
-						}
-					} else {
-						Table refTable = jDao.getTable(keys[i].getRefid(), productId);
-						if (keys[i].getType() == KeyType.STORAGE) {
-							isDataHelperIncluded = true;
-							String refClassName = refTable.getClassName();
-							if (StringUtils.join(values, "").contains(";")) {
-								isListIncluded = true;
-								type = "List&lt;" + refClassName + "&gt;";
-								method = "DataStorage.getDescriptors(" + refClassName + ".class, getString(\""
-										+ keyName + "\"));";
-							} else {
-								type = refClassName;
-								method = "DataStorage.getDescriptor(" + refClassName + ".class, getString(\"" + keyName
-										+ "\"));";
-							}
-						} else {
-							type = refTable.getName();
-							method = "(getString(\"" + keyName + "\") != null) ? " + refTable.getName()
-									+ ".valueOf(getString(\"" + keyName + "\")) : null;";
-						}
-					}
-					fields.append("<br>private ").append(type).append(" ").append(fieldName).append(";");
-					constructor.append("<br>this.").append(fieldName).append(" = ").append(method);
-
-					methods.append("<br><br>public ").append(type).append(" get").append(keyName)
-							.append("() {<br>return ").append(fieldName).append(";<br>}");
-				}
+				keys = table.getTableJson().getKeys();
 			} else {
-				List<Key> keys = pDao.getKeys(table.getId());
-				for (Key key : keys) {
-					String keyName = key.getName();
-					String fieldName = StringUtils.uncapitalize(keyName).replace(" ", "");
-					String type = "String";
-					String method = "getString(\"" + keyName + "\");";
+				keys = table.getKeys();
+			}
+			for (int i = 0; i < keys.length; i++) {
+				String keyName = keys[i].getName();
+				String fieldName = StringUtils.uncapitalize(keyName).replace(" ", "");
+				String type = "String";
+				String method = "getString(\"" + keyName + "\");";
 
-					List<Value> values = pDao.getValues(key);
-					if (key.getReferenceTableId() == 0) {
-						if (isBoolean(values)) {
-							type = "boolean";
-							method = "getBoolean(\"" + keyName + "\");";
+				List<String> values = null;
+				if (ServletHelper.isJson()) {
+					values = jDao.getValuesByKeyOrder(table, i);
+				} else {
+					values = pDao.getValuesByKeyOrder(table, i);
+				}
+				if (keys[i].getType() == KeyType.TEXT) {
+					if (StringUtils.join(values, "").matches("[true|false]+")) {
+						type = "boolean";
+						method = "getBoolean(\"" + keyName + "\");";
+					}
+				} else {
+					Table refTable = null;
+					if (ServletHelper.isJson()) {
+						refTable = jDao.getTable(keys[i].getRefid(), productId);
+					} else {
+						refTable = pDao.getTable(keys[i].getRefid());
+					}
+					if (keys[i].getType() == KeyType.STORAGE) {
+						isDataHelperIncluded = true;
+						String refClassName = refTable.getClassName();
+						if (StringUtils.join(values, "").contains(";")) {
+							isListIncluded = true;
+							type = "List&lt;" + refClassName + "&gt;";
+							method = "DataStorage.getDescriptors(" + refClassName + ".class, getString(\"" + keyName
+									+ "\"));";
+						} else {
+							type = refClassName;
+							method = "DataStorage.getDescriptor(" + refClassName + ".class, getString(\"" + keyName
+									+ "\"));";
 						}
 					} else {
-						Table refTable = pDao.getTable(key.getReferenceTableId());
-						if (refTable.getType() == TableType.STORAGE) {
-							isDataHelperIncluded = true;
-							String refClassName = refTable.getClassName();
-							if (semicolumnExists(values)) {
-								isListIncluded = true;
-								type = "List&lt;" + refClassName + "&gt;";
-								method = "DataStorage.getDescriptors(" + refClassName + ".class, getString(\""
-										+ keyName + "\"));";
-							} else {
-								type = refClassName;
-								method = "DataStorage.getDescriptor(" + refClassName + ".class, getString(\"" + keyName
-										+ "\"));";
-							}
-						} else {
-							type = refTable.getName();
-							method = "(getString(\"" + keyName + "\") != null) ? " + refTable.getName()
-									+ ".valueOf(getString(\"" + keyName + "\")) : null;";
-						}
+						type = refTable.getName();
+						method = "(getString(\"" + keyName + "\") != null) ? " + refTable.getName()
+								+ ".valueOf(getString(\"" + keyName + "\")) : null;";
 					}
-					fields.append("<br>private ").append(type).append(" ").append(fieldName).append(";");
-					constructor.append("<br>this.").append(fieldName).append(" = ").append(method);
-
-					methods.append("<br><br>public ").append(type).append(" get").append(keyName)
-							.append("() {<br>return ").append(fieldName).append(";<br>}");
 				}
+				fields.append("<br>private ").append(type).append(" ").append(fieldName).append(";");
+				constructor.append("<br>this.").append(fieldName).append(" = ").append(method);
+
+				methods.append("<br><br>public ").append(type).append(" get").append(keyName).append("() {<br>return ")
+						.append(fieldName).append(";<br>}");
 			}
 
 			if (isListIncluded) {
@@ -315,24 +272,6 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			e.printStackTrace();
 		}
 		return pack.toString();
-	}
-
-	private boolean semicolumnExists(List<Value> values) {
-		List<String> strValues = new ArrayList<String>();
-		for (Value value : values) {
-			strValues.add(value.getValue());
-		}
-		String allValues = StringUtils.join(strValues, "");
-		return allValues.contains(";");
-	}
-
-	private boolean isBoolean(List<Value> values) {
-		List<String> strValues = new ArrayList<String>();
-		for (Value value : values) {
-			strValues.add(value.getValue());
-		}
-		String allValues = StringUtils.join(strValues, "");
-		return allValues.matches("[true|false]+");
 	}
 
 	private String getCSharpClass() {
@@ -354,79 +293,55 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			constructor.append(className);
 			constructor.append("(Dictionary&lt;string, string&gt; data) : base(data)<br>{");
 
+			Key[] keys = null;
 			if (ServletHelper.isJson()) {
-				KeyJson[] keys = table.getTableJson().getKeys();
-				for (int i = 0; i < keys.length; i++) {
-					String keyName = keys[i].getName().replace(" ", "");
-					String type = "string";
-					String method = "GetString(\"" + keyName + "\");";
-
-					List<String> values = jDao.getValuesByKeyOrder(table, i);
-					if (keys[i].getType() == KeyType.TEXT) {
-						if (StringUtils.join(values, "").matches("[true|false]+")) {
-							type = "bool";
-							method = "GetBoolean(\"" + keyName + "\");";
-						}
-					} else {
-						Table refTable = jDao.getTable(keys[i].getRefid(), productId);
-						if (keys[i].getType() == KeyType.STORAGE) {
-							String refClassName = refTable.getClassName();
-							if (StringUtils.join(values, "").contains(";")) {
-								type = "List&lt;" + refClassName + "&gt;";
-								method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\""
-										+ keyName + "\"));";
-							} else {
-								type = refClassName;
-								method = "DataStorage.GetDescriptor&lt;" + refClassName + "&gt;(GetString(\"" + keyName
-										+ "\"));";
-							}
-						} else {
-							type = refTable.getName();
-							method = "(" + refTable.getName() + ") Enum.Parse(typeof(" + refTable.getName()
-									+ "), GetString(\"" + keyName + "\"));";
-						}
-					}
-					properties.append("<br>public ").append(type).append(" ").append(keyName)
-							.append(" { get; private set; }");
-					constructor.append("<br>").append(keyName).append(" = ").append(method);
-				}
+				keys = table.getTableJson().getKeys();
 			} else {
-				List<Key> keys = pDao.getKeys(table.getId());
-				for (Key key : keys) {
-					String keyName = key.getName().replace(" ", "");
-					String type = "string";
-					String method = "GetString(\"" + keyName + "\");";
+				keys = table.getKeys();
+			}
+			for (int i = 0; i < keys.length; i++) {
+				String keyName = keys[i].getName().replace(" ", "");
+				String type = "string";
+				String method = "GetString(\"" + keyName + "\");";
 
-					List<Value> values = pDao.getValues(key);
-					if (key.getReferenceTableId() == 0) {
-						if (isBoolean(values)) {
-							type = "bool";
-							method = "GetBoolean(\"" + keyName + "\");";
+				List<String> values = null;
+				if (ServletHelper.isJson()) {
+					values = jDao.getValuesByKeyOrder(table, i);
+				} else {
+					values = pDao.getValuesByKeyOrder(table, i);
+				}
+				if (keys[i].getType() == KeyType.TEXT) {
+					if (StringUtils.join(values, "").matches("[true|false]+")) {
+						type = "bool";
+						method = "GetBoolean(\"" + keyName + "\");";
+					}
+				} else {
+					Table refTable = null;
+					if (ServletHelper.isJson()) {
+						refTable = jDao.getTable(keys[i].getRefid(), productId);
+					} else {
+						refTable = pDao.getTable(keys[i].getRefid());
+					}
+					if (keys[i].getType() == KeyType.STORAGE) {
+						String refClassName = refTable.getClassName();
+						if (StringUtils.join(values, "").contains(";")) {
+							type = "List&lt;" + refClassName + "&gt;";
+							method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+									+ "\"));";
+						} else {
+							type = refClassName;
+							method = "DataStorage.GetDescriptor&lt;" + refClassName + "&gt;(GetString(\"" + keyName
+									+ "\"));";
 						}
 					} else {
-						PostgresDao dao = pDao;
-						Table refTable = dao.getTable(key.getReferenceTableId());
-						if (refTable.getType() == TableType.STORAGE) {
-							String refClassName = dao.getTable(key.getReferenceTableId()).getClassName();
-							if (semicolumnExists(values)) {
-								type = "List&lt;" + refClassName + "&gt;";
-								method = "DataStorage.GetDescriptors&lt;" + refClassName + "&gt;(GetString(\""
-										+ keyName + "\"));";
-							} else {
-								type = refClassName;
-								method = "DataStorage.GetDescriptor&lt;" + refClassName + "&gt;(GetString(\"" + keyName
-										+ "\"));";
-							}
-						} else {
-							type = refTable.getName();
-							method = "(" + refTable.getName() + ") Enum.Parse(typeof(" + refTable.getName()
-									+ "), GetString(\"" + keyName + "\"));";
-						}
+						type = refTable.getName();
+						method = "(" + refTable.getName() + ") Enum.Parse(typeof(" + refTable.getName()
+								+ "), GetString(\"" + keyName + "\"));";
 					}
-					properties.append("<br>public ").append(type).append(" ").append(keyName)
-							.append(" { get; private set; }");
-					constructor.append("<br>").append(keyName).append(" = ").append(method);
 				}
+				properties.append("<br>public ").append(type).append(" ").append(keyName)
+						.append(" { get; private set; }");
+				constructor.append("<br>").append(keyName).append(" = ").append(method);
 			}
 
 			constructor.append("<br>}");

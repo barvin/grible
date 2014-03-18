@@ -23,7 +23,7 @@ import org.grible.model.Category;
 import org.grible.model.Product;
 import org.grible.model.Table;
 import org.grible.model.TableType;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 import org.grible.settings.GlobalSettings;
 import org.grible.uimodel.Section;
 import org.grible.uimodel.Sections;
@@ -121,8 +121,8 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public int insertTable(String name, TableType type, Category category, Integer parentId, String className)
-			throws Exception {
+	public int insertTable(String name, TableType type, Category category, Integer parentId, String className,
+			Key[] keys, String[][] values) throws Exception {
 		Product product = getProduct(category.getProductId());
 		if (parentId != null) {
 			name = getTable(parentId, category.getProductId()).getName() + "_" + type.toString();
@@ -133,6 +133,8 @@ public class JsonDao implements Dao {
 		table.getTableJson().setType(type);
 		table.getTableJson().setClassName(className);
 		table.getTableJson().setShowWarning(true);
+		table.getTableJson().setKeys(keys);
+		table.getTableJson().setValues(values);		
 		table.save();
 		table.setTableJson();
 
@@ -239,10 +241,10 @@ public class JsonDao implements Dao {
 		addTablesUsingTable(result, storages, table);
 		return result;
 	}
-	
+
 	private void addTablesUsingTable(List<Table> result, List<Table> tables, Table table) {
 		for (Table foundTable : tables) {
-			KeyJson[] keys = foundTable.getTableJson().getKeys();
+			Key[] keys = foundTable.getTableJson().getKeys();
 			for (int i = 0; i < keys.length; i++) {
 				if (keys[i].getRefid() == table.getId()) {
 					result.add(foundTable);
@@ -299,7 +301,7 @@ public class JsonDao implements Dao {
 		}
 		return null;
 	}
-	
+
 	public boolean isProductWithPathExists(String path) throws Exception {
 		List<Product> productList = getProducts();
 		for (Product product : productList) {
@@ -324,7 +326,7 @@ public class JsonDao implements Dao {
 
 		GlobalSettings.getInstance().getConfigJson().setProducts(productList);
 		GlobalSettings.getInstance().getConfigJson().save();
-		
+
 		File gribleJsonFile = new File(product.getGribleJson().getFilePath());
 		if (gribleJsonFile.exists()) {
 			for (Section section : Sections.getSections()) {
@@ -454,7 +456,7 @@ public class JsonDao implements Dao {
 
 	private void addTablesUsingRow(List<Table> result, List<Table> tables, Table table, int rowOrder) {
 		for (Table foundTable : tables) {
-			KeyJson[] keys = foundTable.getTableJson().getKeys();
+			Key[] keys = foundTable.getTableJson().getKeys();
 			for (int i = 0; i < keys.length; i++) {
 				if (keys[i].getRefid() == table.getId()) {
 					String[][] values = foundTable.getTableJson().getValues();

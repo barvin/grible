@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.grible.dao.PostgresDao;
-import org.grible.dbmigrate.oldmodel.Key;
-import org.grible.dbmigrate.oldmodel.Row;
-import org.grible.dbmigrate.oldmodel.Value;
+import org.grible.dbmigrate.oldmodel.OldKey;
+import org.grible.dbmigrate.oldmodel.OldRow;
+import org.grible.dbmigrate.oldmodel.OldValue;
 import org.grible.model.Table;
 import org.grible.model.TableType;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 
 public class MigrationActions {
@@ -18,8 +18,8 @@ public class MigrationActions {
 		List<Table> tables = dao.getAllTables();
 
 		for (Table table : tables) {
-			List<Key> oldKeys = dao.getKeys(table.getId());
-			KeyJson[] newKeys = new KeyJson[oldKeys.size()];
+			List<OldKey> oldKeys = dao.getOldKeys(table.getId());
+			Key[] newKeys = new Key[oldKeys.size()];
 			for (int i = 0; i < newKeys.length; i++) {
 				KeyType type = KeyType.TEXT;
 				if (oldKeys.get(i).getReferenceTableId() != 0) {
@@ -29,13 +29,13 @@ public class MigrationActions {
 						type = KeyType.ENUMERATION;
 					}
 				}
-				newKeys[i] = new KeyJson(oldKeys.get(i).getName(), type, oldKeys.get(i).getReferenceTableId());
+				newKeys[i] = new Key(oldKeys.get(i).getName(), type, oldKeys.get(i).getReferenceTableId());
 			}
 
-			List<Row> rows = dao.getRows(table.getId());
+			List<OldRow> rows = dao.getOldRows(table.getId());
 			String[][] newValues = new String[rows.size()][newKeys.length];
 			for (int i = 0; i < rows.size(); i++) {
-				ArrayList<Value> rowValues = dao.getValues(rows.get(i));
+				ArrayList<OldValue> rowValues = dao.getOldValues(rows.get(i));
 				for (int j = 0; j < rowValues.size(); j++) {
 					newValues[i][j] = rowValues.get(j).getValue();
 				}

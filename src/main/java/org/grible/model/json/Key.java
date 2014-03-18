@@ -1,11 +1,11 @@
 package org.grible.model.json;
 
-public class KeyJson {
+public class Key {
 	private String name;
 	private String type;
 	private int refid;
 	
-	public KeyJson(String name, KeyType type, int refid) {
+	public Key(String name, KeyType type, int refid) {
 		setName(name);
 		setType(type);
 		setRefid(refid);

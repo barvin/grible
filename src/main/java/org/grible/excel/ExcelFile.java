@@ -28,10 +28,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.grible.dao.PostgresDao;
-import org.grible.dbmigrate.oldmodel.Key;
-import org.grible.dbmigrate.oldmodel.Value;
+import org.grible.dbmigrate.oldmodel.OldKey;
+import org.grible.dbmigrate.oldmodel.OldValue;
 import org.grible.model.Table;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
+import org.grible.model.json.KeyType;
 import org.grible.servlets.ServletHelper;
 
 public class ExcelFile {
@@ -78,7 +79,7 @@ public class ExcelFile {
 			keyCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
 
 			if (ServletHelper.isJson()) {
-				KeyJson[] keys = table.getTableJson().getKeys();
+				Key[] keys = table.getTableJson().getKeys();
 				for (int i = 0; i < keys.length; i++) {
 					Cell cell = row1.createCell(i);
 					cell.setCellValue(keys[i].getName());
@@ -95,17 +96,17 @@ public class ExcelFile {
 				}
 			} else {
 				PostgresDao dao = new PostgresDao();
-				List<Key> keys = dao.getKeys(table.getId());
+				List<OldKey> keys = dao.getOldKeys(table.getId());
 				for (int i = 0; i < keys.size(); i++) {
 					Cell cell = row1.createCell(i);
 					cell.setCellValue(keys.get(i).getName());
 					cell.setCellStyle(keyCellStyle);
 				}
 
-				List<org.grible.dbmigrate.oldmodel.Row> rows = dao.getRows(table.getId());
+				List<org.grible.dbmigrate.oldmodel.OldRow> rows = dao.getOldRows(table.getId());
 				for (int i = 0; i < rows.size(); i++) {
 					Row excelRow = worksheet.createRow(i + 1);
-					List<Value> values = dao.getValues(rows.get(i));
+					List<OldValue> values = dao.getOldValues(rows.get(i));
 					for (int j = 0; j < values.size(); j++) {
 						Cell cell = excelRow.createCell(j);
 						cell.setCellValue(values.get(j).getValue());
@@ -122,23 +123,21 @@ public class ExcelFile {
 		}
 	}
 
-	public ArrayList<ArrayList<String>> getValues() {
-
-		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+	public String[][] getValues() {
 
 		Sheet sheet = workbook.getSheetAt(0);
 
 		int keysCount = generalKeys.size();
 		int rowCount = sheet.getPhysicalNumberOfRows() - 1;
+		
+		String[][] result = new String[rowCount][keysCount];
 
 		for (int i = 1; i < rowCount + 1; i++) {
-			ArrayList<String> values = new ArrayList<String>();
 			Row row = sheet.getRow(i);
 			for (int j = 0; j < keysCount; j++) {
 				Cell cell = row.getCell(j);
-				values.add(getStringCellValue(cell));
+				result[i][j] = getStringCellValue(cell);
 			}
-			result.add(values);
 		}
 
 		return result;
@@ -164,8 +163,12 @@ public class ExcelFile {
 		return cell.getStringCellValue();
 	}
 
-	public List<String> getKeys() {
-		return generalKeys;
+	public Key[] getKeys() {
+		Key[] keys = new Key[generalKeys.size()];
+		for (int i = 0; i < keys.length; i++) {
+			keys[i] = new Key(generalKeys.get(i), KeyType.TEXT, 0);
+		}
+		return keys;
 	}
 
 	private void setKeys() {

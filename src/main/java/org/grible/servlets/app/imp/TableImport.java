@@ -12,9 +12,7 @@ package org.grible.servlets.app.imp;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -33,6 +31,8 @@ import org.grible.helpers.StringHelper;
 import org.grible.model.Category;
 import org.grible.model.Table;
 import org.grible.model.TableType;
+import org.grible.model.json.Key;
+import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 
@@ -90,10 +90,10 @@ public class TableImport extends HttpServlet {
 					currentKeysCount = table.getTableJson().getKeys().length;
 				} else {
 					table = pDao.getTable(tableName, categoryId);
-					currentKeysCount = pDao.getKeys(table.getId()).size();
+					currentKeysCount = pDao.getOldKeys(table.getId()).size();
 				}
 
-				int importedKeysCount = excelFile.getKeys().size();
+				int importedKeysCount = excelFile.getKeys().length;
 				if (currentKeysCount != importedKeysCount) {
 					throw new Exception("Parameters number is different.<br>In the current table: " + currentKeysCount
 							+ ". In the Excel file: " + importedKeysCount + ".");
@@ -104,55 +104,29 @@ public class TableImport extends HttpServlet {
 				String destination = "/tables/?product=" + productId + "&id=" + table.getId();
 				response.sendRedirect(destination);
 			} else {
+				Key[] keys = excelFile.getKeys();
+				String[][] values = excelFile.getValues();
 				int tableId = DataManager.getInstance().getDao()
-						.insertTable(tableName, TableType.TABLE, category, null, null);
-
-				if (ServletHelper.isJson()) {
-					Table table = jDao.getTable(tableId, productId);
-					table.getTableJson().setKeys(excelFile.getKeys());
-					table.getTableJson().setValues(excelFile.getValues());
-					table.save();
-				} else {
-					List<Integer> keyIds = pDao.insertKeys(tableId, excelFile.getKeys());
-					ArrayList<ArrayList<String>> values = excelFile.getValues();
-					List<Integer> rowIds = pDao.insertRows(tableId, values.size());
-					pDao.insertValues(rowIds, keyIds, values);
-				}
+						.insertTable(tableName, TableType.TABLE, category, null, null, keys, values);
 
 				if (excelFile.hasPreconditions()) {
-					List<String> precondKeyNames = getKeyNames(excelFile.getPrecondition());
-					ArrayList<ArrayList<String>> precondValues = getValues(excelFile.getPrecondition());
-					int precondTableId = DataManager.getInstance().getDao()
-							.insertTable(null, TableType.PRECONDITION, category, tableId, null);
-
-					if (ServletHelper.isJson()) {
-						Table table = jDao.getTable(precondTableId, productId);
-						table.getTableJson().setKeys(precondKeyNames);
-						table.getTableJson().setValues(precondValues);
-						table.save();
-					} else {
-						List<Integer> precondKeyIds = pDao.insertKeys(precondTableId, precondKeyNames);
-						List<Integer> precondRowIds = pDao.insertRows(precondTableId, 1);
-						pDao.insertValues(precondRowIds, precondKeyIds, precondValues);
-					}
+					Key[] precondKeys = getKeys(excelFile.getPrecondition());
+					String[][] precondValues = getValues(excelFile.getPrecondition());
+					DataManager
+							.getInstance()
+							.getDao()
+							.insertTable(null, TableType.PRECONDITION, category, tableId, null, precondKeys,
+									precondValues);
 				}
 
 				if (excelFile.hasPostconditions()) {
-					List<String> postcondKeyNames = getKeyNames(excelFile.getPostcondition());
-					ArrayList<ArrayList<String>> postcondValues = getValues(excelFile.getPostcondition());
-					int postcondTableId = DataManager.getInstance().getDao()
-							.insertTable(null, TableType.POSTCONDITION, category, tableId, null);
-
-					if (ServletHelper.isJson()) {
-						Table table = jDao.getTable(postcondTableId, productId);
-						table.getTableJson().setKeys(postcondKeyNames);
-						table.getTableJson().setValues(postcondValues);
-						table.save();
-					} else {
-						List<Integer> postcondKeyIds = pDao.insertKeys(postcondTableId, postcondKeyNames);
-						List<Integer> postcondRowIds = pDao.insertRows(postcondTableId, 1);
-						pDao.insertValues(postcondRowIds, postcondKeyIds, postcondValues);
-					}
+					Key[] postcondKeys = getKeys(excelFile.getPostcondition());
+					String[][] postcondValues = getValues(excelFile.getPostcondition());
+					DataManager
+							.getInstance()
+							.getDao()
+							.insertTable(null, TableType.POSTCONDITION, category, tableId, null, postcondKeys,
+									postcondValues);
 				}
 
 				String message = "'" + tableName + "' table was successfully imported.";
@@ -170,20 +144,20 @@ public class TableImport extends HttpServlet {
 		}
 	}
 
-	private ArrayList<ArrayList<String>> getValues(HashMap<String, String> preconditions) {
-		ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
-		ArrayList<String> values = new ArrayList<String>();
-		for (String value : preconditions.values()) {
-			values.add(value);
+	private String[][] getValues(HashMap<String, String> preconditions) {
+		String[][] result = new String[1][preconditions.size()];
+		String[] values = preconditions.values().toArray(new String[0]);
+		for (int i = 0; i < preconditions.size(); i++) {
+			result[1][i] = values[i];
 		}
-		result.add(values);
 		return result;
 	}
 
-	private List<String> getKeyNames(HashMap<String, String> preconditions) {
-		List<String> result = new ArrayList<String>();
-		for (String keyName : preconditions.keySet()) {
-			result.add(keyName);
+	private Key[] getKeys(HashMap<String, String> preconditions) {
+		Key[] result = new Key[preconditions.size()];
+		String[] keyNames = preconditions.keySet().toArray(new String[0]);
+		for (int i = 0; i < preconditions.size(); i++) {
+			result[i] = new Key(keyNames[i], KeyType.TEXT, 0);
 		}
 		return result;
 	}

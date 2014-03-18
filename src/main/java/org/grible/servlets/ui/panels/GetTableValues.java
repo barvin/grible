@@ -27,7 +27,7 @@ import org.grible.json.ui.UiColumn;
 import org.grible.json.ui.UiTable;
 import org.grible.model.Table;
 import org.grible.model.TableType;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.model.json.TableJson;
 import org.grible.security.Security;
@@ -96,7 +96,7 @@ public class GetTableValues extends HttpServlet {
 				// }
 				// writeValues(uiTable, values);
 				uiTable.setIndex(true);
-				uiTable.setKeys(new KeyJson[] { new KeyJson("editme", KeyType.TEXT, 0) });
+				uiTable.setKeys(new Key[] { new Key("editme", KeyType.TEXT, 0) });
 				UiColumn[] columns = new UiColumn[1];
 				columns[0] = new UiColumn();
 				columns[0].setType("text");
@@ -120,7 +120,7 @@ public class GetTableValues extends HttpServlet {
 			uiTable.setIndex(false);
 		}
 		TableJson tableJson = table.getTableJson();
-		KeyJson[] keys = tableJson.getKeys();
+		Key[] keys = tableJson.getKeys();
 		uiTable.setKeys(keys);
 
 		List<Table> dataSotages = DataManager.getInstance().getDao().getTablesOfProduct(productId, TableType.STORAGE);

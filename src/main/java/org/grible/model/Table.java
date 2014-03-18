@@ -18,7 +18,7 @@ import java.io.FileWriter;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
-import org.grible.model.json.KeyJson;
+import org.grible.model.json.Key;
 import org.grible.model.json.TableJson;
 
 import com.google.gson.Gson;
@@ -34,7 +34,7 @@ public class Table {
 	private String className;
 	private boolean showWarning;
 	private Date modifiedTime;
-	private KeyJson[] keys;
+	private Key[] keys;
 	private String[][] values;
 
 	public Table(int id) {
@@ -125,11 +125,11 @@ public class Table {
 		this.modifiedTime = dateTime;
 	}
 
-	public KeyJson[] getKeys() {
+	public Key[] getKeys() {
 		return keys;
 	}
 
-	public void setKeys(KeyJson[] keys) {
+	public void setKeys(Key[] keys) {
 		this.keys = keys;
 	}
 

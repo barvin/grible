@@ -28,8 +28,6 @@ import org.grible.json.ui.UiTable;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.model.json.Key;
-import org.grible.model.json.KeyType;
-import org.grible.model.json.TableJson;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
@@ -80,30 +78,7 @@ public class GetTableValues extends HttpServlet {
 			tableType = table.getType();
 
 			UiTable uiTable = new UiTable();
-			if (isJson()) {
-				transformTableToUiTable(table, uiTable);
-			} else {
-				// TODO: implement PostgreSQL part.
-				
-				// List<Key> keys = pDao.getKeys(tableId);
-				// writeKeys(uiTable, keys);
-				//
-				// List<Row> rows = pDao.getRows(tableId);
-				// ArrayList<ArrayList<Value>> values = new
-				// ArrayList<ArrayList<Value>>();
-				// for (Row row : rows) {
-				// values.add(pDao.getValues(row));
-				// }
-				// writeValues(uiTable, values);
-				uiTable.setIndex(true);
-				uiTable.setKeys(new Key[] { new Key("editme", KeyType.TEXT, 0) });
-				UiColumn[] columns = new UiColumn[1];
-				columns[0] = new UiColumn();
-				columns[0].setType("text");
-				columns[0].setAllowInvalid(true);
-				uiTable.setColumns(columns);
-				uiTable.setValues(new String[][] { { "" } });
-			}
+			transformTableToUiTable(table, uiTable);
 			out.print(new Gson().toJson(uiTable));
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
@@ -119,8 +94,12 @@ public class GetTableValues extends HttpServlet {
 		} else {
 			uiTable.setIndex(false);
 		}
-		TableJson tableJson = table.getTableJson();
-		Key[] keys = tableJson.getKeys();
+		Key[] keys = null;
+		if (isJson()) {
+			keys = table.getTableJson().getKeys();
+		} else {
+			keys = table.getKeys();
+		}
 		uiTable.setKeys(keys);
 
 		List<Table> dataSotages = DataManager.getInstance().getDao().getTablesOfProduct(productId, TableType.STORAGE);
@@ -178,7 +157,12 @@ public class GetTableValues extends HttpServlet {
 			uiTable.setEnumerations(enumNames);
 		}
 
-		String[][] values = tableJson.getValues();
+		String[][] values = null;
+		if (isJson()) {
+			values = table.getTableJson().getValues();
+		} else {
+			values = table.getValues();
+		}
 		uiTable.setValues(values);
 	}
 

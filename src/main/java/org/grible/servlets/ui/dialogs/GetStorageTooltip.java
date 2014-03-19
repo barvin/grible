@@ -34,8 +34,6 @@ import org.grible.servlets.ServletHelper;
 @WebServlet("/GetStorageTooltip")
 public class GetStorageTooltip extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private JsonDao jDao;
-	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -65,13 +63,13 @@ public class GetStorageTooltip extends HttpServlet {
 			int productId = Integer.parseInt(request.getParameter("product"));
 			int rowsInRefTable = 0;
 			if (ServletHelper.isJson()) {
-				jDao = new JsonDao();
+				JsonDao jDao = new JsonDao();
 				refTable = jDao.getTable(refId, productId);
 				rowsInRefTable = refTable.getTableJson().getValues().length;
 			} else {
-				pDao = new PostgresDao();
+				PostgresDao pDao = new PostgresDao();
 				refTable = pDao.getTable(refId);
-				//TODO: implement PostgreSQL part.
+				rowsInRefTable = refTable.getValues().length;
 			}
 			
 			boolean correctFormat = true;

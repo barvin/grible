@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.json.ui.UiRowsUsage;
@@ -64,26 +65,28 @@ public class GetRowsUsage extends HttpServlet {
 			}
 
 			UiRowsUsage uiRowsUsage = new UiRowsUsage();
+			int tableId = Integer.parseInt(request.getParameter("tableid"));
+			productId = Integer.parseInt(request.getParameter("product"));
+			Table table = null;
+			int rowsCount = 0;
 			if (ServletHelper.isJson()) {
-				int tableId = Integer.parseInt(request.getParameter("tableid"));
-				productId = Integer.parseInt(request.getParameter("product"));
-
 				jDao = new JsonDao();
-				Table table = jDao.getTable(tableId, productId);
-				int rowsCount = table.getTableJson().getValues().length;
-				String[] usageInTables = new String[rowsCount];
-				String[] usageInStorages = new String[rowsCount];
-				for (int i = 0; i < rowsCount; i++) {
-					List<Table> allTablesUsingRow = jDao.getTablesUsingRow(productId, table, i + 1);
-					usageInTables[i] = getTestTableOccurences(allTablesUsingRow);
-					usageInStorages[i] = getDataStorageOccurences(allTablesUsingRow);
-				}
-				uiRowsUsage.setTables(usageInTables);
-				uiRowsUsage.setStorages(usageInStorages);				
+				table = jDao.getTable(tableId, productId);
+				rowsCount = table.getTableJson().getValues().length;
 			} else {
-				// TODO: implement PostgreSQL part.
 				pDao = new PostgresDao();
+				table = pDao.getTable(tableId);
+				rowsCount = table.getValues().length;
 			}
+			String[] usageInTables = new String[rowsCount];
+			String[] usageInStorages = new String[rowsCount];
+			for (int i = 0; i < rowsCount; i++) {
+				List<Table> allTablesUsingRow = DataManager.getInstance().getDao().getTablesUsingRow(productId, table, i + 1);
+				usageInTables[i] = getTestTableOccurences(allTablesUsingRow);
+				usageInStorages[i] = getDataStorageOccurences(allTablesUsingRow);
+			}
+			uiRowsUsage.setTables(usageInTables);
+			uiRowsUsage.setStorages(usageInStorages);
 
 			out.println(new Gson().toJson(uiRowsUsage));
 

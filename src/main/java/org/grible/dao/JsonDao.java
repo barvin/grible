@@ -228,20 +228,18 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public List<Table> getTablesUsingStorage(Table table, int productId) throws Exception {
+	public List<Table> getTablesUsingStorage(Table storage, int productId) throws Exception {
 		List<Table> result = new ArrayList<Table>();
-		List<Table> tables = getTablesOfProduct(productId, TableType.TABLE);
-		addTablesUsingTable(result, tables, table);
-		List<Table> preconditions = getTablesOfProduct(productId, TableType.PRECONDITION);
-		addTablesUsingTable(result, preconditions, table);
-		List<Table> postconditions = getTablesOfProduct(productId, TableType.POSTCONDITION);
-		addTablesUsingTable(result, postconditions, table);
-		List<Table> storages = getTablesOfProduct(productId, TableType.STORAGE);
-		addTablesUsingTable(result, storages, table);
+		List<Table> allTables = getTablesOfProduct(productId, TableType.TABLE);
+		allTables.addAll(getTablesOfProduct(productId, TableType.PRECONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.POSTCONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.STORAGE));
+		
+		addTablesUsingStorage(result, allTables, storage);
 		return result;
 	}
 
-	private void addTablesUsingTable(List<Table> result, List<Table> tables, Table table) {
+	private void addTablesUsingStorage(List<Table> result, List<Table> tables, Table table) {
 		for (Table foundTable : tables) {
 			Key[] keys = foundTable.getTableJson().getKeys();
 			for (int i = 0; i < keys.length; i++) {
@@ -442,19 +440,17 @@ public class JsonDao implements Dao {
 	 */
 	public List<Table> getTablesUsingRow(int productId, Table table, int rowOrder) throws Exception {
 		List<Table> result = new ArrayList<Table>();
-		List<Table> tables = getTablesOfProduct(productId, TableType.TABLE);
-		addTablesUsingRow(result, tables, table, rowOrder);
-		List<Table> preconditions = getTablesOfProduct(productId, TableType.PRECONDITION);
-		addTablesUsingRow(result, preconditions, table, rowOrder);
-		List<Table> postconditions = getTablesOfProduct(productId, TableType.POSTCONDITION);
-		addTablesUsingRow(result, postconditions, table, rowOrder);
-		List<Table> storages = getTablesOfProduct(productId, TableType.STORAGE);
-		addTablesUsingRow(result, storages, table, rowOrder);
+		List<Table> allTables = getTablesOfProduct(productId, TableType.TABLE);
+		allTables.addAll(getTablesOfProduct(productId, TableType.PRECONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.POSTCONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.STORAGE));		
+		addTablesUsingRow(result, allTables, table, rowOrder);
 		return result;
 	}
 
 	private void addTablesUsingRow(List<Table> result, List<Table> tables, Table table, int rowOrder) {
 		for (Table foundTable : tables) {
+			boolean found = false;
 			Key[] keys = foundTable.getTableJson().getKeys();
 			for (int i = 0; i < keys.length; i++) {
 				if (keys[i].getRefid() == table.getId()) {
@@ -464,10 +460,17 @@ public class JsonDao implements Dao {
 						for (String index : indexes) {
 							if (index.equals(String.valueOf(rowOrder))) {
 								result.add(foundTable);
+								found = true;
 								break;
 							}
 						}
+						if (found) {
+							break;
+						}
 					}
+				}
+				if (found) {
+					break;
 				}
 			}
 		}

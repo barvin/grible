@@ -21,11 +21,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 import com.google.gson.Gson;
 
@@ -35,6 +38,8 @@ import com.google.gson.Gson;
 @WebServlet("/SaveTable")
 public class SaveTable extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private JsonDao jDao;
+	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -57,8 +62,14 @@ public class SaveTable extends HttpServlet {
 			}
 			int tableId = Integer.parseInt(request.getParameter("tableid"));
 			int productId = Integer.parseInt(request.getParameter("product"));
-			JsonDao dao = new JsonDao();
-			Table table = dao.getTable(tableId, productId);
+			Table table = null;
+			if (ServletHelper.isJson()) {
+				jDao = new JsonDao();
+				table = jDao.getTable(tableId, productId);
+			} else {
+				pDao = new PostgresDao();
+				table = pDao.getTable(tableId);
+			}
 
 			String[] keyNames = request.getParameterValues("keys[]");
 			String[] keyTypes = request.getParameterValues("keyTypes[]");
@@ -85,7 +96,12 @@ public class SaveTable extends HttpServlet {
 								throw new Exception("ERROR: One of indexes in the row " + (i + 1) + " is not numeric.");
 							}
 							if (!"0".equals(index)) {
-								Table refTable = dao.getTable(keys[j].getRefid(), productId);
+								Table refTable = null;
+								if (ServletHelper.isJson()) {
+									refTable = jDao.getTable(keys[j].getRefid(), productId);
+								} else {
+									refTable = pDao.getTable(keys[j].getRefid());
+								}
 								String[][] refRows = refTable.getTableJson().getValues();
 								if (refRows.length < Integer.parseInt(index)) {
 									throw new Exception("ERROR: Data storage '" + refTable.getName()
@@ -97,8 +113,14 @@ public class SaveTable extends HttpServlet {
 						}
 
 					} else if (keys[j].getType() == KeyType.ENUMERATION) {
-						Table refTable = dao.getTable(keys[j].getRefid(), productId);
-						List<String> enumValues = dao.getValuesByKeyOrder(refTable, 0);
+						Table refTable = null;
+						if (ServletHelper.isJson()) {
+							refTable = jDao.getTable(keys[j].getRefid(), productId);
+						} else {
+							refTable = pDao.getTable(keys[j].getRefid());
+						}
+
+						List<String> enumValues = DataManager.getInstance().getDao().getValuesByKeyOrder(refTable, 0);
 						if (!enumValues.contains(value)) {
 							throw new Exception("ERROR: Enumeration '" + refTable.getName()
 									+ "' does not contain value '" + value + "'.<br>You specified it in row: "
@@ -109,10 +131,16 @@ public class SaveTable extends HttpServlet {
 				}
 			}
 
-			table.getTableJson().setKeys(keys);
-			table.getTableJson().setValues(values);
+			if (ServletHelper.isJson()) {
+				table.getTableJson().setKeys(keys);
+				table.getTableJson().setValues(values);
+				table.save();
+			} else {
+				table.setKeys(keys);
+				table.setValues(values);
+				pDao.updateTable(table);
+			}
 
-			table.save();
 			out.print("success");
 
 		} catch (Exception e) {

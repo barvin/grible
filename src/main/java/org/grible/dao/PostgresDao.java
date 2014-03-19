@@ -567,22 +567,47 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Table> getTablesUsingRow(int tableId, int rowOrder) throws SQLException {
+	/**
+	 * @param productId
+	 * @param table
+	 * @param rowOrder
+	 *            - one-based order of the row in the table.
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Table> getTablesUsingRow(int productId, Table table, int rowOrder) throws Exception {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		// TODO: finish
-		// ResultSet rs = stmt
-		// .executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-		// +
-		// "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
-		// +
-		// "ON t.type=tt.id AND t.id IN (SELECT tableid FROM rows WHERE id IN "
-		// + "(SELECT rowid FROM values WHERE " + rowId +
-		// " = ANY (storagerows))) ORDER BY t.id");
-		// while (rs.next()) {
-		// result.add(initTable(rs));
-		// }
+		List<Table> allTables = getTablesOfProduct(productId, TableType.TABLE);
+		allTables.addAll(getTablesOfProduct(productId, TableType.PRECONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.POSTCONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.STORAGE));
+		for (Table foundTable : allTables) {
+			boolean found = false;
+			Key[] keys = foundTable.getKeys();
+			for (int i = 0; i < keys.length; i++) {
+				if (keys[i].getRefid() == table.getId()) {
+					String[][] values = foundTable.getValues();
+					for (int j = 0; j < values.length; j++) {
+						String[] indexes = values[j][i].split(";");
+						for (String index : indexes) {
+							if (index.equals(String.valueOf(rowOrder))) {
+								result.add(foundTable);
+								found = true;
+								break;
+							}
+						}
+						if (found) {
+							break;
+						}
+					}
+				}
+				if (found) {
+					break;
+				}
+			}
+		}
 
 		stmt.close();
 		return result;
@@ -667,20 +692,23 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Table> getTablesUsingStorage(Table table, int productId) throws SQLException {
+	public List<Table> getTablesUsingStorage(Table storage, int productId) throws SQLException {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		//TODO: finish
-//		ResultSet rs = stmt
-//				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-//						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
-//						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + table.getId()
-//						+ ") ORDER BY t.id");
-//		while (rs.next()) {
-//			result.add(initTable(rs));
-//		}
-
+		List<Table> allTables = getTablesOfProduct(productId, TableType.TABLE);
+		allTables.addAll(getTablesOfProduct(productId, TableType.PRECONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.POSTCONDITION));
+		allTables.addAll(getTablesOfProduct(productId, TableType.STORAGE));
+		for (Table table : allTables) {
+			Key[] keys = table.getKeys();
+			for (Key key : keys) {
+				if (key.getRefid() == storage.getId()) {
+					result.add(table);
+					break;
+				}
+			}
+		}
 		stmt.close();
 		return result;
 	}
@@ -720,7 +748,7 @@ public class PostgresDao implements Dao {
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
 				+ table.getParentId() + ", showwarning=" + table.isShowWarning() + ", modifiedtime='"
 				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(table.getModifiedTime()) + "', keys='"
-				+ gson.toJson(table.getKeys()) + "' values='" + gson.toJson(table.getValues()) + "' WHERE id="
+				+ gson.toJson(table.getKeys()) + "', values='" + gson.toJson(table.getValues()) + "' WHERE id="
 				+ table.getId());
 
 		stmt.close();

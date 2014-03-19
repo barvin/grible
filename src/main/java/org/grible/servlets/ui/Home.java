@@ -86,6 +86,8 @@ public class Home extends HttpServlet {
 			if (!isMultipleUsers()) {
 				responseHtml.append("var productsWhosePathsNotExist = ").append(getProductsWhosePathsNotExist())
 						.append(";");
+			} else {
+				responseHtml.append("var productsWhosePathsNotExist = [];");
 			}
 			responseHtml.append("</script>");
 			responseHtml.append("</head>");

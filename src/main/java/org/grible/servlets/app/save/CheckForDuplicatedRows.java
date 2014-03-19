@@ -24,8 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
-import org.grible.dbmigrate.oldmodel.OldRow;
-import org.grible.dbmigrate.oldmodel.OldValue;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
@@ -90,14 +88,14 @@ public class CheckForDuplicatedRows extends HttpServlet {
 						}
 					} else {
 						List<String> strValues = new ArrayList<String>();
-						List<OldRow> rows = pDao.getOldRows(id);
-						for (OldRow row : rows) {
-							strValues.add(getCombinedValues(row));
+						String[][] values = table.getValues();
+						for (String[] row : values) {
+							strValues.add(StringUtils.join(row));
 						}
-						for (int i = 0; i < rows.size(); i++) {
+						for (int i = 0; i < values.length; i++) {
 							String currValue = strValues.remove(0);
 							if (strValues.contains(currValue)) {
-								int first = rows.get(i).getOrder();
+								int first = i + 1;
 								int second = first + 1 + strValues.indexOf(currValue);
 								message += "|Duplicated rows detected: " + first + " and " + second + ".";
 							}
@@ -115,14 +113,5 @@ public class CheckForDuplicatedRows extends HttpServlet {
 		}
 		out.flush();
 		out.close();
-	}
-
-	private String getCombinedValues(OldRow row) throws Exception {
-		StringBuilder builder = new StringBuilder();
-		List<OldValue> values = pDao.getOldValues(row);
-		for (OldValue value : values) {
-			builder.append(value.getValue());
-		}
-		return builder.toString();
 	}
 }

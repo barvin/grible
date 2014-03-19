@@ -19,7 +19,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
+import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
@@ -53,17 +55,18 @@ public class GetEnumValues extends HttpServlet {
 				return;
 			}
 
+			int tableId = Integer.parseInt(request.getParameter("tableid"));
+			int productId = Integer.parseInt(request.getParameter("product"));
+			Table table = null;
 			if (ServletHelper.isJson()) {
-				int tableId = Integer.parseInt(request.getParameter("tableid"));
-				int productId = Integer.parseInt(request.getParameter("product"));
-
 				JsonDao jDao = new JsonDao();
-				Table table = jDao.getTable(tableId, productId);
-				String[] options = jDao.getValuesByKeyOrder(table, 0).toArray(new String[0]);
-				out.println(new Gson().toJson(options, String[].class));
+				table = jDao.getTable(tableId, productId);
 			} else {
-				// TODO: implement PostgreSQL part.
+				PostgresDao pDao = new PostgresDao();
+				table = pDao.getTable(tableId);
 			}
+			String[] options = DataManager.getInstance().getDao().getValuesByKeyOrder(table, 0).toArray(new String[0]);
+			out.println(new Gson().toJson(options, String[].class));
 
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());

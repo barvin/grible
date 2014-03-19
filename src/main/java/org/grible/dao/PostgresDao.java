@@ -671,14 +671,15 @@ public class PostgresDao implements Dao {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
-						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + table.getId()
-						+ ") ORDER BY t.id");
-		while (rs.next()) {
-			result.add(initTable(rs));
-		}
+		//TODO: finish
+//		ResultSet rs = stmt
+//				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
+//						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
+//						+ "ON t.type=tt.id AND t.id IN (SELECT tableid FROM keys WHERE reftable=" + table.getId()
+//						+ ") ORDER BY t.id");
+//		while (rs.next()) {
+//			result.add(initTable(rs));
+//		}
 
 		stmt.close();
 		return result;
@@ -695,10 +696,6 @@ public class PostgresDao implements Dao {
 		}
 		rs.close();
 
-		stmt.executeUpdate("DELETE FROM values WHERE rowid IN (SELECT id FROM rows WHERE tableid=" + table.getId()
-				+ ")");
-		stmt.executeUpdate("DELETE FROM keys WHERE tableid=" + table.getId());
-		stmt.executeUpdate("DELETE FROM rows WHERE tableid=" + table.getId());
 		stmt.executeUpdate("DELETE FROM tables WHERE id=" + table.getId());
 
 		ResultSet rs2 = stmt.executeQuery("SELECT id FROM tables WHERE id=" + table.getId());
@@ -735,19 +732,6 @@ public class PostgresDao implements Dao {
 		stmt.executeUpdate("UPDATE categories SET name='" + category.getName() + "' WHERE id=" + category.getId());
 
 		stmt.close();
-	}
-
-	public int getRefStorageId(int keyId) throws SQLException {
-		int result = 0;
-		Connection conn = getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT reftable FROM keys WHERE id=" + keyId);
-		if (rs.next()) {
-			result = rs.getInt("reftable");
-		}
-
-		stmt.close();
-		return result;
 	}
 
 	public boolean isLastAdmin(String userId) throws SQLException {

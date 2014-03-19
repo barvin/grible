@@ -134,26 +134,25 @@ public class JsonDao implements Dao {
 		table.getTableJson().setClassName(className);
 		table.getTableJson().setShowWarning(true);
 		table.getTableJson().setKeys(keys);
-		table.getTableJson().setValues(values);		
+		table.getTableJson().setValues(values);
 		table.save();
 		table.setTableJson();
 
 		int id = product
 				.getGribleJson()
-				.read()
+				.read(product.getGribleJsonPath())
 				.addPath(
 						category.getType().getSection().getDirName() + File.separator + category.getPath()
 								+ File.separator + name + ".json");
-		product.getGribleJson().save();
+		product.getGribleJson().save(product.getGribleJsonPath());
 		return id;
 	}
 
 	public Table getTable(int id, int productId) throws Exception {
 		Product product = getProduct(productId);
-		String path = product.getGribleJson().read().getPathById(id);
+		String path = product.getGribleJson().read(product.getGribleJsonPath()).getPathById(id);
 		if (path == null) {
-			throw new Exception("Entry with id = " + id + " not found in '" + product.getGribleJson().getFilePath()
-					+ "'.");
+			throw new Exception("Entry with id = " + id + " not found in '" + product.getGribleJsonPath() + "'.");
 		}
 		File file = new File(product.getPath() + File.separator + path);
 		Table table = new Table(file);
@@ -182,7 +181,7 @@ public class JsonDao implements Dao {
 				table.setTableJson();
 				table.setId(product
 						.getGribleJson()
-						.read()
+						.read(product.getGribleJsonPath())
 						.getIdByPath(
 								category.getType().getSection().getDirName() + File.separator + category.getPath()
 										+ File.separator + file.getName()));
@@ -194,7 +193,7 @@ public class JsonDao implements Dao {
 
 	public Integer getChildTableId(int tableId, int productId, TableType childType) throws Exception {
 		Product product = getProduct(productId);
-		String parentPath = product.getGribleJson().read().getPathById(tableId);
+		String parentPath = product.getGribleJson().read(product.getGribleJsonPath()).getPathById(tableId);
 		String childPath = StringUtils.replace(parentPath, ".json", "_" + childType.toString() + ".json");
 		int result = product.getGribleJson().getIdByPath(childPath);
 		return (result == 0) ? null : result;
@@ -202,7 +201,7 @@ public class JsonDao implements Dao {
 
 	public Integer getParentTableId(int tableId, int productId, TableType childType) throws Exception {
 		Product product = getProduct(productId);
-		String childPath = product.getGribleJson().read().getPathById(tableId);
+		String childPath = product.getGribleJson().read(product.getGribleJsonPath()).getPathById(tableId);
 		String parentPath = StringUtils.replace(childPath, "_" + childType.toString() + ".json", ".json");
 		return product.getGribleJson().getIdByPath(parentPath);
 	}
@@ -267,8 +266,8 @@ public class JsonDao implements Dao {
 			}
 		}
 		Product product = getProduct(productId);
-		product.getGribleJson().read().deleteId(table.getId());
-		product.getGribleJson().save();
+		product.getGribleJson().read(product.getGribleJsonPath()).deleteId(table.getId());
+		product.getGribleJson().save(product.getGribleJsonPath());
 		File file = table.getFile();
 		file.delete();
 		return !file.exists();
@@ -327,7 +326,7 @@ public class JsonDao implements Dao {
 		GlobalSettings.getInstance().getConfigJson().setProducts(productList);
 		GlobalSettings.getInstance().getConfigJson().save();
 
-		File gribleJsonFile = new File(product.getGribleJson().getFilePath());
+		File gribleJsonFile = new File(product.getGribleJsonPath());
 		if (gribleJsonFile.exists()) {
 			for (Section section : Sections.getSections()) {
 				File dir = new File(path + File.separator + section.getDirName());
@@ -336,7 +335,7 @@ public class JsonDao implements Dao {
 				}
 			}
 		} else {
-			product.getGribleJson().save();
+			product.getGribleJson().save(product.getGribleJsonPath());
 			for (Section section : Sections.getSections()) {
 				File dir = new File(path + File.separator + section.getDirName());
 				if (dir.exists()) {
@@ -391,7 +390,7 @@ public class JsonDao implements Dao {
 			if (table.getType() == type) {
 				table.setId(product
 						.getGribleJson()
-						.read()
+						.read(product.getGribleJsonPath())
 						.getIdByPath(
 								type.getSection().getDirName() + File.separator
 										+ StringHelper.getCategoryPathFromTable(table, productId, type)
@@ -429,8 +428,8 @@ public class JsonDao implements Dao {
 		Product product = getProduct(productId);
 		String pathAfterProduct = table.getType().getSection().getDirName() + File.separator + newCategoryPath
 				+ File.separator + newName + ".json";
-		product.getGribleJson().read().updatePath(table.getId(), pathAfterProduct);
-		product.getGribleJson().save();
+		product.getGribleJson().read(product.getGribleJsonPath()).updatePath(table.getId(), pathAfterProduct);
+		product.getGribleJson().save(product.getGribleJsonPath());
 		File file = table.getFile();
 		file.renameTo(new File(product.getPath() + File.separator + pathAfterProduct));
 	}
@@ -497,7 +496,7 @@ public class JsonDao implements Dao {
 		String path = type.getSection().getDirName() + File.separator;
 		path += StringHelper.getCategoryPathFromTable(table, category.getProductId(), type);
 		path += File.separator + name + ".json";
-		table.setId(product.getGribleJson().read().getIdByPath(path));
+		table.setId(product.getGribleJson().read(product.getGribleJsonPath()).getIdByPath(path));
 		return table;
 	}
 

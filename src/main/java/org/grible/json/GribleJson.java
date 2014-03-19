@@ -10,7 +10,6 @@ import java.util.List;
 import com.google.gson.Gson;
 
 public class GribleJson {
-	private String filePath;
 	private IdPathPair[] pairs;
 
 	public IdPathPair[] getPairs() {
@@ -57,28 +56,19 @@ public class GribleJson {
 		return maxId;
 	}
 
-	public void setFilePath(String path) {
-		this.filePath = path;
-	}
-
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void save() throws Exception {
+	public void save(String filePath) throws Exception {
 		FileWriter fw = new FileWriter(filePath);
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(new Gson().toJson(this));
 		bw.close();
 	}
 
-	public GribleJson read() throws Exception {
+	public GribleJson read(String filePath) throws Exception {
 		FileReader fr = new FileReader(filePath);
 		BufferedReader br = new BufferedReader(fr);
 		GribleJson gribleJson = new Gson().fromJson(br, GribleJson.class);
 		br.close();
 		setIdPathPairs(gribleJson.getIdPathPairs());
-		setFilePath(gribleJson.getFilePath());
 		return this;
 	}
 

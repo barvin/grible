@@ -42,11 +42,14 @@ public class Product {
 		return path;
 	}
 
+	public String getGribleJsonPath() {
+		return path + File.separator + "grible.json";
+	}
+	
 	public void setPath(String path) {
 		this.path = path;
 		this.gribleJson = new GribleJson();
 		gribleJson.setIdPathPairs(new ArrayList<IdPathPair>());
-		gribleJson.setFilePath(path + File.separator + "grible.json");
 	}
 
 	public GribleJson getGribleJson() throws Exception {

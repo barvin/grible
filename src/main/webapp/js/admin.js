@@ -225,18 +225,16 @@ $().ready(
 				$.post("../ApplyUpdates", function(data) {
 					if (data == "success") {
 						$("#update-result").html("<img src='../img/ajax-loader-small.gif'> Installing...");
-						(function updater() {
+						var updater = function() {
 							$.ajax({
-								url : '/../',
-								success : function(data) {
-									window.location = "/../";
-								},
-								complete : function() {
-									// Schedule the next request when the current one's complete
-									setTimeout(updater, 5000);
-								}
+								url : "/../"
+							}).done(function(response) {
+								window.location = "/../"; 
+							}).always(function() {
+								setTimeout(updater, 5000);
 							});
-						})();
+						};
+						updater();
 					} else {
 						$("#update-result").html(data);
 					}

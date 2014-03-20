@@ -120,18 +120,37 @@ $().ready(
 						$("body").append(
 								'<div id="edit-user-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Edit User</div>' + '<div class="ui-dialog-content">'
 
-								+ '<div class="table">' + '<div class="table-row">' + '<div class="table-cell">User Name:</div>' + '<div class="table-cell"><input class="username" value="'
-										+ $userName + '"></div>' + '</div>' + '<div class="table-row">' + '<div class="table-cell">New password:</div>'
-										+ '<div class="table-cell"><input class="pass" type="password" ></div>' + '</div>' + '<div class="table-row">' + '<div class="table-cell">Retype it:</div>'
-										+ '<div class="table-cell"><input class="retype-pass" type="password" ></div>' + '</div>' + '<div class="table-row">'
-										+ '<div class="table-cell">Is Admin:</div>' + '<div class="table-cell"><input class="isadmin" type="checkbox" ></div>' + '</div>' + '<div class="table-row">'
-										+ '<div class="table-cell">Products:</div>' + '<div class="table-cell">'
+								+ '<div class="table">' + '<div class="table-row">' + '<div class="table-cell">User Name:</div>'
+										+ '<div class="table-cell"><input class="username" value="'
+										+ $userName
+										+ '"></div>'
+										+ '</div>'
+										+ '<div class="table-row">'
+										+ '<div class="table-cell">New password:</div>'
+										+ '<div class="table-cell"><input class="pass" type="password" ></div>'
+										+ '</div>'
+										+ '<div class="table-row">'
+										+ '<div class="table-cell">Retype it:</div>'
+										+ '<div class="table-cell"><input class="retype-pass" type="password" ></div>'
+										+ '</div>'
+										+ '<div class="table-row">'
+										+ '<div class="table-cell">Is Admin:</div>'
+										+ '<div class="table-cell"><input class="isadmin" type="checkbox" ></div>'
+										+ '</div>'
+										+ '<div class="table-row">'
+										+ '<div class="table-cell">Products:</div>'
+										+ '<div class="table-cell">'
 
 										+ getProductsCheckboxes()
 
-										+ '</div>' + '</div>' + '</div>'
+										+ '</div>'
+										+ '</div>'
+										+ '</div>'
 
-										+ '<br><div class="right">' + '<button id="' + $userid + '" class="ui-button btn-update-user">Update</button> '
+										+ '<br><div class="right">'
+										+ '<button id="'
+										+ $userid
+										+ '" class="ui-button btn-update-user">Update</button> '
 										+ '<button class="ui-button btn-cancel">Cancel</button>' + '</div></div></div>');
 						initEditUserDialog(jQuery);
 					});
@@ -206,9 +225,19 @@ $().ready(
 				$.post("../ApplyUpdates", function(data) {
 					if (data == "success") {
 						$("#update-result").html("<img src='../img/ajax-loader-small.gif'> Installing...");
-						setTimeout(function () {
-							window.location = "/../";
-					    }, 10000);
+						setTimeout(function() {
+							var isUpdated = false;
+							while (!isUpdated) {
+								setTimeout(function() {
+									$.get("/../", function(response) {
+										if (response.indexOf("Grible") > -1) {
+											window.location = "/../";
+											isUpdated = true;
+										}
+									});
+								}, 2000);
+							}
+						}, 10000);
 					} else {
 						$("#update-result").html(data);
 					}

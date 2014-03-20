@@ -225,19 +225,18 @@ $().ready(
 				$.post("../ApplyUpdates", function(data) {
 					if (data == "success") {
 						$("#update-result").html("<img src='../img/ajax-loader-small.gif'> Installing...");
-						setTimeout(function() {
-							var isUpdated = false;
-							while (!isUpdated) {
-								setTimeout(function() {
-									$.get("/../", function(response) {
-										if (response.indexOf("Grible") > -1) {
-											window.location = "/../";
-											isUpdated = true;
-										}
-									});
-								}, 2000);
-							}
-						}, 10000);
+						(function updater() {
+							$.ajax({
+								url : '/../',
+								success : function(data) {
+									window.location = "/../";
+								},
+								complete : function() {
+									// Schedule the next request when the current one's complete
+									setTimeout(updater, 5000);
+								}
+							});
+						})();
 					} else {
 						$("#update-result").html(data);
 					}

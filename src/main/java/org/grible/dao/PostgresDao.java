@@ -38,9 +38,9 @@ import com.google.gson.Gson;
  */
 public class PostgresDao implements Dao {
 
-	private Connection connection;
+	private static Connection connection;
 
-	private Connection getConnection() throws SQLException {
+	private static Connection getConnection() throws SQLException {
 		if (connection == null) {
 			initializeSQLDriver();
 			String sqlserver = null;
@@ -63,7 +63,7 @@ public class PostgresDao implements Dao {
 		return connection;
 	}
 
-	private void initializeSQLDriver() {
+	private static void initializeSQLDriver() {
 		try {
 			Class.forName("org.postgresql.Driver").newInstance();
 		} catch (Exception e) {
@@ -91,7 +91,11 @@ public class PostgresDao implements Dao {
 		Table result = new Table(rs.getInt("id"));
 		result.setType(TableType.valueOf(rs.getString("type").toUpperCase()));
 		result.setName(rs.getString("name"));
-		result.setCategoryId(rs.getInt("categoryid"));
+		if (rs.getInt("categoryid") == 0) {
+			result.setCategoryId(null);
+		} else {
+			result.setCategoryId(rs.getInt("categoryid"));
+		}
 		if (rs.getInt("parentid") == 0) {
 			result.setParentId(null);
 		} else {
@@ -205,7 +209,7 @@ public class PostgresDao implements Dao {
 			}
 		}
 		rs.close();
-		if (isVersionTableExist) {
+		if (!isVersionTableExist) {
 			result = "0.8.x";
 		} else {
 			ResultSet rs2 = stmt.executeQuery("SELECT dbversion FROM version");

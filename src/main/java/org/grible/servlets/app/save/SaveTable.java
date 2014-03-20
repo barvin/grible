@@ -97,12 +97,14 @@ public class SaveTable extends HttpServlet {
 							}
 							if (!"0".equals(index)) {
 								Table refTable = null;
+								String[][] refRows = null;
 								if (ServletHelper.isJson()) {
 									refTable = jDao.getTable(keys[j].getRefid(), productId);
+									refRows = refTable.getTableJson().getValues();
 								} else {
 									refTable = pDao.getTable(keys[j].getRefid());
+									refRows = refTable.getValues();
 								}
-								String[][] refRows = refTable.getTableJson().getValues();
 								if (refRows.length < Integer.parseInt(index)) {
 									throw new Exception("ERROR: Data storage '" + refTable.getName()
 											+ "' does not contain row number " + index

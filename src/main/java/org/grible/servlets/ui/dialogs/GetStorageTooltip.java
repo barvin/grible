@@ -71,7 +71,7 @@ public class GetStorageTooltip extends HttpServlet {
 				refTable = pDao.getTable(refId);
 				rowsInRefTable = refTable.getValues().length;
 			}
-			
+
 			boolean correctFormat = true;
 			for (int i = 0; i < indexes.length; i++) {
 				if (!StringUtils.isNumeric(indexes[i])) {
@@ -102,11 +102,16 @@ public class GetStorageTooltip extends HttpServlet {
 		}
 	}
 
-	private String getStorageTooltip(String[] indexes, Table refTable, int productId) {
+	private String getStorageTooltip(String[] indexes, Table refTable, int productId) throws Exception {
 		StringBuilder result = new StringBuilder("<div class=\"tooltip\"><div style=\"width: auto;\" class=\"table\">");
 		result.append("<div class=\"table-row key-row\">");
 		result.append("<div class=\"table-cell ui-cell-mini index-header-cell\"></div>");
-		Key[] keys = refTable.getTableJson().getKeys();
+		Key[] keys = null;
+		if (ServletHelper.isJson()) {
+			keys = refTable.getTableJson().getKeys();
+		} else {
+			keys = refTable.getKeys();
+		}
 		for (Key key : keys) {
 			result.append("<div class=\"table-cell ui-cell-mini key-cell\">");
 			result.append(key.getName());
@@ -114,7 +119,12 @@ public class GetStorageTooltip extends HttpServlet {
 		}
 		result.append("</div>");
 
-		String[][] rows = refTable.getTableJson().getValues();
+		String[][] rows = null;
+		if (ServletHelper.isJson()) {
+			rows = refTable.getTableJson().getValues();
+		} else {
+			rows = refTable.getValues();
+		}
 		for (int i = 0; i < indexes.length; i++) {
 			result.append("<div class=\"table-row value-row\">");
 			result.append("<div id=\"").append(indexes[i]);
@@ -132,7 +142,11 @@ public class GetStorageTooltip extends HttpServlet {
 			result.append("</div>");
 		}
 		result.append("</div>");
-		result.append("<a href=\"/storages/?product=").append(productId).append("&id=").append(refTable.getId())
+		String productPart = "";
+		if (ServletHelper.isJson()) {
+			productPart = "product=" + productId + "&";
+		}
+		result.append("<a href=\"/storages/?").append(productPart).append("id=").append(refTable.getId())
 				.append("\" target=\"_blank\">Open storage in the new tab</a></div>");
 		return result.toString();
 	}

@@ -65,10 +65,10 @@ public class GetTableValues extends HttpServlet {
 				return;
 			}
 			int tableId = Integer.parseInt(request.getParameter("id"));
+			productId = Integer.parseInt(request.getParameter("product"));
 			Table table = null;
 			if (isJson()) {
 				jDao = new JsonDao();
-				productId = Integer.parseInt(request.getParameter("product"));
 				table = jDao.getTable(tableId, productId);
 			} else {
 				pDao = new PostgresDao();
@@ -123,8 +123,15 @@ public class GetTableValues extends HttpServlet {
 			case ENUMERATION:
 				columns[i].setType("dropdown");
 				columns[i].setAllowInvalid(false);
-				Table refTable = jDao.getTable(keys[i].getRefid(), productId);
-				String[] source = jDao.getValuesByKeyOrder(refTable, 0).toArray(new String[0]);
+				
+				String[] source = null;
+				if (isJson()) {
+					Table refTable = jDao.getTable(keys[i].getRefid(), productId);
+					source = jDao.getValuesByKeyOrder(refTable, 0).toArray(new String[0]);
+				} else {
+					Table refTable = pDao.getTable(keys[i].getRefid());
+					source = pDao.getValuesByKeyOrder(refTable, 0).toArray(new String[0]);
+				}
 				columns[i].setSource(source);
 				break;
 

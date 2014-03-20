@@ -1012,7 +1012,6 @@ function setRowsUsage(usage) {
 				$newColHeader[$newColHeader.length - 1] = "Used in storages";
 
 				$tableInstance.updateSettings({
-					width : $("#table-container").width(),
 					cells : function(row, col, prop) {
 						var cellProperties = {};
 						if (countCols - col < 3) {
@@ -1219,8 +1218,7 @@ function loadTableValues(args) {
 			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
 			cells : setColumnTypes,
-			width : $("#table-container").width(),
-			height : $("#table-container").height(),
+			width : 5000,
 			autoWrapRow : true,
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
@@ -1311,8 +1309,12 @@ function loadTableValues(args) {
 				}
 			},
 			afterInit : function() {
+
+				var $tableInstance = $tableContainer.handsontable('getInstance');
+				$tableInstance.updateSettings({
+					width : ($("table.htCore").width() + 10)
+				});
 				if (tableType == "enumeration") {
-					var $tableInstance = $tableContainer.handsontable('getInstance');
 					$tableInstance.updateSettings({
 						contextMenu : [ 'row_above', 'row_below', 'hsep1', 'remove_row', 'hsep3', 'undo', 'redo' ]
 					});
@@ -1322,6 +1324,9 @@ function loadTableValues(args) {
 				if ($(".handsontable td.htInvalid").length > 0) {
 					disableSaveButton();
 				}
+
+				var $tableInstance = $tableContainer.handsontable('getInstance');
+
 				$(".handsontable thead th").each(function(i) {
 					if (($(this).find("span.colHeader").length > 0) && (tableType != "enumeration") && ($(this).attr("type") != "undefined")) {
 						var $colHeader = $(this);
@@ -1372,7 +1377,6 @@ function loadTableValues(args) {
 									name : "Save",
 									icon : "save",
 									callback : function(key, opt) {
-										var $tableInstance = $tableContainer.handsontable('getInstance');
 										if (opt.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
 											$colHeader.attr("modified", true);
 											var $newColHeader = $tableInstance.getColHeader();
@@ -1511,6 +1515,12 @@ function loadTableValues(args) {
 			$("#main .table-cell").removeClass("floatleft");
 		}
 	});
+
+	// var $tableInstance = $("#table-container").handsontable('getInstance');
+	// $tableInstance.updateSettings({
+	// width : $("#table-container").width()
+	// });
+
 }
 
 function isNumber(n) {

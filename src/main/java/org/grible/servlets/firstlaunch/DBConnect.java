@@ -39,6 +39,7 @@ public class DBConnect extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			initializeSQLDriver();
+			AppTypes appType = AppTypes.valueOf(request.getParameter("apptype").toUpperCase());
 			String dbhost = request.getParameter("dbhost");
 			String dbport = request.getParameter("dbport");
 			String dbname = request.getParameter("dbname");
@@ -48,7 +49,7 @@ public class DBConnect extends HttpServlet {
 			if (con != null) {
 				out.print("Done.");
 				con.close();
-				GlobalSettings.getInstance().setAppType(AppTypes.POSTGRESQL);
+				GlobalSettings.getInstance().setAppType(appType);
 				GlobalSettings.getInstance().setDbHost(dbhost);
 				GlobalSettings.getInstance().setDbPort(dbport);
 				GlobalSettings.getInstance().setDbName(dbname);

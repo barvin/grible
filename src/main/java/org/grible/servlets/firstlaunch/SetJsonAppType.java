@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,8 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import nu.xom.Document;
 import nu.xom.Element;
 
-import org.grible.json.ConfigJson;
-import org.grible.model.Product;
+import org.grible.servlets.ServletHelper;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
 
@@ -61,11 +59,7 @@ public class SetJsonAppType extends HttpServlet {
 			}
 			writeToFileInConfigFolder(GlobalSettings.getInstance().getConfigFilePath(), result);
 			
-			ConfigJson configJson = new ConfigJson();
-			configJson.setProducts(new ArrayList<Product>());
-			configJson.setTooltipOnClick(false);
-			GlobalSettings.getInstance().setConfigJson(configJson);
-			GlobalSettings.getInstance().getConfigJson().save();
+			ServletHelper.setConfigJsonFile();
 			
 			out.print("success");
 

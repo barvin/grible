@@ -36,4 +36,8 @@ public class StringHelper {
 		result = StringUtils.substringBeforeLast(result, File.separator);
 		return result;
 	}
+	
+	public static String removeForbiddenCharactersForFolder(String str) {
+		return StringUtils.removePattern(str, "[<|>|:|\"|\\\\|/|\\||\\?|\\*]");
+	}
 }

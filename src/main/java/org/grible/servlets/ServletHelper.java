@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.excel.ExcelFile;
+import org.grible.json.ConfigJson;
 import org.grible.model.Product;
 import org.grible.model.Table;
 import org.grible.model.TableType;
@@ -291,6 +293,14 @@ public class ServletHelper {
 	public static boolean isWindows() {
 		String os = System.getProperty("os.name").toLowerCase();
 		return (os.contains("win"));
+	}
+	
+	public static void setConfigJsonFile() throws Exception {
+		ConfigJson configJson = new ConfigJson();
+		configJson.setProducts(new ArrayList<Product>());
+		configJson.setTooltipOnClick(false);
+		GlobalSettings.getInstance().setConfigJson(configJson);
+		GlobalSettings.getInstance().getConfigJson().save();
 	}
 
 }

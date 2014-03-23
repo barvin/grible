@@ -895,11 +895,9 @@ function initTopPanel() {
 				$values.push(row);
 			});
 
-			$(".handsontable thead th").each(function(i) {
-				if (i > 0) {
-					$keyTypes.push($(this).attr("type"));
-					$keyRefids.push($(this).attr("refid"));
-				}
+			$(".handsontable thead th").has("span.colHeader").each(function(i) {
+				$keyTypes.push($(this).attr("type"));
+				$keyRefids.push($(this).attr("refid"));
 			});
 			$.post("../SaveTable", {
 				tableid : tableId,
@@ -1218,8 +1216,10 @@ function loadTableValues(args) {
 			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
 			cells : setColumnTypes,
-			width : 5000,
+			width : $("#table-container").width(),
+			height : $("#table-container").height(),
 			autoWrapRow : true,
+			//nativeScrollbars: true,
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
 				TH.setAttribute("refid", $colRefids[col]);
@@ -1283,6 +1283,11 @@ function loadTableValues(args) {
 						});
 					}
 				}
+				// var $tableInstance =
+				// $tableContainer.handsontable('getInstance');
+				// $tableInstance.updateSettings({
+				// width : ($("table.htCore").width() + (amount * 50) + 10)
+				// });
 			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
@@ -1307,6 +1312,11 @@ function loadTableValues(args) {
 					}
 					setModifiedCells();
 				}
+				// var $tableInstance =
+				// $tableContainer.handsontable('getInstance');
+				// $tableInstance.updateSettings({
+				// width : ($("table.htCore").width() - (amount * 50) + 10)
+				// });
 			},
 			afterInit : function() {
 

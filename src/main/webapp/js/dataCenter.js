@@ -889,6 +889,7 @@ function initTopPanel() {
 					var $counter = 0;
 
 					(function saveTableRow($counter) {
+						console.log($tableContainer.getDataAtRow($counter));
 						$.post("../SaveTableRow", {
 							tableid : tableId,
 							product : productId,
@@ -1264,9 +1265,10 @@ function loadTableValues(args) {
 				for (var i = 0; i < $columns.length; i++) {
 					if ($columns[i].type === "dropdown") {
 						$tableContainer.handsontable("setDataAtCell", index, i, $columns[i].source[0]);
-					}
-					if ($columns[i].type === "text" && $columns[i].allowInvalid == false) {
+					} else if ($columns[i].type === "text" && $columns[i].allowInvalid == false) {
 						$tableContainer.handsontable("setDataAtCell", index, i, "0");
+					} else {
+						$tableContainer.handsontable("setDataAtCell", index, i, "");
 					}
 				}
 			},

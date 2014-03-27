@@ -1,6 +1,8 @@
 var $changedCells = [];
 var $isRowsUsageShown = false;
 var $isRowsUsageJustTurnedOn = false;
+var $colTypes = [];
+var $colRefids = [];
 
 $(window).on("load", function() {
 	var docHeight = $(window).height() - 95;
@@ -873,59 +875,61 @@ function initTopPanel() {
 	$("#btn-save-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
 			disableSaveButton();
+			$("#waiting-bg").addClass("loading");
 			var $tableContainer = $("#table-container").handsontable('getInstance');
-			var $keyNames = [];
-			var $colHeadersCount = $(".handsontable thead th span.colHeader").length;
-			$(".handsontable thead th span.colHeader").each(function(i) {
-				if (!$isRowsUsageShown || ($isRowsUsageShown && i < $colHeadersCount - 2)) {
-					$keyNames[i] = $(this).text();
-				}
-			});
-			var $keyTypes = [];
-			var $keyRefids = [];
-			var $values = [];
-			var $data = $tableContainer.getData();
-			$.each($data, function(index, rowValues) {
-				var row = "[\"";
-				if ($isRowsUsageShown) {
-					rowValues.splice(rowValues.length - 2, 2);
-				}
-				row += rowValues.join("\",\"");
-				row += "\"]";
-				$values.push(row);
-			});
+			var $keyNames = $tableContainer.getColHeader();
 
-			$(".handsontable thead th").has("span.colHeader").each(function(i) {
-				$keyTypes.push($(this).attr("type"));
-				$keyRefids.push($(this).attr("refid"));
-			});
-			$.post("../SaveTable", {
-				tableid : tableId,
-				product : productId,
+			$.post("../SaveTableHead", {
 				keys : $keyNames,
-				keyTypes : $keyTypes,
-				keyRefids : $keyRefids,
-				values : $values
+				keyTypes : $colTypes,
+				keyRefids : $colRefids
 			}, function(data) {
 				if (data == "success") {
-					$changedCells = [];
-					$("td[modified]").removeAttr("modified");
-					$("th[modified]").removeAttr("modified");
-					$(".current-row").removeClass("current-row");
-					$.post("../CheckForDuplicatedRows", {
-						id : tableId,
-						product : productId
-					}, function(data) {
-						var message = data.split("|");
-						if (message[0] == "true") {
-							for (var i = 1; i < message.length; i++) {
+					var $rowsCount = $tableContainer.countRows();
+					var $counter = 0;
+
+					(function saveTableRow($counter) {
+						$.post("../SaveTableRow", {
+							tableid : tableId,
+							product : productId,
+							row : $counter,
+							values : $tableContainer.getDataAtRow($counter),
+							islastrow : ($rowsCount - $counter === 1)
+						}, function(data) {
+							if (data == "success") {
+								$counter++;
+								if ($counter < $rowsCount) {
+									saveTableRow($counter);
+								} else {
+									$("#waiting-bg").removeClass("loading");
+									$changedCells = [];
+									$("td[modified]").removeAttr("modified");
+									$("th[modified]").removeAttr("modified");
+									$(".current-row").removeClass("current-row");
+									$.post("../CheckForDuplicatedRows", {
+										id : tableId,
+										product : productId
+									}, function(data) {
+										var message = data.split("|");
+										if (message[0] == "true") {
+											for (var i = 1; i < message.length; i++) {
+												noty({
+													type : "warning",
+													text : message[i]
+												});
+											}
+										}
+									});
+								}
+							} else {
 								noty({
-									type : "warning",
-									text : message[i]
+									type : "error",
+									text : data
 								});
 							}
-						}
-					});
+						});
+					})($counter);
+
 				} else {
 					noty({
 						type : "error",
@@ -1148,10 +1152,15 @@ function initGeneratedClassDialog() {
 function loadTableValues(args) {
 	$.post("../GetTableValues", args, function(res) {
 
+		var defaultCellRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+			Handsontable.renderers.TextRenderer.apply(this, arguments);
+			$(td).removeClass("storage-cell");
+			$(td).removeAttr("refid");
+		};
 		var storageCellRenderer = function(instance, td, row, col, prop, value, cellProperties) {
 			Handsontable.renderers.TextRenderer.apply(this, arguments);
 			$(td).addClass("storage-cell");
-			$(td).attr("refid", $(".handsontable thead th:nth-child(" + (col + 2) + ")").attr("refid"));
+			$(td).attr("refid", $colRefids[col]);
 		};
 		var storageValidatorRegExp = function(value, callback) {
 			if (/^\d+[;\d+]*$/.test(value)) {
@@ -1163,8 +1172,6 @@ function loadTableValues(args) {
 
 		var $data = jQuery.parseJSON(res);
 		var $colNames = [];
-		var $colTypes = [];
-		var $colRefids = [];
 		for (var i = 0; i < $data.keys.length; i++) {
 			$colNames[i] = $data.keys[i].name;
 			$colTypes[i] = $data.keys[i].type;
@@ -1184,6 +1191,8 @@ function loadTableValues(args) {
 				if ($columns[col].type === "text" && $columns[col].allowInvalid == false) {
 					cellProperties.renderer = storageCellRenderer;
 					cellProperties.validator = storageValidatorRegExp;
+				} else {
+					cellProperties.renderer = defaultCellRenderer;
 				}
 			} else if (col - $columns.length < 2) {
 				cellProperties.readOnly = true;
@@ -1219,7 +1228,6 @@ function loadTableValues(args) {
 			width : $("#table-container").width(),
 			height : $("#table-container").height(),
 			autoWrapRow : true,
-			//nativeScrollbars: true,
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
 				TH.setAttribute("refid", $colRefids[col]);
@@ -1283,11 +1291,6 @@ function loadTableValues(args) {
 						});
 					}
 				}
-				// var $tableInstance =
-				// $tableContainer.handsontable('getInstance');
-				// $tableInstance.updateSettings({
-				// width : ($("table.htCore").width() + (amount * 50) + 10)
-				// });
 			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
@@ -1312,18 +1315,10 @@ function loadTableValues(args) {
 					}
 					setModifiedCells();
 				}
-				// var $tableInstance =
-				// $tableContainer.handsontable('getInstance');
-				// $tableInstance.updateSettings({
-				// width : ($("table.htCore").width() - (amount * 50) + 10)
-				// });
 			},
 			afterInit : function() {
 
 				var $tableInstance = $tableContainer.handsontable('getInstance');
-				$tableInstance.updateSettings({
-					width : ($("table.htCore").width() + 10)
-				});
 				if (tableType == "enumeration") {
 					$tableInstance.updateSettings({
 						contextMenu : [ 'row_above', 'row_below', 'hsep1', 'remove_row', 'hsep3', 'undo', 'redo' ]
@@ -1390,7 +1385,8 @@ function loadTableValues(args) {
 										if (opt.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
 											$colHeader.attr("modified", true);
 											var $newColHeader = $tableInstance.getColHeader();
-											$newColHeader[i - 1] = opt.inputs["name"].$input.val();
+											var $firstVisibleColIndex = $tableInstance.colOffset();
+											$newColHeader[$firstVisibleColIndex + i - 1] = opt.inputs["name"].$input.val();
 											$tableInstance.updateSettings({
 												colHeaders : $newColHeader
 											});
@@ -1464,6 +1460,7 @@ function loadTableValues(args) {
 							},
 							events : {
 								show : function(opt) {
+									opt.items.name.value = $colHeader.find("span.colHeader").text();
 									$(".context-menu-input").each(function(i) {
 										if ($(this).find("span").text() === "") {
 											$(this).find("span").remove();
@@ -1506,7 +1503,7 @@ function loadTableValues(args) {
 						});
 					}
 				});
-				initTooltipCells($(".storage-cell"));
+				initTooltipCells($("td"));
 			},
 		});
 
@@ -1526,11 +1523,6 @@ function loadTableValues(args) {
 		}
 	});
 
-	// var $tableInstance = $("#table-container").handsontable('getInstance');
-	// $tableInstance.updateSettings({
-	// width : $("#table-container").width()
-	// });
-
 }
 
 function isNumber(n) {
@@ -1539,18 +1531,26 @@ function isNumber(n) {
 
 function initTooltipCells(elements) {
 	if (isTooltipOnClick) {
-		elements.click(function() {
-			$(this).off("mouseover");
-			initTooltipCellsOnClick($(this));
+		elements.each(function(i) {
+			if ($(this).is(".storage-cell")) {
+				$(this).off("mouseenter mouseleave");
+				$(this).click(initTooltipCellsOnClick);
+			} else {
+				$(this).unbind("click");
+			}
 		});
 	} else {
-		elements.hover(function() {
-			initTooltipCellsOnHover($(this));
+		elements.each(function(i) {
+			if ($(this).is(".storage-cell")) {
+				$(this).hover(initTooltipCellsOnHover);
+			} else {
+				$(this).off("mouseenter mouseleave");
+			}
 		});
 	}
 
-	function initTooltipCellsOnClick(value) {
-		var $value = value;
+	function initTooltipCellsOnClick() {
+		var $value = $(this);
 		if (($value.text() != "0") && ($value.text() != "")) {
 			if ($value.has("div.tooltip").length == 0) {
 				var $content = $value.text();
@@ -1560,10 +1560,17 @@ function initTooltipCells(elements) {
 					content : $content
 				};
 				$.post("../GetStorageTooltip", $args, function(data) {
-					$value.html(data);
-					var $tooltip = $value.find("div.tooltip");
-					adjustTooltipPosition($value, $tooltip);
-					$value.find("div.tooltip").show();
+					if (data.indexOf("ERROR") === 0) {
+						noty({
+							type : "error",
+							text : data
+						});
+					} else {
+						$value.html(data);
+						var $tooltip = $value.find("div.tooltip");
+						adjustTooltipPosition($value, $tooltip);
+						$value.find("div.tooltip").show();
+					}
 				});
 			} else {
 				$value.find("div.tooltip").toggle();
@@ -1571,8 +1578,8 @@ function initTooltipCells(elements) {
 		}
 	}
 
-	function initTooltipCellsOnHover(td) {
-		var $value = td;
+	function initTooltipCellsOnHover() {
+		var $value = $(this);
 		if (($value.text() != "0") && ($value.text() != "") && ($value.has("div.tooltip").length == 0)) {
 			var $content = $value.text();
 			var $args = {
@@ -1581,9 +1588,16 @@ function initTooltipCells(elements) {
 				content : $content
 			};
 			$.post("../GetStorageTooltip", $args, function(data) {
-				$value.html(data);
-				var $tooltip = $value.find("div.tooltip");
-				adjustTooltipPosition($value, $tooltip);
+				if (data.indexOf("ERROR") === 0) {
+					noty({
+						type : "error",
+						text : data
+					});
+				} else {
+					$value.html(data);
+					var $tooltip = $value.find("div.tooltip");
+					adjustTooltipPosition($value, $tooltip);
+				}
 			});
 		}
 	}

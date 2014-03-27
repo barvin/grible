@@ -219,6 +219,7 @@ $.noty.defaults = {
 	force : false, // adds notification to the beginning of queue when set
 	// to true
 	modal : false,
+	maxVisible: 3,
 	closeWith : [ 'click', 'button' ], // ['click', 'button', 'hover']
 	callback : {
 		onShow : function() {

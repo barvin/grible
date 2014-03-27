@@ -89,6 +89,7 @@ public class ExportFromDbToJson extends HttpServlet {
 				addCategories(allCategories, "");
 
 				updateTableIds();
+				crossIds.clear();
 			}
 
 			GlobalSettings.getInstance().getConfigJson().setProducts(new ArrayList<Product>());
@@ -108,12 +109,12 @@ public class ExportFromDbToJson extends HttpServlet {
 			category.setName(StringHelper.removeForbiddenCharactersForFolder(category.getName()));
 			jDao.insertCategory(category.getType(), jsonProductId, category.getName(), null, parentPath
 					+ File.separator);
-			String path = category.getName();
+			String categoryPath = category.getName();
 			if (!parentPath.isEmpty()) {
-				path = parentPath + File.separator + category.getName();
+				categoryPath = parentPath + File.separator + category.getName();
 			}
 			List<Table> tables = pDao.getTablesByCategory(category);
-			category.setPath(path);
+			category.setPath(categoryPath);
 			category.setProductId(jsonProductId);
 			for (Table table : tables) {
 				table.setName(StringHelper.removeForbiddenCharactersForFolder(table.getName()));
@@ -138,10 +139,7 @@ public class ExportFromDbToJson extends HttpServlet {
 				}
 			}
 			List<Category> childCategories = pDao.getChildCategories(category);
-			if (!parentPath.isEmpty()) {
-				parentPath += File.separator;
-			}
-			addCategories(childCategories, parentPath + category.getName());
+			addCategories(childCategories, categoryPath);
 		}
 	}
 

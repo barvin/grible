@@ -95,7 +95,7 @@ public class GetStorageTooltip extends HttpServlet {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			out.print(e.getLocalizedMessage());
+			out.print("ERROR: " + e.getLocalizedMessage());
 		} finally {
 			out.flush();
 			out.close();

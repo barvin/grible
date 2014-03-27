@@ -1292,6 +1292,26 @@ function loadTableValues(args) {
 					}
 				}
 			},
+			beforeRemoveRow : function(index, amount) {
+				var res = $.ajax({
+					type : "POST",
+					url : "../GetRowUsage",
+					data : {
+						tableid : tableId,
+						product : productId,
+						row : index
+					},
+					async : false
+				}).responseText;
+				if (res !== "") {
+					noty({
+						type : "error",
+						text : res
+					});
+					return false;
+				}
+				return true;
+			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
 				for (var i = 0; i < $changedCells.length; i++) {

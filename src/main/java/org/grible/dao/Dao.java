@@ -69,4 +69,6 @@ public interface Dao {
 	public List<String> getValuesByKeyOrder(Table table, int keyOrder);
 	
 	public List<Table> getTablesUsingRow(int productId, Table table, int rowOrder) throws Exception;
+
+	public String[][] getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception;
 }

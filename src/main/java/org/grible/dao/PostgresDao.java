@@ -933,4 +933,10 @@ public class PostgresDao implements Dao {
 		}
 		return values;
 	}
+
+	@Override
+	public String[][] getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

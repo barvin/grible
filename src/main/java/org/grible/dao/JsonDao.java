@@ -503,4 +503,26 @@ public class JsonDao implements Dao {
 		return table;
 	}
 
+	@Override
+	public String[][] getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception {
+		Table storage = getTable(storageId, productId);
+		String[][] storageValues = storage.getTableJson().getValues();
+
+		Table table = getTable(tableId, productId);
+		Key[] keys = table.getTableJson().getKeys();
+		String[][] values = table.getTableJson().getValues();
+		
+		List<Integer> rows = new ArrayList<>();
+		for (int i = 0; i < values.length; i++) {
+			for (int j = 0; j < values[0].length; j++) {
+				if (keys[j].getRefid() == storageId) {
+					String[] indexes = values[i][j].split(";");
+					//for ()
+				}
+			}
+		}
+		//String[][] result = new String
+		return null;
+	}
+
 }

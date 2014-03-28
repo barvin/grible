@@ -87,7 +87,7 @@ public class GetRowUsage extends HttpServlet {
 				}
 			}
 			
-			out.println(result);
+			out.print(result);
 
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());

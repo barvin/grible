@@ -3,6 +3,8 @@ var $isRowsUsageShown = false;
 var $isRowsUsageJustTurnedOn = false;
 var $colTypes = [];
 var $colRefids = [];
+var $draggedRowValues = [];
+var $rowNumbers = [];
 
 $(window).on("load", function() {
 	var docHeight = $(window).height() - 95;
@@ -902,11 +904,28 @@ function initTopPanel() {
 								if ($counter < $rowsCount) {
 									saveTableRow($counter);
 								} else {
-									$("#waiting-bg").removeClass("loading");
 									$changedCells = [];
 									$("td[modified]").removeAttr("modified");
 									$("th[modified]").removeAttr("modified");
 									$(".current-row").removeClass("current-row");
+									$.post("../UpdateRowsOrder", {
+										tableid : tableId,
+										product : productId,
+										rows : $rowNumbers
+									}, function(data) {
+										$("#waiting-bg").removeClass("loading");
+										if (data == "success") {
+											for (var i = 0; i < $rowsCount; i++) {
+												$rowNumbers[i] = i;
+											}
+										} else {
+											noty({
+												type : "error",
+												text : data
+											});
+										}
+									});
+
 									$.post("../CheckForDuplicatedRows", {
 										id : tableId,
 										product : productId
@@ -1262,14 +1281,25 @@ function loadTableValues(args) {
 					}
 				}
 				setModifiedCells();
-				for (var i = 0; i < $columns.length; i++) {
-					if ($columns[i].type === "dropdown") {
-						$tableContainer.handsontable("setDataAtCell", index, i, $columns[i].source[0]);
-					} else if ($columns[i].type === "text" && $columns[i].allowInvalid == false) {
-						$tableContainer.handsontable("setDataAtCell", index, i, "0");
-					} else {
-						$tableContainer.handsontable("setDataAtCell", index, i, "");
+				if ($draggedRowValues.length === 0) {
+					// adding row
+					for (var i = 0; i < $columns.length; i++) {
+						if ($columns[i].type === "dropdown") {
+							$tableContainer.handsontable("setDataAtCell", index, i, $columns[i].source[0]);
+						} else if ($columns[i].type === "text" && $columns[i].allowInvalid == false) {
+							$tableContainer.handsontable("setDataAtCell", index, i, "0");
+						} else {
+							$tableContainer.handsontable("setDataAtCell", index, i, "");
+						}
 					}
+					$rowNumbers.splice(index, 0, -1);
+				} else {
+					// dragging row
+					for (var i = 0; i < $columns.length; i++) {
+						$tableContainer.handsontable("setDataAtCell", index, i, $draggedRowValues[i]);
+					}
+					$draggedRowValues = [];
+					$("#waiting-bg").removeClass("loading");
 				}
 			},
 			afterCreateCol : function(index, amount) {
@@ -1295,13 +1325,16 @@ function loadTableValues(args) {
 				}
 			},
 			beforeRemoveRow : function(index, amount) {
+				if ($draggedRowValues.length > 0 || $rowNumbers[index] === -1) {
+					return true;
+				}
 				var res = $.ajax({
 					type : "POST",
 					url : "../GetRowUsage",
 					data : {
 						tableid : tableId,
 						product : productId,
-						row : index
+						row : $rowNumbers[index]
 					},
 					async : false
 				}).responseText;
@@ -1324,6 +1357,7 @@ function loadTableValues(args) {
 					}
 				}
 				setModifiedCells();
+				$rowNumbers.splice(index, 1);
 			},
 			afterRemoveCol : function(index, amount) {
 				if (amount == 1) {
@@ -1346,6 +1380,26 @@ function loadTableValues(args) {
 						contextMenu : [ 'row_above', 'row_below', 'hsep1', 'remove_row', 'hsep3', 'undo', 'redo' ]
 					});
 				}
+
+				$(".handsontable .htCore tbody").sortable({
+					update : function(event, ui) {
+						$("#waiting-bg").addClass("loading");
+						var $draggedRow = ui.item;
+						var $rowIndex = $draggedRow.find("th").text() - 1;
+						var $unsavedRowNumber = $rowNumbers[$rowIndex];
+						$draggedRowValues = $tableInstance.getDataAtRow($rowIndex);
+						$tableInstance.alter("remove_row", $rowIndex, 1);
+
+						var $newRowIndex = parseInt($draggedRow.prev().find("th").text());
+						$tableInstance.alter("insert_row", $newRowIndex, 1);
+						$rowNumbers.splice($newRowIndex, 0, $unsavedRowNumber);
+					}
+				});
+
+				for (var i = 0; i < $data.values.length; i++) {
+					$rowNumbers[i] = i;
+				}
+
 			},
 			afterRender : function() {
 				if ($(".handsontable td.htInvalid").length > 0) {

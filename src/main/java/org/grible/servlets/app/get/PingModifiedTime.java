@@ -8,12 +8,12 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.grible.servlets.app.save;
+package org.grible.servlets.app.get;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,10 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.PostgresDao;
-import org.grible.dbmigrate.oldmodel.OldRow;
-import org.grible.dbmigrate.oldmodel.OldValue;
 import org.grible.model.Table;
-import org.grible.model.TableType;
 import org.grible.security.Security;
 
 /**
@@ -58,29 +55,13 @@ public class PingModifiedTime extends HttpServlet {
 			pDao = new PostgresDao();
 
 			int id = Integer.parseInt(request.getParameter("id"));
+			Date userStartTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("time"));
 			Table table = pDao.getTable(id);
 
 			String message = "";
 
-			if (table.getType() == TableType.TABLE || table.getType() == TableType.STORAGE) {
-				if (table.isShowWarning()) {
-					List<String> strValues = new ArrayList<String>();
-					List<OldRow> rows = pDao.getOldRows(id);
-					for (OldRow row : rows) {
-						strValues.add(getCombinedValues(row));
-					}
-					for (int i = 0; i < rows.size(); i++) {
-						String currValue = strValues.remove(0);
-						if (strValues.contains(currValue)) {
-							int first = rows.get(i).getOrder();
-							int second = first + 1 + strValues.indexOf(currValue);
-							message += "|Duplicated rows detected: " + first + " and " + second + ".";
-						}
-					}
-				}
-			}
-			if (!message.equals("")) {
-				message = "true" + message;
+			if (table.getModifiedTime().after(userStartTime)) {
+				message = "This table was modified by another user. Please, refresh the page.";
 			}
 			out.print(message);
 		} catch (Exception e) {
@@ -89,14 +70,5 @@ public class PingModifiedTime extends HttpServlet {
 		}
 		out.flush();
 		out.close();
-	}
-
-	private String getCombinedValues(OldRow row) throws Exception {
-		StringBuilder builder = new StringBuilder();
-		List<OldValue> values = pDao.getOldValues(row);
-		for (OldValue value : values) {
-			builder.append(value.getValue());
-		}
-		return builder.toString();
 	}
 }

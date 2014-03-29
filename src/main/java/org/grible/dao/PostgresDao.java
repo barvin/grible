@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.grible.dbmigrate.oldmodel.OldKey;
@@ -87,7 +88,7 @@ public class PostgresDao implements Dao {
 		return category;
 	}
 
-	private Table initTable(ResultSet rs) throws SQLException {
+	private Table initTable(ResultSet rs) throws Exception {
 		Table result = new Table(rs.getInt("id"));
 		result.setType(TableType.valueOf(rs.getString("type").toUpperCase()));
 		result.setName(rs.getString("name"));
@@ -103,7 +104,7 @@ public class PostgresDao implements Dao {
 		}
 		result.setClassName(rs.getString("className"));
 		result.setShowWarning(rs.getBoolean("showwarning"));
-		result.setModifiedTime(rs.getTimestamp("modifiedtime"));
+		result.setModifiedTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rs.getString("modifiedtime")));
 		Gson gson = new Gson();
 		result.setKeys(gson.fromJson(rs.getString("keys"), Key[].class));
 		result.setValues(gson.fromJson(rs.getString("values"), String[][].class));
@@ -444,7 +445,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public Table getTable(int id) throws SQLException {
+	public Table getTable(int id) throws Exception {
 		Table result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -461,7 +462,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public Table getTable(String name, Integer categoryId) throws SQLException {
+	public Table getTable(String name, Integer categoryId) throws Exception {
 		Table result = null;
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -514,7 +515,7 @@ public class PostgresDao implements Dao {
 		return productId;
 	}
 
-	public List<Table> getTablesByCategory(Category category) throws SQLException {
+	public List<Table> getTablesByCategory(Category category) throws Exception {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -696,7 +697,7 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public List<Table> getTablesUsingStorage(Table storage, int productId) throws SQLException {
+	public List<Table> getTablesUsingStorage(Table storage, int productId) throws Exception {
 		List<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
@@ -751,7 +752,7 @@ public class PostgresDao implements Dao {
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
 				+ table.getParentId() + ", showwarning=" + table.isShowWarning() + ", modifiedtime='"
-				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(table.getModifiedTime()) + "', keys='"
+				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "', keys='"
 				+ gson.toJson(table.getKeys()) + "', values='" + gson.toJson(table.getValues()) + "' WHERE id="
 				+ table.getId());
 
@@ -866,7 +867,7 @@ public class PostgresDao implements Dao {
 		stmt.close();
 	}
 
-	public List<Table> getTablesOfProduct(int productId, TableType type) throws SQLException {
+	public List<Table> getTablesOfProduct(int productId, TableType type) throws Exception {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();

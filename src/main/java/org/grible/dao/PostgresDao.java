@@ -935,8 +935,43 @@ public class PostgresDao implements Dao {
 	}
 
 	@Override
-	public String[][] getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Integer> getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception {
+		Table table = getTable(tableId);
+		Key[] keys = table.getKeys();
+		String[][] values = table.getValues();
+
+		List<Integer> rows = new ArrayList<>();
+		for (int i = 0; i < values.length; i++) {
+			for (int j = 0; j < values[0].length; j++) {
+				if (keys[j].getRefid() == storageId) {
+					String[] indexes = values[i][j].split(";");
+					for (String index : indexes) {
+						if (!rows.contains(Integer.parseInt(index) - 1)) {
+							rows.add(Integer.parseInt(index) - 1);
+						}
+					}
+				}
+			}
+		}
+		return rows;
+	}
+
+	@Override
+	public List<Table> getTablesUsingStorage(int storageId, int productId, TableType tableType) throws Exception {
+		List<Table> result = new ArrayList<Table>();
+		Connection conn = getConnection();
+		Statement stmt = conn.createStatement();
+		List<Table> allTables = getTablesOfProduct(productId, tableType);
+		for (Table table : allTables) {
+			Key[] keys = table.getKeys();
+			for (Key key : keys) {
+				if (key.getRefid() == storageId) {
+					result.add(table);
+					break;
+				}
+			}
+		}
+		stmt.close();
+		return result;
 	}
 }

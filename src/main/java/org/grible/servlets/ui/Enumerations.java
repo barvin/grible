@@ -95,6 +95,7 @@ public class Enumerations extends HttpServlet {
 				responseHtml.append("<script type=\"text/javascript\">");
 				responseHtml.append("var productId = \"").append(productId).append("\";");
 				responseHtml.append("var tableId = \"").append(tableId).append("\";");
+				responseHtml.append("var filter = 0;");
 				responseHtml.append("var tableType = \"enumeration\";");
 				if (isMultipleUsers()) {
 					responseHtml.append("var isTooltipOnClick = ").append(user.isTooltipOnClick()).append(";");

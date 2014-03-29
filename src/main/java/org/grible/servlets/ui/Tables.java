@@ -130,6 +130,7 @@ public class Tables extends HttpServlet {
 				responseHtml.append("var productId = \"").append(productId).append("\";");
 				responseHtml.append("var tableId = \"").append(tableId).append("\";");
 				responseHtml.append("var tableType = \"").append(tableType).append("\";");
+				responseHtml.append("var filter = 0;");
 				responseHtml.append("var appType = \"")
 						.append(GlobalSettings.getInstance().getAppType().toString().toLowerCase()).append("\";");
 				if (isMultipleUsers()) {

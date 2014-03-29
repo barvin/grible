@@ -3,7 +3,7 @@ package org.grible.json.ui;
 import org.grible.model.json.Key;
 
 public class UiTable {
-	private boolean isIndex;
+	private int[] rowHeaders;
 	private Key[] keys;
 	private String[][] values;
 	private UiRowsUsage info;
@@ -13,12 +13,12 @@ public class UiTable {
 	private int[] enumerationIds;
 	private String[] enumerations;
 
-	public boolean isIndex() {
-		return isIndex;
+	public int[] getRowHeaders() {
+		return rowHeaders;
 	}
 
-	public void setIndex(boolean isIndex) {
-		this.isIndex = isIndex;
+	public void setRowHeaders(int[] rowHeaders) {
+		this.rowHeaders = rowHeaders;
 	}
 
 	public Key[] getKeys() {

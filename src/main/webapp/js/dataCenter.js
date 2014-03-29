@@ -189,15 +189,8 @@ function initLeftPanel() {
 		}
 
 		$("#table-container").show();
-		loadTableValues({
-			id : tableId,
-			product : productId
-		});
-		loadTopPanel({
-			tabletype : tableType,
-			tableid : tableId,
-			product : productId
-		});
+		loadTableValues();
+		loadTopPanel();
 	}
 
 	$
@@ -380,15 +373,8 @@ function initLeftPanel() {
 		$breadcrumb.append("<span class='extends-symbol'>&nbsp;&gt;&nbsp;</span>");
 		$breadcrumb.append("<a href='" + window.location + "'><span id='" + tableType + "-name'>" + name + "</span></a>");
 
-		loadTableValues({
-			id : tableId,
-			product : productId
-		});
-		loadTopPanel({
-			tabletype : tableType,
-			tableid : tableId,
-			product : productId
-		});
+		loadTableValues();
+		loadTopPanel();
 	} else {
 		$("#table-container").hide();
 	}
@@ -688,7 +674,13 @@ function initOneButtonDialog() {
 	});
 }
 
-function loadTopPanel(args) {
+function loadTopPanel() {
+	var args = {
+		tabletype : tableType,
+		tableid : tableId,
+		product : productId,
+		filter : filter
+	};
 	$.post("../GetTopPanel", args, function(data) {
 		$(".top-panel").html(data);
 		initTopPanel(jQuery);
@@ -718,15 +710,8 @@ function initTopPanel() {
 					}, "", "?id=" + tableId);
 				}
 
-				loadTableValues({
-					id : tableId,
-					product : productId
-				});
-				loadTopPanel({
-					tabletype : tableType,
-					tableid : tableId,
-					product : productId
-				});
+				loadTableValues();
+				loadTopPanel();
 			}
 		});
 	} else {
@@ -960,6 +945,16 @@ function initTopPanel() {
 		}
 	});
 
+	$("#btn-discard-filter").click(function() {
+		if ($(this).hasClass("button-enabled")) {
+			if (isJson()) {
+				window.location = "?product=" + productId + "&id=" + tableId;
+			} else {
+				window.location = "?id=" + tableId;
+			}
+		}
+	});
+
 	$("#btn-edit-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
 			$.post("../GetEditTableDialog", {
@@ -979,6 +974,16 @@ function initTopPanel() {
 		}, function(data) {
 			$("body").append(data);
 			initGeneratedClassDialog(jQuery);
+		});
+	});
+
+	$("#btn-filter").click(function() {
+		$.post("../GetFilterDialog", {
+			tableid : tableId,
+			product : productId
+		}, function(data) {
+			$("body").append(data);
+			initFilterDialog(jQuery);
 		});
 	});
 
@@ -1147,6 +1152,32 @@ function initEditDataItemDialog() {
 	});
 }
 
+function initFilterDialog() {
+	initDialog();
+
+	var submitDataItem = function() {
+		var $filter = 0;
+		if ($("input[name='table-type'][value='table']").is(":checked")) {
+			$filter = $("select.tables-list").find("option:selected").val();
+		} else if ($("input[name='table-type'][value='storage']").is(":checked")) {
+			$filter = $("select.storage-list").find("option:selected").val();
+		}
+		if (isNumber($filter) && $filter > 0) {
+			if (isJson()) {
+				window.location = "?product=" + productId + "&id=" + tableId + "&filter=" + $filter;
+			} else {
+				window.location = "?id=" + tableId + "&filter=" + $filter;
+			}
+		}
+	};
+
+	$("#dialog-btn-filter").click(submitDataItem);
+
+	$(".btn-cancel").click(function() {
+		$(".ui-dialog").remove();
+	});
+}
+
 function initGeneratedClassDialog() {
 	$("#tabs").tabs();
 
@@ -1169,7 +1200,13 @@ function initGeneratedClassDialog() {
 	});
 }
 
-function loadTableValues(args) {
+function loadTableValues() {
+	var args = {
+		id : tableId,
+		product : productId,
+		filter : filter
+	};
+
 	$.post("../GetTableValues", args, function(res) {
 
 		var defaultCellRenderer = function(instance, td, row, col, prop, value, cellProperties) {
@@ -1241,7 +1278,7 @@ function loadTableValues(args) {
 			manualColumnMove : true,
 			manualColumnResize : true,
 			contextMenu : true,
-			rowHeaders : $data.isIndex,
+			rowHeaders : $data.rowHeaders,
 			colHeaders : $colNames,
 			currentRowClassName : 'current-row',
 			cells : setColumnTypes,
@@ -1631,6 +1668,7 @@ function initTooltipCells(elements) {
 			if ($value.has("div.tooltip").length == 0) {
 				var $content = $value.text();
 				var $args = {
+					tableid : tableId,
 					product : productId,
 					refid : $value.attr("refid"),
 					content : $content
@@ -1659,6 +1697,7 @@ function initTooltipCells(elements) {
 		if (($value.text() != "0") && ($value.text() != "") && ($value.has("div.tooltip").length == 0)) {
 			var $content = $value.text();
 			var $args = {
+				tableid : tableId,
 				product : productId,
 				refid : $value.attr("refid"),
 				content : $content

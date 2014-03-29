@@ -48,6 +48,8 @@ public interface Dao {
 
 	public List<Table> getTablesUsingStorage(Table storage, int productId) throws Exception;
 
+	public List<Table> getTablesUsingStorage(int storageId, int productId, TableType tableType) throws Exception;
+
 	public boolean deleteTable(Table table, int productId) throws Exception;
 
 	public void updateCategory(Category category) throws Exception;
@@ -70,5 +72,5 @@ public interface Dao {
 	
 	public List<Table> getTablesUsingRow(int productId, Table table, int rowOrder) throws Exception;
 
-	public String[][] getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception;
+	public List<Integer> getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception;
 }

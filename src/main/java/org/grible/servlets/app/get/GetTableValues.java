@@ -8,10 +8,11 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.grible.servlets.ui.panels;
+package org.grible.servlets.app.get;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -40,10 +41,11 @@ import com.google.gson.Gson;
 @WebServlet("/GetTableValues")
 public class GetTableValues extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private TableType tableType;
 	private JsonDao jDao;
 	private PostgresDao pDao;
 	private int productId;
+	private int filter;
+	private int tableId;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -64,8 +66,9 @@ public class GetTableValues extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			int tableId = Integer.parseInt(request.getParameter("id"));
+			tableId = Integer.parseInt(request.getParameter("id"));
 			productId = Integer.parseInt(request.getParameter("product"));
+			filter = Integer.parseInt(request.getParameter("filter"));
 			Table table = null;
 			if (isJson()) {
 				jDao = new JsonDao();
@@ -74,8 +77,6 @@ public class GetTableValues extends HttpServlet {
 				pDao = new PostgresDao();
 				table = pDao.getTable(tableId);
 			}
-
-			tableType = table.getType();
 
 			UiTable uiTable = new UiTable();
 			transformTableToUiTable(table, uiTable);
@@ -89,11 +90,6 @@ public class GetTableValues extends HttpServlet {
 	}
 
 	private void transformTableToUiTable(Table table, UiTable uiTable) throws Exception {
-		if (tableType == TableType.STORAGE || tableType == TableType.TABLE || tableType == TableType.ENUMERATION) {
-			uiTable.setIndex(true);
-		} else {
-			uiTable.setIndex(false);
-		}
 		Key[] keys = null;
 		if (isJson()) {
 			keys = table.getTableJson().getKeys();
@@ -123,7 +119,7 @@ public class GetTableValues extends HttpServlet {
 			case ENUMERATION:
 				columns[i].setType("dropdown");
 				columns[i].setAllowInvalid(false);
-				
+
 				String[] source = null;
 				if (isJson()) {
 					Table refTable = jDao.getTable(keys[i].getRefid(), productId);
@@ -170,7 +166,36 @@ public class GetTableValues extends HttpServlet {
 		} else {
 			values = table.getValues();
 		}
+
+		int[] rowHeaders = null;
+
+		if (filter > 0) {
+			List<Integer> filteredRows = DataManager.getInstance().getDao()
+					.getStorageRowsUsedByTable(productId, tableId, filter);
+			Integer[] sortedFilteredRows = filteredRows.toArray(new Integer[0]);
+			Arrays.sort(sortedFilteredRows);
+			String[][] filteredValues = new String[sortedFilteredRows.length][values[0].length];
+			int rowCounter = 0;
+			for (int row : sortedFilteredRows) {
+				for (int key = 0; key < values[0].length; key++) {
+					filteredValues[rowCounter][key] = values[row][key];
+				}
+				rowCounter++;
+			}
+			values = filteredValues;
+
+			rowHeaders = new int[sortedFilteredRows.length];
+			for (int i = 0; i < rowHeaders.length; i++) {
+				rowHeaders[i] = sortedFilteredRows[i] + 1;
+			}
+		} else {
+			rowHeaders = new int[values.length];
+			for (int i = 0; i < rowHeaders.length; i++) {
+				rowHeaders[i] = i + 1;
+			}
+		}
 		uiTable.setValues(values);
+		uiTable.setRowHeaders(rowHeaders);
 	}
 
 	private boolean isJson() throws Exception {

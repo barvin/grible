@@ -234,16 +234,16 @@ public class JsonDao implements Dao {
 		allTables.addAll(getTablesOfProduct(productId, TableType.PRECONDITION));
 		allTables.addAll(getTablesOfProduct(productId, TableType.POSTCONDITION));
 		allTables.addAll(getTablesOfProduct(productId, TableType.STORAGE));
-		
-		addTablesUsingStorage(result, allTables, storage);
+
+		addTablesUsingStorage(result, allTables, storage.getId());
 		return result;
 	}
 
-	private void addTablesUsingStorage(List<Table> result, List<Table> tables, Table table) {
+	private void addTablesUsingStorage(List<Table> result, List<Table> tables, int tableId) {
 		for (Table foundTable : tables) {
 			Key[] keys = foundTable.getTableJson().getKeys();
 			for (int i = 0; i < keys.length; i++) {
-				if (keys[i].getRefid() == table.getId()) {
+				if (keys[i].getRefid() == tableId) {
 					result.add(foundTable);
 					break;
 				}
@@ -443,7 +443,7 @@ public class JsonDao implements Dao {
 		List<Table> allTables = getTablesOfProduct(productId, TableType.TABLE);
 		allTables.addAll(getTablesOfProduct(productId, TableType.PRECONDITION));
 		allTables.addAll(getTablesOfProduct(productId, TableType.POSTCONDITION));
-		allTables.addAll(getTablesOfProduct(productId, TableType.STORAGE));		
+		allTables.addAll(getTablesOfProduct(productId, TableType.STORAGE));
 		addTablesUsingRow(result, allTables, table, rowOrder);
 		return result;
 	}
@@ -504,25 +504,33 @@ public class JsonDao implements Dao {
 	}
 
 	@Override
-	public String[][] getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception {
-		Table storage = getTable(storageId, productId);
-		String[][] storageValues = storage.getTableJson().getValues();
-
+	public List<Integer> getStorageRowsUsedByTable(int productId, int storageId, int tableId) throws Exception {
 		Table table = getTable(tableId, productId);
 		Key[] keys = table.getTableJson().getKeys();
 		String[][] values = table.getTableJson().getValues();
-		
+
 		List<Integer> rows = new ArrayList<>();
 		for (int i = 0; i < values.length; i++) {
 			for (int j = 0; j < values[0].length; j++) {
 				if (keys[j].getRefid() == storageId) {
 					String[] indexes = values[i][j].split(";");
-					//for ()
+					for (String index : indexes) {
+						if (!rows.contains(Integer.parseInt(index) - 1)) {
+							rows.add(Integer.parseInt(index) - 1);
+						}
+					}
 				}
 			}
 		}
-		//String[][] result = new String
-		return null;
+		return rows;
+	}
+
+	@Override
+	public List<Table> getTablesUsingStorage(int storageId, int productId, TableType tableType) throws Exception {
+		List<Table> result = new ArrayList<Table>();
+		List<Table> allTables = getTablesOfProduct(productId, tableType);
+		addTablesUsingStorage(result, allTables, storageId);
+		return result;
 	}
 
 }

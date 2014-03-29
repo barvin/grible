@@ -59,6 +59,7 @@ public class GetStorageTooltip extends HttpServlet {
 
 			String[] indexes = content.split(";");
 			Table refTable = null;
+			int tableId = Integer.parseInt(request.getParameter("tableid"));
 			int refId = Integer.parseInt(request.getParameter("refid"));
 			int productId = Integer.parseInt(request.getParameter("product"));
 			int rowsInRefTable = 0;
@@ -89,7 +90,7 @@ public class GetStorageTooltip extends HttpServlet {
 			}
 
 			if (correctFormat) {
-				out.print(content + getStorageTooltip(indexes, refTable, productId));
+				out.print(content + getStorageTooltip(tableId, indexes, refTable, productId));
 			} else {
 				out.print(content);
 			}
@@ -102,7 +103,7 @@ public class GetStorageTooltip extends HttpServlet {
 		}
 	}
 
-	private String getStorageTooltip(String[] indexes, Table refTable, int productId) throws Exception {
+	private String getStorageTooltip(int tableId, String[] indexes, Table refTable, int productId) throws Exception {
 		StringBuilder result = new StringBuilder("<div class=\"tooltip\"><div style=\"width: auto;\" class=\"table\">");
 		result.append("<div class=\"table-row key-row\">");
 		result.append("<div class=\"table-cell ui-cell-mini index-header-cell\"></div>");
@@ -146,8 +147,9 @@ public class GetStorageTooltip extends HttpServlet {
 		if (ServletHelper.isJson()) {
 			productPart = "product=" + productId + "&";
 		}
-		result.append("<a href=\"/storages/?").append(productPart).append("id=").append(refTable.getId())
-				.append("\" target=\"_blank\">Open storage in the new tab</a></div>");
+		result.append("<a href=\"/storages/?").append(productPart).append("id=").append(refTable.getId());
+		result.append("&filter=").append(tableId);
+		result.append("\" target=\"_blank\">Open storage in the new tab</a></div>");
 		return result.toString();
 	}
 }

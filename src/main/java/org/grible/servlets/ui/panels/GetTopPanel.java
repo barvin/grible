@@ -61,6 +61,7 @@ public class GetTopPanel extends HttpServlet {
 			}
 			if (tableType == TableType.STORAGE) {
 				int tableId = Integer.parseInt(request.getParameter("tableid"));
+				int filter = Integer.parseInt(request.getParameter("filter"));
 				Table table = null;
 				if (isJson()) {
 					table = new JsonDao().getTable(tableId, productId);
@@ -68,11 +69,18 @@ public class GetTopPanel extends HttpServlet {
 					table = new PostgresDao().getTable(tableId);
 				}
 				responseHtml.append("<div id=\"manage-buttons\">");
-
-				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
-				responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
-				responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
+				
+				if (filter == 0) {
+					responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
+					responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
+					responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
+					responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
+				} else {
+					responseHtml.append("<div id=\"btn-discard-filter\" class=\"icon-button button-enabled\">");
+					responseHtml.append("<img src=\"../img/discard-icon.png\" class=\"icon-enabled\">");
+					responseHtml.append("<img src=\"../img/discard-icon.png\" class=\"icon-disabled\">");
+					responseHtml.append("<span class=\"icon-button-text\"> Discard filter</span></div>");
+				}
 
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
@@ -106,6 +114,10 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div id=\"btn-class-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/brackets.png\">");
 				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
+
+				responseHtml.append("<div id=\"btn-filter\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/filter-icon.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Filter by...</span></div>");
 
 				responseHtml.append("<div id=\"btn-export-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/export-icon.png\">");

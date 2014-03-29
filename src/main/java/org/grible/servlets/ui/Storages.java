@@ -70,12 +70,16 @@ public class Storages extends HttpServlet {
 
 			int productId;
 			int tableId;
+			int filter = 0;
 			if (StringUtils.isNumeric(request.getParameter("id"))) {
 				tableId = Integer.parseInt(request.getParameter("id"));
 				if (isMultipleUsers()) {
 					productId = new PostgresDao().getProductIdByPrimaryTableId(tableId);
 				} else {
 					productId = Integer.parseInt(request.getParameter("product"));
+				}
+				if (StringUtils.isNumeric(request.getParameter("filter"))) {
+					filter = Integer.parseInt(request.getParameter("filter"));
 				}
 			} else {
 				productId = Integer.parseInt(request.getParameter("product"));
@@ -96,6 +100,7 @@ public class Storages extends HttpServlet {
 				responseHtml.append("<script type=\"text/javascript\">");
 				responseHtml.append("var productId = \"").append(productId).append("\";");
 				responseHtml.append("var tableId = \"").append(tableId).append("\";");
+				responseHtml.append("var filter = ").append(filter).append(";");
 				responseHtml.append("var tableType = \"storage\";");
 				if (isMultipleUsers()) {
 					responseHtml.append("var isTooltipOnClick = ").append(user.isTooltipOnClick()).append(";");

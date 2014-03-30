@@ -92,7 +92,7 @@ public class StorageImport extends HttpServlet {
 					currentKeysCount = table.getTableJson().getKeys().length;
 				} else {
 					table = pDao.getTable(storageName, categoryId);
-					currentKeysCount = pDao.getOldKeys(table.getId()).size();
+					currentKeysCount = table.getKeys().length;
 				}
 				int importedKeysCount = excelFile.getKeys().length;
 

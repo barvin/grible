@@ -282,7 +282,7 @@ public class ServletHelper {
 			if (isJson()) {
 				rowsCount = currTable.getTableJson().getValues().length;
 			} else {
-				rowsCount = new PostgresDao().getOldRows(currTable.getId()).size();
+				rowsCount = currTable.getValues().length;
 			}
 			responseHtml.append("$(window).on('load', function() { showAdvancedImportDialog(" + rowsCount + ", "
 					+ excelFile.getValues().length + "); });");

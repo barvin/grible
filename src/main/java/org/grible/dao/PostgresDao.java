@@ -741,22 +741,24 @@ public class PostgresDao implements Dao {
 		return result;
 	}
 
-	public void updateTable(Table table) throws Exception {
+	public String updateTable(Table table) throws Exception {
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
 		String finalName = table.getName();
 		if (finalName != null) {
 			finalName = "'" + finalName + "'";
 		}
+		String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 		Gson gson = new Gson();
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
 				+ table.getParentId() + ", showwarning=" + table.isShowWarning() + ", modifiedtime='"
-				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "', keys='"
+				+ time + "', keys='"
 				+ gson.toJson(table.getKeys()) + "', values='" + gson.toJson(table.getValues()) + "' WHERE id="
 				+ table.getId());
 
 		stmt.close();
+		return time;
 	}
 
 	public void updateCategory(Category category) throws SQLException {

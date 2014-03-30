@@ -61,7 +61,7 @@ public class PingModifiedTime extends HttpServlet {
 			String message = "";
 
 			if (table.getModifiedTime().after(userStartTime)) {
-				message = "This table was modified by another user. Please, refresh the page.";
+				message = "This table was modified somewhere else. Please, refresh the page.";
 			}
 			out.print(message);
 		} catch (Exception e) {

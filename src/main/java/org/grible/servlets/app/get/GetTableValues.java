@@ -12,7 +12,9 @@ package org.grible.servlets.app.get;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -196,6 +198,8 @@ public class GetTableValues extends HttpServlet {
 		}
 		uiTable.setValues(values);
 		uiTable.setRowHeaders(rowHeaders);
+		
+		uiTable.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 	}
 
 	private boolean isJson() throws Exception {

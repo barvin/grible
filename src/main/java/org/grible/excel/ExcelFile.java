@@ -27,9 +27,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.grible.dao.PostgresDao;
-import org.grible.dbmigrate.oldmodel.OldKey;
-import org.grible.dbmigrate.oldmodel.OldValue;
 import org.grible.model.Table;
 import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
@@ -78,39 +75,26 @@ public class ExcelFile {
 			keyCellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
 			keyCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
 
+			Key[] keys = null;
+			String[][] values = null;
 			if (ServletHelper.isJson()) {
-				Key[] keys = table.getTableJson().getKeys();
-				for (int i = 0; i < keys.length; i++) {
-					Cell cell = row1.createCell(i);
-					cell.setCellValue(keys[i].getName());
-					cell.setCellStyle(keyCellStyle);
-				}
-
-				String[][] values = table.getTableJson().getValues();
-				for (int i = 0; i < values.length; i++) {
-					Row excelRow = worksheet.createRow(i + 1);
-					for (int j = 0; j < values[i].length; j++) {
-						Cell cell = excelRow.createCell(j);
-						cell.setCellValue(values[i][j]);
-					}
-				}
+				keys = table.getTableJson().getKeys();
+				values = table.getTableJson().getValues();
 			} else {
-				PostgresDao dao = new PostgresDao();
-				List<OldKey> keys = dao.getOldKeys(table.getId());
-				for (int i = 0; i < keys.size(); i++) {
-					Cell cell = row1.createCell(i);
-					cell.setCellValue(keys.get(i).getName());
-					cell.setCellStyle(keyCellStyle);
-				}
+				keys = table.getKeys();
+				values = table.getValues();
+			}
+			for (int i = 0; i < keys.length; i++) {
+				Cell cell = row1.createCell(i);
+				cell.setCellValue(keys[i].getName());
+				cell.setCellStyle(keyCellStyle);
+			}
 
-				List<org.grible.dbmigrate.oldmodel.OldRow> rows = dao.getOldRows(table.getId());
-				for (int i = 0; i < rows.size(); i++) {
-					Row excelRow = worksheet.createRow(i + 1);
-					List<OldValue> values = dao.getOldValues(rows.get(i));
-					for (int j = 0; j < values.size(); j++) {
-						Cell cell = excelRow.createCell(j);
-						cell.setCellValue(values.get(j).getValue());
-					}
+			for (int i = 0; i < values.length; i++) {
+				Row excelRow = worksheet.createRow(i + 1);
+				for (int j = 0; j < values[i].length; j++) {
+					Cell cell = excelRow.createCell(j);
+					cell.setCellValue(values[i][j]);
 				}
 			}
 
@@ -129,11 +113,11 @@ public class ExcelFile {
 
 		int keysCount = generalKeys.size();
 		int rowCount = sheet.getPhysicalNumberOfRows() - 1;
-		
+
 		String[][] result = new String[rowCount][keysCount];
 
-		for (int i = 1; i < rowCount + 1; i++) {
-			Row row = sheet.getRow(i);
+		for (int i = 0; i < rowCount; i++) {
+			Row row = sheet.getRow(i + 1);
 			for (int j = 0; j < keysCount; j++) {
 				Cell cell = row.getCell(j);
 				result[i][j] = getStringCellValue(cell);

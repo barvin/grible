@@ -66,7 +66,7 @@ public interface Dao {
 
 	public boolean isTableInProductExist(String name, TableType type, Category category) throws Exception;
 
-	public void updateTable(Table table) throws Exception;
+	public String updateTable(Table table) throws Exception;
 	
 	public List<String> getValuesByKeyOrder(Table table, int keyOrder);
 	

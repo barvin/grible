@@ -5,6 +5,9 @@ var $colTypes = [];
 var $colRefids = [];
 var $draggedRowValues = [];
 var $rowNumbers = [];
+var $tableGenerationTime = "";
+var $tableGenerationTimer;
+var $isTimeMessageShown = false;
 
 $(window).on("load", function() {
 	var docHeight = $(window).height() - 95;
@@ -46,6 +49,7 @@ function initialize() {
 		$("#category-container").html(data);
 		initLeftPanel(jQuery);
 	});
+
 }
 
 function initLeftPanel() {
@@ -89,6 +93,7 @@ function initLeftPanel() {
 	});
 
 	function onCategoryItemClick(thisCategoryItem) {
+		clearInterval($tableGenerationTimer);
 		$(".category-item-selected").removeClass("category-item-selected");
 		thisCategoryItem.addClass("category-item-selected");
 		$(".data-item-selected").removeClass("data-item-selected");
@@ -834,6 +839,7 @@ function initTopPanel() {
 								history.pushState({
 									product : productId
 								}, "", "?product=" + productId);
+								clearInterval($tableGenerationTimer);
 							} else if (isNumber(data)) {
 								if (isJson()) {
 									window.location = "?product=" + productId + "&id=" + data;
@@ -884,7 +890,8 @@ function initTopPanel() {
 							values : $tableContainer.getDataAtRow($counter),
 							islastrow : ($rowsCount - $counter === 1)
 						}, function(data) {
-							if (data == "success") {
+							var res = data.split("|");
+							if (res[0] == "success") {
 								$counter++;
 								if ($counter < $rowsCount) {
 									saveTableRow($counter);
@@ -893,23 +900,31 @@ function initTopPanel() {
 									$("td[modified]").removeAttr("modified");
 									$("th[modified]").removeAttr("modified");
 									$(".current-row").removeClass("current-row");
-									$.post("../UpdateRowsOrder", {
-										tableid : tableId,
-										product : productId,
-										rows : $rowNumbers
-									}, function(data) {
-										$("#waiting-bg").removeClass("loading");
-										if (data == "success") {
-											for (var i = 0; i < $rowsCount; i++) {
-												$rowNumbers[i] = i;
+									$tableGenerationTime = res[1];
+									if (tableType == "storage") {
+										$.post("../UpdateRowsOrder", {
+											tableid : tableId,
+											product : productId,
+											rows : $rowNumbers
+										}, function(data) {
+											$("#waiting-bg").removeClass("loading");
+											if (data == "success") {
+												for (var i = 0; i < $rowsCount; i++) {
+													$rowNumbers[i] = i;
+												}
+											} else {
+												noty({
+													type : "error",
+													text : data
+												});
 											}
-										} else {
-											noty({
-												type : "error",
-												text : data
-											});
+										});
+									} else {
+										$("#waiting-bg").removeClass("loading");
+										for (var i = 0; i < $rowsCount; i++) {
+											$rowNumbers[i] = i;
 										}
-									});
+									}
 
 									$.post("../CheckForDuplicatedRows", {
 										id : tableId,
@@ -1228,6 +1243,28 @@ function loadTableValues() {
 		};
 
 		var $data = jQuery.parseJSON(res);
+
+		if (!isJson()) {
+			$tableGenerationTime = $data.time;
+
+			var pingModifiedTime = function() {
+				$.post("../PingModifiedTime", {
+					time : $tableGenerationTime,
+					id : tableId
+				}, function(res) {
+					if (res !== "" && !$isTimeMessageShown) {
+						$isTimeMessageShown = true;
+						noty({
+							type : "warning",
+							text : res
+						});
+					}
+				});
+			};
+
+			$tableGenerationTimer = setInterval(pingModifiedTime, 5000);
+		}
+
 		var $colNames = [];
 		for (var i = 0; i < $data.keys.length; i++) {
 			$colNames[i] = $data.keys[i].name;
@@ -1416,27 +1453,25 @@ function loadTableValues() {
 					$tableInstance.updateSettings({
 						contextMenu : [ 'row_above', 'row_below', 'hsep1', 'remove_row', 'hsep3', 'undo', 'redo' ]
 					});
+				} else {
+					$(".handsontable .htCore tbody").sortable({
+						update : function(event, ui) {
+							$("#waiting-bg").addClass("loading");
+							var $draggedRow = ui.item;
+							var $rowIndex = $draggedRow.find("th").text() - 1;
+							var $unsavedRowNumber = $rowNumbers[$rowIndex];
+							$draggedRowValues = $tableInstance.getDataAtRow($rowIndex);
+							$tableInstance.alter("remove_row", $rowIndex, 1);
+
+							var $newRowIndex = parseInt($draggedRow.prev().find("th").text());
+							$tableInstance.alter("insert_row", $newRowIndex, 1);
+							$rowNumbers.splice($newRowIndex, 0, $unsavedRowNumber);
+						}
+					});
 				}
-
-				$(".handsontable .htCore tbody").sortable({
-					update : function(event, ui) {
-						$("#waiting-bg").addClass("loading");
-						var $draggedRow = ui.item;
-						var $rowIndex = $draggedRow.find("th").text() - 1;
-						var $unsavedRowNumber = $rowNumbers[$rowIndex];
-						$draggedRowValues = $tableInstance.getDataAtRow($rowIndex);
-						$tableInstance.alter("remove_row", $rowIndex, 1);
-
-						var $newRowIndex = parseInt($draggedRow.prev().find("th").text());
-						$tableInstance.alter("insert_row", $newRowIndex, 1);
-						$rowNumbers.splice($newRowIndex, 0, $unsavedRowNumber);
-					}
-				});
-
 				for (var i = 0; i < $data.values.length; i++) {
 					$rowNumbers[i] = i;
 				}
-
 			},
 			afterRender : function() {
 				if ($(".handsontable td.htInvalid").length > 0) {

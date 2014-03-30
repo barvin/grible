@@ -271,10 +271,11 @@ public class JsonDao implements Dao {
 		return !file.exists();
 	}
 
-	public void updateTable(Table table) throws Exception {
+	public String updateTable(Table table) throws Exception {
 		table.getTableJson().setClassName(table.getClassName());
 		table.getTableJson().setShowWarning(table.isShowWarning());
 		table.save();
+		return null;
 	}
 
 	@Override

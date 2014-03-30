@@ -12,6 +12,7 @@ public class UiTable {
 	private String[] storages;
 	private int[] enumerationIds;
 	private String[] enumerations;
+	private String time;
 
 	public int[] getRowHeaders() {
 		return rowHeaders;
@@ -83,6 +84,14 @@ public class UiTable {
 
 	public void setEnumerationIds(int[] enumerationIds) {
 		this.enumerationIds = enumerationIds;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 }

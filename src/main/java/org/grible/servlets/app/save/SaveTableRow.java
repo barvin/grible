@@ -27,6 +27,7 @@ import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
+import org.grible.model.TableType;
 import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.security.Security;
@@ -130,25 +131,42 @@ public class SaveTableRow extends HttpServlet {
 			}
 			tempTable.setValues(values);
 
+			String time = "";
 			boolean isLastRow = Boolean.parseBoolean(request.getParameter("islastrow"));
 			if (isLastRow) {
 				int tableId = Integer.parseInt(request.getParameter("tableid"));
 
+				Table table = null;
 				if (ServletHelper.isJson()) {
-					Table table = jDao.getTable(tableId, productId);
+					table = jDao.getTable(tableId, productId);
+				} else {
+					table = pDao.getTable(tableId);
+				}
+				if (table.getType() == TableType.ENUMERATION) {
+					List<String> oldEnumValues = DataManager.getInstance().getDao().getValuesByKeyOrder(table, 0);
+					List<String> newEnumValues = DataManager.getInstance().getDao().getValuesByKeyOrder(tempTable, 0);
+					for (int i = 0; i < oldEnumValues.size(); i++) {
+						if (i >= newEnumValues.size()) {
+							changeEnumValueInAllTables(productId, table, oldEnumValues.get(i), newEnumValues.get(0));
+						} else if (!oldEnumValues.get(i).equals(newEnumValues.get(i))) {
+							changeEnumValueInAllTables(productId, table, oldEnumValues.get(i), newEnumValues.get(i));
+						}
+					}
+				}
+
+				if (ServletHelper.isJson()) {
 					table.getTableJson().setKeys(keys);
 					table.getTableJson().setValues(values);
 					table.save();
 				} else {
-					Table table = pDao.getTable(tableId);
 					table.setKeys(keys);
 					table.setValues(values);
-					pDao.updateTable(table);
+					time = pDao.updateTable(table);
 				}
 				request.getSession(false).setAttribute("SaveTable", null);
 			}
 
-			out.print("success");
+			out.print("success|" + time);
 
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
@@ -156,6 +174,45 @@ public class SaveTableRow extends HttpServlet {
 		} finally {
 			out.flush();
 			out.close();
+		}
+	}
+
+	private void changeEnumValueInAllTables(int productId, Table table, String oldValue, String newValue)
+			throws Exception {
+		List<Table> tables = null;
+		if (tables == null) {
+			tables = DataManager.getInstance().getDao().getTablesUsingStorage(table, productId);
+		}
+		for (Table usingTable : tables) {
+			Key[] usingKeys = null;
+			String[][] usingValues = null;
+			boolean isTableChanged = false;
+			if (ServletHelper.isJson()) {
+				usingKeys = usingTable.getTableJson().getKeys();
+				usingValues = usingTable.getTableJson().getValues();
+			} else {
+				usingKeys = usingTable.getKeys();
+				usingValues = usingTable.getValues();
+			}
+			for (int row = 0; row < usingValues.length; row++) {
+				for (int key = 0; key < usingKeys.length; key++) {
+					if (usingKeys[key].getRefid() == table.getId() && usingValues[row][key].equals(oldValue)) {
+						usingValues[row][key] = newValue;
+						if (!isTableChanged) {
+							isTableChanged = true;
+						}
+					}
+				}
+			}
+			if (isTableChanged) {
+				if (ServletHelper.isJson()) {
+					usingTable.getTableJson().setValues(usingValues);
+					usingTable.save();
+				} else {
+					usingTable.setValues(usingValues);
+					pDao.updateTable(usingTable);
+				}
+			}
 		}
 	}
 

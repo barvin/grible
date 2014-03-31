@@ -715,6 +715,7 @@ function initTopPanel() {
 					}, "", "?id=" + tableId);
 				}
 
+				$("#table-container").handsontable("destroy");
 				loadTableValues();
 				loadTopPanel();
 			}
@@ -1452,6 +1453,10 @@ function loadTableValues() {
 				if (tableType == "enumeration") {
 					$tableInstance.updateSettings({
 						contextMenu : [ 'row_above', 'row_below', 'hsep1', 'remove_row', 'hsep3', 'undo', 'redo' ]
+					});
+				} else if (tableType == "precondition" || tableType == "postcondition") {
+					$tableInstance.updateSettings({
+						contextMenu : [ 'col_left', 'col_right', 'hsep2', 'remove_col', 'hsep3', 'undo', 'redo' ]
 					});
 				} else {
 					$(".handsontable .htCore tbody").sortable({

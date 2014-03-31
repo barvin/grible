@@ -610,6 +610,10 @@ h3.category-item:hover {
 	padding-right: 10px;
 }
 
+#credentials .dialog-label {
+	width: 70px;
+}
+
 .error-message {
 	font-size: 18px;
 	color: #C03300;
@@ -767,7 +771,8 @@ h3.category-item:hover {
 
 #login-grible-logo {
 	float: left;
-	padding: 16px 16px 15px 16px;
+	height: 103px;
+	padding: 23px;
 	border-left: 1px solid rgb(221, 221, 221);
 	border-top: 1px solid rgb(221, 221, 221);
 	border-bottom: 1px solid rgb(221, 221, 221);
@@ -777,20 +782,24 @@ h3.category-item:hover {
 #outer-credentials {
 	float: left;
 	border: 1px solid rgb(221, 221, 221);
+	width: 370px;
 }
 
 #outer-dialog-error-message {
-	width: 250px;
+	width: 280px;
 }
 
 #credentials {
 	padding: 10px;
-	width: 280px;
+	width: 350px;
+	height: 75px;
 }
 
 .login-dialog-buttons {
 	border-top: 1px solid #DDDDDD;
 	padding: 10px;
+	width: 350px;
+	height: 33px;
 }
 
 .label-option {
@@ -806,7 +815,7 @@ h3.category-item:hover {
 	display: none;
 }
 
-#video-tutorial-msg .msg-text {
+.msg-text {
 	position: relative;
 	top: -7px;
 	left: 4px;
@@ -820,4 +829,8 @@ h3.category-item:hover {
 	position: relative;
 	top: 4px;
 	margin-right: 5px;
+}
+
+#product-info-dialog {
+	width: 500px;
 }

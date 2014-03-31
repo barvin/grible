@@ -35,6 +35,25 @@ $(window).on(
 						initAddProductDialog(jQuery);
 					});
 
+			$("#lnk-product-info").click(
+					function(e) {
+						e.preventDefault();
+						$("#product-info-dialog").remove();
+						$("body").append(
+								'<div id="product-info-dialog" class="ui-dialog"><div class="ui-dialog-title">Product</div><div class="ui-dialog-content">'
+										+ '<p><strong>Product</strong> here represents the specific software product automated tests are developed for. '
+										+ 'One Grible instance is meant to have data for automated tests for different software products, '
+										+ 'that is why you can create more than one product.</p>' + '<p><strong>Product</strong> properties:'
+										+ '<ul><li><strong>Name</strong> - name of the product (normally the name of the software product). '
+										+ 'The name is unique within the Grible instance</li>'
+										+ '<li><strong>(In JSON version) Path</strong> - full path to the directory where JSON files would be placed. '
+										+ 'E.g. "C:\\Automation\\Product\\Data", where automation framework is in "C:\\Automation\\Product", this way '
+										+ 'JSON data files are kept with the framework in the control version system and are edited with Grible. '
+										+ 'When you delete a product, the directory is not deleted.' + '</li>' + '</ul>' + '</p>' + '<div class="dialog-buttons right">'
+										+ '<button class="ui-button btn-cancel">Close</button>' + '</div></div></div>');
+						initOneButtonDialog(jQuery);
+					});
+
 			$.contextMenu({
 				selector : ".product-item",
 				items : {
@@ -216,6 +235,13 @@ $(window).on(
 				$(".ui-dialog").draggable({
 					handle : ".ui-dialog-title",
 					cursor : "move"
+				});
+			}
+
+			function initOneButtonDialog() {
+				initDialog();
+				$(".btn-cancel").click(function() {
+					$(".ui-dialog").remove();
 				});
 			}
 

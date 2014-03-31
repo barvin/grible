@@ -105,12 +105,12 @@ public class Home extends HttpServlet {
 				responseHtml.append("<div class=\"table-row\">");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Username:</div>");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-edit\">");
-				responseHtml.append("<input class=\"dialog-edit\" name=\"username\" size=\"30\"></div>");
+				responseHtml.append("<input class=\"dialog-edit\" name=\"username\" style=\"width: 250px\"></div>");
 				responseHtml.append("</div>");
 				responseHtml.append("<div class=\"table-row\">");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Password:</div>");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-edit\">");
-				responseHtml.append("<input type=\"password\" class=\"dialog-edit\" name=\"pass\" size=\"30\"></div>");
+				responseHtml.append("<input type=\"password\" class=\"dialog-edit\" name=\"pass\" style=\"width: 250px\"></div>");
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");
 				if (request.getParameter("url") != null) {
@@ -198,6 +198,8 @@ public class Home extends HttpServlet {
 						responseHtml.append("<div class=\"icon-button button-enabled\" id=\"btn-add-product\">");
 						responseHtml.append("<img src=\"img/add-icon.png\" class=\"icon-enabled\">");
 						responseHtml.append("<span class=\"icon-button-text\"> Add product</span></div>");
+						responseHtml.append("<p><img src=\"img/info-icon.png\"><span class=\"msg-text\">"
+								+ "<a href=\"#\" id=\"lnk-product-info\">What is product?</a></span></p>");
 						responseHtml.append("</div>");
 					}
 

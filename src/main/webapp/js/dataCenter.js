@@ -1,4 +1,3 @@
-var $changedCells = [];
 var $isRowsUsageShown = false;
 var $isRowsUsageJustTurnedOn = false;
 var $colTypes = [];
@@ -98,8 +97,7 @@ function initLeftPanel() {
 		thisCategoryItem.addClass("category-item-selected");
 		$(".data-item-selected").removeClass("data-item-selected");
 		$(".data-item-selected").find(".changed-sign").remove();
-		$(".top-panel").find("div").hide();
-		$("#table-container > div.entities-values > div").remove();
+		$(".top-panel").find("div").hide();		
 		$("#table-container").hide();
 		if ($("#breadcrumb>a").length > 3) {
 			$(".extends-symbol").last().remove();
@@ -1310,6 +1308,7 @@ function loadTableValues() {
 			}
 		}
 
+		$("#table-container").handsontable("destroy");
 		var $tableContainer = $("#table-container");
 		$tableContainer.handsontable({
 			data : $data.values,
@@ -1333,15 +1332,11 @@ function loadTableValues() {
 					for (var i = 0; i < changes.length; i++) {
 						if (changes[i][2] !== changes[i][3]) {
 							isDataChanged = true;
-							$changedCells.push({
-								row : changes[i][0],
-								col : changes[i][1]
-							});
+							break;
 						}
 					}
 					if (isDataChanged) {
 						enableSaveButton();
-						setModifiedCells();
 					}
 				}
 				if ($isRowsUsageJustTurnedOn) {
@@ -1350,12 +1345,6 @@ function loadTableValues() {
 			},
 			afterCreateRow : function(index, amount) {
 				enableSaveButton();
-				for (var i = 0; i < $changedCells.length; i++) {
-					if ($changedCells[i].row >= index) {
-						$changedCells[i].row++;
-					}
-				}
-				setModifiedCells();
 				if ($draggedRowValues.length === 0) {
 					// adding row
 					for (var i = 0; i < $columns.length; i++) {
@@ -1382,12 +1371,6 @@ function loadTableValues() {
 					enableSaveButton();
 					$colTypes.splice(index, 0, "text");
 					$colRefids.splice(index, 0, "0");
-					for (var i = 0; i < $changedCells.length; i++) {
-						if ($changedCells[i].col >= index) {
-							$changedCells[i].col++;
-						}
-					}
-					setModifiedCells();
 					$columns.splice(index, 0, {
 						type : "text",
 						allowInvalid : true
@@ -1424,27 +1407,11 @@ function loadTableValues() {
 			},
 			afterRemoveRow : function(index, amount) {
 				enableSaveButton();
-				for (var i = 0; i < $changedCells.length; i++) {
-					if ($changedCells[i].row === index) {
-						$changedCells.slice(i, 1);
-					} else if ($changedCells[i].row > index) {
-						$changedCells[i].row--;
-					}
-				}
-				setModifiedCells();
 				$rowNumbers.splice(index, 1);
 			},
 			afterRemoveCol : function(index, amount) {
 				if (amount == 1) {
 					enableSaveButton();
-					for (var i = 0; i < $changedCells.length; i++) {
-						if ($changedCells[i].col === index) {
-							$changedCells.slice(i, 1);
-						} else if ($changedCells[i].col > index) {
-							$changedCells[i].col--;
-						}
-					}
-					setModifiedCells();
 				}
 			},
 			afterInit : function() {
@@ -1659,16 +1626,6 @@ function loadTableValues() {
 				initTooltipCells($("td"));
 			},
 		});
-
-		function setModifiedCells() {
-			$(".handsontable td[modified]").removeAttr("modified");
-			for (var i = 0; i < $changedCells.length; i++) {
-				var td = $tableContainer.handsontable("getCell", $changedCells[i].row, $changedCells[i].col);
-				if (td != null) {
-					td.setAttribute("modified", true);
-				}
-			}
-		}
 
 		$("#waiting-bg").removeClass("loading");
 		if (isChrome()) {

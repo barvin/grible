@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.security.Security;
+import org.grible.servlets.ServletHelper;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -49,6 +50,11 @@ public class PingModifiedTime extends HttpServlet {
 		response.setContentType("text/plain");
 		PrintWriter out = response.getWriter();
 		try {
+			if (!ServletHelper.isJson()
+					&& (request.getSession(false) == null || request.getSession(false).getAttribute("userName") == null)) {
+				out.print("logged-out");
+				return;
+			}
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}

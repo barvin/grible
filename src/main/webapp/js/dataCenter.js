@@ -1257,7 +1257,9 @@ function loadTableValues() {
 					time : $tableGenerationTime,
 					id : tableId
 				}, function(res) {
-					if (res !== "" && !$isTimeMessageShown) {
+					if (res === "logged-out") {
+						location.reload(true);
+					} else if (res !== "" && !$isTimeMessageShown) {
 						$isTimeMessageShown = true;
 						noty({
 							type : "warning",

@@ -97,7 +97,7 @@ function initLeftPanel() {
 		thisCategoryItem.addClass("category-item-selected");
 		$(".data-item-selected").removeClass("data-item-selected");
 		$(".data-item-selected").find(".changed-sign").remove();
-		$(".top-panel").find("div").hide();		
+		$(".top-panel").find("div").hide();
 		$("#table-container").hide();
 		if ($("#breadcrumb>a").length > 3) {
 			$(".extends-symbol").last().remove();
@@ -808,154 +808,13 @@ function initTopPanel() {
 
 	$("#btn-delete-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
-			noty({
-				type : "confirm",
-				text : "Are you sure you want to delete this " + tableType + "?",
-				buttons : [ {
-					addClass : 'btn btn-primary ui-button',
-					text : 'Delete',
-					onClick : function($noty) {
-						$noty.close();
-						$.post("../DeleteTable", {
-							id : tableId,
-							product : productId
-						}, function(data) {
-							if (data == "success") {
-								noty({
-									type : "success",
-									text : "The " + tableType + " was deleted.",
-									timeout : 3000
-								});
-								$(".data-item-selected").remove();
-								$(".top-panel").find("div").hide();
-								$("#table-container").hide();
-								if ($("#breadcrumb>a").length > 3) {
-									$(".extends-symbol").last().remove();
-									$("#breadcrumb>a").last().remove();
-									$("#section-name").removeClass("link-infront");
-								}
-								document.title = $("#section-name").text() + " - Grible";
-								history.pushState({
-									product : productId
-								}, "", "?product=" + productId);
-								clearInterval($tableGenerationTimer);
-							} else if (isNumber(data)) {
-								if (isJson()) {
-									window.location = "?product=" + productId + "&id=" + data;
-								} else {
-									window.location = "?id=" + data;
-								}
-							} else {
-								noty({
-									type : "error",
-									text : data
-								});
-							}
-						});
-					}
-				}, {
-					addClass : 'btn btn-danger ui-button',
-					text : 'Cancel',
-					onClick : function($noty) {
-						$noty.close();
-					}
-				} ]
-			});
+			deleteTable();
 		}
 	});
 
 	$("#btn-save-data-item").click(function() {
 		if ($(this).hasClass("button-enabled")) {
-			disableSaveButton();
-			$("#waiting-bg").addClass("loading");
-			var $tableContainer = $("#table-container").handsontable('getInstance');
-			var $keyNames = $tableContainer.getColHeader();
-
-			$.post("../SaveTableHead", {
-				keys : $keyNames,
-				keyTypes : $colTypes,
-				keyRefids : $colRefids
-			}, function(data) {
-				if (data == "success") {
-					var $rowsCount = $tableContainer.countRows();
-					var $counter = 0;
-
-					(function saveTableRow($counter) {
-						console.log($tableContainer.getDataAtRow($counter));
-						$.post("../SaveTableRow", {
-							tableid : tableId,
-							product : productId,
-							row : $counter,
-							values : $tableContainer.getDataAtRow($counter),
-							islastrow : ($rowsCount - $counter === 1)
-						}, function(data) {
-							var res = data.split("|");
-							if (res[0] == "success") {
-								$counter++;
-								if ($counter < $rowsCount) {
-									saveTableRow($counter);
-								} else {
-									$changedCells = [];
-									$("td[modified]").removeAttr("modified");
-									$("th[modified]").removeAttr("modified");
-									$(".current-row").removeClass("current-row");
-									$tableGenerationTime = res[1];
-									if (tableType == "storage") {
-										$.post("../UpdateRowsOrder", {
-											tableid : tableId,
-											product : productId,
-											rows : $rowNumbers
-										}, function(data) {
-											$("#waiting-bg").removeClass("loading");
-											if (data == "success") {
-												for (var i = 0; i < $rowsCount; i++) {
-													$rowNumbers[i] = i;
-												}
-											} else {
-												noty({
-													type : "error",
-													text : data
-												});
-											}
-										});
-									} else {
-										$("#waiting-bg").removeClass("loading");
-										for (var i = 0; i < $rowsCount; i++) {
-											$rowNumbers[i] = i;
-										}
-									}
-
-									$.post("../CheckForDuplicatedRows", {
-										id : tableId,
-										product : productId
-									}, function(data) {
-										var message = data.split("|");
-										if (message[0] == "true") {
-											for (var i = 1; i < message.length; i++) {
-												noty({
-													type : "warning",
-													text : message[i]
-												});
-											}
-										}
-									});
-								}
-							} else {
-								noty({
-									type : "error",
-									text : data
-								});
-							}
-						});
-					})($counter);
-
-				} else {
-					noty({
-						type : "error",
-						text : data
-					});
-				}
-			});
+			saveTable();
 		}
 	});
 
@@ -1020,6 +879,160 @@ function initTopPanel() {
 	});
 }
 
+function deleteTable() {
+	noty({
+		type : "confirm",
+		text : "Are you sure you want to delete this " + tableType + "?",
+		buttons : [ {
+			addClass : 'btn btn-primary ui-button',
+			text : 'Delete',
+			onClick : function($noty) {
+				$noty.close();
+				$.post("../DeleteTable", {
+					id : tableId,
+					product : productId
+				}, function(data) {
+					if (data == "success") {
+						noty({
+							type : "success",
+							text : "The " + tableType + " was deleted.",
+							timeout : 3000
+						});
+						$(".data-item-selected").remove();
+						$(".top-panel").find("div").hide();
+						$("#table-container").hide();
+						if ($("#breadcrumb>a").length > 3) {
+							$(".extends-symbol").last().remove();
+							$("#breadcrumb>a").last().remove();
+							$("#section-name").removeClass("link-infront");
+						}
+						document.title = $("#section-name").text() + " - Grible";
+						history.pushState({
+							product : productId
+						}, "", "?product=" + productId);
+						clearInterval($tableGenerationTimer);
+					} else if (isNumber(data)) {
+						if (isJson()) {
+							window.location = "?product=" + productId + "&id=" + data;
+						} else {
+							window.location = "?id=" + data;
+						}
+					} else {
+						noty({
+							type : "error",
+							text : data
+						});
+					}
+				});
+			}
+		}, {
+			addClass : 'btn btn-danger ui-button',
+			text : 'Cancel',
+			onClick : function($noty) {
+				$noty.close();
+			}
+		} ]
+	});
+}
+
+function saveTable() {
+	disableSaveButton();
+	$("#waiting-bg").addClass("loading");
+	var $tableContainer = $("#table-container").handsontable('getInstance');
+	var $keyNames = $tableContainer.getColHeader();
+	if ($isRowsUsageShown) {
+		$keyNames.splice($keyNames.length - 2, 2);
+	}
+
+	$.post("../SaveTableHead", {
+		keys : $keyNames,
+		keyTypes : $colTypes,
+		keyRefids : $colRefids
+	}, function(data) {
+		if (data == "success") {
+			var $rowsCount = $tableContainer.countRows();
+			var $counter = 0;
+
+			(function saveTableRow($counter) {
+				var $values = $tableContainer.getDataAtRow($counter);
+				if ($isRowsUsageShown) {
+					$values.splice($values.length - 2, 2);
+				}
+				$.post("../SaveTableRow", {
+					tableid : tableId,
+					product : productId,
+					row : $counter,
+					values : $values,
+					islastrow : ($rowsCount - $counter === 1)
+				}, function(data) {
+					var res = data.split("|");
+					if (res[0] == "success") {
+						$counter++;
+						if ($counter < $rowsCount) {
+							saveTableRow($counter);
+						} else {
+							$(".current-row").removeClass("current-row");
+							$tableGenerationTime = res[1];
+							$tableContainer.render();
+							$("#cbx-show-usage").prop("checked", false);
+							if (tableType == "storage") {
+								$.post("../UpdateRowsOrder", {
+									tableid : tableId,
+									product : productId,
+									rows : $rowNumbers
+								}, function(data) {
+									$("#waiting-bg").removeClass("loading");
+									if (data == "success") {
+										for (var i = 0; i < $rowsCount; i++) {
+											$rowNumbers[i] = i;
+										}
+									} else {
+										noty({
+											type : "error",
+											text : data
+										});
+									}
+								});
+							} else {
+								$("#waiting-bg").removeClass("loading");
+								for (var i = 0; i < $rowsCount; i++) {
+									$rowNumbers[i] = i;
+								}
+							}
+
+							$.post("../CheckForDuplicatedRows", {
+								id : tableId,
+								product : productId
+							}, function(data) {
+								var message = data.split("|");
+								if (message[0] == "true") {
+									for (var i = 1; i < message.length; i++) {
+										noty({
+											type : "warning",
+											text : message[i]
+										});
+									}
+								}
+							});
+						}
+					} else {
+						noty({
+							type : "error",
+							text : data
+						});
+					}
+				});
+			})($counter);
+
+		} else {
+			noty({
+				type : "error",
+				text : data
+			});
+		}
+	});
+}
+
 function setRowsUsage(usage) {
 	$("#data-item-options").off("mouseleave");
 	$("#data-item-options").hide(1);
@@ -1053,13 +1066,6 @@ function setRowsUsage(usage) {
 				$newColHeader[$newColHeader.length - 1] = "Used in storages";
 
 				$tableInstance.updateSettings({
-					cells : function(row, col, prop) {
-						var cellProperties = {};
-						if (countCols - col < 3) {
-							cellProperties.readOnly = true;
-						}
-						return cellProperties;
-					},
 					colHeaders : $newColHeader
 				});
 
@@ -1072,8 +1078,8 @@ function setRowsUsage(usage) {
 		});
 	} else {
 		var $tableInstance = $("#table-container").handsontable('getInstance');
-		var countCols = $tableInstance.countCols();
-		$tableInstance.alter('remove_col', countCols - 2, 2);
+		var $countCols = $tableInstance.countCols();
+		$tableInstance.alter('remove_col', $countCols - 2, 2);
 	}
 }
 
@@ -1251,7 +1257,9 @@ function loadTableValues() {
 					time : $tableGenerationTime,
 					id : tableId
 				}, function(res) {
-					if (res !== "" && !$isTimeMessageShown) {
+					if (res === "logged-out") {
+						location.reload(true);
+					} else if (res !== "" && !$isTimeMessageShown) {
 						$isTimeMessageShown = true;
 						noty({
 							type : "warning",
@@ -1503,7 +1511,6 @@ function loadTableValues() {
 									icon : "save",
 									callback : function(key, opt) {
 										if (opt.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
-											$colHeader.attr("modified", true);
 											var $newColHeader = $tableInstance.getColHeader();
 											var $firstVisibleColIndex = $tableInstance.colOffset();
 											$newColHeader[$firstVisibleColIndex + i - 1] = opt.inputs["name"].$input.val();
@@ -1572,7 +1579,6 @@ function loadTableValues() {
 												$colHeader.attr("type", "enumeration");
 												$colHeader.attr("refid", opt.inputs["enumselect"].$input.val());
 											}
-											$colHeader.attr("modified", true);
 											enableSaveButton();
 										}
 									}

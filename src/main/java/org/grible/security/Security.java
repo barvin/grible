@@ -17,11 +17,11 @@ public class Security {
 			return false;
 		}
 		if (request.getSession(false) == null) {
-			response.sendRedirect("/?url=" + request.getRequestURI() + "?" + request.getQueryString());
+			response.sendRedirect("/?url=" + request.getRequestURI() + "?" + request.getQueryString().replace("&", "--"));
 			return true;
 		}
 		if (request.getSession(false).getAttribute("userName") == null) {
-			response.sendRedirect("/?url=" + request.getRequestURI() + "?" + request.getQueryString());
+			response.sendRedirect("/?url=" + request.getRequestURI() + "?" + request.getQueryString().replace("&", "--"));
 			return true;
 		}
 		return false;

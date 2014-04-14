@@ -78,7 +78,7 @@ public class Login extends HttpServlet {
 
 		String path = "";
 		if (request.getParameter("url") != null) {
-			path = request.getParameter("url");
+			path = request.getParameter("url").replace("--", "&");
 		}
 
 		response.sendRedirect(path);

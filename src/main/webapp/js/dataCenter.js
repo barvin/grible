@@ -1471,6 +1471,82 @@ function loadTableValues() {
 
 						var storageSelected = 0;
 						var enumSelected = 0;
+
+						var runOptions = {};
+						function onSaveCoulmnHeaderProperties() {
+							if (runOptions.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
+								var $newColHeader = $tableInstance.getColHeader();
+								var $firstVisibleColIndex = $tableInstance.colOffset();
+								$newColHeader[$firstVisibleColIndex + i - 1] = runOptions.inputs["name"].$input.val();
+								$tableInstance.updateSettings({
+									colHeaders : $newColHeader
+								});
+								enableSaveButton();
+							}
+							var isTextTypeChanged = runOptions.inputs["textradio"].$input.is(":checked") != isTextRadioSelected;
+							var isStorageTypeChanged = runOptions.inputs["storageradio"].$input.is(":checked") != isStorageRadioSelected;
+							var isEnumTypeChanged = runOptions.inputs["enumradio"].$input.is(":checked") != isEnumRadioSelected;
+							var isStorageIdChanged = runOptions.inputs["storageselect"].$input.val() != storageSelected;
+							var isEnumIdChanged = runOptions.inputs["enumselect"].$input.val() != enumSelected;
+							if (isTextTypeChanged || isStorageTypeChanged || isEnumTypeChanged || isStorageIdChanged || isEnumIdChanged) {
+								if (runOptions.inputs["textradio"].$input.is(":checked")) {
+									$columns[i - 1].type = "text";
+									$columns[i - 1].allowInvalid = true;
+									$tableInstance.updateSettings({
+										cells : setColumnTypes
+									});
+
+									$colTypes[i - 1] = "text";
+									$colRefids[i - 1] = "0";
+									$colHeader.attr("type", "text");
+									$colHeader.attr("refid", "0");
+								} else if (runOptions.inputs["storageradio"].$input.is(":checked")) {
+									$columns[i - 1].type = "text";
+									$columns[i - 1].allowInvalid = false;
+									$tableInstance.updateSettings({
+										cells : setColumnTypes
+									});
+									$tableInstance.validateCells(function() {
+										$tableInstance.render();
+									});
+
+									$colTypes[i - 1] = "storage";
+									$colRefids[i - 1] = runOptions.inputs["storageselect"].$input.val();
+									$colHeader.attr("type", "storage");
+									$colHeader.attr("refid", runOptions.inputs["storageselect"].$input.val());
+								} else {
+									$columns[i - 1].type = "dropdown";
+									$columns[i - 1].allowInvalid = false;
+									$.post("../GetEnumValues", {
+										tableid : runOptions.inputs["enumselect"].$input.val(),
+										product : productId
+									}, function(runOptionsions) {
+										var optionsArray = jQuery.parseJSON(options);
+										$columns[i - 1].source = optionsArray;
+										$tableInstance.updateSettings({
+											cells : setColumnTypes
+										});
+										var changes = [];
+										for (var j = 0; j < $tableInstance.countRows(); j++) {
+											if (optionsArray.indexOf($tableInstance.getDataAtCell(j, (i - 1))) == -1) {
+												changes.push([ j, (i - 1), optionsArray[0] ]);
+											}
+										}
+										$tableInstance.setDataAtCell(changes);
+										$tableInstance.validateCells(function() {
+											$tableInstance.render();
+										});
+									});
+
+									$colTypes[i - 1] = "enumeration";
+									$colRefids[i - 1] = runOptions.inputs["enumselect"].$input.val();
+									$colHeader.attr("type", "enumeration");
+									$colHeader.attr("refid", runOptions.inputs["enumselect"].$input.val());
+								}
+								enableSaveButton();
+							}
+						};
+						
 						$.contextMenu({
 							selector : ".handsontable thead th:nth-child(" + (i + 1) + ")",
 							items : {
@@ -1478,7 +1554,15 @@ function loadTableValues() {
 									name : "Column name",
 									type : 'text',
 									value : $colName,
-									icon : "edit"
+									icon : "edit",
+									events : {
+										keyup : function(event) {
+											if (event.which === 13) {
+												onSaveCoulmnHeaderProperties();
+												$(".handsontable thead th:nth-child(" + (i + 1) + ")").contextMenu("hide");
+											}
+										}
+									}
 								},
 								sep1 : "---------",
 								textradio : {
@@ -1510,77 +1594,8 @@ function loadTableValues() {
 									name : "Save",
 									icon : "save",
 									callback : function(key, opt) {
-										if (opt.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
-											var $newColHeader = $tableInstance.getColHeader();
-											var $firstVisibleColIndex = $tableInstance.colOffset();
-											$newColHeader[$firstVisibleColIndex + i - 1] = opt.inputs["name"].$input.val();
-											$tableInstance.updateSettings({
-												colHeaders : $newColHeader
-											});
-											enableSaveButton();
-										}
-										var isTextTypeChanged = opt.inputs["textradio"].$input.is(":checked") != isTextRadioSelected;
-										var isStorageTypeChanged = opt.inputs["storageradio"].$input.is(":checked") != isStorageRadioSelected;
-										var isEnumTypeChanged = opt.inputs["enumradio"].$input.is(":checked") != isEnumRadioSelected;
-										var isStorageIdChanged = opt.inputs["storageselect"].$input.val() != storageSelected;
-										var isEnumIdChanged = opt.inputs["enumselect"].$input.val() != enumSelected;
-										if (isTextTypeChanged || isStorageTypeChanged || isEnumTypeChanged || isStorageIdChanged || isEnumIdChanged) {
-											if (opt.inputs["textradio"].$input.is(":checked")) {
-												$columns[i - 1].type = "text";
-												$columns[i - 1].allowInvalid = true;
-												$tableInstance.updateSettings({
-													cells : setColumnTypes
-												});
-
-												$colTypes[i - 1] = "text";
-												$colRefids[i - 1] = "0";
-												$colHeader.attr("type", "text");
-												$colHeader.attr("refid", "0");
-											} else if (opt.inputs["storageradio"].$input.is(":checked")) {
-												$columns[i - 1].type = "text";
-												$columns[i - 1].allowInvalid = false;
-												$tableInstance.updateSettings({
-													cells : setColumnTypes
-												});
-												$tableInstance.validateCells(function() {
-													$tableInstance.render();
-												});
-
-												$colTypes[i - 1] = "storage";
-												$colRefids[i - 1] = opt.inputs["storageselect"].$input.val();
-												$colHeader.attr("type", "storage");
-												$colHeader.attr("refid", opt.inputs["storageselect"].$input.val());
-											} else {
-												$columns[i - 1].type = "dropdown";
-												$columns[i - 1].allowInvalid = false;
-												$.post("../GetEnumValues", {
-													tableid : opt.inputs["enumselect"].$input.val(),
-													product : productId
-												}, function(options) {
-													var optionsArray = jQuery.parseJSON(options);
-													$columns[i - 1].source = optionsArray;
-													$tableInstance.updateSettings({
-														cells : setColumnTypes
-													});
-													var changes = [];
-													for (var j = 0; j < $tableInstance.countRows(); j++) {
-														if (optionsArray.indexOf($tableInstance.getDataAtCell(j, (i - 1))) == -1) {
-															changes.push([ j, (i - 1), optionsArray[0] ]);
-														}
-													}
-													$tableInstance.setDataAtCell(changes);
-													$tableInstance.validateCells(function() {
-														$tableInstance.render();
-													});
-												});
-
-												$colTypes[i - 1] = "enumeration";
-												$colRefids[i - 1] = opt.inputs["enumselect"].$input.val();
-												$colHeader.attr("type", "enumeration");
-												$colHeader.attr("refid", opt.inputs["enumselect"].$input.val());
-											}
-											enableSaveButton();
-										}
+										runOptions = opt;
+										onSaveCoulmnHeaderProperties();	
 									}
 								}
 							},
@@ -1624,6 +1639,7 @@ function loadTableValues() {
 									opt.items.enumradio.selected = isEnumRadioSelected;
 									opt.items.storageselect.selected = storageSelected;
 									opt.items.enumselect.selected = enumSelected;
+									runOptions = opt;
 								}
 							}
 						});

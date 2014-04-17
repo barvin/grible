@@ -949,7 +949,7 @@ public class PostgresDao implements Dao {
 				if (keys[j].getRefid() == storageId) {
 					String[] indexes = values[i][j].split(";");
 					for (String index : indexes) {
-						if (!rows.contains(Integer.parseInt(index) - 1)) {
+						if (!index.equals("0") && !rows.contains(Integer.parseInt(index) - 1)) {
 							rows.add(Integer.parseInt(index) - 1);
 						}
 					}

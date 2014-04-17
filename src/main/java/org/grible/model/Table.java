@@ -64,7 +64,7 @@ public class Table {
 	public int getId() {
 		return id;
 	}
-	
+
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -118,6 +118,12 @@ public class Table {
 	}
 
 	public Date getModifiedTime() {
+		if (file != null) {
+			String strTime = StringUtils.substring(String.valueOf(file.lastModified()), 0,
+					String.valueOf(file.lastModified()).length() - 3)
+					+ "000";
+			return new Date(Long.parseLong(strTime));
+		}
 		return modifiedTime;
 	}
 

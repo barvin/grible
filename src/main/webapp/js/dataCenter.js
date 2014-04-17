@@ -30,16 +30,6 @@ $(window).on("load", function() {
 $().ready(initialize());
 
 function initialize() {
-
-	$(document).ajaxError(
-			function(e, xhr, settings, exception) {
-				var exrrorText = xhr.responseText.substring(xhr.responseText.indexOf("<h1>"));
-				$("body").append(
-						'<div id="error-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Error</div>' + '<div class="ui-dialog-content">' + 'Location: ' + settings.url
-								+ '<br><br>' + exrrorText + '<br><br>' + '<div class="right">' + '<button class="ui-button btn-cancel">OK</button>' + '</div></div></div>');
-				initOneButtonDialog(jQuery);
-			});
-
 	$.post("../GetCategories", {
 		productId : productId,
 		tableId : tableId,
@@ -48,7 +38,6 @@ function initialize() {
 		$("#category-container").html(data);
 		initLeftPanel(jQuery);
 	});
-
 }
 
 function initLeftPanel() {
@@ -1249,28 +1238,25 @@ function loadTableValues() {
 
 		var $data = jQuery.parseJSON(res);
 
-		if (!isJson()) {
-			$tableGenerationTime = $data.time;
-
-			var pingModifiedTime = function() {
-				$.post("../PingModifiedTime", {
-					time : $tableGenerationTime,
-					id : tableId
-				}, function(res) {
-					if (res === "logged-out") {
-						location.reload(true);
-					} else if (res !== "" && !$isTimeMessageShown) {
-						$isTimeMessageShown = true;
-						noty({
-							type : "warning",
-							text : res
-						});
-					}
-				});
-			};
-
-			$tableGenerationTimer = setInterval(pingModifiedTime, 5000);
-		}
+		$tableGenerationTime = $data.time;
+		var pingModifiedTime = function() {
+			$.post("../PingModifiedTime", {
+				time : $tableGenerationTime,
+				id : tableId,
+				product : productId
+			}, function(res) {
+				if (res === "logged-out") {
+					location.reload(true);
+				} else if (res !== "" && !$isTimeMessageShown) {
+					$isTimeMessageShown = true;
+					noty({
+						type : "warning",
+						text : res
+					});
+				}
+			});
+		};
+		$tableGenerationTimer = setInterval(pingModifiedTime, 5000);
 
 		var $colNames = [];
 		for (var i = 0; i < $data.keys.length; i++) {
@@ -1545,8 +1531,9 @@ function loadTableValues() {
 								}
 								enableSaveButton();
 							}
-						};
-						
+						}
+						;
+
 						$.contextMenu({
 							selector : ".handsontable thead th:nth-child(" + (i + 1) + ")",
 							items : {
@@ -1595,7 +1582,7 @@ function loadTableValues() {
 									icon : "save",
 									callback : function(key, opt) {
 										runOptions = opt;
-										onSaveCoulmnHeaderProperties();	
+										onSaveCoulmnHeaderProperties();
 									}
 								}
 							},

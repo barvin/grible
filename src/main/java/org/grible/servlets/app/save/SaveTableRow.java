@@ -12,6 +12,7 @@ package org.grible.servlets.app.save;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -158,6 +159,7 @@ public class SaveTableRow extends HttpServlet {
 					table.getTableJson().setKeys(keys);
 					table.getTableJson().setValues(values);
 					table.save();
+					time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(table.getModifiedTime());
 				} else {
 					table.setKeys(keys);
 					table.setValues(values);

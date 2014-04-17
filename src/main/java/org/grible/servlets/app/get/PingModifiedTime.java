@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.security.Security;
@@ -32,7 +33,6 @@ import org.grible.servlets.ServletHelper;
 @WebServlet("/PingModifiedTime")
 public class PingModifiedTime extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private PostgresDao pDao;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -58,11 +58,16 @@ public class PingModifiedTime extends HttpServlet {
 			if (Security.anyServletEntryCheckFailed(request, response)) {
 				return;
 			}
-			pDao = new PostgresDao();
-
 			int id = Integer.parseInt(request.getParameter("id"));
+			int productId = Integer.parseInt(request.getParameter("product"));
 			Date userStartTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("time"));
-			Table table = pDao.getTable(id);
+			
+			Table table = null;
+			if (ServletHelper.isJson()) {
+				table = new JsonDao().getTable(id, productId);
+			} else {
+				table = new PostgresDao().getTable(id);
+			}
 
 			String message = "";
 

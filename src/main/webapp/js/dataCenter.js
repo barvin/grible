@@ -1369,6 +1369,11 @@ function loadTableValues() {
 						type : "text",
 						allowInvalid : true
 					});
+					var $tableInstance = $tableContainer.handsontable('getInstance');
+					var countRows = $tableInstance.countRows();
+					for (var i = 0; i < countRows; i++) {
+						$tableInstance.setDataAtCell(i, index, "");
+					}
 					if ($isRowsUsageShown) {
 						$tableContainer.handsontable("updateSettings", {
 							cells : setColumnTypes

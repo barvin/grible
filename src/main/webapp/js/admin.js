@@ -182,6 +182,7 @@ $().ready(
 
 				if (formvalid) {
 					$.post("../DBConnect", {
+						apptype: "POSTGRESQL",
 						dbhost : $("input[name='dbhost']").val(),
 						dbport : $("input[name='dbport']").val(),
 						dbname : $("input[name='dbname']").val(),

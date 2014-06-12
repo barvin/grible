@@ -924,6 +924,14 @@ function deleteTable() {
 	});
 }
 
+function replaceNullWithEmptyString(array) {
+	for (var i = 0; i < array.length; i++) {
+		if (array[i] === null)
+			array[i] = "";
+	}
+	return array;
+}
+
 function saveTable() {
 	disableSaveButton();
 	$("#waiting-bg").addClass("loading");
@@ -943,7 +951,7 @@ function saveTable() {
 			var $counter = 0;
 
 			(function saveTableRow($counter) {
-				var $values = $tableContainer.getDataAtRow($counter);
+				var $values = replaceNullWithEmptyString($tableContainer.getDataAtRow($counter));
 				if ($isRowsUsageShown) {
 					$values.splice($values.length - 2, 2);
 				}
@@ -1369,11 +1377,6 @@ function loadTableValues() {
 						type : "text",
 						allowInvalid : true
 					});
-					var $tableInstance = $tableContainer.handsontable('getInstance');
-					var countRows = $tableInstance.countRows();
-					for (var i = 0; i < countRows; i++) {
-						$tableInstance.setDataAtCell(i, index, "");
-					}
 					if ($isRowsUsageShown) {
 						$tableContainer.handsontable("updateSettings", {
 							cells : setColumnTypes

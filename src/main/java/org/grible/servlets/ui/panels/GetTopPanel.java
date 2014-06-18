@@ -123,6 +123,10 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<img src=\"../img/export-icon.png\">");
 				responseHtml.append("<span class=\"icon-button-text\">Export to Excel</span></div>");
 
+				responseHtml.append("<div id=\"btn-help\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/info-icon-mini.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Help</span></div>");
+
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");
@@ -155,6 +159,10 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div id=\"btn-class-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/brackets.png\">");
 				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
+
+				responseHtml.append("<div id=\"btn-help\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/info-icon-mini.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Help</span></div>");
 
 				responseHtml.append("</div></div>");
 
@@ -253,11 +261,19 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
 				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
+				
 				responseHtml.append("<div id=\"data-item-options\">");
+				
 				responseHtml.append(showWarning);
+				
 				responseHtml.append("<div id=\"btn-export-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/export-icon.png\">");
 				responseHtml.append("<span class=\"icon-button-text\">Export to Excel</span></div>");
+
+				responseHtml.append("<div id=\"btn-help\" class=\"checkbox-option\">");
+				responseHtml.append("<img src=\"../img/info-icon-mini.png\">");
+				responseHtml.append("<span class=\"icon-button-text\">Help</span></div>");
+				
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");

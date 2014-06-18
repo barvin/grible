@@ -84,10 +84,10 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				result.append("<li><a href=\"#tabs-1\"><span class=\"dialog-tab\">Java</span></a></li>");
 				result.append("<li><a href=\"#tabs-2\"><span class=\"dialog-tab\">C#</span></a></li>");
 				result.append("</ul>");
-				result.append("<div id=\"tabs-1\" class=\"tab-content\">");
+				result.append("<div id=\"tabs-1\" class=\"tab-content scrollable\">");
 				result.append(getJavaClass());
 				result.append("</div>");
-				result.append("<div id=\"tabs-2\" class=\"tab-content\">");
+				result.append("<div id=\"tabs-2\" class=\"tab-content scrollable\">");
 				result.append(getCSharpClass());
 				result.append("</div>");
 				result.append("</div>");
@@ -103,10 +103,10 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				result.append("<li><a href=\"#tabs-1\"><span class=\"dialog-tab\">Java</span></a></li>");
 				result.append("<li><a href=\"#tabs-2\"><span class=\"dialog-tab\">C#</span></a></li>");
 				result.append("</ul>");
-				result.append("<div id=\"tabs-1\" class=\"tab-content\">");
+				result.append("<div id=\"tabs-1\" class=\"tab-content scrollable\">");
 				result.append(getJavaEnum());
 				result.append("</div>");
-				result.append("<div id=\"tabs-2\" class=\"tab-content\">");
+				result.append("<div id=\"tabs-2\" class=\"tab-content scrollable\">");
 				result.append(getCSharpEnum());
 				result.append("</div>");
 				result.append("</div>");

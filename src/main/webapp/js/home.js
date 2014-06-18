@@ -40,12 +40,12 @@ $(window).on(
 						e.preventDefault();
 						$("#product-info-dialog").remove();
 						$("body").append(
-								'<div id="product-info-dialog" class="ui-dialog"><div class="ui-dialog-title">Product</div><div class="ui-dialog-content">'
+								'<div id="product-info-dialog" class="ui-dialog"><div class="ui-dialog-title">Product</div><div class="ui-dialog-content scrollable">'
 										+ '<p><strong>Product</strong> here represents the specific software product automated tests are developed for. '
 										+ 'One Grible instance is meant to have data for automated tests for different software products, '
 										+ 'that is why you can create more than one product.</p>' + '<p><strong>Product</strong> properties:'
 										+ '<ul><li><strong>Name</strong> - name of the product (normally the name of the software product). '
-										+ 'The name is unique within the Grible instance</li>'
+										+ 'The name is unique within the Grible instance</li><br>'
 										+ '<li><strong>(In JSON version) Path</strong> - full path to the directory where JSON files would be placed. '
 										+ 'E.g. "C:\\Automation\\Product\\Data", where automation framework is in "C:\\Automation\\Product", this way '
 										+ 'JSON data files are kept with the framework in the control version system and are edited with Grible. '

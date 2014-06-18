@@ -109,36 +109,6 @@ public class ServletHelper {
 		return builder.toString();
 	}
 
-	// public static String getContextMenus(String tableType) {
-	// StringBuilder responseHtml = new StringBuilder();
-	// responseHtml.append("<ul id=\"categoryMenu\" class=\"contextMenu\">");
-	// responseHtml.append("<li class=\"add\"><a href=\"#add\">Add " + tableType
-	// + "</a></li>");
-	// responseHtml.append("<li class=\"import\"><a href=\"#import\">Import " +
-	// tableType + "</a></li>");
-	// responseHtml.append("<li class=\"add separator\"><a href=\"#add-category\">Add subcategory</a></li>");
-	// responseHtml.append("<li class=\"edit\"><a href=\"#edit\">Edit category</a></li>");
-	// responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete category</a></li>");
-	// responseHtml.append("</ul>");
-	//
-	// if (!"enumeration".equals(tableType)) {
-	// responseHtml.append("<ul id=\"keyMenu\" class=\"contextMenu\">");
-	// responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert column</a></li>");
-	// responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate column</a></li>");
-	// responseHtml.append("<li class=\"fill\"><a href=\"#fill\">Fill column with...</a></li>");
-	// responseHtml.append("<li class=\"parameter\"><a href=\"#parameter\">Change parameter type</a></li>");
-	// responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete column</a></li>");
-	// responseHtml.append("</ul>");
-	// }
-	//
-	// responseHtml.append("<ul id=\"rowMenu\" class=\"contextMenu\">");
-	// responseHtml.append("<li class=\"add\"><a href=\"#add\">Insert row</a></li>");
-	// responseHtml.append("<li class=\"copy\"><a href=\"#copy\">Duplicate row</a></li>");
-	// responseHtml.append("<li class=\"delete\"><a href=\"#delete\">Delete row</a></li>");
-	// responseHtml.append("</ul>");
-	// return responseHtml.toString();
-	// }
-
 	public static String getMain() {
 		StringBuilder responseHtml = new StringBuilder();
 		responseHtml.append("<div id=\"main\" class=\"table\">");
@@ -206,6 +176,7 @@ public class ServletHelper {
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.11.0.min.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-ui.min.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.handsontable.full.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.hotkeys.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");

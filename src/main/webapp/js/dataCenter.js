@@ -866,6 +866,30 @@ function initTopPanel() {
 			}
 		});
 	});
+
+	$("#btn-help").click(
+			function(e) {
+				e.preventDefault();
+				$("#help-dialog").remove();
+				$("body").append(
+						'<div id="help-dialog" class="ui-dialog"><div class="ui-dialog-title">Help</div><div class="ui-dialog-content">'
+								+ '<div class="ui-dialog-content-inner scrollable">' + '<p><h2>Cell context menu</h2></p>' + '<p><img src="../img/scr_cell_context.png"></p>'
+								+ '<p>On a cell context menu you can perform the following actions:' + '<ul><li>Insert row (above or below)</li>'
+								+ '<li>Insert column (on the left or right)</li>' + '<li>Remove row</li>' + '<li>Remove column</li>' + '<li>Undo</li>' + '<li>Redo</li>' + '</ul>'
+								+ '</p>' + '<p><h2>Column header context menu</h2></p>' + '<p><img src="../img/scr_header_context.png"></p>'
+								+ '<p>On a column header context menu you can perform the following actions:' + '<ul><li>Change column name</li>'
+								+ '<li>Change parameter type</li>' + '</ul>' + '</p>' + '<p><h2>Shortcuts</h2></p>' + '<p>You can use the following shortcuts:'
+								+ '<ul><li>Alt + U</i> - insert row above</li>' + '<li><i>Alt + D</i> - insert row below</li>'
+								+ '<li><i> Alt + L</i> - insert column on the left</li>' + '<li><i>Alt + R</i> - insert column on the right</li>'
+								+ '<li><i>Ctrl + Alt + R</i> - Remove row</li>' + '<li><i>Ctrl + Alt + C</i> - Remove column</li>' + '<li><i>Ctrl + Z</i> - Undo</li>'
+								+ '<li><i>Ctrl + Y</i> - Redo</li>' + '</ul>' + '</p>' + '<p><h2>Index ranges</h2></p>'
+								+ '<p>To make your life easier Grible transforms values like <strong>"3;;7"</strong> '
+								+ 'into <strong>"3;4;5;6;7"</strong> if the cell belongs to the storage type parameter. '
+								+ 'This way you can enter large ranges of indexes faster.</p>'
+
+								+ '</div><div class="dialog-buttons right">' + '<button class="ui-button btn-cancel">Close</button>' + '</div></div></div>');
+				initOneButtonDialog(jQuery);
+			});
 }
 
 function deleteTable() {
@@ -924,6 +948,14 @@ function deleteTable() {
 	});
 }
 
+function replaceNullWithEmptyString(array) {
+	for (var i = 0; i < array.length; i++) {
+		if (array[i] === null)
+			array[i] = "";
+	}
+	return array;
+}
+
 function saveTable() {
 	disableSaveButton();
 	$("#waiting-bg").addClass("loading");
@@ -943,7 +975,7 @@ function saveTable() {
 			var $counter = 0;
 
 			(function saveTableRow($counter) {
-				var $values = $tableContainer.getDataAtRow($counter);
+				var $values = replaceNullWithEmptyString($tableContainer.getDataAtRow($counter));
 				if ($isRowsUsageShown) {
 					$values.splice($values.length - 2, 2);
 				}
@@ -1331,6 +1363,17 @@ function loadTableValues() {
 					}
 					if (isDataChanged) {
 						enableSaveButton();
+						if (source == "edit" && /\d+;;\d+/.test(changes[0][3]) && $colTypes[changes[0][1]] == "storage") {
+							var $tableInstance = $tableContainer.handsontable('getInstance');
+							var $newContent = changes[0][3];
+							var start = parseInt($newContent.substring(0, $newContent.indexOf(";;")));
+							var end = parseInt($newContent.substring($newContent.indexOf(";;") + 2));
+							$newContent = start;
+							for (var i = start + 1; i < end + 1; i++) {
+								$newContent += ";" + i;
+							}
+							$tableInstance.setDataAtCell(changes[0][0], changes[0][1], $newContent);
+						}
 					}
 				}
 				if ($isRowsUsageJustTurnedOn) {
@@ -1369,11 +1412,6 @@ function loadTableValues() {
 						type : "text",
 						allowInvalid : true
 					});
-					var $tableInstance = $tableContainer.handsontable('getInstance');
-					var countRows = $tableInstance.countRows();
-					for (var i = 0; i < countRows; i++) {
-						$tableInstance.setDataAtCell(i, index, "");
-					}
 					if ($isRowsUsageShown) {
 						$tableContainer.handsontable("updateSettings", {
 							cells : setColumnTypes
@@ -1424,24 +1462,44 @@ function loadTableValues() {
 					$tableInstance.updateSettings({
 						contextMenu : [ 'col_left', 'col_right', 'hsep2', 'remove_col', 'hsep3', 'undo', 'redo' ]
 					});
-				} else {
-					$(".handsontable .htCore tbody").sortable({
-						update : function(event, ui) {
-							$("#waiting-bg").addClass("loading");
-							var $draggedRow = ui.item;
-							var $rowIndex = $draggedRow.find("th").text() - 1;
-							var $unsavedRowNumber = $rowNumbers[$rowIndex];
-							$draggedRowValues = $tableInstance.getDataAtRow($rowIndex);
-							$tableInstance.alter("remove_row", $rowIndex, 1);
-
-							var $newRowIndex = parseInt($draggedRow.prev().find("th").text());
-							$tableInstance.alter("insert_row", $newRowIndex, 1);
-							$rowNumbers.splice($newRowIndex, 0, $unsavedRowNumber);
-						}
-					});
 				}
+
 				for (var i = 0; i < $data.values.length; i++) {
 					$rowNumbers[i] = i;
+				}
+
+			},
+			beforeKeyDown : function(e) {
+				var $tableInstance = $tableContainer.handsontable('getInstance');
+				if (e.altKey === true && e.which === 85) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_row', $tableInstance.getSelected()[0], 1);
+				}
+				if (e.altKey === true && e.which === 68) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_row', $tableInstance.getSelected()[0] + 1, 1);
+				}
+				if (e.altKey === true && e.which === 76) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_col', $tableInstance.getSelected()[1], 1);
+				}
+				if (e.altKey === true && e.which === 82) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_col', $tableInstance.getSelected()[1] + 1, 1);
+				}
+				if (e.ctrlKey === true && e.altKey === true && e.which === 82) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('remove_row', $tableInstance.getSelected()[0], 1);
+				}
+				if (e.ctrlKey === true && e.altKey === true && e.which === 67) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('remove_col', $tableInstance.getSelected()[1], 1);
 				}
 			},
 			afterRender : function() {
@@ -1465,9 +1523,9 @@ function loadTableValues() {
 
 						var runOptions = {};
 						function onSaveCoulmnHeaderProperties() {
+							var $firstVisibleColIndex = $tableInstance.colOffset();
 							if (runOptions.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
 								var $newColHeader = $tableInstance.getColHeader();
-								var $firstVisibleColIndex = $tableInstance.colOffset();
 								$newColHeader[$firstVisibleColIndex + i - 1] = runOptions.inputs["name"].$input.val();
 								$tableInstance.updateSettings({
 									colHeaders : $newColHeader
@@ -1479,21 +1537,22 @@ function loadTableValues() {
 							var isEnumTypeChanged = runOptions.inputs["enumradio"].$input.is(":checked") != isEnumRadioSelected;
 							var isStorageIdChanged = runOptions.inputs["storageselect"].$input.val() != storageSelected;
 							var isEnumIdChanged = runOptions.inputs["enumselect"].$input.val() != enumSelected;
+							var $colIndex = $firstVisibleColIndex + i - 1;
 							if (isTextTypeChanged || isStorageTypeChanged || isEnumTypeChanged || isStorageIdChanged || isEnumIdChanged) {
 								if (runOptions.inputs["textradio"].$input.is(":checked")) {
-									$columns[i - 1].type = "text";
-									$columns[i - 1].allowInvalid = true;
+									$columns[$colIndex].type = "text";
+									$columns[$colIndex].allowInvalid = true;
 									$tableInstance.updateSettings({
 										cells : setColumnTypes
 									});
 
-									$colTypes[i - 1] = "text";
-									$colRefids[i - 1] = "0";
+									$colTypes[$colIndex] = "text";
+									$colRefids[$colIndex] = "0";
 									$colHeader.attr("type", "text");
 									$colHeader.attr("refid", "0");
 								} else if (runOptions.inputs["storageradio"].$input.is(":checked")) {
-									$columns[i - 1].type = "text";
-									$columns[i - 1].allowInvalid = false;
+									$columns[$colIndex].type = "text";
+									$columns[$colIndex].allowInvalid = false;
 									$tableInstance.updateSettings({
 										cells : setColumnTypes
 									});
@@ -1501,26 +1560,26 @@ function loadTableValues() {
 										$tableInstance.render();
 									});
 
-									$colTypes[i - 1] = "storage";
-									$colRefids[i - 1] = runOptions.inputs["storageselect"].$input.val();
+									$colTypes[$colIndex] = "storage";
+									$colRefids[$colIndex] = runOptions.inputs["storageselect"].$input.val();
 									$colHeader.attr("type", "storage");
 									$colHeader.attr("refid", runOptions.inputs["storageselect"].$input.val());
 								} else {
-									$columns[i - 1].type = "dropdown";
-									$columns[i - 1].allowInvalid = false;
+									$columns[$colIndex].type = "dropdown";
+									$columns[$colIndex].allowInvalid = false;
 									$.post("../GetEnumValues", {
 										tableid : runOptions.inputs["enumselect"].$input.val(),
 										product : productId
 									}, function(runOptionsions) {
 										var optionsArray = jQuery.parseJSON(options);
-										$columns[i - 1].source = optionsArray;
+										$columns[$colIndex].source = optionsArray;
 										$tableInstance.updateSettings({
 											cells : setColumnTypes
 										});
 										var changes = [];
 										for (var j = 0; j < $tableInstance.countRows(); j++) {
-											if (optionsArray.indexOf($tableInstance.getDataAtCell(j, (i - 1))) == -1) {
-												changes.push([ j, (i - 1), optionsArray[0] ]);
+											if (optionsArray.indexOf($tableInstance.getDataAtCell(j, $colIndex)) == -1) {
+												changes.push([ j, $colIndex, optionsArray[0] ]);
 											}
 										}
 										$tableInstance.setDataAtCell(changes);
@@ -1529,8 +1588,8 @@ function loadTableValues() {
 										});
 									});
 
-									$colTypes[i - 1] = "enumeration";
-									$colRefids[i - 1] = runOptions.inputs["enumselect"].$input.val();
+									$colTypes[$colIndex] = "enumeration";
+									$colRefids[$colIndex] = runOptions.inputs["enumselect"].$input.val();
 									$colHeader.attr("type", "enumeration");
 									$colHeader.attr("refid", runOptions.inputs["enumselect"].$input.val());
 								}

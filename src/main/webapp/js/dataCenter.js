@@ -866,6 +866,30 @@ function initTopPanel() {
 			}
 		});
 	});
+
+	$("#btn-help").click(
+			function(e) {
+				e.preventDefault();
+				$("#help-dialog").remove();
+				$("body").append(
+						'<div id="help-dialog" class="ui-dialog"><div class="ui-dialog-title">Help</div><div class="ui-dialog-content">'
+								+ '<div class="ui-dialog-content-inner scrollable">' + '<p><h2>Cell context menu</h2></p>' + '<p><img src="../img/scr_cell_context.png"></p>'
+								+ '<p>On a cell context menu you can perform the following actions:' + '<ul><li>Insert row (above or below)</li>'
+								+ '<li>Insert column (on the left or right)</li>' + '<li>Remove row</li>' + '<li>Remove column</li>' + '<li>Undo</li>' + '<li>Redo</li>' + '</ul>'
+								+ '</p>' + '<p><h2>Column header context menu</h2></p>' + '<p><img src="../img/scr_header_context.png"></p>'
+								+ '<p>On a column header context menu you can perform the following actions:' + '<ul><li>Change column name</li>'
+								+ '<li>Change parameter type</li>' + '</ul>' + '</p>' + '<p><h2>Shortcuts</h2></p>' + '<p>You can use the following shortcuts:'
+								+ '<ul><li>Alt + U</i> - insert row above</li>' + '<li><i>Alt + D</i> - insert row below</li>'
+								+ '<li><i> Alt + L</i> - insert column on the left</li>' + '<li><i>Alt + R</i> - insert column on the right</li>'
+								+ '<li><i>Ctrl + Alt + R</i> - Remove row</li>' + '<li><i>Ctrl + Alt + C</i> - Remove column</li>' + '<li><i>Ctrl + Z</i> - Undo</li>'
+								+ '<li><i>Ctrl + Y</i> - Redo</li>' + '</ul>' + '</p>' + '<p><h2>Index ranges</h2></p>'
+								+ '<p>To make your life easier Grible transforms values like <strong>"3;;7"</strong> '
+								+ 'into <strong>"3;4;5;6;7"</strong> if the cell belongs to the storage type parameter. '
+								+ 'This way you can enter large ranges of indexes faster.</p>'
+
+								+ '</div><div class="dialog-buttons right">' + '<button class="ui-button btn-cancel">Close</button>' + '</div></div></div>');
+				initOneButtonDialog(jQuery);
+			});
 }
 
 function deleteTable() {
@@ -1339,6 +1363,17 @@ function loadTableValues() {
 					}
 					if (isDataChanged) {
 						enableSaveButton();
+						if (source == "edit" && /\d+;;\d+/.test(changes[0][3]) && $colTypes[changes[0][1]] == "storage") {
+							var $tableInstance = $tableContainer.handsontable('getInstance');
+							var $newContent = changes[0][3];
+							var start = parseInt($newContent.substring(0, $newContent.indexOf(";;")));
+							var end = parseInt($newContent.substring($newContent.indexOf(";;") + 2));
+							$newContent = start;
+							for (var i = start + 1; i < end + 1; i++) {
+								$newContent += ";" + i;
+							}
+							$tableInstance.setDataAtCell(changes[0][0], changes[0][1], $newContent);
+						}
 					}
 				}
 				if ($isRowsUsageJustTurnedOn) {
@@ -1428,8 +1463,43 @@ function loadTableValues() {
 						contextMenu : [ 'col_left', 'col_right', 'hsep2', 'remove_col', 'hsep3', 'undo', 'redo' ]
 					});
 				}
+
 				for (var i = 0; i < $data.values.length; i++) {
 					$rowNumbers[i] = i;
+				}
+
+			},
+			beforeKeyDown : function(e) {
+				var $tableInstance = $tableContainer.handsontable('getInstance');
+				if (e.altKey === true && e.which === 85) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_row', $tableInstance.getSelected()[0], 1);
+				}
+				if (e.altKey === true && e.which === 68) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_row', $tableInstance.getSelected()[0] + 1, 1);
+				}
+				if (e.altKey === true && e.which === 76) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_col', $tableInstance.getSelected()[1], 1);
+				}
+				if (e.altKey === true && e.which === 82) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('insert_col', $tableInstance.getSelected()[1] + 1, 1);
+				}
+				if (e.ctrlKey === true && e.altKey === true && e.which === 82) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('remove_row', $tableInstance.getSelected()[0], 1);
+				}
+				if (e.ctrlKey === true && e.altKey === true && e.which === 67) {
+					e.stopImmediatePropagation();
+					e.preventDefault();
+					$tableInstance.alter('remove_col', $tableInstance.getSelected()[1], 1);
 				}
 			},
 			afterRender : function() {

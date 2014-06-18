@@ -150,7 +150,7 @@ a:hover,a:hover>.link-infront {
 }
 
 .handsontable .current-row {
-  background-color: #ECF7F7;
+	background-color: #ECF7F7;
 }
 
 .index-cell {
@@ -625,11 +625,14 @@ h3.category-item:hover {
 	color: #C03300;
 }
 
+.scrollable {
+	overflow: auto;
+}
+
 .tab-content {
 	background-color: #FFFFFF;
 	border: 1px solid #C0C0C0;
 	padding: 10px 20px;
-	overflow: auto;
 	font-family: Consolas, 'Lucida Console', 'Bitstream Vera Sans Mono',
 		'DejaVu Sans Mono', monospace;
 }
@@ -833,4 +836,17 @@ h3.category-item:hover {
 
 #product-info-dialog {
 	width: 500px;
+}
+
+#help-dialog {
+	height: 90%;
+	width: 800px;
+}
+
+#help-dialog .ui-dialog-content {
+	height: 90%;
+}
+
+#help-dialog .ui-dialog-content-inner {
+	height: 99%;
 }

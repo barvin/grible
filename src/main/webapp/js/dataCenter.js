@@ -1427,21 +1427,6 @@ function loadTableValues() {
 					$tableInstance.updateSettings({
 						contextMenu : [ 'col_left', 'col_right', 'hsep2', 'remove_col', 'hsep3', 'undo', 'redo' ]
 					});
-				} else {
-					$(".handsontable .htCore tbody").sortable({
-						update : function(event, ui) {
-							$("#waiting-bg").addClass("loading");
-							var $draggedRow = ui.item;
-							var $rowIndex = $draggedRow.find("th").text() - 1;
-							var $unsavedRowNumber = $rowNumbers[$rowIndex];
-							$draggedRowValues = $tableInstance.getDataAtRow($rowIndex);
-							$tableInstance.alter("remove_row", $rowIndex, 1);
-
-							var $newRowIndex = parseInt($draggedRow.prev().find("th").text());
-							$tableInstance.alter("insert_row", $newRowIndex, 1);
-							$rowNumbers.splice($newRowIndex, 0, $unsavedRowNumber);
-						}
-					});
 				}
 				for (var i = 0; i < $data.values.length; i++) {
 					$rowNumbers[i] = i;
@@ -1468,9 +1453,9 @@ function loadTableValues() {
 
 						var runOptions = {};
 						function onSaveCoulmnHeaderProperties() {
+							var $firstVisibleColIndex = $tableInstance.colOffset();
 							if (runOptions.inputs["name"].$input.val() !== $colHeader.find("span.colHeader").text()) {
 								var $newColHeader = $tableInstance.getColHeader();
-								var $firstVisibleColIndex = $tableInstance.colOffset();
 								$newColHeader[$firstVisibleColIndex + i - 1] = runOptions.inputs["name"].$input.val();
 								$tableInstance.updateSettings({
 									colHeaders : $newColHeader
@@ -1482,21 +1467,22 @@ function loadTableValues() {
 							var isEnumTypeChanged = runOptions.inputs["enumradio"].$input.is(":checked") != isEnumRadioSelected;
 							var isStorageIdChanged = runOptions.inputs["storageselect"].$input.val() != storageSelected;
 							var isEnumIdChanged = runOptions.inputs["enumselect"].$input.val() != enumSelected;
+							var $colIndex = $firstVisibleColIndex + i - 1;
 							if (isTextTypeChanged || isStorageTypeChanged || isEnumTypeChanged || isStorageIdChanged || isEnumIdChanged) {
 								if (runOptions.inputs["textradio"].$input.is(":checked")) {
-									$columns[i - 1].type = "text";
-									$columns[i - 1].allowInvalid = true;
+									$columns[$colIndex].type = "text";
+									$columns[$colIndex].allowInvalid = true;
 									$tableInstance.updateSettings({
 										cells : setColumnTypes
 									});
 
-									$colTypes[i - 1] = "text";
-									$colRefids[i - 1] = "0";
+									$colTypes[$colIndex] = "text";
+									$colRefids[$colIndex] = "0";
 									$colHeader.attr("type", "text");
 									$colHeader.attr("refid", "0");
 								} else if (runOptions.inputs["storageradio"].$input.is(":checked")) {
-									$columns[i - 1].type = "text";
-									$columns[i - 1].allowInvalid = false;
+									$columns[$colIndex].type = "text";
+									$columns[$colIndex].allowInvalid = false;
 									$tableInstance.updateSettings({
 										cells : setColumnTypes
 									});
@@ -1504,26 +1490,26 @@ function loadTableValues() {
 										$tableInstance.render();
 									});
 
-									$colTypes[i - 1] = "storage";
-									$colRefids[i - 1] = runOptions.inputs["storageselect"].$input.val();
+									$colTypes[$colIndex] = "storage";
+									$colRefids[$colIndex] = runOptions.inputs["storageselect"].$input.val();
 									$colHeader.attr("type", "storage");
 									$colHeader.attr("refid", runOptions.inputs["storageselect"].$input.val());
 								} else {
-									$columns[i - 1].type = "dropdown";
-									$columns[i - 1].allowInvalid = false;
+									$columns[$colIndex].type = "dropdown";
+									$columns[$colIndex].allowInvalid = false;
 									$.post("../GetEnumValues", {
 										tableid : runOptions.inputs["enumselect"].$input.val(),
 										product : productId
 									}, function(runOptionsions) {
 										var optionsArray = jQuery.parseJSON(options);
-										$columns[i - 1].source = optionsArray;
+										$columns[$colIndex].source = optionsArray;
 										$tableInstance.updateSettings({
 											cells : setColumnTypes
 										});
 										var changes = [];
 										for (var j = 0; j < $tableInstance.countRows(); j++) {
-											if (optionsArray.indexOf($tableInstance.getDataAtCell(j, (i - 1))) == -1) {
-												changes.push([ j, (i - 1), optionsArray[0] ]);
+											if (optionsArray.indexOf($tableInstance.getDataAtCell(j, $colIndex)) == -1) {
+												changes.push([ j, $colIndex, optionsArray[0] ]);
 											}
 										}
 										$tableInstance.setDataAtCell(changes);
@@ -1532,8 +1518,8 @@ function loadTableValues() {
 										});
 									});
 
-									$colTypes[i - 1] = "enumeration";
-									$colRefids[i - 1] = runOptions.inputs["enumselect"].$input.val();
+									$colTypes[$colIndex] = "enumeration";
+									$colRefids[$colIndex] = runOptions.inputs["enumselect"].$input.val();
 									$colHeader.attr("type", "enumeration");
 									$colHeader.attr("refid", runOptions.inputs["enumselect"].$input.val());
 								}

@@ -22,16 +22,15 @@ $(window).on(
 					function() {
 						var productPath = "";
 						if ($("#lbl-user").length == 0) {
-							productPath = '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-									+ 'Path:</div><div class="table-cell dialog-cell dialog-edit">' + '<input class="product-path dialog-edit" size="50"></div></div>';
+							productPath = '<div class="table-row"><div class="table-cell dialog-cell dialog-label">' + lang.path
+									+ ':</div><div class="table-cell dialog-cell dialog-edit">' + '<input class="product-path dialog-edit" size="50"></div></div>';
 						}
 						$("body").append(
-								'<div id="add-product-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Add product</div>' + '<div class="ui-dialog-content">'
-										+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-										+ 'Name:</div><div class="table-cell dialog-cell dialog-edit">' + '<input class="product-name dialog-edit" size="50"></div>' + '</div>'
-										+ productPath + '</div>' + '<div class="dialog-buttons right">'
-										+ '<button id="dialog-btn-add-product" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-										+ '</div></div></div>');
+								'<div id="add-product-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">' + lang.addproduct + '</div>'
+										+ '<div class="ui-dialog-content">' + '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+										+ lang.name + ':</div><div class="table-cell dialog-cell dialog-edit">' + '<input class="product-name dialog-edit" size="50"></div>'
+										+ '</div>' + productPath + '</div>' + '<div class="dialog-buttons right">' + '<button id="dialog-btn-add-product" class="ui-button">'
+										+ lang.add + '</button> <button class="ui-button btn-cancel">' + lang.cancel + '</button>' + '</div></div></div>');
 						initAddProductDialog(jQuery);
 					});
 
@@ -40,17 +39,11 @@ $(window).on(
 						e.preventDefault();
 						$("#product-info-dialog").remove();
 						$("body").append(
-								'<div id="product-info-dialog" class="ui-dialog"><div class="ui-dialog-title">Product</div><div class="ui-dialog-content scrollable">'
-										+ '<p><strong>Product</strong> here represents the specific software product automated tests are developed for. '
-										+ 'One Grible instance is meant to have data for automated tests for different software products, '
-										+ 'that is why you can create more than one product.</p>' + '<p><strong>Product</strong> properties:'
-										+ '<ul><li><strong>Name</strong> - name of the product (normally the name of the software product). '
-										+ 'The name is unique within the Grible instance</li><br>'
-										+ '<li><strong>(In JSON version) Path</strong> - full path to the directory where JSON files would be placed. '
-										+ 'E.g. "C:\\Automation\\Product\\Data", where automation framework is in "C:\\Automation\\Product", this way '
-										+ 'JSON data files are kept with the framework in the control version system and are edited with Grible. '
-										+ 'When you delete a product, the directory is not deleted.' + '</li>' + '</ul>' + '</p>' + '<div class="dialog-buttons right">'
-										+ '<button class="ui-button btn-cancel">Close</button>' + '</div></div></div>');
+								'<div id="product-info-dialog" class="ui-dialog"><div class="ui-dialog-title">' + lang.product + '</div><div class="ui-dialog-content scrollable">'
+										+ '<p><strong>' + lang.product + '</strong> ' + lang.productdefinition + '</p>' + '<p><strong>' + lang.product + '</strong> '
+										+ lang.properties + ':' + '<ul><li><strong>' + lang.name + '</strong> - ' + lang.namepropdesr + '</li><br>' + '<li><strong>' + lang.injson
+										+ ' ' + lang.path + '</strong> - '+lang.pathpropdescr + '</li>' + '</ul>' + '</p>' + '<div class="dialog-buttons right">'
+										+ '<button class="ui-button btn-cancel">'+lang.close+'</button>' + '</div></div></div>');
 						initOneButtonDialog(jQuery);
 					});
 
@@ -58,7 +51,7 @@ $(window).on(
 				selector : ".product-item",
 				items : {
 					edit : {
-						name : "Edit product",
+						name : lang.editproduct,
 						icon : "edit",
 						callback : function() {
 							var $id = $(this).attr("id");
@@ -71,23 +64,23 @@ $(window).on(
 						}
 					},
 					"delete" : {
-						name : "Delete product",
+						name : lang.deleteproduct,
 						icon : "delete",
 						callback : function() {
 							var $productItem = $(this);
 							var $id = $productItem.attr("id");
 							var message;
 							if (isJson()) {
-								message = "Are you sure you want to delete this product?<br>(Product directory will not be deleted)";
+								message = lang.suredelproduct + "<br>" + lang.prodnotdeleted;
 							} else {
-								message = "Are you sure you want to delete this product?";
+								message = lang.suredelproduct;
 							}
 							noty({
 								type : "confirm",
 								text : message,
 								buttons : [ {
 									addClass : 'btn btn-primary ui-button',
-									text : 'Delete',
+									text : lang.del,
 									onClick : function($noty) {
 										$noty.close();
 										$.post("DeleteProduct", {
@@ -96,7 +89,7 @@ $(window).on(
 											if (data == "success") {
 												noty({
 													type : "success",
-													text : "The product was deleted.",
+													text : lang.proddeleted,
 													timeout : 3000
 												});
 												$productItem.parents(".table-row").remove();
@@ -110,7 +103,7 @@ $(window).on(
 									}
 								}, {
 									addClass : 'btn btn-danger ui-button',
-									text : 'Cancel',
+									text : lang.cancel,
 									onClick : function($noty) {
 										$noty.close();
 									}
@@ -130,7 +123,7 @@ $(window).on(
 			for (var i = 0; i < productsWhosePathsNotExist.length; i++) {
 				noty({
 					type : "warning",
-					text : "Directory of product '" + productsWhosePathsNotExist[i] + "' does not exist or does not have write permissions."
+					text : lang.dirnotexist1 + " '" + productsWhosePathsNotExist[i] + "' " + lang.dirnotexist2
 				});
 			}
 
@@ -175,10 +168,10 @@ $(window).on(
 						} else if (data == "folder-not-exists") {
 							noty({
 								type : "confirm",
-								text : "Directory '" + $("input.product-path").val() + "' does not exist.<br>Do you want to create it?",
+								text : lang.dir + " '" + $("input.product-path").val() + "' " + lang.confcreatedir,
 								buttons : [ {
 									addClass : 'btn btn-primary ui-button',
-									text : 'Create directory',
+									text : lang.createdir,
 									onClick : function($noty) {
 										$noty.close();
 										$.post("CreateDirectory", {
@@ -206,7 +199,7 @@ $(window).on(
 									}
 								}, {
 									addClass : 'btn btn-danger ui-button',
-									text : 'Cancel',
+									text : lang.cancel,
 									onClick : function($noty) {
 										$noty.close();
 									}

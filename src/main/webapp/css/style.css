@@ -810,11 +810,10 @@ h3.category-item:hover {
 }
 
 #video-tutorial-msg {
-	width: 360px;
 	height: 40px;
 	position: absolute;
 	bottom: 10%;
-	right: 0px;
+	right: 25px;
 	display: none;
 }
 

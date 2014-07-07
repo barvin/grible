@@ -299,9 +299,13 @@ public class PostgresDao implements Dao {
 		if (className != null) {
 			finalClassName = "'" + className + "'";
 		}
+		String categoryId = "null";
+		if (category != null) {
+			categoryId = String.valueOf(category.getId());
+		}
 		Gson gson = new Gson();
 		stmt.executeUpdate("INSERT INTO tables(name, type, categoryid, parentid, classname, keys, values) VALUES ('"
-				+ name + "', " + type.getId() + ", " + category.getId() + ", " + parentId + ", " + finalClassName
+				+ name + "', " + type.getId() + ", " + categoryId + ", " + parentId + ", " + finalClassName
 				+ ", '" + gson.toJson(keys) + "', '" + gson.toJson(escape(values)) + "')");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM tables ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {

@@ -335,8 +335,7 @@ public class GetGeneratedClassDialog extends HttpServlet {
 						}
 					} else {
 						type = refTable.getName();
-						method = "(" + refTable.getName() + ") Enum.Parse(typeof(" + refTable.getName()
-								+ "), GetString(\"" + keyName + "\"));";
+						method = "GetEnum&lt;" + refTable.getName() + "&gt;(\"" + keyName + "\");";
 					}
 				}
 				properties.append("<br>public ").append(type).append(" ").append(keyName)

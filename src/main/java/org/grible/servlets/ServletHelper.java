@@ -33,6 +33,7 @@ import org.grible.model.TableType;
 import org.grible.model.User;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 import org.grible.uimodel.Sections;
 
 public class ServletHelper {
@@ -54,10 +55,9 @@ public class ServletHelper {
 	}
 
 	public static String getFooter(String realPath) {
-		return "<div id=\"footer\"><span class=\"build\">Version: " + getVersion(realPath) + "</span></div>";
+		return "<div id=\"footer\"><span class=\"build\">" + Lang.get("version") + ": " + getVersion(realPath)
+				+ "</span></div>";
 	}
-
-	// <img src=\"" + pathToImg + "/grible_logo_mini.png\">
 
 	public static String getVersion(String realPath) {
 		return getContents(realPath + "/VERSION.txt");
@@ -87,24 +87,24 @@ public class ServletHelper {
 	public static String getUserPanel() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<div id=\"user-panel\"><span id=\"lnk-admin-page\">");
-		builder.append("<a class=\"confirm-needed\" href=\"/admin/\">Admin page</a>");
+		builder.append("<a class=\"confirm-needed\" href=\"/admin/\">" + Lang.get("adminpage") + "</a>");
 		builder.append("</span><span id=\"lnk-settings\"> | <a class=\"confirm-needed\" ");
-		builder.append("href=\"/settings/\">Settings</a></span>");
-		builder.append("<span id=\"lnk-logout\"> | <a class=\"confirm-needed\" ");
-		builder.append("href=\"/logout\">Log out</a></span></div>");
+		builder.append("href=\"/settings/\">" + Lang.get("settings") + "</a></span></div>");
 		return builder.toString();
 	}
 
 	public static String getUserPanel(User user) {
 		StringBuilder builder = new StringBuilder();
-		builder.append("<div id=\"user-panel\"><span id=\"lbl-user\">User: </span><span id=\"userName\">"
-				+ user.getName() + "</span><span id=\"lnk-admin-page\">");
+		builder.append("<div id=\"user-panel\"><span id=\"lbl-user\">" + Lang.get("user")
+				+ ": </span><span id=\"userName\">" + user.getName() + "</span><span id=\"lnk-admin-page\">");
 		if (user.isAdmin()) {
-			builder.append(" | <a class=\"confirm-needed\" href=\"/admin/\">Admin page</a>");
+			builder.append(" | <a class=\"confirm-needed\" href=\"/admin/\">" + Lang.get("adminpage") + "</a>");
 		}
 		builder.append(
-				"</span><span id=\"lnk-settings\"> | <a class=\"confirm-needed\" href=\"/settings/\">Settings</a></span>")
-				.append("<span id=\"lnk-logout\"> | <a class=\"confirm-needed\" href=\"/logout\">Log out</a></span></div>");
+				"</span><span id=\"lnk-settings\"> | <a class=\"confirm-needed\" href=\"/settings/\">"
+						+ Lang.get("settings") + "</a></span>").append(
+				"<span id=\"lnk-logout\"> | <a class=\"confirm-needed\" href=\"/logout\">" + Lang.get("logout")
+						+ "</a></span></div>");
 
 		return builder.toString();
 	}
@@ -152,7 +152,7 @@ public class ServletHelper {
 		responseHtml.append(pathToImg);
 		responseHtml.append("/grible_logo_mini.png\"></span>");
 		responseHtml.append("<a class=\"confirm-needed\" ");
-		responseHtml.append("href=\"/\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
+		responseHtml.append("href=\"/\"><span id=\"home\" class=\"link-infront\">" + Lang.get("home") + "</span></a>");
 		responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 		responseHtml.append("<a class=\"confirm-needed\" href=\"/?product=");
 		responseHtml.append(product.getId()).append("\">");
@@ -175,6 +175,7 @@ public class ServletHelper {
 		responseHtml.append("<link href=\"../css/style.css\" rel=\"stylesheet\" type=\"text/css\" />");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.11.0.min.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-ui.min.js\"></script>");
+		responseHtml.append("<script type=\"text/javascript\" src=\"../lang/current.json\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.handsontable.full.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.hotkeys.js\"></script>");
 		responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery.contextMenu.js\"></script>");
@@ -265,7 +266,7 @@ public class ServletHelper {
 		String os = System.getProperty("os.name").toLowerCase();
 		return (os.contains("win"));
 	}
-	
+
 	public static void setConfigJsonFile() throws Exception {
 		ConfigJson configJson = new ConfigJson();
 		configJson.setProducts(new ArrayList<Product>());

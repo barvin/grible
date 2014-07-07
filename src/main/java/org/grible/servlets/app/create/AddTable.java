@@ -161,8 +161,8 @@ public class AddTable extends HttpServlet {
 					.insertTable(name, type, category, parentId, className, keys, values);
 			out.print(tableId);
 		} catch (Exception e) {
-			out.print(e.getLocalizedMessage());
-			if ((e.getLocalizedMessage() != null) && (!e.getLocalizedMessage().startsWith("ERROR"))) {
+			out.print(e.getMessage());
+			if ((e.getMessage() != null) && (!e.getMessage().startsWith("ERROR"))) {
 				e.printStackTrace();
 			}
 		}

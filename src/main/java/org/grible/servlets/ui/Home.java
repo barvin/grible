@@ -31,6 +31,7 @@ import org.grible.model.User;
 import org.grible.servlets.ServletHelper;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 import org.grible.uimodel.Section;
 import org.grible.uimodel.Sections;
 
@@ -74,6 +75,7 @@ public class Home extends HttpServlet {
 			responseHtml.append("<link href=\"css/jquery.contextMenu.css\" rel=\"stylesheet\" type=\"text/css\" />");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-1.11.0.min.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery-ui.min.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"lang/current.json\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/jquery.contextMenu.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"js/noty/jquery.noty.js\"></script>");
@@ -103,14 +105,19 @@ public class Home extends HttpServlet {
 				responseHtml.append("<form method=\"post\" action=\"Login\">");
 				responseHtml.append("<div id=\"credentials\" class=\"table\">");
 				responseHtml.append("<div class=\"table-row\">");
-				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Username:</div>");
+				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">");
+				responseHtml.append(Lang.get("username"));
+				responseHtml.append(":</div>");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-edit\">");
 				responseHtml.append("<input class=\"dialog-edit\" name=\"username\" style=\"width: 250px\"></div>");
 				responseHtml.append("</div>");
 				responseHtml.append("<div class=\"table-row\">");
-				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Password:</div>");
+				responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">");
+				responseHtml.append(Lang.get("password"));
+				responseHtml.append(":</div>");
 				responseHtml.append("<div class=\"table-cell dialog-cell dialog-edit\">");
-				responseHtml.append("<input type=\"password\" class=\"dialog-edit\" name=\"pass\" style=\"width: 250px\"></div>");
+				responseHtml
+						.append("<input type=\"password\" class=\"dialog-edit\" name=\"pass\" style=\"width: 250px\"></div>");
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");
 				if (request.getParameter("url") != null) {
@@ -126,7 +133,11 @@ public class Home extends HttpServlet {
 				}
 				responseHtml.append("</div>");
 				responseHtml.append("<div class=\"table-cell\">");
-				responseHtml.append("<input type=\"submit\" value=\"Log in\" class=\"ui-button\">");
+
+				responseHtml.append("<script type=\"text/javascript\">document.write(");
+				responseHtml.append("'<input type=\"submit\" value=\"'+ lang['login'] + '\" ");
+				responseHtml.append("class=\"ui-button\">')</script>");
+
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");
@@ -146,7 +157,9 @@ public class Home extends HttpServlet {
 
 				responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
 				responseHtml.append("<span id=\"home-image\"><img src=\"img/grible_logo_mini.png\"></span>");
-				responseHtml.append("<a href=\".\"><span id=\"home\">Home</span></a>");
+				responseHtml.append("<a href=\".\"><span id=\"home\">");
+				responseHtml.append(Lang.get("home"));
+				responseHtml.append("</span></a>");
 
 				if (request.getParameter("product") != null) {
 					if (StringUtils.isNumeric(request.getParameter("product"))) {
@@ -154,8 +167,8 @@ public class Home extends HttpServlet {
 						int id = Integer.parseInt(request.getParameter("product"));
 						Product product = DataManager.getInstance().getDao().getProduct(id);
 						if (product != null) {
-							responseHtml.replace(responseHtml.indexOf(">Home"), responseHtml.indexOf(">Home") + 1,
-									" class=\"link-infront\">");
+							responseHtml.replace(responseHtml.indexOf("id=\"home\">") + 9,
+									responseHtml.indexOf("id=\"home\">") + 10, " class=\"link-infront\">");
 							responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
 							responseHtml.append("<a href=\"?product=" + id + "\"><span id=\"product-name\">");
 							responseHtml.append(product.getName());
@@ -164,7 +177,7 @@ public class Home extends HttpServlet {
 							if (isMultipleUsers() && (!user.hasAccessToProduct(product.getId()))) {
 								responseHtml.append("<br/><br/>");
 								responseHtml.append("<div class=\"error-message\">");
-								responseHtml.append("You do not have permissions to access this page.</div>");
+								responseHtml.append(Lang.get("nopermissions") + "</div>");
 							} else {
 								includeSections(responseHtml, product);
 							}
@@ -197,18 +210,21 @@ public class Home extends HttpServlet {
 						responseHtml.append("<div class=\"under-sections\">");
 						responseHtml.append("<div class=\"icon-button button-enabled\" id=\"btn-add-product\">");
 						responseHtml.append("<img src=\"img/add-icon.png\" class=\"icon-enabled\">");
-						responseHtml.append("<span class=\"icon-button-text\"> Add product</span></div>");
+						responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("addproduct")
+								+ "</span></div>");
 						responseHtml.append("<p><img src=\"img/info-icon.png\"><span class=\"msg-text\">"
-								+ "<a href=\"#\" id=\"lnk-product-info\">What is product?</a></span></p>");
+								+ "<a href=\"#\" id=\"lnk-product-info\">" + Lang.get("whatisproduct")
+								+ "</a></span></p>");
 						responseHtml.append("</div>");
 					}
 
 					responseHtml.append("<div id=\"video-tutorial-msg\">");
 					responseHtml.append("<img src=\"img/info-icon.png\"> ");
-					responseHtml.append("<span class=\"msg-text\">New to Grible? ");
-					responseHtml.append("Watch <a href=\"http://www.grible.org/docs.php#video\" ");
-					responseHtml.append("target=\"_blank\">video tutorial</a> ");
-					responseHtml.append("on the official website.</span>");
+					responseHtml.append("<span class=\"msg-text\">" + Lang.get("newtogrible1"));
+					responseHtml.append("<a href=\"http://www.grible.org/docs.php#video\" ");
+					responseHtml.append("target=\"_blank\">" + Lang.get("video") + "</a>");
+					responseHtml.append(Lang.get("newtogrible2"));
+					responseHtml.append("</span>");
 					responseHtml.append("</div>");
 				}
 				responseHtml.append(ServletHelper.getFooter(getServletContext().getRealPath("")));

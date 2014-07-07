@@ -33,4 +33,15 @@ public enum TableType {
 	public Section getSection() {
 		return this.section;
 	}
+
+	public TableType getParentTableType() {
+		switch (this) {
+		case PRECONDITION:
+		case POSTCONDITION:
+			return TableType.TABLE;
+
+		default:
+			return this;
+		}
+	}
 }

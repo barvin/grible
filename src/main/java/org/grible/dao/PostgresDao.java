@@ -305,8 +305,8 @@ public class PostgresDao implements Dao {
 		}
 		Gson gson = new Gson();
 		stmt.executeUpdate("INSERT INTO tables(name, type, categoryid, parentid, classname, keys, values) VALUES ('"
-				+ name + "', " + type.getId() + ", " + categoryId + ", " + parentId + ", " + finalClassName
-				+ ", '" + gson.toJson(keys) + "', '" + gson.toJson(escape(values)) + "')");
+				+ name + "', " + type.getId() + ", " + categoryId + ", " + parentId + ", " + finalClassName + ", '"
+				+ gson.toJson(keys) + "', '" + gson.toJson(escape(values)) + "')");
 		ResultSet rs = stmt.executeQuery("SELECT id FROM tables ORDER BY id DESC LIMIT 1");
 		if (rs.next()) {
 			id = rs.getInt("id");
@@ -756,10 +756,9 @@ public class PostgresDao implements Dao {
 		Gson gson = new Gson();
 		stmt.executeUpdate("UPDATE tables SET name=" + finalName + ", type=" + table.getType().getId()
 				+ ", classname='" + table.getClassName() + "', categoryid=" + table.getCategoryId() + ", parentid="
-				+ table.getParentId() + ", showwarning=" + table.isShowWarning() + ", modifiedtime='"
-				+ time + "', keys='"
-				+ gson.toJson(table.getKeys()) + "', values='" + gson.toJson(table.getValues()) + "' WHERE id="
-				+ table.getId());
+				+ table.getParentId() + ", showwarning=" + table.isShowWarning() + ", modifiedtime='" + time
+				+ "', keys='" + gson.toJson(table.getKeys()) + "', values='" + gson.toJson(table.getValues())
+				+ "' WHERE id=" + table.getId());
 
 		stmt.close();
 		return time;
@@ -873,16 +872,27 @@ public class PostgresDao implements Dao {
 		stmt.close();
 	}
 
-	public List<Table> getTablesOfProduct(int productId, TableType type) throws Exception {
+	public List<Table> getTablesOfProduct(int productId, TableType tableType) throws Exception {
 		ArrayList<Table> result = new ArrayList<Table>();
 		Connection conn = getConnection();
 		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt
-				.executeQuery("SELECT t.id, t.name, t.categoryid, t.parentid, "
-						+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
-						+ "ON t.type=tt.id AND t.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
-						+ " AND type=(SELECT id FROM tabletypes WHERE name='" + type.toString().toLowerCase()
-						+ "')) ORDER BY t.name");
+		TableType categoryType = tableType.getParentTableType();
+		String query;
+		if (tableType == TableType.PRECONDITION || tableType == TableType.POSTCONDITION) {
+			query = "SELECT t.id, t.name, t.categoryid, t.parentid, "
+					+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t "
+					+ "JOIN tabletypes as tt ON t.type=tt.id " + "JOIN tables as t2 ON t.parentid=t2.id "
+					+ "WHERE t2.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
+					+ " AND type=(SELECT id FROM tabletypes WHERE name='" + categoryType.toString().toLowerCase()
+					+ "')) " + "AND tt.name='" + tableType.toString().toLowerCase() + "' " + "ORDER BY t.name";
+		} else {
+			query = "SELECT t.id, t.name, t.categoryid, t.parentid, "
+					+ "t.classname, t.showwarning, t.modifiedtime, t.keys, t.values, tt.name as type FROM tables as t JOIN tabletypes as tt "
+					+ "ON t.type=tt.id WHERE t.categoryid IN (SELECT id FROM categories WHERE productid=" + productId
+					+ " AND type=(SELECT id FROM tabletypes WHERE name='" + categoryType.toString().toLowerCase()
+					+ "')) ORDER BY t.name";
+		}
+		ResultSet rs = stmt.executeQuery(query);
 		while (rs.next()) {
 			result.add(initTable(rs));
 		}

@@ -4,11 +4,20 @@ public class Key {
 	private String name;
 	private String type;
 	private int refid;
-	
+	private int colWidth;
+
 	public Key(String name, KeyType type, int refid) {
 		setName(name);
 		setType(type);
 		setRefid(refid);
+		setColWidth(80);
+	}
+
+	public Key(String name, KeyType type, int refid, int colWidth) {
+		setName(name);
+		setType(type);
+		setRefid(refid);
+		setColWidth(colWidth);
 	}
 
 	public String getName() {
@@ -34,4 +43,13 @@ public class Key {
 	public void setRefid(int refid) {
 		this.refid = refid;
 	}
+
+	public int getColWidth() {
+		return colWidth;
+	}
+
+	public void setColWidth(int colWidth) {
+		this.colWidth = colWidth;
+	}
+
 }

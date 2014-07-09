@@ -2,6 +2,7 @@ var $isRowsUsageShown = false;
 var $isRowsUsageJustTurnedOn = false;
 var $colTypes = [];
 var $colRefids = [];
+var $colWidth = [];
 var $draggedRowValues = [];
 var $rowNumbers = [];
 var $tableGenerationTime = "";
@@ -968,7 +969,8 @@ function saveTable() {
 	$.post("../SaveTableHead", {
 		keys : $keyNames,
 		keyTypes : $colTypes,
-		keyRefids : $colRefids
+		keyRefids : $colRefids,
+		keyWidth : $colWidth,
 	}, function(data) {
 		if (data == "success") {
 			var $rowsCount = $tableContainer.countRows();
@@ -1295,6 +1297,7 @@ function loadTableValues() {
 			$colNames[i] = $data.keys[i].name;
 			$colTypes[i] = $data.keys[i].type;
 			$colRefids[i] = $data.keys[i].refid;
+			$colWidth[i] = ($data.keys[i].colWidth == 0) ? 80 : $data.keys[i].colWidth;
 		}
 
 		var $columns = $data.columns;
@@ -1343,11 +1346,18 @@ function loadTableValues() {
 			contextMenu : true,
 			rowHeaders : $data.rowHeaders,
 			colHeaders : $colNames,
+			colWidths : $colWidth,
 			currentRowClassName : 'current-row',
 			cells : setColumnTypes,
 			width : $("#table-container").width(),
 			height : $("#table-container").height(),
 			autoWrapRow : true,
+			afterColumnResize : function(col, size) {
+				if ($colWidth[col] != size) {
+					enableSaveButton();
+					$colWidth[col] = size;
+				}
+			},
 			afterGetColHeader : function(col, TH) {
 				TH.setAttribute("type", $colTypes[col]);
 				TH.setAttribute("refid", $colRefids[col]);
@@ -1382,32 +1392,23 @@ function loadTableValues() {
 			},
 			afterCreateRow : function(index, amount) {
 				enableSaveButton();
-				if ($draggedRowValues.length === 0) {
-					// adding row
-					for (var i = 0; i < $columns.length; i++) {
-						if ($columns[i].type === "dropdown") {
-							$tableContainer.handsontable("setDataAtCell", index, i, $columns[i].source[0]);
-						} else if ($columns[i].type === "text" && $columns[i].allowInvalid == false) {
-							$tableContainer.handsontable("setDataAtCell", index, i, "0");
-						} else {
-							$tableContainer.handsontable("setDataAtCell", index, i, "");
-						}
+				for (var i = 0; i < $columns.length; i++) {
+					if ($columns[i].type === "dropdown") {
+						$tableContainer.handsontable("setDataAtCell", index, i, $columns[i].source[0]);
+					} else if ($columns[i].type === "text" && $columns[i].allowInvalid == false) {
+						$tableContainer.handsontable("setDataAtCell", index, i, "0");
+					} else {
+						$tableContainer.handsontable("setDataAtCell", index, i, "");
 					}
-					$rowNumbers.splice(index, 0, -1);
-				} else {
-					// dragging row
-					for (var i = 0; i < $columns.length; i++) {
-						$tableContainer.handsontable("setDataAtCell", index, i, $draggedRowValues[i]);
-					}
-					$draggedRowValues = [];
-					$("#waiting-bg").removeClass("loading");
 				}
+				$rowNumbers.splice(index, 0, -1);
 			},
 			afterCreateCol : function(index, amount) {
 				if (amount == 1) {
 					enableSaveButton();
 					$colTypes.splice(index, 0, "text");
 					$colRefids.splice(index, 0, "0");
+					$colWidth.push(50);
 					$columns.splice(index, 0, {
 						type : "text",
 						allowInvalid : true
@@ -1449,6 +1450,10 @@ function loadTableValues() {
 			afterRemoveCol : function(index, amount) {
 				if (amount == 1) {
 					enableSaveButton();
+					$colWidth.splice($colWidth.length - 1, 1);
+					$colTypes.splice(index, 1);
+					$colRefids.splice(index, 1);
+					$columns.splice(index, 1);
 				}
 			},
 			afterInit : function() {

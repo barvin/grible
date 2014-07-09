@@ -55,11 +55,12 @@ public class SaveTableHead extends HttpServlet {
 			String[] keyNames = request.getParameterValues("keys[]");
 			String[] keyTypes = request.getParameterValues("keyTypes[]");
 			String[] keyRefids = request.getParameterValues("keyRefids[]");
+			String[] keyWidth = request.getParameterValues("keyWidth[]");
 			Key[] keys = new Key[keyNames.length];
 
 			for (int i = 0; i < keys.length; i++) {
 				keys[i] = new Key(keyNames[i], KeyType.valueOf(keyTypes[i].toUpperCase()),
-						Integer.parseInt(keyRefids[i]));
+						Integer.parseInt(keyRefids[i]), Integer.parseInt(keyWidth[i]));
 			}
 
 			table.setKeys(keys);

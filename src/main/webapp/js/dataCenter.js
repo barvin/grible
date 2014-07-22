@@ -1006,6 +1006,7 @@ function saveTable() {
 								}, function(data) {
 									$("#waiting-bg").removeClass("loading");
 									if (data == "success") {
+										$isRowsUsageShown = false;
 										for (var i = 0; i < $rowsCount; i++) {
 											$rowNumbers[i] = i;
 										}

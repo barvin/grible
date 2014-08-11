@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.PostgresDao;
 import org.grible.model.User;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -71,12 +72,12 @@ public class UpdateUser extends HttpServlet {
 						String hashPass = new String(md.digest());
 						dao.updateUserPassword(user.getId(), hashPass);
 					} catch (NoSuchAlgorithmException e) {
-						out.print("ERROR: " + e.getMessage());
+						out.print(Lang.get("error") + ": " + e.getMessage());
 						noErrors = false;
 						e.printStackTrace();
 					}
 				} else {
-					out.print("ERROR: Password 'password' is not permitted. It is too obvious.");
+					out.print(Lang.get("error") + ": " + Lang.get("pswdnotallowed"));
 					noErrors = false;
 				}
 			}

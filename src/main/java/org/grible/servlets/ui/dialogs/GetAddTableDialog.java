@@ -29,6 +29,7 @@ import org.grible.model.TableType;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -81,31 +82,52 @@ public class GetAddTableDialog extends HttpServlet {
 			responseHtml.append("<div id=\"add-data-");
 			responseHtml.append(tableType);
 			responseHtml.append("-dialog\" class=\"ui-dialog\">");
-			responseHtml.append("<div class=\"ui-dialog-title\">Add ");
-			responseHtml.append(tableType);
+			responseHtml.append("<div class=\"ui-dialog-title\">");
+
+			switch (category.getType()) {
+			case TABLE:
+				responseHtml.append(Lang.get("addtable"));
+				break;
+			case STORAGE:
+				responseHtml.append(Lang.get("addstorage"));
+				break;
+			case ENUMERATION:
+				responseHtml.append(Lang.get("addenumeration"));
+				break;
+
+			default:
+				break;
+			}
+
 			responseHtml.append("</div>");
 			responseHtml.append("<div class=\"ui-dialog-content\">");
 			responseHtml.append("<div class=\"table\">");
 			responseHtml.append("<div class=\"table-row\"><div class=\"table-cell dialog-cell dialog-label\">");
-			responseHtml.append("Name:</div><div class=\"table-cell dialog-cell dialog-edit\">");
+			responseHtml.append(Lang.get("name"));
+			responseHtml.append(":</div><div class=\"table-cell dialog-cell dialog-edit\">");
 			responseHtml.append("<input class=\"data-item-name dialog-edit\"></div>");
 			responseHtml.append("</div>");
 
 			if (category.getType() == TableType.STORAGE) {
 				responseHtml.append("<div class=\"table-row\"><div class=\"table-cell dialog-cell dialog-label\">");
-				responseHtml.append("Class name:</div><div class=\"table-cell dialog-cell dialog-edit\">");
+				responseHtml.append(Lang.get("classname"));
+				responseHtml.append(":</div><div class=\"table-cell dialog-cell dialog-edit\">");
 				responseHtml.append("<input class=\"data-storage-class-name dialog-edit\"></div>");
 				responseHtml.append("</div>");
 			}
 
 			responseHtml.append("<div class=\"table-row\">");
-			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Copy existing one:</div>");
+			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">");
+			responseHtml.append(Lang.get("copyexisting"));
+			responseHtml.append(":</div>");
 			responseHtml.append("<div class=\"table-cell dialog-cell\">");
 			responseHtml.append("<input class=\"copy-existing\" type=\"checkbox\"></div>");
 			responseHtml.append("</div>");
 
 			responseHtml.append("<div class=\"table-row\">");
-			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Which one:</div>");
+			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">");
+			responseHtml.append(Lang.get("whichone"));
+			responseHtml.append(":</div>");
 			responseHtml.append("<div class=\"table-cell dialog-cell\">");
 			responseHtml.append("<select class=\"tables-list dialog-edit\" disabled=\"disabled\"\">");
 
@@ -122,15 +144,30 @@ public class GetAddTableDialog extends HttpServlet {
 			responseHtml.append("</div>");
 
 			responseHtml.append("<div class=\"table-row\">");
-			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">Only column names:</div>");
+			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">");
+			responseHtml.append(Lang.get("colsonly"));
+			responseHtml.append(":</div>");
 			responseHtml.append("<div class=\"table-cell dialog-cell\">");
 			responseHtml.append("<input class=\"only-columns\" type=\"checkbox\" disabled=\"disabled\"></div>");
 			responseHtml.append("</div>");
 
-			responseHtml.append("</div>");
-			responseHtml.append("<br/>This ");
-			responseHtml.append(tableType);
-			responseHtml.append(" will be added to the category \"");
+			responseHtml.append("</div><br/>");
+
+			switch (category.getType()) {
+			case TABLE:
+				responseHtml.append(Lang.get("tableaddedto") + " ");
+				break;
+			case STORAGE:
+				responseHtml.append(Lang.get("storageaddedto") + " ");
+				break;
+			case ENUMERATION:
+				responseHtml.append(Lang.get("enumaddedto") + " ");
+				break;
+
+			default:
+				break;
+			}
+
 			responseHtml.append(category.getName());
 			responseHtml.append("\".");
 			responseHtml.append("<div class=\"dialog-buttons right\">");
@@ -138,8 +175,11 @@ public class GetAddTableDialog extends HttpServlet {
 			responseHtml.append(category.getId());
 			responseHtml.append("\" category-path=\"");
 			responseHtml.append(category.getPath());
-			responseHtml
-					.append("\" class=\"ui-button\">Add</button> <button class=\"ui-button btn-cancel\">Cancel</button>");
+			responseHtml.append("\" class=\"ui-button\">");
+			responseHtml.append(Lang.get("add"));
+			responseHtml.append("</button> <button class=\"ui-button btn-cancel\">");
+			responseHtml.append(Lang.get("cancel"));
+			responseHtml.append("</button>");
 			responseHtml.append("</div></div></div>");
 
 			out.print(responseHtml.toString());

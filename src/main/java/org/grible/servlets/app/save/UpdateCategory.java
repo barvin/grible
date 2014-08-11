@@ -27,6 +27,7 @@ import org.grible.model.TableType;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -56,7 +57,7 @@ public class UpdateCategory extends HttpServlet {
 			}
 			String name = request.getParameter("name");
 			if ("".equals(name)) {
-				out.print("ERROR: Category name cannot be empty.");
+				out.print(Lang.get("error") + ": " + Lang.get("categorynameempty"));
 			} else {
 				Category category = null;
 				if (isJson()) {

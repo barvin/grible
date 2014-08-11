@@ -26,6 +26,7 @@ import org.grible.dao.PostgresDao;
 import org.grible.model.Table;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -61,7 +62,7 @@ public class PingModifiedTime extends HttpServlet {
 			int id = Integer.parseInt(request.getParameter("id"));
 			int productId = Integer.parseInt(request.getParameter("product"));
 			Date userStartTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(request.getParameter("time"));
-			
+
 			Table table = null;
 			if (ServletHelper.isJson()) {
 				table = new JsonDao().getTable(id, productId);
@@ -72,7 +73,7 @@ public class PingModifiedTime extends HttpServlet {
 			String message = "";
 
 			if (table.getModifiedTime().after(userStartTime)) {
-				message = "This table was modified somewhere else. Please, refresh the page.";
+				message = Lang.get("tablewasmodified");
 			}
 			out.print(message);
 		} catch (Exception e) {

@@ -18,6 +18,7 @@ import nu.xom.Element;
 import org.grible.servlets.ServletHelper;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class SaveDBSettings
@@ -64,7 +65,7 @@ public class SetJsonAppType extends HttpServlet {
 			out.print("success");
 
 		} catch (Exception e) {
-			out.print("ERROR: " + e.getLocalizedMessage());
+			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {
 			out.flush();

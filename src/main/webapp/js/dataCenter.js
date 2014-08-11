@@ -59,10 +59,10 @@ function initLeftPanel() {
 		if ($("#btn-save-data-item").hasClass("button-enabled")) {
 			noty({
 				type : "confirm",
-				text : "Leave unsaved table?",
+				text : lang.leaveunsaved,
 				buttons : [ {
 					addClass : 'btn btn-primary ui-button',
-					text : 'Yes',
+					text : lang.yes,
 					onClick : function($noty) {
 						$noty.close();
 						$("#btn-save-data-item").removeClass("button-enabled");
@@ -70,7 +70,7 @@ function initLeftPanel() {
 					}
 				}, {
 					addClass : 'btn btn-danger ui-button',
-					text : 'No',
+					text : lang.no,
 					onClick : function($noty) {
 						$noty.close();
 					}
@@ -112,10 +112,10 @@ function initLeftPanel() {
 		if ($("#btn-save-data-item").hasClass("button-enabled")) {
 			noty({
 				type : "confirm",
-				text : "Leave unsaved table?",
+				text : lang.leaveunsaved,
 				buttons : [ {
 					addClass : 'btn btn-primary ui-button',
-					text : 'Yes',
+					text : lang.yes,
 					onClick : function($noty) {
 						$noty.close();
 						$("#btn-save-data-item").removeClass("button-enabled");
@@ -123,7 +123,7 @@ function initLeftPanel() {
 					}
 				}, {
 					addClass : 'btn btn-danger ui-button',
-					text : 'No',
+					text : lang.no,
 					onClick : function($noty) {
 						$noty.close();
 					}
@@ -186,165 +186,170 @@ function initLeftPanel() {
 		loadTopPanel();
 	}
 
-	$
-			.contextMenu({
-				selector : ".category-item",
-				items : {
-					add : {
-						name : "Add " + tableType,
-						icon : "add",
-						callback : function() {
-							var $id = $(this).attr("id");
-							var $args;
-							if (isJson()) {
-								$args = {
-									product : productId,
-									tabletype : tableType,
-									path : getCategoryPath($(this))
-								};
-							} else {
-								$args = {
-									categoryid : $id
-								};
-							}
-							$.post("../GetAddTableDialog", $args, function(data) {
-								$("body").append(data);
-								initAddDataItemDialog(jQuery);
-							});
-						}
-					},
-					import : {
-						name : "Import " + tableType,
-						icon : "import",
-						callback : function() {
-							var $id = $(this).attr("id");
-							var dialogText = "";
-							var servlet = "";
-							var fields = "";
-							if (tableType == "storage") {
-								dialogText = "<br />Only .XLS or .XLSX files are acceptable. Only first sheet will be processed."
-										+ "<br />Make sure \"Index\" column or any other help data is absent. File name would be storage name." + "<br /><br />";
-								servlet = "../StorageImport";
-								fields = '<div class="table"><div class="table-row"><div class="table-cell dialog-cell dialog-label">Class name:</div><div class="table-cell dialog-cell dialog-edit">'
-										+ '<input name="class"></div></div></div>';
-							} else {
-								dialogText = "<br />Only .XLS or .XLSX files are acceptable."
-										+ "<br />First sheet will be processed as the General data sheet."
-										+ "<br />If \"Preconditions\" sheet is present, it will be processed as Preconditions (1st row - the row of keys, 2nd - the row of values)."
-										+ "<br />If \"Postconditions\" sheet is present, it will be processed as Postconditions (1st row - the row of keys, 2nd - the row of values)."
-										+ "<br />Make sure \"Index\" column or any other help data is absent. Table name will be taken from the Excel file name." + "<br /><br />";
-								servlet = "../TableImport";
-							}
-							$("body").append(
-									'<div id="import-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Import data ' + tableType + '</div>'
-											+ '<div class="ui-dialog-content">' + dialogText + '<form action="' + servlet + '?product=' + productId + '&category=' + $id
-											+ '&categorypath=' + getCategoryPath($(this)) + '" method="post" enctype="multipart/form-data">' + fields
-											+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">Browse...</div>'
-											+ '<input id="file" type="file" name="file" size="1"/></div>'
-											+ '<div class="dialog-buttons right"><input type="submit" class="ui-button" value="Import">'
-											+ '</input> <button class="ui-button btn-cancel">Cancel</button></div></form></div></div>');
-							initImportDialog(jQuery);
-						}
-					},
-					sep1 : "---------",
-					addCategory : {
-						name : "Add subcategory",
-						icon : "add",
-						callback : function() {
-							var $id = $(this).attr("id");
-							$("body").append(
-									'<div id="add-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Add category</div>' + '<div class="ui-dialog-content">'
-											+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-											+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>' + '</div>' + '</div>'
-											+ '<div class="dialog-buttons right">' + '<button id="dialog-btn-add-category" parentid="' + $id + '" parent-path="'
-											+ getCategoryPath($(this)) + '" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-											+ '</div></div></div>');
-							initAddCategoryDialog(jQuery);
-						}
-					},
-					edit : {
-						name : "Edit category",
-						icon : "edit",
-						callback : function() {
-							var $id = $(this).attr("id");
-							$("body").append(
-									'<div id="edit-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Edit category</div>' + '<div class="ui-dialog-content">'
-											+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-											+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="' + $(this).text().trim()
-											+ '"></div>' + '</div>' + '</div>' + '<div class="dialog-buttons right">' + '<button id="dialog-btn-edit-category" category-id="' + $id
-											+ '" path="' + getCategoryPath($(this)) + '" class="ui-button">Save</button> <button class="ui-button btn-cancel">Cancel</button>'
-											+ '</div></div></div>');
-							initEditCategoryDialog(jQuery);
-						}
-					},
-					"delete" : {
-						name : "Delete category",
-						icon : "delete",
-						callback : function() {
-							var $thisCategory = $(this);
-							var $id = $thisCategory.attr("id");
-							noty({
-								type : "confirm",
-								text : "Are you sure you want to delete this category?",
-								buttons : [ {
-									addClass : 'btn btn-primary ui-button',
-									text : 'Delete',
-									onClick : function($noty) {
-										$noty.close();
-										var $args;
-										if (isJson()) {
-											$args = {
-												product : productId,
-												tabletype : tableType,
-												path : getCategoryPath($thisCategory)
-											};
-										} else {
-											$args = {
-												id : $id
-											};
-										}
-										$.post("../DeleteCategory", $args, function(data) {
-											if (data == "success") {
-												noty({
-													type : "success",
-													text : "The category was deleted.",
-													timeout : 3000
-												});
-												$thisCategory.remove();
-												history.pushState({
-													product : productId
-												}, "", "?product=" + productId);
-											} else {
-												noty({
-													type : "error",
-													text : data
-												});
-											}
+	var $contextMenuAddItem = "";
+	var $contextMenuImportItem = "";
+	if (tableType == "table") {
+		$contextMenuAddItem = lang.addtable;
+		$contextMenuImportItem = lang.importtable;
+	} else if (tableType == "storage") {
+		$contextMenuAddItem = lang.addstorage;
+		$contextMenuImportItem = lang.importstorage;
+	} else {
+		$contextMenuAddItem = lang.addenumeration;
+	}
+
+	$.contextMenu({
+		selector : ".category-item",
+		items : {
+			add : {
+				name : $contextMenuAddItem,
+				icon : "add",
+				callback : function() {
+					var $id = $(this).attr("id");
+					var $args;
+					if (isJson()) {
+						$args = {
+							product : productId,
+							tabletype : tableType,
+							path : getCategoryPath($(this))
+						};
+					} else {
+						$args = {
+							categoryid : $id
+						};
+					}
+					$.post("../GetAddTableDialog", $args, function(data) {
+						$("body").append(data);
+						initAddDataItemDialog(jQuery);
+					});
+				}
+			},
+			import : {
+				name : $contextMenuImportItem,
+				icon : "import",
+				callback : function() {
+					var $id = $(this).attr("id");
+					var dialogText = "";
+					var servlet = "";
+					var fields = "";
+					if (tableType == "storage") {
+						dialogText = "<br />" + lang.importstorage1 + "<br />" + lang.importstorage2 + "<br /><br />";
+						servlet = "../StorageImport";
+						fields = '<div class="table"><div class="table-row"><div class="table-cell dialog-cell dialog-label">' + lang.classname
+								+ ':</div><div class="table-cell dialog-cell dialog-edit">' + '<input name="class"></div></div></div>';
+					} else {
+						dialogText = "<br />" + lang.tableimport1 + "<br />" + lang.tableimport2 + "<br />" + lang.tableimport3 + "<br />" + lang.tableimport4 + "<br />"
+								+ lang.tableimport5 + "<br /><br />";
+						servlet = "../TableImport";
+					}
+					$("body").append(
+							'<div id="import-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">' + $contextMenuImportItem + '</div>' + '<div class="ui-dialog-content">'
+									+ dialogText + '<form action="' + servlet + '?product=' + productId + '&category=' + $id + '&categorypath=' + getCategoryPath($(this))
+									+ '" method="post" enctype="multipart/form-data">' + fields
+									+ '<div class="fileform"><div id="fileformlabel"></div><div class="selectbutton ui-button">' + lang.browse + '</div>'
+									+ '<input id="file" type="file" name="file" size="1"/></div>'
+									+ '<div class="dialog-buttons right"><input type="submit" class="ui-button" value="' + lang.import + '">'
+									+ '</input> <button class="ui-button btn-cancel">' + lang.cancel + '</button></div></form></div></div>');
+					initImportDialog(jQuery);
+				}
+			},
+			sep1 : "---------",
+			addCategory : {
+				name : lang.addsubcategory,
+				icon : "add",
+				callback : function() {
+					var $id = $(this).attr("id");
+					$("body").append(
+							'<div id="add-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">' + lang.addcategory + '</div>' + '<div class="ui-dialog-content">'
+									+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">' + lang.name
+									+ ':</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>' + '</div>' + '</div>'
+									+ '<div class="dialog-buttons right">' + '<button id="dialog-btn-add-category" parentid="' + $id + '" parent-path="' + getCategoryPath($(this))
+									+ '" class="ui-button">' + lang.add + '</button> <button class="ui-button btn-cancel">' + lang.cancel + '</button>' + '</div></div></div>');
+					initAddCategoryDialog(jQuery);
+				}
+			},
+			edit : {
+				name : lang.editcategory,
+				icon : "edit",
+				callback : function() {
+					var $id = $(this).attr("id");
+					$("body").append(
+							'<div id="edit-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">' + lang.editcategory + '</div>'
+									+ '<div class="ui-dialog-content">' + '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+									+ lang.name + ':</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit" value="' + $(this).text().trim()
+									+ '"></div>' + '</div>' + '</div>' + '<div class="dialog-buttons right">' + '<button id="dialog-btn-edit-category" category-id="' + $id
+									+ '" path="' + getCategoryPath($(this)) + '" class="ui-button">' + lang.save + '</button> <button class="ui-button btn-cancel">' + lang.cancel
+									+ '</button>' + '</div></div></div>');
+					initEditCategoryDialog(jQuery);
+				}
+			},
+			"delete" : {
+				name : lang.deletecategory,
+				icon : "delete",
+				callback : function() {
+					var $thisCategory = $(this);
+					var $id = $thisCategory.attr("id");
+					noty({
+						type : "confirm",
+						text : lang.suredelcategory,
+						buttons : [ {
+							addClass : 'btn btn-primary ui-button',
+							text : lang.del,
+							onClick : function($noty) {
+								$noty.close();
+								var $args;
+								if (isJson()) {
+									$args = {
+										product : productId,
+										tabletype : tableType,
+										path : getCategoryPath($thisCategory)
+									};
+								} else {
+									$args = {
+										product : productId,
+										id : $id
+									};
+								}
+								$.post("../DeleteCategory", $args, function(data) {
+									if (data == "success") {
+										noty({
+											type : "success",
+											text : lang.categorydeleted,
+											timeout : 3000
+										});
+										$thisCategory.remove();
+										history.pushState({
+											product : productId
+										}, "", "?product=" + productId);
+									} else {
+										noty({
+											type : "error",
+											text : data
 										});
 									}
-								}, {
-									addClass : 'btn btn-danger ui-button',
-									text : 'Cancel',
-									onClick : function($noty) {
-										$noty.close();
-									}
-								} ]
-							});
-						}
-					},
-				},
-			});
+								});
+							}
+						}, {
+							addClass : 'btn btn-danger ui-button',
+							text : lang.cancel,
+							onClick : function($noty) {
+								$noty.close();
+							}
+						} ]
+					});
+				}
+			},
+		},
+	});
 
 	$("#btn-add-category").click(
 			function() {
-				$("body")
-						.append(
-								'<div id="add-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Add category</div>' + '<div class="ui-dialog-content">'
-										+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">'
-										+ 'Name:</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>' + '</div>' + '</div>'
-										+ '<div class="dialog-buttons right">'
-										+ '<button id="dialog-btn-add-category" class="ui-button">Add</button> <button class="ui-button btn-cancel">Cancel</button>'
-										+ '</div></div></div>');
+				$("body").append(
+						'<div id="add-category-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">' + lang.addcategory + '</div>' + '<div class="ui-dialog-content">'
+								+ '<div class="table">' + '<div class="table-row"><div class="table-cell dialog-cell dialog-label">' + lang.name
+								+ ':</div><div class="table-cell dialog-cell dialog-edit"><input class="category-name dialog-edit"></div>' + '</div>' + '</div>'
+								+ '<div class="dialog-buttons right">' + '<button id="dialog-btn-add-category" class="ui-button">' + lang.add
+								+ '</button> <button class="ui-button btn-cancel">' + lang.cancel + '</button>' + '</div></div></div>');
 				initAddCategoryDialog(jQuery);
 			});
 
@@ -873,33 +878,48 @@ function initTopPanel() {
 				e.preventDefault();
 				$("#help-dialog").remove();
 				$("body").append(
-						'<div id="help-dialog" class="ui-dialog"><div class="ui-dialog-title">Help</div><div class="ui-dialog-content">'
-								+ '<div class="ui-dialog-content-inner scrollable">' + '<p><h2>Cell context menu</h2></p>' + '<p><img src="../img/scr_cell_context.png"></p>'
-								+ '<p>On a cell context menu you can perform the following actions:' + '<ul><li>Insert row (above or below)</li>'
-								+ '<li>Insert column (on the left or right)</li>' + '<li>Remove row</li>' + '<li>Remove column</li>' + '<li>Undo</li>' + '<li>Redo</li>' + '</ul>'
-								+ '</p>' + '<p><h2>Column header context menu</h2></p>' + '<p><img src="../img/scr_header_context.png"></p>'
-								+ '<p>On a column header context menu you can perform the following actions:' + '<ul><li>Change column name</li>'
-								+ '<li>Change parameter type</li>' + '</ul>' + '</p>' + '<p><h2>Shortcuts</h2></p>' + '<p>You can use the following shortcuts:'
-								+ '<ul><li>Alt + U</i> - insert row above</li>' + '<li><i>Alt + D</i> - insert row below</li>'
-								+ '<li><i> Alt + L</i> - insert column on the left</li>' + '<li><i>Alt + R</i> - insert column on the right</li>'
-								+ '<li><i>Ctrl + Alt + R</i> - Remove row</li>' + '<li><i>Ctrl + Alt + C</i> - Remove column</li>' + '<li><i>Ctrl + Z</i> - Undo</li>'
-								+ '<li><i>Ctrl + Y</i> - Redo</li>' + '</ul>' + '</p>' + '<p><h2>Index ranges</h2></p>'
-								+ '<p>To make your life easier Grible transforms values like <strong>"3;;7"</strong> '
-								+ 'into <strong>"3;4;5;6;7"</strong> if the cell belongs to the storage type parameter. '
-								+ 'This way you can enter large ranges of indexes faster.</p>'
+						'<div id="help-dialog" class="ui-dialog"><div class="ui-dialog-title">' + lang.help + '</div><div class="ui-dialog-content">'
+								+ '<div class="ui-dialog-content-inner scrollable">' + '<p><h2>' + lang.help1 + '</h2></p>' + '<p><img src="../img/scr_cell_context.png"></p>'
+								+ '<p>' + lang.help2 + '<ul><li>' + lang.help3 + '</li>' + '<li>' + lang.help4 + '</li>' + '<li>' + lang.help5 + '</li>' + '<li>' + lang.help6
+								+ '</li>' + '<li>' + lang.help7 + '</li>' + '<li>' + lang.help8 + '</li>' + '</ul>' + '</p>' + '<p><h2>' + lang.help9 + '</h2></p>'
+								+ '<p><img src="../img/scr_header_context.png"></p>' + '<p>' + lang.help10 + '<ul><li>' + lang.help11 + '</li>' + '<li>' + lang.help12 + '</li>'
+								+ '</ul>' + '</p>' + '<p><h2>' + lang.help13 + '</h2></p>' + '<p>' + lang.help14 + '<ul><li>Alt + U</i> - ' + lang.help15 + '</li>'
+								+ '<li><i>Alt + D</i> - ' + lang.help16 + '</li>' + '<li><i> Alt + L</i> - ' + lang.help17 + '</li>' + '<li><i>Alt + R</i> - ' + lang.help18
+								+ '</li>' + '<li><i>Ctrl + Alt + R</i> - ' + lang.help19 + '</li>' + '<li><i>Ctrl + Alt + C</i> - ' + lang.help20 + '</li>'
+								+ '<li><i>Ctrl + Z</i> - ' + lang.help21 + '</li>' + '<li><i>Ctrl + Y</i> - ' + lang.help22 + '</li>' + '</ul>' + '</p>' + '<p><h2>' + lang.help23
+								+ '</h2></p>' + '<p>' + lang.help24 + ' <strong>"3;;7"</strong> ' + lang.help25 + ' <strong>"3;4;5;6;7"</strong> ' + lang.help26 + '</p>'
 
-								+ '</div><div class="dialog-buttons right">' + '<button class="ui-button btn-cancel">Close</button>' + '</div></div></div>');
+								+ '</div><div class="dialog-buttons right">' + '<button class="ui-button btn-cancel">' + lang.close + '</button>' + '</div></div></div>');
 				initOneButtonDialog(jQuery);
 			});
 }
 
 function deleteTable() {
+	var $areYouSure = "";
+	var $wasDeleted = "";
+	if (tableType == "table") {
+		$areYouSure = lang.suredeltable;
+		$wasDeleted = lang.tabledeleted;
+	} else if (tableType == "storage") {
+		$areYouSure = lang.suredelstorage;
+		$wasDeleted = lang.storagedeleted;
+	} else if (tableType == "enumeration") {
+		$areYouSure = lang.suredelenum;
+		$wasDeleted = lang.enumdeleted;
+	} else if (tableType == "precondition") {
+		$areYouSure = lang.suredelprecon;
+		$wasDeleted = lang.postcondeleted;
+	} else if (tableType == "postcondition") {
+		$areYouSure = lang.suredelpostcon;
+		$wasDeleted = lang.postcondeleted;
+	}
+
 	noty({
 		type : "confirm",
-		text : "Are you sure you want to delete this " + tableType + "?",
+		text : $areYouSure,
 		buttons : [ {
 			addClass : 'btn btn-primary ui-button',
-			text : 'Delete',
+			text : lang.del,
 			onClick : function($noty) {
 				$noty.close();
 				$.post("../DeleteTable", {
@@ -909,7 +929,7 @@ function deleteTable() {
 					if (data == "success") {
 						noty({
 							type : "success",
-							text : "The " + tableType + " was deleted.",
+							text : $wasDeleted,
 							timeout : 3000
 						});
 						$(".data-item-selected").remove();
@@ -941,7 +961,7 @@ function deleteTable() {
 			}
 		}, {
 			addClass : 'btn btn-danger ui-button',
-			text : 'Cancel',
+			text : lang.cancel,
 			onClick : function($noty) {
 				$noty.close();
 			}
@@ -1344,6 +1364,7 @@ function loadTableValues() {
 			data : $data.values,
 			manualColumnMove : true,
 			manualColumnResize : true,
+			manualRowMove : true,
 			contextMenu : true,
 			rowHeaders : $data.rowHeaders,
 			colHeaders : $colNames,
@@ -1608,7 +1629,7 @@ function loadTableValues() {
 							selector : ".handsontable thead th:nth-child(" + (i + 1) + ")",
 							items : {
 								name : {
-									name : "Column name",
+									name : lang.columnname,
 									type : 'text',
 									value : $colName,
 									icon : "edit",
@@ -1627,7 +1648,7 @@ function loadTableValues() {
 									type : "radio"
 								},
 								storageradio : {
-									name : "Data storage",
+									name : lang.satastorage,
 									type : "radio",
 									disabled : $isStoragesEmpty
 								},
@@ -1637,7 +1658,7 @@ function loadTableValues() {
 									options : $storages
 								},
 								enumradio : {
-									name : "Enumeration",
+									name : lang.enumeration,
 									type : "radio",
 									disabled : $isEnumerationsEmpty
 								},
@@ -1648,7 +1669,7 @@ function loadTableValues() {
 								},
 								sep2 : "---------",
 								save : {
-									name : "Save",
+									name : lang.save,
 									icon : "save",
 									callback : function(key, opt) {
 										runOptions = opt;
@@ -1750,7 +1771,7 @@ function initTooltipCells(elements) {
 					content : $content
 				};
 				$.post("../GetStorageTooltip", $args, function(data) {
-					if (data.indexOf("ERROR") === 0) {
+					if (data.indexOf(lang.error) === 0) {
 						noty({
 							type : "error",
 							text : data
@@ -1779,7 +1800,7 @@ function initTooltipCells(elements) {
 				content : $content
 			};
 			$.post("../GetStorageTooltip", $args, function(data) {
-				if (data.indexOf("ERROR") === 0) {
+				if (data.indexOf(lang.error) === 0) {
 					noty({
 						type : "error",
 						text : data
@@ -1846,15 +1867,15 @@ function enableSaveButton() {
 }
 
 function showImportResult(message) {
-	if (message.indexOf("WARNING") > 0) {
+	if (message.indexOf(lang.warning) > 0) {
 		noty({
 			type : "success",
-			text : message.substring(0, message.indexOf("WARNING")),
+			text : message.substring(0, message.indexOf(lang.warning)),
 			timeout : 3000
 		});
 		noty({
 			type : "warning",
-			text : message.substring(message.indexOf("WARNING"))
+			text : message.substring(message.indexOf(lang.warning))
 		});
 	} else if (message.indexOf("successfully") > 0) {
 		noty({
@@ -1872,20 +1893,29 @@ function showImportResult(message) {
 
 function showAdvancedImportDialog(currentRowsCount, importedRowsCount) {
 	var noteText = "";
+	var $importExisting = "";
+	var $sameName = "";
+	var $rowsInCurrent = "";
 	if (tableType == "storage") {
+		$importExisting = lang.importexistingstorage;
+		$sameName = lang.samenamestorage;
+		$rowsInCurrent = lang.rowsincurrentstorage;
 	} else {
-		noteText = "<strong>Note:</strong> Only General table will change. Preconditions and Postconditions are ignored.<br /><br />";
+		noteText = "<strong>" + lang.note + ":</strong> " + lang.advimportnote + "<br /><br />";
+		$importExisting = lang.importexistingtable;
+		$sameName = lang.samenametable;
+		$rowsInCurrent = lang.rowsincurrenttable;
 	}
-	var options = '<br/><br/><input type="radio" value="addtoend" name="import-option" checked="checked">Add to the end of the table'
-			+ '<br/><br/><input type="radio" value="addfromrow" name="import-option">Replace from row: ' + '<input id="start-row" size="4" disabled="disabled" value="1"/>';
+
+	var options = '<br/><br/><input type="radio" value="addtoend" name="import-option" checked="checked">' + lang.addtoend
+			+ '<br/><br/><input type="radio" value="addfromrow" name="import-option">' + lang.replacefrom + ': ' + '<input id="start-row" size="4" disabled="disabled" value="1"/>';
 	$("body").append(
-			'<div id="advanced-import-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">Import existing data ' + tableType + '</div>' + '<div class="ui-dialog-content">'
-					+ '<br />Data ' + tableType + ' with the same name was found.<br /><br /><br />' + '<div class="table"><div class="table-row">'
-					+ '<div class="table-cell dialog-cell dialog-label">Rows in the current ' + tableType + ':</div><div class="table-cell dialog-cell">' + currentRowsCount
-					+ '</div></div><div class="table-row"><div class="table-cell dialog-cell dialog-label">Rows in the file being imported:</div>'
-					+ '<div class="table-cell dialog-cell">' + importedRowsCount + '</div></div></div>' + '<br/><br/>How would you like to apply changes?' + options
-					+ '<br /><br />' + noteText + '<div class="dialog-buttons right"><button class="ui-button btn-apply">Apply</button> '
-					+ '<button class="ui-button btn-cancel">Cancel</button></div></div></div>');
+			'<div id="advanced-import-dialog" class="ui-dialog">' + '<div class="ui-dialog-title">' + $importExisting + '</div>' + '<div class="ui-dialog-content">' + '<br />'
+					+ $sameName + '<br /><br /><br />' + '<div class="table"><div class="table-row">' + '<div class="table-cell dialog-cell dialog-label">' + $rowsInCurrent
+					+ ':</div><div class="table-cell dialog-cell">' + currentRowsCount + '</div></div><div class="table-row"><div class="table-cell dialog-cell dialog-label">'
+					+ lang.rowsinfile + ':</div>' + '<div class="table-cell dialog-cell">' + importedRowsCount + '</div></div></div>' + '<br/><br/>' + lang.howapplychanges
+					+ options + '<br /><br />' + noteText + '<div class="dialog-buttons right"><button class="ui-button btn-apply">' + lang.apply + '</button> '
+					+ '<button class="ui-button btn-cancel">' + lang.cancel + '</button></div></div></div>');
 	initAdvancedImportDialog(jQuery);
 }
 
@@ -1958,17 +1988,17 @@ function confirmLeavingUnsavedTable(url) {
 	if ($("#btn-save-data-item").hasClass("button-enabled")) {
 		noty({
 			type : "confirm",
-			text : "Leave unsaved table?",
+			text : lang.leaveunsaved,
 			buttons : [ {
 				addClass : 'btn btn-primary ui-button',
-				text : 'Yes',
+				text : lang.yes,
 				onClick : function($noty) {
 					$noty.close();
 					window.location = url;
 				}
 			}, {
 				addClass : 'btn btn-danger ui-button',
-				text : 'No',
+				text : lang.no,
 				onClick : function($noty) {
 					$noty.close();
 				}

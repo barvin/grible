@@ -26,6 +26,7 @@ import org.grible.model.Table;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -57,9 +58,9 @@ public class EditTable extends HttpServlet {
 			String className = request.getParameter("classname");
 
 			if ("".equals(newName)) {
-				out.print("ERROR: Name cannot be empty.");
+				out.print(Lang.get("error") + ": " + Lang.get("nameempty"));
 			} else if ("".equals(className)) {
-				out.print("ERROR: Class name cannot be empty.");
+				out.print(Lang.get("error") + ": " + Lang.get("classnameempty"));
 			} else {
 				int id = Integer.parseInt(request.getParameter("id"));
 				Integer productId = null;

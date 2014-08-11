@@ -25,6 +25,7 @@ import org.grible.excel.ExcelFile;
 import org.grible.model.Table;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -104,10 +105,10 @@ public class AnvancedImport extends HttpServlet {
 					if (StringUtils.isNumeric(request.getParameter("startrow"))) {
 						startRow = Integer.parseInt(request.getParameter("startrow"));
 					} else {
-						throw new Exception("ERROR: Start row is null.");
+						throw new Exception(Lang.get("error") + ": " + Lang.get("startrownull"));
 					}
 				} else {
-					throw new Exception("ERROR: Start row is null.");
+					throw new Exception(Lang.get("error") + ": " + Lang.get("startrownull"));
 				}
 
 				String[][] excelValues = excelFile.getValues();
@@ -118,7 +119,7 @@ public class AnvancedImport extends HttpServlet {
 
 					int rowsCount = oldValues.length;
 					if (startRow > rowsCount) {
-						throw new Exception("ERROR: Start row is out of range.");
+						throw new Exception(Lang.get("error") + ": " + Lang.get("startrowoutofrange"));
 					}
 					int limit = rowsCount;
 					if (rowsCount < (startRow - 1 + excelValuesCount)) {
@@ -144,7 +145,7 @@ public class AnvancedImport extends HttpServlet {
 
 					int rowsCount = oldValues.length;
 					if (startRow > rowsCount) {
-						throw new Exception("ERROR: Start row is out of range.");
+						throw new Exception(Lang.get("error") + ": " + Lang.get("startrowoutofrange"));
 					}
 					int limit = rowsCount;
 					if (rowsCount < (startRow - 1 + excelValuesCount)) {

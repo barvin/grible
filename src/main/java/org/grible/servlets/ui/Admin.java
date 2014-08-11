@@ -266,7 +266,7 @@ public class Admin extends HttpServlet {
 						}
 					} catch (UnknownHostException e) {
 						e.printStackTrace();
-						responseHtml.append(Lang.get("hostunavailable") + " " + host + Lang.get("checkconnection"));
+						responseHtml.append(Lang.get("error") + ": " + Lang.get("hostunavailable") + " " + host + Lang.get("checkconnection"));
 					} catch (Exception e) {
 						e.printStackTrace();
 						responseHtml.append(Lang.get("error") + ": " + e.getLocalizedMessage());

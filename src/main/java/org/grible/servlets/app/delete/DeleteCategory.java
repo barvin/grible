@@ -30,7 +30,6 @@ import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -90,7 +89,7 @@ public class DeleteCategory extends HttpServlet {
 				if (deleted) {
 					out.print("success");
 				} else {
-					out.print(Lang.get("error") + ": " + Lang.get("categorynotdeleted"));
+					out.print("ERROR: Category was not deleted. See server logs for details.");
 				}
 			}
 

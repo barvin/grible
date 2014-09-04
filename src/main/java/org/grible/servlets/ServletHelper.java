@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.grible.dao.DataManager;
 import org.grible.dao.JsonDao;
 import org.grible.dao.PostgresDao;
@@ -117,9 +118,7 @@ public class ServletHelper {
 		responseHtml.append("<div class=\"top-left-cell\">");
 		responseHtml.append("<div class=\"icon-button button-enabled\"");
 		responseHtml.append("id=\"btn-add-category\"><img src=\"../img/add-icon.png\" class=\"icon-enabled\">");
-		responseHtml.append("<span class=\"icon-button-text\"> ");
-		responseHtml.append(Lang.get("addcategory"));
-		responseHtml.append("</span></div>");
+		responseHtml.append("<span class=\"icon-button-text\"> Add category</span></div>");
 		responseHtml.append("</div>");
 		responseHtml.append("<div class=\"left-panel\">");
 		responseHtml.append("<div id=\"entities-list\">");
@@ -208,18 +207,8 @@ public class ServletHelper {
 					.getTablesUsingStorage(currentTable, productId);
 			if (!tablesUsingThisStorage.isEmpty()) {
 				isUsedByTables = true;
-				error = Lang.get("error") + ": ";
-				switch (currentTable.getType()) {
-				case STORAGE:
-					error += String.format(Lang.get("storageusedby"), currentTable.getName());
-					break;
-				case ENUMERATION:
-					error += String.format(Lang.get("enumeusedby"), currentTable.getName());
-					break;
-
-				default:
-					break;
-				}
+				error = "ERROR: " + StringUtils.capitalize(currentTable.getType().toString().toLowerCase()) + " '"
+						+ currentTable.getName() + "' is used by:";
 				for (Table table : tablesUsingThisStorage) {
 					error += "<br>- " + table.getName() + " (" + table.getType().toString().toLowerCase() + ");";
 				}
@@ -247,25 +236,8 @@ public class ServletHelper {
 			}
 		}
 
-		switch (currentTable.getType()) {
-		case TABLE:
-			return Lang.get("error") + ": " + Lang.get("tablenotdeleted");
-
-		case STORAGE:
-			return Lang.get("error") + ": " + Lang.get("storagenotdeleted");
-
-		case ENUMERATION:
-			return Lang.get("error") + ": " + Lang.get("enumnotdeleted");
-
-		case PRECONDITION:
-			return Lang.get("error") + ": " + Lang.get("preconnotdeleted");
-
-		case POSTCONDITION:
-			return Lang.get("error") + ": " + Lang.get("postconnotdeleted");
-
-		default:
-			return "ERROR";
-		}
+		return "ERROR: " + currentTable.getType().toString().toLowerCase()
+				+ " was not deleted. See server logs for details.";
 	}
 
 	public static boolean isJson() throws Exception {

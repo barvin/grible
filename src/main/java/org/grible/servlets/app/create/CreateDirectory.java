@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.security.Security;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -56,7 +55,7 @@ public class CreateDirectory extends HttpServlet {
 			if (isDirCreated) {
 				out.print("success");
 			} else {
-				out.print(Lang.get("error") + ": " + Lang.get("dir") + " '" + path + "' " + Lang.get("cannotbecreated"));
+				out.print("ERROR: Directory '" + path + "' cannot be created.");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

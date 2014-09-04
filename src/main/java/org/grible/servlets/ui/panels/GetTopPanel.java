@@ -26,7 +26,6 @@ import org.grible.model.TableType;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -70,40 +69,39 @@ public class GetTopPanel extends HttpServlet {
 					table = new PostgresDao().getTable(tableId);
 				}
 				responseHtml.append("<div id=\"manage-buttons\">");
-
+				
 				if (filter == 0) {
 					responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
 					responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
 					responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
-					responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("save") + "</span></div>");
+					responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
 				} else {
 					responseHtml.append("<div id=\"btn-discard-filter\" class=\"icon-button button-enabled\">");
 					responseHtml.append("<img src=\"../img/discard-icon.png\" class=\"icon-enabled\">");
 					responseHtml.append("<img src=\"../img/discard-icon.png\" class=\"icon-disabled\">");
-					responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("discardfilter")
-							+ "</span></div>");
+					responseHtml.append("<span class=\"icon-button-text\"> Discard filter</span></div>");
 				}
 
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("edit") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
 
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("del") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
 
 				responseHtml.append("<div id=\"btn-more\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("more") + "</span>");
-
+				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
+				
 				responseHtml.append("<div id=\"data-item-options\">");
-
+				
 				responseHtml.append("<div id=\"btn-show-usage\" class=\"checkbox-option\">");
 				responseHtml.append("<input id=\"cbx-show-usage\" type=\"checkbox\" />");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("showrowsusage") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Show rows usage</span></div>");
 
 				String warning = "";
 				if (table.isShowWarning()) {
@@ -111,23 +109,23 @@ public class GetTopPanel extends HttpServlet {
 				}
 				responseHtml.append("<div id=\"btn-show-warning\" class=\"checkbox-option\">");
 				responseHtml.append("<input id=\"cbx-show-warning\" type=\"checkbox\" ").append(warning).append(" />");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("showduplicates") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Show duplication warning</span></div>");
 
 				responseHtml.append("<div id=\"btn-class-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/brackets.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("generateclass") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
 
 				responseHtml.append("<div id=\"btn-filter\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/filter-icon.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("filterby") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Filter by...</span></div>");
 
 				responseHtml.append("<div id=\"btn-export-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/export-icon.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("exporttoexcel") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Export to Excel</span></div>");
 
 				responseHtml.append("<div id=\"btn-help\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/info-icon-mini.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("help") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Help</span></div>");
 
 				responseHtml.append("</div></div>");
 
@@ -139,32 +137,32 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
 				responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("save") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
 
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("edit") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
 
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("del") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
 
 				responseHtml.append("<div id=\"btn-more\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("more") + "</span>");
+				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
 
 				responseHtml.append("<div id=\"data-item-options\">");
 
 				responseHtml.append("<div id=\"btn-class-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/brackets.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("generateclass") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Generate class</span></div>");
 
 				responseHtml.append("<div id=\"btn-help\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/info-icon-mini.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("help") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Help</span></div>");
 
 				responseHtml.append("</div></div>");
 
@@ -202,7 +200,7 @@ public class GetTopPanel extends HttpServlet {
 					}
 					showWarning += "<div id=\"btn-show-warning\" class=\"checkbox-option\">";
 					showWarning += "<input id=\"cbx-show-warning\" type=\"checkbox\" " + warning + " />";
-					showWarning += "<span class=\"icon-button-text\">" + Lang.get("showduplicates") + "</span></div>";
+					showWarning += "<span class=\"icon-button-text\">Show duplication warning</span></div>";
 					break;
 
 				case PRECONDITION:
@@ -246,36 +244,36 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div id=\"btn-save-data-item\" class=\"icon-button button-disabled\">");
 				responseHtml.append("<img src=\"../img/save-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/save-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("save") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Save</span></div>");
 
 				responseHtml.append("<div id=\"btn-edit-data-item\" class=\"icon-button ");
 				responseHtml.append(editButtonEnable).append("\">");
 				responseHtml.append("<img src=\"../img/edit-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/edit-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("edit") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Edit</span></div>");
 
 				responseHtml.append("<div id=\"btn-delete-data-item\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/delete-icon-disabled.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("del") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\"> Delete</span></div>");
 
 				responseHtml.append("<div id=\"btn-more\" class=\"icon-button button-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-enabled\">");
 				responseHtml.append("<img src=\"../img/more.png\" class=\"icon-disabled\">");
-				responseHtml.append("<span class=\"icon-button-text\"> " + Lang.get("more") + "</span>");
-
+				responseHtml.append("<span class=\"icon-button-text\"> More</span>");
+				
 				responseHtml.append("<div id=\"data-item-options\">");
-
+				
 				responseHtml.append(showWarning);
-
+				
 				responseHtml.append("<div id=\"btn-export-data-item\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/export-icon.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("exporttoexcel") + "</span></div>");
+				responseHtml.append("<span class=\"icon-button-text\">Export to Excel</span></div>");
 
 				responseHtml.append("<div id=\"btn-help\" class=\"checkbox-option\">");
 				responseHtml.append("<img src=\"../img/info-icon-mini.png\">");
-				responseHtml.append("<span class=\"icon-button-text\">" + Lang.get("help") + "</span></div>");
-
+				responseHtml.append("<span class=\"icon-button-text\">Help</span></div>");
+				
 				responseHtml.append("</div></div>");
 
 				responseHtml.append("</div>");
@@ -286,7 +284,7 @@ public class GetTopPanel extends HttpServlet {
 				responseHtml.append("<div class=\"sheet-tab-top-border\"></div>");
 				responseHtml.append("<div class=\"sheet-tab-top\"></div>");
 				responseHtml.append("<div id=\"").append(tableId).append("\" class=\"sheet-tab\"");
-				responseHtml.append(" label=\"table\">" + Lang.get("general") + "</div>");
+				responseHtml.append(" label=\"table\">General</div>");
 				responseHtml.append("</div>");
 
 				responseHtml.append("<div class=\"sheet-tab-container");
@@ -295,10 +293,10 @@ public class GetTopPanel extends HttpServlet {
 					responseHtml.append("<div class=\"sheet-tab-top-border\"></div>");
 					responseHtml.append("<div class=\"sheet-tab-top\"></div>");
 					responseHtml.append("<div id=\"").append(preId)
-							.append("\" class=\"sheet-tab\" label=\"precondition\">" + Lang.get("preconditions") + "</div>");
+							.append("\" class=\"sheet-tab\" label=\"precondition\">Preconditions</div>");
 				} else {
 					responseHtml.append("<div class=\"add-tab-top\"></div>");
-					responseHtml.append("<div id=\"btn-add-preconditions\" class=\"add-tab\">" + Lang.get("addpreconditions") + "</div>");
+					responseHtml.append("<div id=\"btn-add-preconditions\" class=\"add-tab\">Add preconditions</div>");
 				}
 				responseHtml.append("</div>");
 
@@ -308,11 +306,11 @@ public class GetTopPanel extends HttpServlet {
 					responseHtml.append("<div class=\"sheet-tab-top-border\"></div>");
 					responseHtml.append("<div class=\"sheet-tab-top\"></div>");
 					responseHtml.append("<div id=\"").append(postId)
-							.append("\" class=\"sheet-tab\" label=\"postcondition\">" + Lang.get("postconditions") + "</div>");
+							.append("\" class=\"sheet-tab\" label=\"postcondition\">Postconditions</div>");
 				} else {
 					responseHtml.append("<div class=\"add-tab-top\"></div>");
 					responseHtml
-							.append("<div id=\"btn-add-postconditions\" class=\"add-tab\">" + Lang.get("addpostconditions") + "</div>");
+							.append("<div id=\"btn-add-postconditions\" class=\"add-tab\">Add postconditions</div>");
 				}
 				responseHtml.append("</div>");
 				responseHtml.append("</div>");

@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 import nu.xom.Document;
 import nu.xom.Element;
@@ -87,10 +86,10 @@ public class SaveDBSettings extends HttpServlet {
 			bw.write(result);
 			bw.close();
 
-			out.print("success");
+			out.print("Done.");
 
 		} catch (Exception e) {
-			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
+			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {
 			out.flush();

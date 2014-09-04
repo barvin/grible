@@ -27,7 +27,6 @@ import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -94,10 +93,9 @@ public class Storages extends HttpServlet {
 			}
 
 			if (isMultipleUsers() && (!user.hasAccessToProduct(productId))) {
-				responseHtml.append("<a href=\".\"><span id=\"home\" class=\"header-text\">" + Lang.get("home")
-						+ "</span></a>");
-				responseHtml.append("<br/><br/>" + "<div class=\"error-message\">" + Lang.get("nopermissions")
-						+ "</div>");
+				responseHtml.append("<a href=\".\"><span id=\"home\" class=\"header-text\">Home</span></a>");
+				responseHtml.append("<br/><br/>"
+						+ "<div class=\"error-message\">You do not have permissions to access this page.</div>");
 			} else {
 				responseHtml.append("<script type=\"text/javascript\">");
 				responseHtml.append("var productId = \"").append(productId).append("\";");

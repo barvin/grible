@@ -19,9 +19,18 @@ public class Sections {
 	public static ArrayList<Section> getSections() {
 		if (sections == null) {
 			sections = new ArrayList<Section>();
-			sections.add(new Section("tables", "testtables", "testtablesdescr", "TestTables"));
-			sections.add(new Section("storages", "datastorages", "datastoragesdescr", "DataStorages"));
-			sections.add(new Section("enumerations", "enums", "enumsdescr", "Enumerations"));
+			sections.add(new Section(
+					"tables",
+					"Test Tables",
+					"Tables of input test data for test cases. One test case = one test table. The number of the rows in the table defines the number of the test iterations.",
+					"TestTables"));
+			sections.add(new Section(
+					"storages",
+					"Data Storages",
+					"Reusable sets of parameters. Normally, they represent entities from the application. Each storage can be used by test tables or other storages.",
+					"DataStorages"));
+			sections.add(new Section("enumerations", "Enumerations",
+					"Predefined sets of string values that can be used in tables and storages.", "Enumerations"));
 		}
 		return sections;
 	}

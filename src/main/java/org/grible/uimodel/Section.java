@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.grible.uimodel;
 
-import org.grible.settings.Lang;
-
 public class Section {
 	private String key;
 	private String name;
@@ -30,11 +28,11 @@ public class Section {
 	}
 
 	public String getName() {
-		return Lang.get(name);
+		return name;
 	}
 
 	public String getDescription() {
-		return Lang.get(description);
+		return description;
 	}
 
 	public String getDirName() {

@@ -95,7 +95,7 @@ public class ExportFromDbToJson extends HttpServlet {
 			GlobalSettings.getInstance().getConfigJson().setProducts(new ArrayList<Product>());
 			GlobalSettings.getInstance().getConfigJson().save();
 
-			out.print("success");
+			out.print("Done.");
 		} catch (Exception e) {
 			out.print(e.getLocalizedMessage());
 			e.printStackTrace();

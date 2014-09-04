@@ -116,9 +116,3 @@ body {
 .center {
 	text-align: center;
 }
-
-#img-world {
-	position: relative;
-	top: -55px;
-	left: 330px;
-}

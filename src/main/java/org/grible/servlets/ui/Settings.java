@@ -25,7 +25,6 @@ import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -80,17 +79,15 @@ public class Settings extends HttpServlet {
 			}
 			responseHtml.append("<div id=\"breadcrumb\" class=\"header-text\">");
 			responseHtml.append("<span id=\"home-image\"><img src=\"../img/grible_logo_mini.png\"></span>");
-			responseHtml.append("<a href=\"/\"><span id=\"home\" class=\"link-infront\">" + Lang.get("home")
-					+ "</span></a>");
+			responseHtml.append("<a href=\"/\"><span id=\"home\" class=\"link-infront\">Home</span></a>");
 			responseHtml.append("<span class=\"extends-symbol\">&nbsp;&gt;&nbsp;</span>");
-			responseHtml.append("<a href=\"/settings/\"><span id=\"product-name\">" + Lang.get("settings")
-					+ "</span></a></div>");
+			responseHtml.append("<a href=\"/settings/\"><span id=\"product-name\">Settings</span></a></div>");
 
 			responseHtml.append("<br /><br />");
 			responseHtml.append("<div id=\"settings-page\" class=\"table\">");
 			responseHtml.append("<div class=\"table-row\">");
 			responseHtml.append("<div id=\"admin-users\" class=\"table-cell border-right\">");
-			responseHtml.append("<span class=\"medium-header\">" + Lang.get("tableview") + "</span>");
+			responseHtml.append("<span class=\"medium-header\">Table view</span>");
 			responseHtml.append("<br /><br />");
 
 			String tooltipOnClick = "";
@@ -99,11 +96,10 @@ public class Settings extends HttpServlet {
 			}
 			responseHtml.append("<input id=\"cbx-tooltiponclick\" type=\"checkbox\" ").append(tooltipOnClick)
 					.append(" />");
-			responseHtml.append("<span id=\"option-tooltiponclick\" class=\"label-option\"> " + Lang.get("showonclick")
-					+ "</span>");
+			responseHtml
+					.append("<span id=\"option-tooltiponclick\" class=\"label-option\"> Show storage cell info on click</span>");
 
-			responseHtml.append("<br><br><button id=\"btn-save-settings\" class=\"ui-button\">" + Lang.get("save")
-					+ "</button>");
+			responseHtml.append("<br><br><button id=\"btn-save-settings\" class=\"ui-button\">Save</button>");
 
 			responseHtml.append("</div>"); // cell
 			responseHtml.append("</div>"); // row

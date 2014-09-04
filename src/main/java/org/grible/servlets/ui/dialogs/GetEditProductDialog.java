@@ -24,7 +24,6 @@ import org.grible.model.Product;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -57,18 +56,18 @@ public class GetEditProductDialog extends HttpServlet {
 			String name = product.getName();
 
 			out.println("<div id=\"edit-product-dialog\" class=\"ui-dialog\">");
-			out.println("<div class=\"ui-dialog-title\">" + Lang.get("editproduct") + "</div>");
+			out.println("<div class=\"ui-dialog-title\">Edit product</div>");
 			out.println("<div class=\"ui-dialog-content\">");
 			out.println("<div class=\"table\">");
 			out.println("<div class=\"table-row\">");
-			out.println("<div class=\"table-cell dialog-cell dialog-label\">" + Lang.get("name") + ":</div>");
+			out.println("<div class=\"table-cell dialog-cell dialog-label\">Name:</div>");
 			out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"product-name dialog-edit\" value=\""
 					+ name + "\" size=\"50\"></div>");
 			out.println("</div>");
 
 			if (isPathPresent()) {
 				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell dialog-label\">" + Lang.get("path") + ":</div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-label\">Path:</div>");
 				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"product-path dialog-edit\" disabled=\"disabled\" value=\""
 						+ product.getPath() + "\" size=\"50\"></div>");
 				out.println("</div>");
@@ -76,12 +75,12 @@ public class GetEditProductDialog extends HttpServlet {
 
 			out.println("</div>");
 			out.println("<div class=\"dialog-buttons right\">");
-			out.println("<button id=\"dialog-btn-edit-product\" product-id=\"" + id + "\" class=\"ui-button\">"
-					+ Lang.get("save") + "</button> ");
-			out.println("<button class=\"ui-button btn-cancel\">" + Lang.get("cancel") + "</button> ");
+			out.println("<button id=\"dialog-btn-edit-product\" product-id=\"" + id
+					+ "\" class=\"ui-button\">Save</button> ");
+			out.println("<button class=\"ui-button btn-cancel\">Cancel</button> ");
 			out.println("</div></div></div>");
 		} catch (Exception e) {
-			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
+			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 		out.flush();

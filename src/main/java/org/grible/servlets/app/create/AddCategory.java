@@ -23,7 +23,6 @@ import org.grible.dao.DataManager;
 import org.grible.helpers.StringHelper;
 import org.grible.model.TableType;
 import org.grible.security.Security;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -71,11 +70,11 @@ public class AddCategory extends HttpServlet {
 			}
 
 			if ("".equals(name)) {
-				out.print(Lang.get("error") + ": " + Lang.get("categorynameempty"));
+				out.print("ERROR: Category name cannot be empty.");
 			} else {
 				Integer categoryId = DataManager.getInstance().getDao().getCategoryId(name, productId, tableType, parentId, parentPath);
 				if (categoryId != null) {
-					out.print(Lang.get("error") + ": "+Lang.get("categorywithname")+" '" + name + "' " + Lang.get("alreadyexists"));
+					out.print("ERROR: Category with name '" + name + "' already exists.");
 				} else {
 					try {
 						DataManager.getInstance().getDao().insertCategory(tableType, productId, name, parentId, parentPath);

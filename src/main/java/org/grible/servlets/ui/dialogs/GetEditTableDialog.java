@@ -32,7 +32,6 @@ import org.grible.model.TableType;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -78,43 +77,26 @@ public class GetEditTableDialog extends HttpServlet {
 				String name = table.getName();
 
 				out.println("<div id=\"edit-table-dialog\" class=\"ui-dialog\">");
-				out.println("<div class=\"ui-dialog-title\">");
-
-				switch (table.getType()) {
-				case TABLE:
-					out.println(Lang.get("edittable"));
-					break;
-				case STORAGE:
-					out.println(Lang.get("editstorage"));
-					break;
-				case ENUMERATION:
-					out.println(Lang.get("editenumeration"));
-					break;
-
-				default:
-					break;
-				}
-
-				out.println("</div>");
+				out.println("<div class=\"ui-dialog-title\">Edit " + table.getType().toString().toLowerCase()
+						+ "</div>");
 				out.println("<div class=\"ui-dialog-content\">");
 				out.println("<div class=\"table\">");
 				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell dialog-label\">" + Lang.get("name") + ":</div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-label\">Name:</div>");
 				out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"data-item-name dialog-edit\" value=\""
 						+ name + "\"></div>");
 				out.println("</div>");
 
 				if (table.getType() == TableType.STORAGE) {
 					out.println("<div class=\"table-row\">");
-					out.println("<div class=\"table-cell dialog-cell dialog-label\">" + Lang.get("classname")
-							+ ":</div>");
+					out.println("<div class=\"table-cell dialog-cell dialog-label\">Class name:</div>");
 					out.println("<div class=\"table-cell dialog-cell dialog-edit\"><input class=\"data-storage-class-name dialog-edit\" value=\""
 							+ table.getClassName() + "\"></div>");
 					out.println("</div>");
 				}
 
 				out.println("<div class=\"table-row\">");
-				out.println("<div class=\"table-cell dialog-cell dialog-label\">" + Lang.get("category") + ":</div>");
+				out.println("<div class=\"table-cell dialog-cell dialog-label\">Category:</div>");
 				out.println("<div class=\"table-cell dialog-cell\">");
 				out.println("<select class=\"categories dialog-edit\" \">");
 
@@ -152,11 +134,11 @@ public class GetEditTableDialog extends HttpServlet {
 				out.println("</div>");
 				out.println("<div class=\"dialog-buttons right\">");
 				out.println("<button id=\"dialog-btn-edit-data-item\" class=\"ui-button\">Save</button> ");
-				out.println("<button class=\"ui-button btn-cancel\">" + Lang.get("cancel") + "</button> ");
+				out.println("<button class=\"ui-button btn-cancel\">Cancel</button> ");
 				out.println("</div></div></div>");
 			}
 		} catch (Exception e) {
-			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
+			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 		out.flush();

@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class DBConnect
@@ -48,7 +47,7 @@ public class DBConnect extends HttpServlet {
 			String dbpswd = request.getParameter("dbpswd");
 			Connection con = getConnection(dbhost, dbport, dbname, dblogin, dbpswd);
 			if (con != null) {
-				out.print("success");
+				out.print("Done.");
 				con.close();
 				GlobalSettings.getInstance().setAppType(appType);
 				GlobalSettings.getInstance().setDbHost(dbhost);
@@ -58,7 +57,7 @@ public class DBConnect extends HttpServlet {
 				GlobalSettings.getInstance().setDbPswd(dbpswd);
 			}
 		} catch (Exception e) {
-			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
+			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {
 			out.flush();

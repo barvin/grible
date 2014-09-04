@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.grible.dao.DataManager;
 import org.grible.model.Product;
 import org.grible.security.Security;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -53,9 +52,9 @@ public class UpdateProduct extends HttpServlet {
 			String name = request.getParameter("name");
 			String path = request.getParameter("path");
 			if ("".equals(name)) {
-				out.print(Lang.get("error") + ": " + Lang.get("productnameempty"));
+				out.print("ERROR: Product name cannot be empty.");
 			} else if ("".equals(path)) {
-				out.print(Lang.get("error") + ": " + Lang.get("productpathempty"));
+				out.print("ERROR: Product path cannot be empty.");
 			} else {
 				int productId = Integer.parseInt(request.getParameter("id"));
 				Product product;

@@ -10,12 +10,9 @@
 <body>
 	<img id="login-logo" src="img/grible_logo.png">
 	<span id="title">Grible</span>
-	<img id="img-world" src="img/world.png">
-	<!-- <script type="text/javascript">document.write(lang.)</script> -->
 	<p>
-		<script type="text/javascript">
-			document.write(lang.firsttime)
-		</script>
+		It seems like you are launching the Grible for the first time. <br />Please,
+		choose what type of Grible you want.
 	</p>
 	<div id="type-selection" class="setting-table">
 		<div class="table">
@@ -29,18 +26,18 @@
 			</div>
 			<div class="table-row">
 				<div class="table-cell">
-					<p>
-						<script type="text/javascript">
-							document.write(lang.jsondescr)
-						</script>
-					</p>
+					<p>This Grible is more like a desktop application with web
+						interface. It does not have users. It uses JSON files to store
+						your test data, so you can keep these files within your automation
+						framework in your control version system.</p>
 				</div>
 				<div class="table-cell">
-					<p>
-						<script type="text/javascript">
-							document.write(lang.postgresdescr)
-						</script>
-					</p>
+					<p>This Grible is to be installed on one server and used by
+						multiple users. It uses PostgreSQL database to store your test
+						data, so it is hard to keep different data for the different
+						branches of your automation framework, but you don't need to
+						commit the changes, because tests use the data directly from the
+						database.</p>
 				</div>
 			</div>
 			<div class="table-row">
@@ -56,205 +53,125 @@
 		</div>
 	</div>
 	<div id="postgres-settings" class="setting-table hiddensettings">
-		<script type="text/javascript">
-			document.write("<strong>" + lang.note + ":</strong> " + lang.postgresnotinstalled)
-		</script>
+		<strong>Note:</strong> If you have not installed PostgreSQL, please <a
+			href="http://www.postgresql.org/download/" target="_blank">do it</a>.
 		<br /> <input type="radio" name="createnewdb" value="true"
-			checked="checked">
-		<script type="text/javascript">
-			document.write(lang.nodatayet)
-		</script>
-		<span class="showninfo info"> *</span><br> <input type="radio"
-			name="createnewdb" value="false">
-		<script type="text/javascript">
-			document.write(lang.alreadyhavedata)
-		</script>
+			checked="checked">I have no data yet, I have just created an
+		empty database<span class="showninfo info"> *</span><br> <input
+			type="radio" name="createnewdb" value="false">I already have
+		some data in the Grible database, I am just (re)installing the
+		application
 		<div class="table">
 			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbhost)
-					</script>
-					:
-				</div>
+				<div class="table-cell dialog-cell">Database host:</div>
 				<div class="table-cell dialog-cell">
 					<input class="dialog-edit" name="dbhost" value="localhost">
 				</div>
 			</div>
 			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbport)
-					</script>
-					:
-				</div>
+				<div class="table-cell dialog-cell">Database port:</div>
 				<div class="table-cell dialog-cell">
 					<input class="dialog-edit" name="dbport" value="5432">
 				</div>
 			</div>
 			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbname)
-					</script>
-					:
-				</div>
+				<div class="table-cell dialog-cell">Database name:</div>
 				<div class="table-cell dialog-cell">
 					<input class="dialog-edit" name="dbname" value="grible">
 				</div>
 			</div>
 			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dblogin)
-					</script>
-					:
-				</div>
+				<div class="table-cell dialog-cell">Database user name:</div>
 				<div class="table-cell dialog-cell">
 					<input class="dialog-edit" name="dblogin" value="postgres">
 				</div>
 			</div>
 			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbpswd)
-					</script>
-					:
-				</div>
+				<div class="table-cell dialog-cell">Database user password:</div>
 				<div class="table-cell dialog-cell">
 					<input type="password" class="dialog-edit" name="dbpswd">
 				</div>
 			</div>
 			<div class="table-row">
 				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.gribleadminname)
-					</script>
-					<span class="hiddeninfo info"> * </span>:
+					Grible administrator name<span class="hiddeninfo info"> * </span>:
 				</div>
 				<div class="table-cell dialog-cell">
 					<input class="dialog-edit" name="griblelogin" value="admin">
 				</div>
 			</div>
 			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.gribleadminpswd)
-					</script>
-					:
-				</div>
+				<div class="table-cell dialog-cell">Grible administrator
+					password:</div>
 				<div class="table-cell dialog-cell">
 					<input type="password" class="dialog-edit" name="griblepswd">
 				</div>
 			</div>
 		</div>
-		<span class="hiddeninfo info"><br>* <script
-				type="text/javascript">
-			document.write(lang.pswdwillbeupdated)
-		</script></span> <span class="showninfo info"><br>* <script
-				type="text/javascript">
-			document.write("<strong>" + lang.note + ":</strong> " + lang.dbcreateinadvance)
-		</script></span>
+		<span class="hiddeninfo info"><br>* If the user with this
+			name already exists, the password will be updated.</span> <span
+			class="showninfo info"><br>* Note: database should be
+			created in advance on the specified host.</span>
 		<div class="dialog-buttons right">
-			<script type="text/javascript">
-				document.write('<input id="btn-createdb" type="button" value="'+ lang['createdb'] + '" class="ui-button">')
-			</script>
+			<input id="btn-createdb" type="button" value="Create database"
+				class="ui-button">
 		</div>
 	</div>
 	<div id="json-settings" class="setting-table hiddensettings">
 		<input type="radio" name="exportfromdb" value="false"
-			checked="checked">
-		<script type="text/javascript">
-			document.write(lang.nodatatoexport)
-		</script>
-		<br> <input type="radio" name="exportfromdb" value="true">
-		<script type="text/javascript">
-			document.write(lang.havesomedata)
-		</script>
+			checked="checked"> I do not have any data to export from
+		PostgreSQL database <br> <input type="radio" name="exportfromdb"
+			value="true">I have some data in the Grible database, I would
+		like to export it to JSON files
 		<div class="table">
 			<div class="table-row">
+				<div class="table-cell dialog-cell">Database host:</div>
 				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbhost)
-					</script>
-					:
+					<input class="dialog-edit" name="dbhost" value="localhost" disabled="disabled">
 				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database port:</div>
 				<div class="table-cell dialog-cell">
-					<input class="dialog-edit" name="dbhost" value="localhost"
-						disabled="disabled">
+					<input class="dialog-edit" name="dbport" value="5432" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database name:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dbname" value="grible" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database user name:</div>
+				<div class="table-cell dialog-cell">
+					<input class="dialog-edit" name="dblogin" value="postgres" disabled="disabled">
+				</div>
+			</div>
+			<div class="table-row">
+				<div class="table-cell dialog-cell">Database user password:</div>
+				<div class="table-cell dialog-cell">
+					<input type="password" class="dialog-edit" name="dbpswd" disabled="disabled">
 				</div>
 			</div>
 			<div class="table-row">
 				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbport)
-					</script>
-					:
+					Destination path on your computer:
 				</div>
 				<div class="table-cell dialog-cell">
-					<input class="dialog-edit" name="dbport" value="5432"
-						disabled="disabled">
-				</div>
-			</div>
-			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbname)
-					</script>
-					:
-				</div>
-				<div class="table-cell dialog-cell">
-					<input class="dialog-edit" name="dbname" value="grible"
-						disabled="disabled">
-				</div>
-			</div>
-			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dblogin)
-					</script>
-					:
-				</div>
-				<div class="table-cell dialog-cell">
-					<input class="dialog-edit" name="dblogin" value="postgres"
-						disabled="disabled">
-				</div>
-			</div>
-			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.dbpswd)
-					</script>
-					:
-				</div>
-				<div class="table-cell dialog-cell">
-					<input type="password" class="dialog-edit" name="dbpswd"
-						disabled="disabled">
-				</div>
-			</div>
-			<div class="table-row">
-				<div class="table-cell dialog-cell">
-					<script type="text/javascript">
-						document.write(lang.destinationpath)
-					</script>
-					:
-				</div>
-				<div class="table-cell dialog-cell">
-					<input class="dialog-edit" name="destination"
-						value="C:\Tools\Grible\Temp" disabled="disabled">
+					<input class="dialog-edit" name="destination" value="C:\Tools\Grible\Temp" disabled="disabled">
 				</div>
 			</div>
 		</div>
 		<div class="dialog-buttons right">
-			<input id="btn-export" type="button" value="Finish" class="ui-button">
+			<input id="btn-export" type="button" value="Finish"
+				class="ui-button">
 		</div>
 	</div>
 	<div id="console" class="hiddensettings"></div>
 	<div id="success"></div>
 	<div id="footer" class="page-bottom">
-		<span class="build"><script type="text/javascript">
-			document.write(lang.version)
-		</script>:</span>
+		<span class="build">Version:</span>
 	</div>
 </body>
 </html>

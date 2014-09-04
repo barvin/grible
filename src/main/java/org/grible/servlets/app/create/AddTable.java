@@ -31,7 +31,6 @@ import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -107,27 +106,13 @@ public class AddTable extends HttpServlet {
 
 			String name = request.getParameter("name");
 			if (("").equals(name)) {
-				throw new Exception(Lang.get("error") + ": " + Lang.get("nameempty"));
+				throw new Exception("ERROR: Name cannot be empty.");
 			}
 			TableType type = TableType.valueOf(request.getParameter("tabletype").toUpperCase());
 
 			if (DataManager.getInstance().getDao().isTableInProductExist(name, type, category)) {
-				String errorMessage = "";
-				switch (type) {
-				case TABLE:
-					errorMessage = Lang.get("tablewithname");
-					break;
-				case STORAGE:
-					errorMessage = Lang.get("storagewithname");
-					break;
-				case ENUMERATION:
-					errorMessage = Lang.get("enumwithname");
-					break;
-
-				default:
-					break;
-				}
-				throw new Exception(Lang.get("error") + ": " + errorMessage + " '" + name + "' " + Lang.get("alreadyexists"));
+				throw new Exception("ERROR: " + type.toString().toLowerCase() + " with name '" + name
+						+ "' already exists.");
 			}
 			String className = request.getParameter("classname");
 
@@ -177,7 +162,7 @@ public class AddTable extends HttpServlet {
 			out.print(tableId);
 		} catch (Exception e) {
 			out.print(e.getMessage());
-			if ((e.getMessage() != null) && (!e.getMessage().startsWith(Lang.get("error")))) {
+			if ((e.getMessage() != null) && (!e.getMessage().startsWith("ERROR"))) {
 				e.printStackTrace();
 			}
 		}

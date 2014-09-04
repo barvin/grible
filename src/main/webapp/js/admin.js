@@ -15,7 +15,7 @@ $().ready(
 				if ($("input.username").val() == "") {
 					noty({
 						type : "error",
-						text : Lang.get("error") + ": " + lang.usernameempty
+						text : "ERROR: User name cannot be empty."
 					});
 					isFormCorrect = false;
 				}
@@ -23,7 +23,7 @@ $().ready(
 				if ($("input.pass").val() == "") {
 					noty({
 						type : "error",
-						text : Lang.get("error") + ": " + lang.pswdempty
+						text : "ERROR: Password cannot be empty."
 					});
 					isFormCorrect = false;
 				}
@@ -31,7 +31,7 @@ $().ready(
 				if ($("input.pass").val() != $("input.retype-pass").val()) {
 					noty({
 						type : "error",
-						text : Lang.get("error") + ": " + lang.pswddiff
+						text : "ERROR: Passwords are different."
 					});
 					isFormCorrect = false;
 				}
@@ -160,38 +160,38 @@ $().ready(
 				var formvalid = true;
 				var errors = "";
 				if ($("input[name='dbhost']").val() == "") {
-					errors += "<br>ERROR: '" + lang.dbhost + "' " + lang.empty;
+					errors += "<br>ERROR: 'Database host' is empty.";
 					formvalid = false;
 				}
 				if ($("input[name='dbport']").val() == "") {
-					errors += "<br>ERROR: '" + lang.dbport + "' " + lang.empty;
+					errors += "<br>ERROR: 'Database port' is empty.";
 					formvalid = false;
 				}
 				if ($("input[name='dbname']").val() == "") {
-					errors += "<br>ERROR: '" + lang.dbname + "' " + lang.empty;
+					errors += "<br>ERROR: 'Database name' is empty.";
 					formvalid = false;
 				}
 				if ($("input[name='dblogin']").val() == "") {
-					errors += "<br>ERROR: '" + lang.dblogin + "' " + lang.empty;
+					errors += "<br>ERROR: 'Database user name' is empty.";
 					formvalid = false;
 				}
 				if ($("input[name='dbpswd']").val() == "") {
-					errors += "<br>ERROR: '" + lang.dbpswd + "' " + lang.empty;
+					errors += "<br>ERROR: 'Database user password' is empty.";
 					formvalid = false;
 				}
 
 				if (formvalid) {
 					$.post("../DBConnect", {
-						apptype : "POSTGRESQL",
+						apptype: "POSTGRESQL",
 						dbhost : $("input[name='dbhost']").val(),
 						dbport : $("input[name='dbport']").val(),
 						dbname : $("input[name='dbname']").val(),
 						dblogin : $("input[name='dblogin']").val(),
 						dbpswd : $("input[name='dbpswd']").val(),
 					}, function(data) {
-						if (data == "success") {
+						if (data == "Done.") {
 							$.post("../SaveDBSettings", function(data) {
-								if (data == "success") {
+								if (data == "Done.") {
 									noty({
 										type : "success",
 										text : "Database settings were successfully saved.",
@@ -267,7 +267,7 @@ function initEditUserDialog() {
 		if ($("div#edit-user-dialog input.username").val() == "") {
 			noty({
 				type : "error",
-				text : Lang.get("error") + ": " + lang.usernameempty
+				text : "ERROR: User name cannot be empty."
 			});
 			isFormCorrect = false;
 		}
@@ -275,7 +275,7 @@ function initEditUserDialog() {
 		if ($("div#edit-user-dialog input.pass").val() != $("div#edit-user-dialog input.retype-pass").val()) {
 			noty({
 				type : "error",
-				text : Lang.get("error") + ": " + lang.pswddiff
+				text : "ERROR: Passwords are different."
 			});
 			isFormCorrect = false;
 		}

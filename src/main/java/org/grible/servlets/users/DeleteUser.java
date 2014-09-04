@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.security.Security;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -62,7 +61,7 @@ public class DeleteUser extends HttpServlet {
 			
 			boolean isLastAdmin = dao.getAdminsCount() == 1;
 			if (deletingSelf && isLastAdmin) {
-				out.print(Lang.get("error") + ": " + Lang.get("lastadmin"));
+				out.print("ERROR: You cannot delete yourself, because you are the last administator.");
 			} else {
 				boolean deleted = dao.deleteUser(userId);
 				if (deleted) {
@@ -72,7 +71,7 @@ public class DeleteUser extends HttpServlet {
 						out.print("success");
 					}
 				} else {
-					out.print(Lang.get("error") + ": " + Lang.get("usernotdeleted"));
+					out.print("ERROR: User was not deleted. See server logs for details.");
 				}
 			}
 		} catch (Exception e) {

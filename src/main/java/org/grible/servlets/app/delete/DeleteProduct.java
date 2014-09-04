@@ -27,7 +27,6 @@ import org.grible.model.TableType;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -67,7 +66,7 @@ public class DeleteProduct extends HttpServlet {
 			if (deleted) {
 				out.print("success");
 			} else {
-				out.print(Lang.get("error") + ": " + Lang.get("productnotdeleted"));
+				out.print("ERROR: Product was not deleted. See server logs for details.");
 			}
 
 		} catch (Exception e) {
@@ -87,7 +86,7 @@ public class DeleteProduct extends HttpServlet {
 			for (Table table : tables) {
 				boolean deleted = DataManager.getInstance().getDao().deleteTable(table, productId);
 				if (!deleted) {
-					out.print(Lang.get("error") + ": " + Lang.get("tablenotdeleted"));
+					out.print("ERROR: Table was not deleted. See server logs for details.");
 				}
 			}
 
@@ -96,7 +95,7 @@ public class DeleteProduct extends HttpServlet {
 			} else {
 				boolean deleted = DataManager.getInstance().getDao().deleteCategory(category);
 				if (!deleted) {
-					out.print(Lang.get("error") + ": " + Lang.get("categorynotdeleted"));
+					out.print("ERROR: Category was not deleted. See server logs for details.");
 				}
 			}
 		}

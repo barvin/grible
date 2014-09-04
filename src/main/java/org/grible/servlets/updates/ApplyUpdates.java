@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.security.Security;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class CheckForUpdates
@@ -44,7 +43,7 @@ public class ApplyUpdates extends HttpServlet {
 			out.print("success");
 			runRestartBatchFile();
 		} catch (Exception e) {
-			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
+			out.print("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {
 			out.flush();

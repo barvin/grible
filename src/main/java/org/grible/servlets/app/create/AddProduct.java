@@ -26,7 +26,6 @@ import org.grible.model.Product;
 import org.grible.security.Security;
 import org.grible.settings.AppTypes;
 import org.grible.settings.GlobalSettings;
-import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -59,22 +58,20 @@ public class AddProduct extends HttpServlet {
 			String path = request.getParameter("path");
 
 			if ("".equals(name)) {
-				out.print(Lang.get("error") + ": " + Lang.get("productnameempty"));
+				out.print("ERROR: Product name cannot be empty.");
 			} else if ("".equals(path)) {
-				out.print(Lang.get("error") + ": " + Lang.get("productpathempty"));
+				out.print("ERROR: Product path cannot be empty.");
 			} else {
 				if (isJson() && (!exists(path))) {
 					out.print("folder-not-exists");
 				} else {
 					Product product = DataManager.getInstance().getDao().getProduct(name);
 					if (product != null) {
-						out.print(Lang.get("error") + ": " + Lang.get("productwithname") + " '" + name + "' "
-								+ Lang.get("alreadyexists"));
+						out.print("ERROR: Product with name '" + name + "' already exists.");
 					} else {
 						path = (path == null) ? "" : path;
 						if (isJson() && (new JsonDao().isProductWithPathExists(path))) {
-							out.print(Lang.get("error") + ": " + Lang.get("productwithpath") + " '" + path + "' "
-									+ Lang.get("alreadyexists"));
+							out.print("ERROR: Product with path '" + path + "' already exists.");
 						} else {
 							DataManager.getInstance().getDao().insertProduct(name, path);
 							out.print("success");

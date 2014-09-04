@@ -30,6 +30,7 @@ import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -72,21 +73,22 @@ public class GetRowUsage extends HttpServlet {
 				pDao = new PostgresDao();
 				table = pDao.getTable(tableId);
 			}
-			List<Table> allTablesUsingRow = DataManager.getInstance().getDao().getTablesUsingRow(productId, table, rowOrder + 1);
+			List<Table> allTablesUsingRow = DataManager.getInstance().getDao()
+					.getTablesUsingRow(productId, table, rowOrder + 1);
 			String usageInTables = getTestTableOccurences(allTablesUsingRow);
 			String usageInStorages = getDataStorageOccurences(allTablesUsingRow);
-			
+
 			String result = "";
 			if (!usageInTables.isEmpty() || !usageInStorages.isEmpty()) {
-				result = "ERROR: Cannot delete this row. It is used in:";
+				result = Lang.get("error") + ": " + Lang.get("cannotdeleterow") + ":";
 				if (!usageInTables.isEmpty()) {
-					result += "<br> - tables: " + usageInTables + ";";
+					result += "<br> - " + Lang.get("tables") + ": " + usageInTables + ";";
 				}
 				if (!usageInStorages.isEmpty()) {
-					result += "<br> - storages: " + usageInStorages + ";";
+					result += "<br> - " + Lang.get("storages") + ": " + usageInStorages + ";";
 				}
 			}
-			
+
 			out.print(result);
 
 		} catch (Exception e) {

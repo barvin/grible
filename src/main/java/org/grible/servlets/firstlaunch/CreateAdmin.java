@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.grible.dao.PostgresDao;
 import org.grible.model.User;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class CreateAdmin
@@ -48,9 +49,9 @@ public class CreateAdmin extends HttpServlet {
 				String hashPass = new String(md.digest());
 				int userId = dao.insertUser(gribleLogin, hashPass, true, false);
 				if (userId > 0) {
-					out.print("Done.");
+					out.print("success");
 				} else {
-					out.print("ERROR: It seemed like Grible admin was inserted, but now we cannot find him.");
+					out.print(Lang.get("error") + ": " + Lang.get("cannotfindadmin"));
 				}
 			} else {
 				if (!griblePswd.equals("")) {
@@ -59,9 +60,9 @@ public class CreateAdmin extends HttpServlet {
 					String hashPass = new String(md.digest());
 					dao.updateUserPassword(user.getId(), hashPass);
 					dao.updateUserIsAdmin(user.getId(), true);
-					out.print("Done.");
+					out.print("success");
 				} else {
-					out.print("ERROR: Password for Grible administrator cannot be empty.");
+					out.print(Lang.get("error") + ": " + Lang.get("pswdempty"));
 				}
 			}
 		} catch (Exception e) {
@@ -70,7 +71,7 @@ public class CreateAdmin extends HttpServlet {
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-			out.print("ERROR: " + e.getLocalizedMessage());
+			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {
 			out.flush();

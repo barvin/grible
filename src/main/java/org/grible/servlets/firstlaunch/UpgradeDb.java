@@ -16,6 +16,7 @@ import org.grible.dbmigrate.Migration;
 import org.grible.dbmigrate.MigrationActions;
 import org.grible.dbmigrate.Migrations;
 import org.grible.settings.GlobalSettings;
+import org.grible.settings.Lang;
 import org.postgresql.util.PSQLException;
 
 /**
@@ -54,14 +55,14 @@ public class UpgradeDb extends HttpServlet {
 					dao.executeUpdate("DROP TABLE rows CASCADE");
 				}
 			}
-			out.print("Done.");
+			out.print("success");
 		} catch (Exception e) {
 			try {
 				GlobalSettings.getInstance().eraseDbSettings();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-			out.print("ERROR: " + e.getLocalizedMessage());
+			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} finally {
 			out.flush();

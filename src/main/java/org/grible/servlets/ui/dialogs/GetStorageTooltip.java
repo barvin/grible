@@ -27,6 +27,7 @@ import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -96,7 +97,7 @@ public class GetStorageTooltip extends HttpServlet {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			out.print("ERROR: " + e.getLocalizedMessage());
+			out.print(Lang.get("error") + ": " + e.getLocalizedMessage());
 		} finally {
 			out.flush();
 			out.close();
@@ -149,7 +150,7 @@ public class GetStorageTooltip extends HttpServlet {
 		}
 		result.append("<a href=\"/storages/?").append(productPart).append("id=").append(refTable.getId());
 		result.append("&filter=").append(tableId);
-		result.append("\" target=\"_blank\">Open storage in the new tab</a></div>");
+		result.append("\" target=\"_blank\">" + Lang.get("openinnewtab") + "</a></div>");
 		return result.toString();
 	}
 }

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.grible.dao.PostgresDao;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -65,14 +66,14 @@ public class AddUser extends HttpServlet {
 					}
 					out.print("success");
 				} else {
-					out.print("ERROR: User was not added. See server logs for details.");
+					out.print(Lang.get("error") + ": " + Lang.get("usernotadded"));
 				}
 			} catch (Exception e) {
 				out.print(e.getLocalizedMessage());
 				e.printStackTrace();
 			}
 		} else {
-			out.print("ERROR: Password 'password' is not permitted. It is too obvious.");
+			out.print(Lang.get("error") + ": " + Lang.get("pswdnotallowed"));
 		}
 		out.flush();
 		out.close();

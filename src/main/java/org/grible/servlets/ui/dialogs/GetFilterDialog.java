@@ -24,6 +24,7 @@ import org.grible.dao.DataManager;
 import org.grible.model.Table;
 import org.grible.model.TableType;
 import org.grible.security.Security;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -57,18 +58,24 @@ public class GetFilterDialog extends HttpServlet {
 
 			StringBuilder responseHtml = new StringBuilder();
 			responseHtml.append("<div id=\"filter-dialog\" class=\"ui-dialog\">");
-			responseHtml.append("<div class=\"ui-dialog-title\">Filter storage</div>");
+			responseHtml.append("<div class=\"ui-dialog-title\">");
+			responseHtml.append(Lang.get("filterstorage"));
+			responseHtml.append("</div>");
 			responseHtml.append("<div class=\"ui-dialog-content\">");
-			responseHtml.append("Filter storage by:<br><br>");
+			responseHtml.append(Lang.get("filterstorageby"));
+			responseHtml.append(":<br><br>");
 			responseHtml.append("<div class=\"table\">");
 
 			responseHtml.append("<div class=\"table-row\">");
 			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">");
-			responseHtml.append("<input name=\"table-type\" type=\"radio\" value=\"table\"> table:</div>");
+			responseHtml.append("<input name=\"table-type\" type=\"radio\" value=\"table\"> ");
+			responseHtml.append(Lang.get("bytable"));
+			responseHtml.append(":</div>");
 			responseHtml.append("<div class=\"table-cell dialog-cell\">");
 			responseHtml.append("<select class=\"tables-list dialog-edit\"\">");
 
-			List<Table> tables = DataManager.getInstance().getDao().getTablesUsingStorage(storageId, productId, TableType.TABLE);
+			List<Table> tables = DataManager.getInstance().getDao()
+					.getTablesUsingStorage(storageId, productId, TableType.TABLE);
 			for (Table table : tables) {
 				responseHtml.append("<option value=\"");
 				responseHtml.append(table.getId());
@@ -81,7 +88,9 @@ public class GetFilterDialog extends HttpServlet {
 
 			responseHtml.append("<div class=\"table-row\">");
 			responseHtml.append("<div class=\"table-cell dialog-cell dialog-label\">");
-			responseHtml.append("<input name=\"table-type\" type=\"radio\" value=\"storage\"> storage:</div>");
+			responseHtml.append("<input name=\"table-type\" type=\"radio\" value=\"storage\"> ");
+			responseHtml.append(Lang.get("bystorage"));
+			responseHtml.append(":</div>");
 			responseHtml.append("<div class=\"table-cell dialog-cell\">");
 			responseHtml.append("<select class=\"storage-list dialog-edit\"\">");
 
@@ -98,8 +107,12 @@ public class GetFilterDialog extends HttpServlet {
 
 			responseHtml.append("</div>");
 			responseHtml.append("<div class=\"dialog-buttons right\">");
-			responseHtml.append("<button id=\"dialog-btn-filter\" class=\"ui-button\">Filter</button> "
-					+ "<button class=\"ui-button btn-cancel\">Cancel</button>");
+			responseHtml.append("<button id=\"dialog-btn-filter\" class=\"ui-button\">");
+			responseHtml.append(Lang.get("filter"));
+			responseHtml.append("</button> ");
+			responseHtml.append("<button class=\"ui-button btn-cancel\">");
+			responseHtml.append(Lang.get("cancel"));
+			responseHtml.append("</button>");
 			responseHtml.append("</div></div></div>");
 
 			out.print(responseHtml.toString());

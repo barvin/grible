@@ -29,6 +29,7 @@ import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class GetStorageValues
@@ -77,7 +78,9 @@ public class GetGeneratedClassDialog extends HttpServlet {
 			if (table.getType() == TableType.STORAGE) {
 				className = table.getClassName();
 				result.append("<div id=\"generated-class-dialog\" class=\"ui-dialog\">");
-				result.append("<div class=\"ui-dialog-title\">Generated class</div>");
+				result.append("<div class=\"ui-dialog-title\">");
+				result.append(Lang.get("generatedclass"));
+				result.append("</div>");
 				result.append("<div class=\"ui-dialog-content\">");
 				result.append("<div id=\"tabs\">");
 				result.append("<ul>");
@@ -111,7 +114,9 @@ public class GetGeneratedClassDialog extends HttpServlet {
 				result.append("</div>");
 				result.append("</div>");
 				result.append("<div class=\"dialog-buttons right\">");
-				result.append("<button class=\"ui-button btn-cancel\">Close</button> ");
+				result.append("<button class=\"ui-button btn-cancel\">");
+				result.append(Lang.get("close"));
+				result.append("</button> ");
 				result.append("</div></div></div>");
 			}
 			out.print(result.toString());

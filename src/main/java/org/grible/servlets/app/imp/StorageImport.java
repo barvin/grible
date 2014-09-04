@@ -34,6 +34,7 @@ import org.grible.model.TableType;
 import org.grible.model.json.Key;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class DataFileImport
@@ -134,7 +135,7 @@ public class StorageImport extends HttpServlet {
 		} catch (Exception e) {
 			int productId = Integer.parseInt(request.getParameter("product"));
 			String destination = "/storages/?product=" + productId;
-			String message = "ERROR: " + e.getMessage();
+			String message = Lang.get("error") + ": " + e.getMessage();
 			e.printStackTrace();
 			request.getSession(true).setAttribute("importResult", message);
 			response.sendRedirect(destination);

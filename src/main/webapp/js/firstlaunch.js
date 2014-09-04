@@ -5,23 +5,23 @@ $(window).on(
 			$("input[name='createnewdb'][value='false']").click(function() {
 				$(".showninfo").css("display", "none");
 				$(".hiddeninfo").show();
-				$("#btn-createdb").val("Connect to database");
+				$("#btn-createdb").val(lang.connecttodb);
 			});
 
 			$("input[name='createnewdb'][value='true']").click(function() {
 				$(".hiddeninfo").css("display", "none");
 				$(".showninfo").show();
-				$("#btn-createdb").val("Create database");
+				$("#btn-createdb").val(lang.createdb);
 			});
 
 			$("input[name='exportfromdb'][value='false']").click(function() {
 				$("input.dialog-edit").prop("disabled", true);
-				$("#btn-export").val("Finish");
+				$("#btn-export").val(lang.finish);
 			});
 
 			$("input[name='exportfromdb'][value='true']").click(function() {
 				$("input.dialog-edit").prop("disabled", false);
-				$("#btn-export").val("Export data");
+				$("#btn-export").val(lang.exportdata);
 			});
 
 			$("#btn-select-json").click(function() {
@@ -46,39 +46,39 @@ $(window).on(
 						if ($console.text().length > 0) {
 							$console.append("<br><br>");
 						}
-						writeToConsole("Validating form... ");
+						writeToConsole(lang.validatingform + " ");
 						var formvalid = true;
 						if ($("#postgres-settings input[name='dbhost']").val() == "") {
-							writeToConsole("<br>ERROR: 'Database host' is empty.");
+							writeToConsole("<br>ERROR: '" + lang.dbhost + "' " + lang.empty);
 							formvalid = false;
 						}
 						if ($("#postgres-settings input[name='dbport']").val() == "") {
-							writeToConsole("<br>ERROR: 'Database port' is empty.");
+							writeToConsole("<br>ERROR: '" + lang.dbport + "' " + lang.empty);
 							formvalid = false;
 						}
 						if ($("#postgres-settings input[name='dbname']").val() == "") {
-							writeToConsole("<br>ERROR: 'Database name' is empty.");
+							writeToConsole("<br>ERROR: '" + lang.dbname + "' " + lang.empty);
 							formvalid = false;
 						}
 						if ($("#postgres-settings input[name='dblogin']").val() == "") {
-							writeToConsole("<br>ERROR: 'Database user name' is empty.");
+							writeToConsole("<br>ERROR: '" + lang.dblogin + "' " + lang.empty);
 							formvalid = false;
 						}
 						if ($("#postgres-settings input[name='dbpswd']").val() == "") {
-							writeToConsole("<br>ERROR: 'Database user password' is empty.");
+							writeToConsole("<br>ERROR: '" + lang.dbpswd + "' " + lang.empty);
 							formvalid = false;
 						}
 						if ($("#postgres-settings input[name='griblelogin']").val() == "") {
-							writeToConsole("<br>ERROR: 'Grible administrator name' is empty.");
+							writeToConsole("<br>ERROR: '" + lang.gribleadminname + "' " + lang.empty);
 							formvalid = false;
 						}
 						if ($("#postgres-settings input[name='griblepswd']").val() == "") {
-							writeToConsole("<br>ERROR: 'Grible administrator password' is empty.");
+							writeToConsole("<br>ERROR: '" + lang.gribleadminpswd + "' " + lang.empty);
 							formvalid = false;
 						}
 
 						if (formvalid) {
-							writeToConsole("Done.<br>Connect to database host... ");
+							writeToConsole(lang.done + "<br>" + lang.connecttodbhost + " ");
 
 							// connect to database host
 							$.post("DBConnect", {
@@ -90,47 +90,53 @@ $(window).on(
 								dbpswd : $("#postgres-settings input[name='dbpswd']").val(),
 							}, function(data) {
 
-								writeToConsole(data);
-
-								if (data == "Done.") {
+								if (data == "success") {
 									// create database | validate database
 									// structure
-									var $message = "<br>Creating database... ";
+									writeToConsole(lang.done);
+									var $message = "<br>" + lang.creatingdb + " ";
 									if ($("#postgres-settings input[name='createnewdb'][value='false']").is(":checked")) {
-										$message = "<br>Upgrading database structure if needed... ";
+										$message = "<br>" + lang.upgradingdb + " ";
 									}
 									writeToConsole($message);
 									$.post("InitDB", {
 										createnew : $("#postgres-settings input[name='createnewdb']:checked").attr('value')
 									}, function(data) {
 
-										writeToConsole(data);
-
-										if (data == "Done.") {
+										if (data == "success") {
 											// create Grible administrator
-											writeToConsole("<br>Creating Grible administrator... ");
+											writeToConsole(lang.done);
+											writeToConsole("<br>" + lang.creatinggribgleadmin + " ");
 											$.post("CreateAdmin", {
 												griblelogin : $("#postgres-settings input[name='griblelogin']").val(),
 												griblepswd : $("#postgres-settings input[name='griblepswd']").val()
 											}, function(data) {
 
-												writeToConsole(data);
-
-												if (data == "Done.") {
+												if (data == "success") {
 													// save database settings
-													writeToConsole("<br>Saving database settings... ");
-													$.post("SaveDBSettings", function(data) {
-														writeToConsole(data);
-														if (data == "Done.") {
-															$("#success").html(
-																	"<img src='img/success-icon.png'> " + "Database is successfully initialized. "
-																			+ "<a href='../'>Start Grible</a>.");
-														}
-													});
+													writeToConsole(lang.done);
+													writeToConsole("<br>" + lang.savingdbsettings + " ");
+													$.post("SaveDBSettings",
+															function(data) {
+																if (data == "success") {
+																	writeToConsole(lang.done);
+																	$("#success").html(
+																			"<img src='img/success-icon.png'> " + lang.dbinitialized + " " + "<a href='../'>" + lang.startgrible
+																					+ "</a>.");
+																} else {
+																	writeToConsole(data);
+																}
+															});
+												} else {
+													writeToConsole(data);
 												}
 											});
+										} else {
+											writeToConsole(data);
 										}
 									});
+								} else {
+									writeToConsole(data);
 								}
 							});
 
@@ -140,11 +146,11 @@ $(window).on(
 			$("#btn-export").click(
 					function() {
 						if ($("#json-settings input[value='false']:checked").length > 0) {
-							writeToConsole("Setting up Grible... ");
+							writeToConsole(lang.settingupgrible + " ");
 							$.post("SetJsonAppType", function(data) {
 								if (data == "success") {
-									writeToConsole("Done.");
-									$("#success").html("<img src='img/success-icon.png'> Grible was successfully set up. <a href='../'>Start Grible</a>.");
+									writeToConsole(lang.done);
+									$("#success").html("<img src='img/success-icon.png'> " + lang.griblesetup + " <a href='../'>" + lang.startgrible + "</a>.");
 								} else {
 									writeToConsole(data);
 								}
@@ -154,35 +160,35 @@ $(window).on(
 							if ($console.text().length > 0) {
 								$console.append("<br><br>");
 							}
-							writeToConsole("Validating form... ");
+							writeToConsole(lang.validatingform + " ");
 							var formvalid = true;
 							if ($("#json-settings input[name='dbhost']").val() == "") {
-								writeToConsole("<br>ERROR: 'Database host' is empty.");
+								writeToConsole("<br>ERROR: '" + lang.dbhost + "' " + lang.empty);
 								formvalid = false;
 							}
 							if ($("#json-settings input[name='dbport']").val() == "") {
-								writeToConsole("<br>ERROR: 'Database port' is empty.");
+								writeToConsole("<br>ERROR: '" + lang.dbport + "' " + lang.empty);
 								formvalid = false;
 							}
 							if ($("#json-settings input[name='dbname']").val() == "") {
-								writeToConsole("<br>ERROR: 'Database name' is empty.");
+								writeToConsole("<br>ERROR: '" + lang.dbname + "' " + lang.empty);
 								formvalid = false;
 							}
 							if ($("#json-settings input[name='dblogin']").val() == "") {
-								writeToConsole("<br>ERROR: 'Database user name' is empty.");
+								writeToConsole("<br>ERROR: '" + lang.dblogin + "' " + lang.empty);
 								formvalid = false;
 							}
 							if ($("#json-settings input[name='dbpswd']").val() == "") {
-								writeToConsole("<br>ERROR: 'Database user password' is empty.");
+								writeToConsole("<br>ERROR: '" + lang.dbpswd + "' " + lang.empty);
 								formvalid = false;
 							}
 							if ($("#json-settings input[name='destination']").val() == "") {
-								writeToConsole("<br>ERROR: 'Destination path' is empty.");
+								writeToConsole("<br>ERROR: '" + lang.destpath + "' " + lang.empty);
 								formvalid = false;
 							}
 
 							if (formvalid) {
-								writeToConsole("Done.<br>Connect to database host... ");
+								writeToConsole(lang.done + "<br>" + lang.connecttodbhost + " ");
 
 								// connect to database host
 								$.post("DBConnect", {
@@ -194,26 +200,24 @@ $(window).on(
 									dbpswd : $("#json-settings input[name='dbpswd']").val(),
 								}, function(data) {
 									writeToConsole(data);
-									if (data == "Done.") {
+									if (data == "success") {
 										// upgrade database structure if needed
-										writeToConsole("<br>Upgrading database structure if needed... ");
+										writeToConsole("<br>" + lang.upgradingdb + " ");
 										$.post("UpgradeDb", function(data) {
 											writeToConsole(data);
-											if (data == "Done.") {
+											if (data == "success") {
 												$.post("SaveDBSettings", function(data) {
-													if (data == "Done.") {
-														writeToConsole("<br>Exporting data... ");
+													if (data == "success") {
+														writeToConsole("<br>" + lang.exportingdata + " ");
 														// export data
 														$.post("ExportFromDbToJson", {
 															dest : $("#json-settings input[name='destination']").val()
 														}, function(data) {
 															writeToConsole(data);
-															if (data == "Done.") {
+															if (data == "success") {
 																$("#success").html(
-																		"<img src='img/success-icon.png'> Data was successfully exported."
-																				+ "<br><br>Now move exported files to your frameworks "
-																				+ "(e.g. from 'C:\\Tools\\Grible\\Temp\MyProduct' to 'D:\\PathToFramework\\MyProduct\\data')."
-																				+ "<br>Then <a href='../'>start Grible</a> and add all these products.");
+																		"<img src='img/success-icon.png'> " + lang.dataexported + "<br><br>" + lang.nowmove + "<br>" + lang.then
+																				+ " <a href='../'>" + lang.startgrible2 + "</a> " + lang.andadd);
 															}
 														});
 													}

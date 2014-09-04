@@ -33,6 +33,7 @@ import org.grible.model.json.Key;
 import org.grible.model.json.KeyType;
 import org.grible.security.Security;
 import org.grible.servlets.ServletHelper;
+import org.grible.settings.Lang;
 
 /**
  * Servlet implementation class SaveTable
@@ -83,8 +84,7 @@ public class SaveTableRow extends HttpServlet {
 					String[] strIndexes = value.split(";");
 					for (String index : strIndexes) {
 						if (!StringUtils.isNumeric(index)) {
-							throw new Exception("ERROR: One of indexes in the row " + (rowNumber + 1)
-									+ " is not numeric.");
+							throw new Exception(Lang.get("error") + ": " + String.format(Lang.get("indexnotnumeric"), (rowNumber + 1)));
 						}
 						if (!"0".equals(index)) {
 							Table refTable = null;
@@ -97,10 +97,9 @@ public class SaveTableRow extends HttpServlet {
 								refRows = refTable.getValues();
 							}
 							if (refRows.length < Integer.parseInt(index)) {
-								throw new Exception("ERROR: Data storage '" + refTable.getName()
-										+ "' does not contain row number " + index + ".<br>You specified it in row: "
-										+ (rowNumber + 1)
-										+ ".<br>You must first create this row in the specified data storage.");
+								throw new Exception(Lang.get("error") + ": "
+										+ String.format(Lang.get("norowinstorage"), refTable.getName(), index,
+												(rowNumber + 1)));
 							}
 						}
 					}
@@ -115,8 +114,7 @@ public class SaveTableRow extends HttpServlet {
 
 					List<String> enumValues = DataManager.getInstance().getDao().getValuesByKeyOrder(refTable, 0);
 					if (!enumValues.contains(value)) {
-						throw new Exception("ERROR: Enumeration '" + refTable.getName() + "' does not contain value '"
-								+ value + "'.<br>You specified it in row: " + (rowNumber + 1) + ".");
+						throw new Exception(Lang.get("error") + ": " + String.format(Lang.get("norowinenum"), refTable.getName(), value, (rowNumber + 1)));
 					}
 				}
 			}

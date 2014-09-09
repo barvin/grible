@@ -61,6 +61,7 @@ public class Settings extends HttpServlet {
 			responseHtml.append("<link rel=\"shortcut icon\" href=\"../img/favicon.ico\" >");
 			responseHtml.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/style.css\" />");
 			responseHtml.append("<script type=\"text/javascript\" src=\"../js/jquery-1.11.0.min.js\"></script>");
+			responseHtml.append("<script type=\"text/javascript\" src=\"../lang/current.json\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"../js/settings.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/jquery.noty.js\"></script>");
 			responseHtml.append("<script type=\"text/javascript\" src=\"../js/noty/top.js\"></script>");

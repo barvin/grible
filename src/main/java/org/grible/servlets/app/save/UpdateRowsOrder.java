@@ -107,10 +107,12 @@ public class UpdateRowsOrder extends HttpServlet {
 											String[] indexes = values[i][j].split(";");
 											for (int indexNum = 0; indexNum < indexes.length; indexNum++) {
 												int index = Integer.parseInt(indexes[indexNum]);
-												if (!isTableChanged) {
-													isTableChanged = true;
+												if (index != 0) {
+													if (!isTableChanged) {
+														isTableChanged = true;
+													}
+													indexes[indexNum] = String.valueOf(newRowNumbers.get(index));
 												}
-												indexes[indexNum] = String.valueOf(newRowNumbers.get(index));
 											}
 											values[i][j] = StringUtils.join(indexes, ";");
 										}

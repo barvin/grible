@@ -11,10 +11,10 @@
 package org.grible.model;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -148,10 +148,10 @@ public class Table {
 	}
 
 	public void save() throws Exception {
-		FileWriter fw = new FileWriter(file);
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(new Gson().toJson(tableJson));
-		bw.close();
+		FileOutputStream fw = new FileOutputStream(file);
+		OutputStreamWriter osw = new OutputStreamWriter(fw, "UTF-8");
+		osw.write(new Gson().toJson(tableJson));
+		osw.close();
 	}
 
 	public void setTableJson() throws Exception {

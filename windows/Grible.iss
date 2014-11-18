@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Grible"
-#define MyAppVersion "0.9.0"
+#define MyAppVersion "0.9.3"
 #define MyAppPublisher "Grible Team"
 #define MyAppURL "http://localhost:8123"
 #define MyAppSiteURL "http://www.grible.org/"
@@ -25,7 +25,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile={#BaseDir}\LISENCE.txt
 OutputDir=D:\Tools\InnoOutput
-OutputBaseFilename=grible
+OutputBaseFilename=grible-64bit
 SetupIconFile={#BaseDir}\grible.ico
 Compression=lzma
 SolidCompression=yes

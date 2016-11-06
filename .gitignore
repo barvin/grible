@@ -2,6 +2,7 @@
 *.class
 
 # IDE files #
+/.idea
 /.settings
 .classpath
 .buildpath

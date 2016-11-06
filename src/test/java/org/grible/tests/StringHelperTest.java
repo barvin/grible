@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.grible.tests;
 
+import java.io.File;
+
 import org.assertj.core.api.Assertions;
 import org.grible.helpers.StringHelper;
 import org.testng.annotations.Test;
-
-import java.io.File;
 
 public class StringHelperTest {
 

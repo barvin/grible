@@ -63,7 +63,7 @@ public class BaseTest {
         webAppThread = new Thread(task);
         webAppThread.start();
         try {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(10);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

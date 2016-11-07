@@ -13,7 +13,6 @@ package org.grible.tests.integration;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import io.github.bonigarcia.wdm.MarionetteDriverManager;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.plus.webapp.EnvConfiguration;
 import org.eclipse.jetty.plus.webapp.PlusConfiguration;
@@ -26,12 +25,12 @@ import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
-import io.github.bonigarcia.wdm.PhantomJsDriverManager;
+import io.github.bonigarcia.wdm.MarionetteDriverManager;
 
 public class BaseTest {
     private Thread webAppThread;
@@ -40,10 +39,6 @@ public class BaseTest {
     @BeforeSuite
     public void beforeSuite() {
         MarionetteDriverManager.getInstance().setup();
-    }
-
-    @BeforeMethod
-    public void beforeAnyTest() {
         Runnable task = () -> {
             Server server = new Server(8123);
             WebAppContext webapp = new WebAppContext();
@@ -70,6 +65,10 @@ public class BaseTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @BeforeMethod
+    public void beforeAnyTest() {
         browser = new FirefoxDriver();
     }
 
@@ -78,6 +77,10 @@ public class BaseTest {
         if (browser != null) {
             browser.quit();
         }
+    }
+
+    @AfterSuite
+    public void afterSuite() {
         if (webAppThread != null && webAppThread.isAlive()) {
             webAppThread.interrupt();
         }

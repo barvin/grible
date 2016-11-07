@@ -13,7 +13,7 @@ package org.grible.tests.integration;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import io.github.bonigarcia.wdm.ChromeDriverManager;
+import io.github.bonigarcia.wdm.MarionetteDriverManager;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.plus.webapp.EnvConfiguration;
 import org.eclipse.jetty.plus.webapp.PlusConfiguration;
@@ -25,10 +25,13 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.webapp.WebInfConfiguration;
 import org.eclipse.jetty.webapp.WebXmlConfiguration;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+
+import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 
 public class BaseTest {
     private Thread webAppThread;
@@ -36,7 +39,7 @@ public class BaseTest {
 
     @BeforeSuite
     public void beforeSuite() {
-        ChromeDriverManager.getInstance().setup();
+        MarionetteDriverManager.getInstance().setup();
     }
 
     @BeforeMethod
@@ -63,11 +66,11 @@ public class BaseTest {
         webAppThread = new Thread(task);
         webAppThread.start();
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(7);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        browser = new ChromeDriver();
+        browser = new FirefoxDriver();
     }
 
     @AfterMethod

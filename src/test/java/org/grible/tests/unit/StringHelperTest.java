@@ -8,7 +8,7 @@
  * Contributors:
  *     Maksym Barvinskyi - initial API and implementation
  ******************************************************************************/
-package org.grible.tests;
+package org.grible.tests.unit;
 
 import java.io.File;
 

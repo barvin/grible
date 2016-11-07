@@ -58,6 +58,7 @@ public class FirstLaunch extends HttpServlet {
 				out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\" />");
 				out.println("<script type=\"text/javascript\" src=\"js/jquery-1.11.0.min.js\"></script>");
 				out.println("<script type=\"text/javascript\" src=\"js/home.js\"></script>");
+				out.println("<script type=\"text/javascript\" src=\"lang/current.json\"></script>");
 				out.println("</head>");
 				out.println("<body>");
 				out.println("<a href=\".\"><img id=\"logo-mini\" src=\"img/grible_logo_mini.png\"></a>");

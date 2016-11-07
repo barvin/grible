@@ -16,9 +16,15 @@ import org.testng.annotations.Test;
 public class GribleStartIT extends BaseTest {
 
     @Test
-    public void startGrible() {
+    public void testHomePageTitle() {
         browser.get("localhost:8123");
         Assertions.assertThat(browser.getTitle()).isEqualTo("First launch - Grible");
+    }
+
+    @Test
+    public void testHomePageUrl() {
+        browser.get("localhost:8123");
+        Assertions.assertThat(browser.getCurrentUrl()).contains("firstlaunch");
     }
 
 }

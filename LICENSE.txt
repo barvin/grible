@@ -1,5 +1,5 @@
 Grible - data-driven cross-platform solution.
-Copyright (C) 2013  Maksym Barvinskyi.
+Copyright (C) 2013 - 2018  Maksym Barvinskyi.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
